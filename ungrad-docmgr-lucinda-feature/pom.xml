@@ -2,11 +2,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>ch.rgw</groupId>
-    <version>1.0.0-SNAPSHOT</version>
-    <artifactId>docmgr-lucinda-aggregator
+    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>elexis-ungrad-aggregator
 </artifactId>
   </parent>
-  <artifactId>ch.rgw.elexis.docmgr-lucinda.feature</artifactId>
+  <artifactId>ch.elexis.ungrad.docmgr-lucinda.feature</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
   
