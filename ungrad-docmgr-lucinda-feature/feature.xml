@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="ch.elexis.ungrad.docmgr-lucinda.feature"
+      label="Document Manager based on Lucinda"
+      version="1.0.0.qualifier"
+      provider-name="G. Weirich"
+      os="linux,macosx,win32"
+      ws="cocoa,gtk,win32">
+
+   <description url="http://github.com/rgwch/Lucinda">
+      A Lucene based document manager for Elexis
+   </description>
+
+   <copyright>
+      Copyright (c) 2016 by G. Weirich
+   </copyright>
+
+   <license url="https://www.eclipse.org/legal/epl-v10.html">
+      Eclipse Public License v1.0
+   </license>
+
+   <requires>
+      <import plugin="ch.elexis.core" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="ch.rgw.utility" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.core.data" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.core.ui" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.8.2" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.core.ui.icons" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.omnivore" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.8.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="ch.elexis.ungrad.docmgr-lucinda"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

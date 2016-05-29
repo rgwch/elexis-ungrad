@@ -1,0 +1,24 @@
+**/.DS_Store
+**/.metadata
+**/.idea
+**/bin/
+**/*tmp/
+**/*.tmp
+**/*.bak
+**/*.swp
+**/*~.nib
+**/local.properties
+**/.settings/
+**/*.log
+**/*.iml
+
+# Locally stored "Eclipse launch configurations"
+**/*.launch
+
+# JDT-specific (Eclipse Java Development Tools)
+**/.classpath
+
+# Created by .ignore support plugin (hsz.mobi)
+**/target/
+**/dependency-reduced-pom.xml
+/lib/

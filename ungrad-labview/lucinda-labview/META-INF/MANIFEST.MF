@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ungrad Labview
+Bundle-SymbolicName: ch.elexis.ungrad.labview
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: ch.elexis.core;bundle-version="3.2.0",
+ ch.elexis.core.data;bundle-version="3.2.0"
+Bundle-Vendor: G. Weirich
