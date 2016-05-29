@@ -1,9 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ungrad Labview
-Bundle-SymbolicName: ch.elexis.ungrad.labview
+Bundle-SymbolicName: ch.elexis.ungrad.labview;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: ch.elexis.core;bundle-version="3.2.0",
- ch.elexis.core.data;bundle-version="3.2.0"
+ ch.elexis.core.data;bundle-version="3.2.0",
+ ch.rgw.utility;bundle-version="3.2.0",
+ org.eclipse.ui;bundle-version="3.8.2",
+ org.eclipse.core.runtime;bundle-version="3.8.0",
+ ch.elexis.core.ui,
+ org.eclipse.nebula.widgets.nattable.core;bundle-version="1.0.1",
+ org.eclipse.nebula.widgets.nattable.extension.glazedlists;bundle-version="1.0.1"
 Bundle-Vendor: G. Weirich
