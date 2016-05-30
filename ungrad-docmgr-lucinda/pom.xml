@@ -10,6 +10,9 @@
     <packaging>eclipse-plugin</packaging>
     <groupId>ch.rgw</groupId>
     <version>1.0.2-SNAPSHOT</version>
+    <properties>
+        <clientlib>lucinda-client-0.4.2-SNAPSHOT.jar</clientlib>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -19,12 +22,12 @@
                         <phase>validate</phase>
                         <configuration>
                             <tasks>
-                            <copy todir="lib">
+                            <!-- copy todir="lib">
                             	<fileset dir="../lucinda-client/target">
                             		<include name="lucinda-client*.jar"></include>
                             	</fileset>
-                            </copy>
-                                <!--   copy file="../lucinda-client/target/lucinda-client-0.4.2-SNAPSHOT.jar" todir="lib"/ -->
+                            <copy -->
+                                <get src="http://www.elexis.ch/ungrad/products/lucinda/latest/${clientlib}" dest="lib/${clientlib}"/>
                             </tasks>
                         </configuration>
                         <goals>
