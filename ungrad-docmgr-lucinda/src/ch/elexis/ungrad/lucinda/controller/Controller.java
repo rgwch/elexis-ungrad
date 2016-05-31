@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -67,7 +69,8 @@ public class Controller implements Handler, IProgressController {
 	long actMax;
 	int div;
 	int actValue;
-	private DocumentFilter docFilter = new DocumentFilter();
+	// private DocumentFilter docFilter = new DocumentFilter();
+	private Set<String> allowed_doctypes=new TreeSet<>();
 
 	public Controller() {
 		lucinda = Activator.getDefault().getLucinda();
@@ -87,13 +90,13 @@ public class Controller implements Handler, IProgressController {
 
 	public Composite createView(Composite parent) {
 		if (Preferences.cfg.get(Preferences.SHOW_CONS, true)) {
-			docFilter.add(Preferences.KONSULTATION_NAME);
+			allowed_doctypes.add(Preferences.KONSULTATION_NAME);
 		}
 		if (Preferences.cfg.get(Preferences.SHOW_OMNIVORE, true)) {
-			docFilter.add(Preferences.OMNIVORE_NAME);
+			allowed_doctypes.add(Preferences.OMNIVORE_NAME);
 		}
 		if (Preferences.cfg.get(Preferences.SHOW_INBOX, true)) {
-			docFilter.add(Preferences.INBOX_NAME);
+			allowed_doctypes.add(Preferences.INBOX_NAME);
 		}
 
 		view = new GlobalViewPane(parent, this);
@@ -119,7 +122,7 @@ public class Controller implements Handler, IProgressController {
 
 	public IStructuredContentProvider getContentProvider(TableViewer tv) {
 		viewer = tv;
-		tv.addFilter(docFilter);
+		//tv.addFilter(docFilter);
 		return cnt;
 
 	}
@@ -188,6 +191,12 @@ public class Controller implements Handler, IProgressController {
 
 	}
 
+	private String buildQuery(String input){
+		StringBuilder q=new StringBuilder("+(");
+		
+		
+		return q.toString();
+	}
 	public void loadDocument(final Document doc) {
 		String doctype = doc.get(Preferences.FLD_LUCINDA_DOCTYPE);
 
@@ -323,9 +332,9 @@ public class Controller implements Handler, IProgressController {
 	 */
 	public void toggleDoctypeFilter(boolean bOn, String doctype) {
 		if (bOn) {
-			docFilter.add(doctype);
+			allowed_doctypes.add(doctype);
 		} else {
-			docFilter.remove(doctype);
+			allowed_doctypes.remove(doctype);
 		}
 		viewer.refresh();
 	}
