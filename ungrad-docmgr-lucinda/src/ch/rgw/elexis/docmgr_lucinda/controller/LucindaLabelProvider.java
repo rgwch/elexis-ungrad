@@ -15,7 +15,7 @@
 package ch.rgw.elexis.docmgr_lucinda.controller;
 
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
-import ch.rgw.elexis.docmgr_lucinda.Preferences;
+import ch.elexis.ungrad.docmgr_lucinda.Preferences;
 import ch.rgw.elexis.docmgr_lucinda.model.Document;
 import ch.rgw.tools.TimeTool;
 

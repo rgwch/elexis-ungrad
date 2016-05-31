@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
-import ch.rgw.elexis.docmgr_lucinda.Preferences;
+import ch.elexis.ungrad.docmgr_lucinda.Preferences;
 import ch.rgw.tools.StringTool;
 
 /**

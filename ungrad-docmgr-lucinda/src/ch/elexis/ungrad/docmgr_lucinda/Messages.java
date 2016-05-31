@@ -1,4 +1,4 @@
-package ch.rgw.elexis.docmgr_lucinda;
+package ch.elexis.ungrad.docmgr_lucinda;
 
 import org.eclipse.osgi.util.NLS;
 

@@ -22,7 +22,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.preferences.inputs.MultilineFieldEditor;
-import ch.rgw.elexis.docmgr_lucinda.Preferences;
+import ch.elexis.ungrad.docmgr_lucinda.Preferences;
 
 public class LucindaPrefs extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 

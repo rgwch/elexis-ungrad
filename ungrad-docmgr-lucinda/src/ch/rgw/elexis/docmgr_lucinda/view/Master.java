@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.ui.icons.Images;
-import ch.rgw.elexis.docmgr_lucinda.Activator;
+import ch.elexis.ungrad.docmgr_lucinda.Activator;
 import ch.rgw.elexis.docmgr_lucinda.controller.DocumentSorter;
 
 public class Master extends Composite {

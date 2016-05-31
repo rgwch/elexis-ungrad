@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.rgw.elexis.docmgr_lucinda;
+package ch.elexis.ungrad.docmgr_lucinda;
 
 import java.util.ArrayList;
 import java.util.List;

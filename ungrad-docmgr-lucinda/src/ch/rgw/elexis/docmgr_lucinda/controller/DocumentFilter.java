@@ -6,7 +6,7 @@ import java.util.Set;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import ch.rgw.elexis.docmgr_lucinda.Preferences;
+import ch.elexis.ungrad.docmgr_lucinda.Preferences;
 import ch.rgw.elexis.docmgr_lucinda.model.Document;
 
 public class DocumentFilter extends ViewerFilter {

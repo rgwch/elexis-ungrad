@@ -23,8 +23,8 @@ import ch.elexis.data.Patient;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.data.Query;
 import ch.elexis.omnivore.data.DocHandle;
-import ch.rgw.elexis.docmgr_lucinda.Activator;
-import ch.rgw.elexis.docmgr_lucinda.Preferences;
+import ch.elexis.ungrad.docmgr_lucinda.Activator;
+import ch.elexis.ungrad.docmgr_lucinda.Preferences;
 import ch.rgw.elexis.docmgr_lucinda.controller.IProgressController;
 import ch.rgw.tools.TimeTool;
 

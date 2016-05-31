@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import ch.elexis.data.PersistentObject;
-import ch.rgw.elexis.docmgr_lucinda.Activator;
+import ch.elexis.ungrad.docmgr_lucinda.Activator;
 import ch.rgw.lucinda.Handler;
 
 /**
