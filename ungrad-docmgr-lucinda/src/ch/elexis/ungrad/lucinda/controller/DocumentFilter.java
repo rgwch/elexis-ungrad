@@ -1,4 +1,4 @@
-package ch.rgw.elexis.docmgr_lucinda.controller;
+package ch.elexis.ungrad.lucinda.controller;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,8 +6,8 @@ import java.util.Set;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import ch.elexis.ungrad.docmgr_lucinda.Preferences;
-import ch.rgw.elexis.docmgr_lucinda.model.Document;
+import ch.elexis.ungrad.lucinda.Preferences;
+import ch.elexis.ungrad.lucinda.model.Document;
 
 public class DocumentFilter extends ViewerFilter {
 	private Set<String> doctypes = new HashSet<>();

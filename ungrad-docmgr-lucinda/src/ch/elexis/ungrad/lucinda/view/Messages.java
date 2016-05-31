@@ -1,9 +1,9 @@
-package ch.rgw.elexis.docmgr_lucinda.view;
+package ch.elexis.ungrad.lucinda.view;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "ch.rgw.elexis.docmgr_lucinda.view.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "ch.elexis.ungrad.lucinda.view.messages"; //$NON-NLS-1$
 	public static String GlobalView_11;
 	public static String GlobalView_actPatient_name;
 	public static String GlobalView_actPatient_tooltip;

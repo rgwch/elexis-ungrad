@@ -12,15 +12,15 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.rgw.elexis.docmgr_lucinda.view;
+package ch.elexis.ungrad.lucinda.view;
 
-import static ch.elexis.ungrad.docmgr_lucinda.Preferences.COLUMN_WIDTHS;
-import static ch.elexis.ungrad.docmgr_lucinda.Preferences.INCLUDE_KONS;
-import static ch.elexis.ungrad.docmgr_lucinda.Preferences.INCLUDE_OMNI;
-import static ch.elexis.ungrad.docmgr_lucinda.Preferences.RESTRICT_CURRENT;
-import static ch.elexis.ungrad.docmgr_lucinda.Preferences.SHOW_CONS;
-import static ch.elexis.ungrad.docmgr_lucinda.Preferences.SHOW_INBOX;
-import static ch.elexis.ungrad.docmgr_lucinda.Preferences.SHOW_OMNIVORE;
+import static ch.elexis.ungrad.lucinda.Preferences.COLUMN_WIDTHS;
+import static ch.elexis.ungrad.lucinda.Preferences.INCLUDE_KONS;
+import static ch.elexis.ungrad.lucinda.Preferences.INCLUDE_OMNI;
+import static ch.elexis.ungrad.lucinda.Preferences.RESTRICT_CURRENT;
+import static ch.elexis.ungrad.lucinda.Preferences.SHOW_CONS;
+import static ch.elexis.ungrad.lucinda.Preferences.SHOW_INBOX;
+import static ch.elexis.ungrad.lucinda.Preferences.SHOW_OMNIVORE;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -38,9 +38,9 @@ import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.data.Patient;
-import ch.elexis.ungrad.docmgr_lucinda.Activator;
-import ch.elexis.ungrad.docmgr_lucinda.Preferences;
-import ch.rgw.elexis.docmgr_lucinda.controller.Controller;
+import ch.elexis.ungrad.lucinda.Activator;
+import ch.elexis.ungrad.lucinda.Preferences;
+import ch.elexis.ungrad.lucinda.controller.Controller;
 
 public class GlobalView extends ViewPart implements IActivationListener {
 

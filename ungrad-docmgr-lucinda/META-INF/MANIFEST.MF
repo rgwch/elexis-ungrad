@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Document Manager based on Lucinda
 Bundle-SymbolicName: ch.elexis.ungrad.docmgr-lucinda;singleton:=true
 Bundle-Version: 1.0.2.qualifier
-Bundle-Activator: ch.elexis.ungrad.docmgr_lucinda.Activator
+Bundle-Activator: ch.elexis.ungrad.lucinda.Activator
 Bundle-Vendor: G. Weirich
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  ch.elexis.core;bundle-version="3.2.0",

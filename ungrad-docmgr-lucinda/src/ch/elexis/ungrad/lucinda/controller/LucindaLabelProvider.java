@@ -12,11 +12,11 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.rgw.elexis.docmgr_lucinda.controller;
+package ch.elexis.ungrad.lucinda.controller;
 
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
-import ch.elexis.ungrad.docmgr_lucinda.Preferences;
-import ch.rgw.elexis.docmgr_lucinda.model.Document;
+import ch.elexis.ungrad.lucinda.Preferences;
+import ch.elexis.ungrad.lucinda.model.Document;
 import ch.rgw.tools.TimeTool;
 
 public class LucindaLabelProvider extends TableLabelProvider {

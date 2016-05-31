@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.rgw.elexis.docmgr_lucinda.controller;
+package ch.elexis.ungrad.lucinda.controller;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;

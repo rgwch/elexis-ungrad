@@ -2,7 +2,7 @@
  * Originally based on BalusC's DateUtil (@link http://balusc.blogspot.com/2007/09/dateutil.html)
  * extended with some patterns for usage in Germany, Austria and Switzerland
  */
-package ch.rgw.elexis.docmgr_lucinda.model;
+package ch.elexis.ungrad.lucinda.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

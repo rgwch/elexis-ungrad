@@ -1,9 +1,9 @@
-package ch.elexis.ungrad.docmgr_lucinda;
+package ch.elexis.ungrad.lucinda;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "ch.rgw.elexis.docmgr_lucinda.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "ch.elexis.ungrad.lucinda.messages"; //$NON-NLS-1$
 	public static String Activator_14;
 	public static String Activator_Lucinda_error_caption;
 	public static String Activator_Server_message;

@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.rgw.elexis.docmgr_lucinda.view;
+package ch.elexis.ungrad.lucinda.view;
 
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -22,7 +22,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.preferences.inputs.MultilineFieldEditor;
-import ch.elexis.ungrad.docmgr_lucinda.Preferences;
+import ch.elexis.ungrad.lucinda.Preferences;
 
 public class LucindaPrefs extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 

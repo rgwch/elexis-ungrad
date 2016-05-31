@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.rgw.elexis.docmgr_lucinda.view;
+package ch.elexis.ungrad.lucinda.view;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
-import ch.elexis.ungrad.docmgr_lucinda.Preferences;
+import ch.elexis.ungrad.lucinda.Preferences;
 import ch.rgw.tools.StringTool;
 
 /**

@@ -1,4 +1,4 @@
-package ch.rgw.elexis.docmgr_lucinda.view;
+package ch.elexis.ungrad.lucinda.view;
 
 
 import java.util.Map;
@@ -14,8 +14,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 
-import ch.elexis.ungrad.docmgr_lucinda.Activator;
-import ch.rgw.elexis.docmgr_lucinda.model.Document;
+import ch.elexis.ungrad.lucinda.Activator;
+import ch.elexis.ungrad.lucinda.model.Document;
 import ch.rgw.lucinda.Handler;
 
 public class LucindaMessages extends ViewPart implements Handler {

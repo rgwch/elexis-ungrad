@@ -4,14 +4,14 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            class="ch.rgw.elexis.docmgr_lucinda.view.GlobalView"
+            class="ch.elexis.ungrad.lucinda.view.GlobalView"
             icon="icons/lucinda.png"
             id="ch.rgw.elexis.docmgr-lucinda.mainView"
             name="Lucinda View"
             restorable="true">
       </view>
       <view
-            class="ch.rgw.elexis.docmgr_lucinda.view.LucindaMessages"
+            class="ch.elexis.ungrad.lucinda.view.LucindaMessages"
             icon="icons/lucinda_msg.png"
             id="ch.rgw.elexis.docmgr-lucinda.msgView"
             name="Lucinda Nachrichten"
@@ -22,7 +22,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="ch.elexis.preferences.transporters"
-            class="ch.rgw.elexis.docmgr_lucinda.view.LucindaPrefs"
+            class="ch.elexis.ungrad.lucinda.view.LucindaPrefs"
             id="ch.rgw.elexis.docmgr-lucinda.prefs"
             name="Lucinda">
       </page>

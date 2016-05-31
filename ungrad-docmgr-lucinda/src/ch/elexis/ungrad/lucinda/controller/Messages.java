@@ -1,9 +1,9 @@
-package ch.rgw.elexis.docmgr_lucinda.controller;
+package ch.elexis.ungrad.lucinda.controller;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "ch.rgw.elexis.docmgr_lucinda.controller.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "ch.elexis.ungrad.lucinda.controller.messages"; //$NON-NLS-1$
 	public static String Controller_cons_not_found_caption;
 	public static String Controller_cons_not_found_text;
 	public static String Controller_could_not_launch_file;

@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.rgw.elexis.docmgr_lucinda.controller;
+package ch.elexis.ungrad.lucinda.controller;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -40,11 +40,11 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Patient;
 import ch.elexis.omnivore.data.DocHandle;
-import ch.elexis.ungrad.docmgr_lucinda.Activator;
-import ch.elexis.ungrad.docmgr_lucinda.Preferences;
-import ch.rgw.elexis.docmgr_lucinda.model.Document;
-import ch.rgw.elexis.docmgr_lucinda.view.GlobalViewPane;
-import ch.rgw.elexis.docmgr_lucinda.view.Master;
+import ch.elexis.ungrad.lucinda.Activator;
+import ch.elexis.ungrad.lucinda.Preferences;
+import ch.elexis.ungrad.lucinda.model.Document;
+import ch.elexis.ungrad.lucinda.view.GlobalViewPane;
+import ch.elexis.ungrad.lucinda.view.Master;
 import ch.rgw.io.FileTool;
 import ch.rgw.lucinda.Client;
 import ch.rgw.lucinda.Handler;

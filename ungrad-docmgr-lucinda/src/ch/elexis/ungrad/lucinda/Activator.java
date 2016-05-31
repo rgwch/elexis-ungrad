@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.elexis.ungrad.docmgr_lucinda;
+package ch.elexis.ungrad.lucinda;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -22,10 +22,10 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import ch.elexis.core.ui.util.SWTHelper;
-import ch.rgw.elexis.docmgr_lucinda.controller.IProgressController;
-import ch.rgw.elexis.docmgr_lucinda.model.ConsultationIndexer;
-import ch.rgw.elexis.docmgr_lucinda.model.Document;
-import ch.rgw.elexis.docmgr_lucinda.model.OmnivoreIndexer;
+import ch.elexis.ungrad.lucinda.controller.IProgressController;
+import ch.elexis.ungrad.lucinda.model.ConsultationIndexer;
+import ch.elexis.ungrad.lucinda.model.Document;
+import ch.elexis.ungrad.lucinda.model.OmnivoreIndexer;
 import ch.rgw.lucinda.Client;
 import ch.rgw.lucinda.Handler;
 

@@ -12,14 +12,14 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.rgw.elexis.docmgr_lucinda.model;
+package ch.elexis.ungrad.lucinda.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import ch.elexis.data.PersistentObject;
-import ch.elexis.ungrad.docmgr_lucinda.Activator;
+import ch.elexis.ungrad.lucinda.Activator;
 import ch.rgw.lucinda.Handler;
 
 /**

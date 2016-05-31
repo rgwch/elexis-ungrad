@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.rgw.elexis.docmgr_lucinda.view;
+package ch.elexis.ungrad.lucinda.view;
 
 import java.util.HashMap;
 
@@ -26,8 +26,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 
-import ch.rgw.elexis.docmgr_lucinda.controller.Controller;
-import ch.rgw.elexis.docmgr_lucinda.model.Document;
+import ch.elexis.ungrad.lucinda.controller.Controller;
+import ch.elexis.ungrad.lucinda.model.Document;
 
 public class GlobalViewPane extends Composite {
 	private SashForm sashForm;

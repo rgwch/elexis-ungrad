@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.rgw.elexis.docmgr_lucinda.model;
+package ch.elexis.ungrad.lucinda.model;
 
 import java.text.ParseException;
 import java.util.HashMap;
