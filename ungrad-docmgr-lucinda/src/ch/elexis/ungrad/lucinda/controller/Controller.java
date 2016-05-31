@@ -36,7 +36,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
-import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Konsultation;
@@ -70,7 +69,7 @@ public class Controller implements Handler, IProgressController {
 	int div;
 	int actValue;
 	// private DocumentFilter docFilter = new DocumentFilter();
-	private Set<String> allowed_doctypes=new TreeSet<>();
+	private Set<String> allowed_doctypes = new TreeSet<>();
 
 	public Controller() {
 		lucinda = Activator.getDefault().getLucinda();
@@ -122,7 +121,7 @@ public class Controller implements Handler, IProgressController {
 
 	public IStructuredContentProvider getContentProvider(TableViewer tv) {
 		viewer = tv;
-		//tv.addFilter(docFilter);
+		// tv.addFilter(docFilter);
 		return cnt;
 
 	}
@@ -161,29 +160,16 @@ public class Controller implements Handler, IProgressController {
 	 *            Query String
 	 */
 	public void runQuery(String input) {
-		StringBuilder query = new StringBuilder();
-		if (bRestrictCurrentPatient) {
-			Patient pat = ElexisEventDispatcher.getSelectedPatient();
-			query.append(" +lastname:").append(pat.getName()).append(" +firstname:").append(pat.getVorname()) //$NON-NLS-1$ //$NON-NLS-2$
-					.append(" +birthdate:").append(new TimeTool(pat.getGeburtsdatum()).toString(TimeTool.DATE_COMPACT)) //$NON-NLS-1$
-					.append(" +").append(input); //$NON-NLS-1$
-		} else {
-			query.append(input);
-		}
-		lucinda.query(query.toString(), result -> {
+		lucinda.query(buildQuery(input), result -> {
 			if (result.get("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
 				@SuppressWarnings("rawtypes")
 				List queryResult = (List) result.get("result"); //$NON-NLS-1$
 				Display.getDefault().asyncExec(new Runnable() {
-
 					@Override
 					public void run() {
 						viewer.setInput(queryResult);
-
 					}
-
 				});
-
 			} else {
 				Activator.getDefault().addMessage(new Document(result));
 			}
@@ -191,12 +177,32 @@ public class Controller implements Handler, IProgressController {
 
 	}
 
-	private String buildQuery(String input){
-		StringBuilder q=new StringBuilder("+(");
-		
-		
+	/*
+	 * Compose a query from the user's supplied query string and the query refiners, such as doctypes and restrict to Patient. 
+	 * @param input The user supplied query
+	 * @return the reined query
+	 */
+	private String buildQuery(String input) {
+		StringBuilder q = new StringBuilder();
+		if (bRestrictCurrentPatient) {
+			Patient pat = ElexisEventDispatcher.getSelectedPatient();
+			q.append("+lastname:").append(pat.getName()).append(" +firstname:").append(pat.getVorname()) //$NON-NLS-1$ //$NON-NLS-2$
+					.append(" +birthdate:").append(new TimeTool(pat.getGeburtsdatum()).toString(TimeTool.DATE_COMPACT)); //$NON-NLS-1$
+		}
+
+		if (allowed_doctypes.isEmpty()) {
+			q.append(" -lucinda_doctype:*"); //$NON-NLS-1$
+		} else {
+			q.append(" +("); //$NON-NLS-1$
+			for (String doctype : allowed_doctypes) {
+				q.append(" lucinda_doctype:").append(doctype); //$NON-NLS-1$
+			}
+			q.append(")");//$NON-NLS-1$
+		}
+		q.append(" +").append(input); //$NON-NLS-1$
 		return q.toString();
 	}
+
 	public void loadDocument(final Document doc) {
 		String doctype = doc.get(Preferences.FLD_LUCINDA_DOCTYPE);
 
@@ -215,8 +221,8 @@ public class Controller implements Handler, IProgressController {
 				String entry = kons.getEintrag().getHead();
 				launchViewerForDocument(entry.getBytes(), "txt"); //$NON-NLS-1$
 			} else {
-				SWTHelper.showError(Messages.Controller_cons_not_found_caption, MessageFormat.format(
-						Messages.Controller_cons_not_found_text, doc.get("title"))); //$NON-NLS-2$
+				SWTHelper.showError(Messages.Controller_cons_not_found_caption,
+						MessageFormat.format(Messages.Controller_cons_not_found_text, doc.get("title"))); // $NON-NLS-2$
 			}
 		} else if (doctype.equalsIgnoreCase(Preferences.OMNIVORE_NAME)) {
 			DocHandle dh = DocHandle.load(doc.get(Preferences.FLD_ID));
@@ -224,8 +230,7 @@ public class Controller implements Handler, IProgressController {
 				dh.execute();
 			} else {
 				SWTHelper.showError(Messages.Controller_omnivore_not_found_caption,
-						Messages.Controller_omnivore_not_found_text,
-						doc.get("title")); //$NON-NLS-1$
+						Messages.Controller_omnivore_not_found_text, doc.get("title")); //$NON-NLS-1$
 			}
 		} else {
 
