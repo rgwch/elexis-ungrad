@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.text.model.Samdas;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Patient;
@@ -178,8 +179,11 @@ public class Controller implements Handler, IProgressController {
 	}
 
 	/*
-	 * Compose a query from the user's supplied query string and the query refiners, such as doctypes and restrict to Patient. 
+	 * Compose a query from the user's supplied query string and the query
+	 * refiners, such as doctypes and restrict to Patient.
+	 * 
 	 * @param input The user supplied query
+	 * 
 	 * @return the reined query
 	 */
 	private String buildQuery(String input) {
@@ -199,7 +203,10 @@ public class Controller implements Handler, IProgressController {
 			}
 			q.append(")");//$NON-NLS-1$
 		}
-		q.append(" +").append(input); //$NON-NLS-1$
+		if (!input.trim().startsWith("+")) {
+			q.append(" +");
+		}
+		q.append(input); // $NON-NLS-1$
 		return q.toString();
 	}
 
@@ -219,6 +226,10 @@ public class Controller implements Handler, IProgressController {
 			Konsultation kons = Konsultation.load(doc.get(Preferences.FLD_ID));
 			if (kons.exists()) {
 				String entry = kons.getEintrag().getHead();
+				if(entry.startsWith("<")){
+					Samdas samdas=new Samdas(entry);
+					entry=samdas.getRecordText();
+				}
 				launchViewerForDocument(entry.getBytes(), "txt"); //$NON-NLS-1$
 			} else {
 				SWTHelper.showError(Messages.Controller_cons_not_found_caption,
@@ -341,7 +352,7 @@ public class Controller implements Handler, IProgressController {
 		} else {
 			allowed_doctypes.remove(doctype);
 		}
-		viewer.refresh();
+		reload();
 	}
 
 	public void changePatient(Patient object) {
