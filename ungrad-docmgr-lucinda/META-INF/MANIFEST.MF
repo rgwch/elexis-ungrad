@@ -15,6 +15,6 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  ch.elexis.omnivore;bundle-version="3.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
- lib/lucinda-client-0.4.2-SNAPSHOT.jar
+ lib/lucinda-client-0.5.0-SNAPSHOT.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: ch.rgw.lucinda

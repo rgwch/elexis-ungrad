@@ -17,6 +17,7 @@ package ch.elexis.ungrad.lucinda.controller;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.model.Document;
+import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 public class LucindaLabelProvider extends TableLabelProvider {
@@ -25,14 +26,22 @@ public class LucindaLabelProvider extends TableLabelProvider {
 	public String getColumnText(Object element, int columnIndex) {
 		Document e = new Document(element);
 		switch (columnIndex) {
-		case 0: 
+		case 0:
 			return e.get(Preferences.FLD_LUCINDA_DOCTYPE);
 		case 1:
 			return e.get("lastname"); //$NON-NLS-1$
 		case 2:
 			return e.getDate().toString(TimeTool.DATE_MYSQL);
 		case 3:
-			return e.get("title"); //$NON-NLS-1$
+			String cat = e.get("category");//$NON-NLS-1$
+			if (StringTool.isNothing(cat)) {
+				cat = e.get("Kategorie");//$NON-NLS-1$
+			}
+			if (StringTool.isNothing(cat)) {
+				return e.get("title"); //$NON-NLS-1$
+			} else {
+				return cat + ": " + e.get("title"); //$NON-NLS-1$
+			}
 		default:
 			return "?"; //$NON-NLS-1$
 		}

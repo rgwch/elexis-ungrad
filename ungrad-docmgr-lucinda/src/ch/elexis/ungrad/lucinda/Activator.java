@@ -21,12 +21,10 @@ import java.util.List;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.lucinda.controller.IProgressController;
 import ch.elexis.ungrad.lucinda.model.ConsultationIndexer;
 import ch.elexis.ungrad.lucinda.model.Document;
 import ch.elexis.ungrad.lucinda.model.OmnivoreIndexer;
-import ch.rgw.lucinda.Client;
 import ch.rgw.lucinda.Handler;
 
 /**
@@ -39,10 +37,6 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
-	private Client lucinda;
-	private boolean connected;
-	private boolean RestAPI = false;
-	private boolean BusApi=false;
 	private List<Handler> handlers = new ArrayList<>();
 	private ConsultationIndexer consultationIndexer = new ConsultationIndexer();
 	private OmnivoreIndexer omnivoreIndexer = new OmnivoreIndexer();
@@ -56,10 +50,6 @@ public class Activator extends AbstractUIPlugin {
 	public Activator() {
 	}
 
-	public Client getLucinda() {
-		return lucinda;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -69,16 +59,13 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		lucinda = new Client();
-		connect();
-	}
-
-	public void connect() {
-		if(Preferences.get(Preferences.SERVER_ADDR, "")!=""){ //$NON-NLS-1$ //$NON-NLS-2$
-			connectRest();
-		}else{
-			connectBus();
+		if (Preferences.get(Preferences.INCLUDE_KONS, "0").equals("1")) { //$NON-NLS-1$ //$NON-NLS-2$
+			syncKons(true);
 		}
+		if (Preferences.get(Preferences.INCLUDE_OMNI, "0").equals("1")) { //$NON-NLS-1$ //$NON-NLS-2$
+			syncOmnivore(true);
+		}
+
 	}
 
 	public void addHandler(Handler handler) {
@@ -89,98 +76,6 @@ public class Activator extends AbstractUIPlugin {
 		handlers.remove(handler);
 	}
 
-	public void connectRest() {
-		if (!connected) {
-			String server = Preferences.get(Preferences.SERVER_ADDR, "127.0.0.1"); //$NON-NLS-1$
-			int port = Integer.parseInt(Preferences.get(Preferences.SERVER_PORT, "2016")); //$NON-NLS-1$
-			lucinda.connect(server, port, result -> {
-				switch ((String) result.get("status")) { //$NON-NLS-1$
-
-				case "connected": //$NON-NLS-1$
-					connected = true;
-					RestAPI = true;
-					if (Preferences.get(Preferences.INCLUDE_KONS, "0").equals("1")) { //$NON-NLS-1$ //$NON-NLS-2$
-						syncKons(true);
-					}
-					if (Preferences.get(Preferences.INCLUDE_OMNI, "0").equals("1")) { //$NON-NLS-1$ //$NON-NLS-2$
-						syncOmnivore(true);
-					}
-			
-					break;
-				case "disconnected": //$NON-NLS-1$
-					connected=false;
-					RestAPI=false;
-					break;
-				case "failure": //$NON-NLS-1$
-					SWTHelper.showInfo("Lucinda", (String) result.get("message")); //$NON-NLS-1$ //$NON-NLS-2$
-					break;
-				case "error": //$NON-NLS-1$
-					SWTHelper.showError("Lucinda", Messages.Activator_Lucinda_error_caption, Messages.Activator_Server_Message + result.get("message")); //$NON-NLS-1$ //$NON-NLS-2$
-					break;
-			
-				default:
-					SWTHelper.showError("Lucinda", "Lucinda", //$NON-NLS-1$ //$NON-NLS-2$
-							Messages.Activator_unexpected_answer + result.get("status") + Messages.Activator_14 + result.get("message"));  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
-				}
-				for (Handler handler : handlers) {
-					handler.signal(result);
-				}
-
-			});
-		}
-	}
-
-	public void connectBus() {
-		if (!connected) {
-			String prefix = Preferences.get(Preferences.MSG, "ch.rgw.lucinda"); //$NON-NLS-1$
-			String network = Preferences.get(Preferences.NETWORK, ""); //$NON-NLS-1$
-			lucinda.connect(prefix, network, result -> {
-				addMessage(new Document(result));
-				switch ((String) result.get("status")) { //$NON-NLS-1$
-				case "connected": //$NON-NLS-1$
-					connected = true;
-					BusApi=true;
-					if (Preferences.get(Preferences.INCLUDE_KONS, "0").equals("1")) { //$NON-NLS-1$ //$NON-NLS-2$
-						syncKons(true);
-					}
-					if (Preferences.get(Preferences.INCLUDE_OMNI, "0").equals("1")) { //$NON-NLS-1$ //$NON-NLS-2$
-						syncOmnivore(true);
-					}
-					break;
-				case "REST ok": //$NON-NLS-1$
-					connected = true;
-					RestAPI = true;
-					break;
-				case "disconnected": //$NON-NLS-1$
-					connected = false;
-					break;
-				case "failure": //$NON-NLS-1$
-					SWTHelper.showInfo("Lucinda", (String) result.get("message")); //$NON-NLS-1$ //$NON-NLS-2$
-					break;
-				case "error": //$NON-NLS-1$
-					SWTHelper.showError("Lucinda", Messages.Activator_Lucinda_error_caption, Messages.Activator_Server_message + result.get("message")); //$NON-NLS-1$ //$NON-NLS-2$
-					break;
-				default:
-					SWTHelper.showError("Lucinda", "Lucinda", //$NON-NLS-1$ //$NON-NLS-2$
-							Messages.Activator_unexpected_answer + result.get("status") + ", " + result.get("message"));  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
-				}
-				for (Handler handler : handlers) {
-					handler.signal(result);
-				}
-
-			});
-		}
-	}
-
-	public void disconnect() {
-		if (connected) {
-			connected = false;
-			if (lucinda != null) {
-				lucinda.shutDown();
-			}
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -188,7 +83,6 @@ public class Activator extends AbstractUIPlugin {
 	 * BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		disconnect();
 		plugin = null;
 		super.stop(context);
 	}
@@ -207,13 +101,6 @@ public class Activator extends AbstractUIPlugin {
 		}
 	}
 
-	public boolean isRestAPI() {
-		return RestAPI;
-	}
-
-	public boolean isBusAPI(){
-		return BusApi;
-	}
 	public void addMessage(Document message) {
 		messages.add(message);
 	}

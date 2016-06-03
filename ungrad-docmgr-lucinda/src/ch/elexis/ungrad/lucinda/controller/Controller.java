@@ -43,12 +43,12 @@ import ch.elexis.data.Konsultation;
 import ch.elexis.data.Patient;
 import ch.elexis.omnivore.data.DocHandle;
 import ch.elexis.ungrad.lucinda.Activator;
+import ch.elexis.ungrad.lucinda.Lucinda;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.model.Document;
 import ch.elexis.ungrad.lucinda.view.GlobalViewPane;
 import ch.elexis.ungrad.lucinda.view.Master;
 import ch.rgw.io.FileTool;
-import ch.rgw.lucinda.Client;
 import ch.rgw.lucinda.Handler;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.TimeTool;
@@ -59,8 +59,7 @@ import ch.rgw.tools.TimeTool;
  * @author gerry
  *
  */
-public class Controller implements Handler, IProgressController {
-	Client lucinda;
+public class Controller implements IProgressController {
 	GlobalViewPane view;
 	ContentProvider cnt;
 	TableViewer viewer;
@@ -69,23 +68,35 @@ public class Controller implements Handler, IProgressController {
 	long actMax;
 	int div;
 	int actValue;
-	// private DocumentFilter docFilter = new DocumentFilter();
+	private Lucinda lucinda;
 	private Set<String> allowed_doctypes = new TreeSet<>();
 
 	public Controller() {
-		lucinda = Activator.getDefault().getLucinda();
-		Activator.getDefault().addHandler(this);
+		lucinda = new Lucinda();
 		bRestrictCurrentPatient = Boolean
 				.parseBoolean(Preferences.get(Preferences.RESTRICT_CURRENT, Boolean.toString(false)));
 		cnt = new ContentProvider();
 		Activator.getDefault().setProgressController(this);
+		connect();
+	}
+
+	private void connect() {
+		lucinda.connect(result -> {
+			switch ((String) result.get("status")) {
+			case "connected":
+			case "Rest OK":
+				view.setConnected(true, lucinda.isBusAPI(), lucinda.isRestAPI());
+				break;
+			}
+		});
+
 	}
 
 	public void reconnect() {
 		clear();
-		view.setConnected(false);
-		Activator.getDefault().disconnect();
-		Activator.getDefault().connect();
+		view.setConnected(false, false, false);
+		lucinda.disconnect();
+		connect();
 	}
 
 	public Composite createView(Composite parent) {
@@ -226,9 +237,9 @@ public class Controller implements Handler, IProgressController {
 			Konsultation kons = Konsultation.load(doc.get(Preferences.FLD_ID));
 			if (kons.exists()) {
 				String entry = kons.getEintrag().getHead();
-				if(entry.startsWith("<")){
-					Samdas samdas=new Samdas(entry);
-					entry=samdas.getRecordText();
+				if (entry.startsWith("<")) {
+					Samdas samdas = new Samdas(entry);
+					entry = samdas.getRecordText();
 				}
 				launchViewerForDocument(entry.getBytes(), "txt"); //$NON-NLS-1$
 			} else {
@@ -251,17 +262,13 @@ public class Controller implements Handler, IProgressController {
 
 	}
 
-	@Override
-	public void signal(Map<String, Object> message) {
-		switch ((String) message.get("status")) { //$NON-NLS-1$
-		case "connected": //$NON-NLS-1$
-			view.setConnected(true);
-			break;
-		case "disconnected": //$NON-NLS-1$
-			view.setConnected(false);
-			break;
-		}
-	}
+	/*
+	 * @Override public void signal(Map<String, Object> message) { switch
+	 * ((String) message.get("status")) { //$NON-NLS-1$ case "connected":
+	 * //$NON-NLS-1$ view.setConnected(true, lucinda.isBusAPI(),
+	 * lucinda.isRestAPI()); break; case "disconnected": //$NON-NLS-1$
+	 * view.setConnected(false, false, false); break; } }
+	 */
 
 	public void launchViewerForDocument(byte[] cnt, String ext) {
 		try {
@@ -329,6 +336,7 @@ public class Controller implements Handler, IProgressController {
 			amount += val;
 			if (visibleProcesses.isEmpty()) {
 				view.finishProgress();
+				actValue = 0;
 			}
 		} else {
 			visibleProcesses.put(handle, val);

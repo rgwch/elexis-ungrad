@@ -172,7 +172,7 @@ public class Master extends Composite {
 			}
 		});
 
-		setConnected(false);
+		setConnected(false,false,false);
 
 	}
 
@@ -202,17 +202,17 @@ public class Master extends Composite {
 		});
 	}
 
-	public void setConnected(boolean bConnected) {
+	public void setConnected(boolean bConnected, boolean hasBusApi, boolean hasRestApi) {
 		Display.getDefault().asyncExec(new Runnable() {
 
 			@Override
 			public void run() {
 				if (bConnected) {
 					StringBuilder sb = new StringBuilder(Messages.Master_connected_tooltip);
-					if (Activator.getDefault().isBusAPI()) {
+					if (hasBusApi) {
 						sb.append("EventBus "); //$NON-NLS-1$
 					}
-					if (Activator.getDefault().isRestAPI()) {
+					if (hasRestApi) {
 						sb.append("REST"); //$NON-NLS-1$
 					}
 					sb.append(Messages.Master_connected_tooltip2);

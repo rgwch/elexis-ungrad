@@ -105,8 +105,8 @@ public class GlobalViewPane extends Composite {
 		}
 	}
 
-	public void setConnected(boolean bConnected) {
-		master.setConnected(bConnected);
+	public void setConnected(boolean bConnected, boolean bHasBusApi, boolean bHasRestApi) {
+		master.setConnected(bConnected, bHasBusApi, bHasRestApi);
 	}
 
 	public Text getSearchField() {
