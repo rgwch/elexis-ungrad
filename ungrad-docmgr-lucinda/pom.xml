@@ -9,9 +9,9 @@
     <artifactId>ch.elexis.ungrad.docmgr-lucinda</artifactId>
     <packaging>eclipse-plugin</packaging>
     <groupId>ch.rgw</groupId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <properties>
-        <clientlib>lucinda-client-0.4.2-SNAPSHOT.jar</clientlib>
+        <clientlib>lucinda-client-0.5.0-SNAPSHOT.jar</clientlib>
     </properties>
     <build>
         <plugins>
