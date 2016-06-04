@@ -21,7 +21,6 @@ import java.util.Map;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.ungrad.lucinda.Lucinda;
-import ch.rgw.lucinda.Client;
 import ch.rgw.lucinda.Handler;
 
 /**
@@ -72,8 +71,9 @@ public class Sender implements Handler {
 				lucinda.disconnect();
 			}
 			sendNext();
-		}else{
-			SWTHelper.showError("Lucinda Sender "+message.get("status"), (String)message.get("message"));
+		} else {
+			SWTHelper.showError("Lucinda Sender " + message.get("status"),
+					(String) message.get("message") + "; " + message.get("title"));
 		}
 	}
 
@@ -91,9 +91,14 @@ public class Sender implements Handler {
 					toDo.clear();
 				} else {
 					byte[] contents = (byte[]) order.toMap().get("payload"); //$NON-NLS-1$
-					onTheWay.add(po.getId());
-					lucinda.addToIndex(po.getId(), order.get("title"), //$NON-NLS-1$
-							order.get("type"), order.toMap(), contents, this); //$NON-NLS-1$
+					if (contents != null) { // skip empty files - no point in
+											// indexing null
+						String title = order.get("title");
+						String type = order.get("type");
+						onTheWay.add(po.getId());
+						lucinda.addToIndex(po.getId(), title == null ? "?" : title, //$NON-NLS-1$
+								type == null ? "" : type, order.toMap(), contents, this); //$NON-NLS-1$
+					}
 				}
 			}
 		}

@@ -33,6 +33,7 @@ public class OmnivoreIndexer implements Customer {
 	private boolean cont = false;
 	private IProgressController pc;
 	Long progressHandle;
+	private String lastCheck;
 
 	/**
 	 * If active, the Index will run over all Consultations. If bActive==false,
@@ -51,7 +52,7 @@ public class OmnivoreIndexer implements Customer {
 
 	public void start(IProgressController pc) {
 		this.pc=pc;
-		String lastCheck = Preferences.get(Preferences.LASTSCAN_OMNI, "20010101"); //$NON-NLS-1$
+		lastCheck = Preferences.get(Preferences.LASTSCAN_OMNI, "20010101"); //$NON-NLS-1$
 		Query<DocHandle> qbe = new Query<DocHandle>(DocHandle.class);
 		qbe.add(DocHandle.FLD_DATE, Query.GREATER_OR_EQUAL, lastCheck);
 		qbe.orderBy(false, DocHandle.FLD_DATE);
@@ -93,6 +94,10 @@ public class OmnivoreIndexer implements Customer {
 			String firstname = get(patient, Patient.FLD_FIRSTNAME);
 			String birthdate = new TimeTool(bdRaw).toString(TimeTool.DATE_COMPACT);
 			String docdate = new TimeTool(dh.getCreationDate()).toString(TimeTool.DATE_COMPACT);
+			if(!(docdate.equals(lastCheck))){
+				lastCheck=docdate;
+				Preferences.set(Preferences.LASTSCAN_OMNI,docdate);
+			}
 			StringBuilder concern = new StringBuilder().append(lastname).append("_").append(firstname).append("_") //$NON-NLS-1$ //$NON-NLS-2$
 					.append(birthdate);
 
