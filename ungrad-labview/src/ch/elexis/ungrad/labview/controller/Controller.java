@@ -1,33 +1,25 @@
 package ch.elexis.ungrad.labview.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultGridLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 
-import ch.elexis.ungrad.labview.model.LabResultsSheet;
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.data.Patient;
-import ch.elexis.ungrad.labview.model.*;
+import ch.elexis.ungrad.labview.model.LabResultsSheet;
 
 public class Controller {
-	LabResultsSheet labResultGenerator;
+	LabResultsSheet labResults;
 	
 	public Controller(){
-		labResultGenerator=new LabResultsSheet();
+		labResults=new LabResultsSheet();
 	}
 	
-	public SortedMap<Item,LabResultsRow> loadData(Patient pat){
+	public void setPatient(Patient pat){
 		try {
-			return labResultGenerator.fetch(pat);
+			labResults.setPatient(pat);
 		} catch (ElexisException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return new TreeMap<Item,LabResultsRow>();
 		}
 	}
 

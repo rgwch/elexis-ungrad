@@ -1,12 +1,12 @@
 package ch.elexis.ungrad.labview.model;
 
 public class Item implements Comparable<Item> {
-	public Item(String titel, String kuerzel, String Gruppe, String Prio, String RefMann, String RefFrauOrTx, String ID) {
+	public Item(String ID, String titel, String kuerzel, String group, String prio, String RefMann, String RefFrauOrTx) {
 		this.titel = titel;
 		this.kuerzel = kuerzel;
 		this.refMann = RefMann;
 		this.refFrauOrTx = RefFrauOrTx;
-		this.gruppe = gruppe;
+		this.gruppe = group==null ? " ":group;
 		this.prio = prio;
 		this.id=ID;
 		psid=titel+kuerzel+refMann+refFrauOrTx;

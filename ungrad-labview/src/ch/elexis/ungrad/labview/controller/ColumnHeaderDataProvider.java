@@ -10,20 +10,17 @@ public class ColumnHeaderDataProvider implements IDataProvider {
 	}
 	@Override
 	public int getColumnCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return controller.labResults.getColumnCount();
 	}
 
 	@Override
-	public Object getDataValue(int arg0, int arg1) {
-		// TODO Auto-generated method stub
-		return null;
+	public Object getDataValue(int row, int column) {
+		return controller.labResults.getDates()[column];
 	}
 
 	@Override
 	public int getRowCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return controller.labResults.getRowCount();
 	}
 
 	@Override

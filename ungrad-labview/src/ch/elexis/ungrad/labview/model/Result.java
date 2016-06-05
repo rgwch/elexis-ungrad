@@ -14,7 +14,13 @@ public class Result implements Comparable<Result>{
 	@Override
 	public int compareTo(Result o) {
 		if(date.equals(o.date)){
-			return time.compareTo(o.time);
+			if(time==null){
+				return 1;
+			}else if(o.time==null){
+				return -1;
+			}else{
+				return time.compareTo(o.time);
+			}
 		}else{
 			return date.compareTo(o.date);
 		}

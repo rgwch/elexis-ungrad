@@ -2,35 +2,29 @@ package ch.elexis.ungrad.labview.controller;
 
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 
-import ch.elexis.data.Patient;
-import ch.elexis.ungrad.labview.model.LabResultsRow;
+import ch.elexis.ungrad.labview.model.Result;
 
 public class BodyDataProvider implements IDataProvider {
-	LabResultsRow[] labValues = new LabResultsRow[0];
 	private Controller controller;
 
 	public BodyDataProvider(Controller controller) {
 		this.controller = controller;
 	}
 
-	public void setPatient(Patient pat) {
-		labValues = (LabResultsRow[]) controller.loadData(pat).keySet().toArray();
-	}
-
 	@Override
 	public int getColumnCount() {
-		return labValues.length;
+		return controller.labResults.getColumnCount();
 	}
 
 	@Override
 	public Object getDataValue(int row, int column) {
-		LabResultsRow lrow = labValues[row];
-		return lrow.get(column);
+		Result res = controller.labResults.getValue(row, column);
+		return res;
 	}
 
 	@Override
 	public int getRowCount() {
-		return labValues.length;
+		return controller.labResults.getRowCount();
 	}
 
 	@Override
