@@ -4,23 +4,27 @@ import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 
 public class ColumnHeaderDataProvider implements IDataProvider {
 	Controller controller;
-	
+
 	public ColumnHeaderDataProvider(Controller controller) {
-		this.controller=controller;
+		this.controller = controller;
 	}
+
 	@Override
 	public int getColumnCount() {
-		return controller.labResults.getColumnCount();
+		int col = controller.labResults.getColumnCount();
+		return col == 0 ? 1 : col+1;
 	}
 
 	@Override
 	public Object getDataValue(int row, int column) {
-		return controller.labResults.getDates()[column];
+		Object res = controller.labResults.getDates()[column];
+		return res == null ? Integer.toString(column) : res;
+		
 	}
 
 	@Override
 	public int getRowCount() {
-		return controller.labResults.getRowCount();
+		return 1; //controller.labResults.getRowCount();
 	}
 
 	@Override

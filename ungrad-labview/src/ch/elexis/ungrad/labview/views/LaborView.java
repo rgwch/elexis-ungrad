@@ -1,6 +1,7 @@
 package ch.elexis.ungrad.labview.views;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.command.VisualRefreshCommand;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -42,6 +43,8 @@ public class LaborView extends ViewPart implements IActivationListener{
 	}
 	public void visible(final boolean mode) {
 		controller.setPatient(ElexisEventDispatcher.getSelectedPatient());
+		nat.doCommand(new VisualRefreshCommand());
+		nat.refresh();
 		if (mode) {
 			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
 		} else {

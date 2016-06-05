@@ -13,18 +13,28 @@ public class BodyDataProvider implements IDataProvider {
 
 	@Override
 	public int getColumnCount() {
-		return controller.labResults.getColumnCount();
+		int col = controller.labResults.getColumnCount();
+		return col;
 	}
 
 	@Override
 	public Object getDataValue(int row, int column) {
-		Result res = controller.labResults.getValue(row, column);
+		String res="?";
+		if (column == 0) {
+			res=controller.labResults.getItemAt(row).toString();
+		} else {
+			res = controller.labResults.getValue(row, column).toString();
+			if (res == null) {
+				res=Integer.toString(row) + "," + Integer.toString(column);
+			}
+		}
 		return res;
 	}
 
 	@Override
 	public int getRowCount() {
-		return controller.labResults.getRowCount();
+		int row = controller.labResults.getRowCount();
+		return row == 0 ? 10 : row;
 	}
 
 	@Override

@@ -4,8 +4,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -23,6 +25,7 @@ public class LabResultsSheet {
 	Patient pat;
 	
 	TimeTool[] dateArray;
+	Item[] itemArray;
 	JdbcLink j;
 	Map<String, Item> items;
 	Map<String, SortedSet<Item>> groups;
@@ -50,6 +53,14 @@ public class LabResultsSheet {
 		}
 	}
 	
+	public Item getItemAt(int row){
+		if(itemArray!=null && row<itemArray.length){
+			return itemArray[row];
+		}else{
+			return null;
+		}
+		
+	}
 	public int getRowCount(){
 		if(rows!=null){
 			return rows.size();
@@ -59,7 +70,7 @@ public class LabResultsSheet {
 	}
 	
 	public Result getValue(int nRow, int nColumn){
-		if(nColumn<0 || nColumn>=dateArray.length){
+		if(nColumn<0 || dateArray==null || nColumn>=dateArray.length){
 			return null;
 		}
 		TimeTool date=dateArray[nColumn];
@@ -98,9 +109,17 @@ public class LabResultsSheet {
 					groups.put(item.gruppe, itemsInGroup);
 					items.put(item.id, item);
 				}
+				List<Item> allItems=new LinkedList<Item>();
+				for(Set<Item> set:groups.values()){
+					for(Item item:set){
+						allItems.add(item);
+					}
+				}
+				itemArray=allItems.toArray(new Item[0]);
+				
 
 			} catch (SQLException ex) {
-				throw new ElexisException("cant fetch Lab Items", ex);
+				throw new ElexisException("can't fetch Lab Items", ex);
 			} finally {
 				j.releasePreparedStatement(psItems);
 			}
