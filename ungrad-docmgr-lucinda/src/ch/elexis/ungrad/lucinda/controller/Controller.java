@@ -201,8 +201,11 @@ public class Controller implements IProgressController {
 		StringBuilder q = new StringBuilder();
 		if (bRestrictCurrentPatient) {
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
-			q.append("+lastname:").append(pat.getName()).append(" +firstname:").append(pat.getVorname()) //$NON-NLS-1$ //$NON-NLS-2$
-					.append(" +birthdate:").append(new TimeTool(pat.getGeburtsdatum()).toString(TimeTool.DATE_COMPACT)); //$NON-NLS-1$
+			if (pat != null) {
+				q.append("+lastname:").append(pat.getName()).append(" +firstname:").append(pat.getVorname()) //$NON-NLS-1$ //$NON-NLS-2$
+						.append(" +birthdate:") //$NON-NLS-1$
+						.append(new TimeTool(pat.getGeburtsdatum()).toString(TimeTool.DATE_COMPACT));
+			}
 		}
 
 		if (allowed_doctypes.isEmpty()) {

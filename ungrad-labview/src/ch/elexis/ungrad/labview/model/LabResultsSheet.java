@@ -23,9 +23,12 @@ public class LabResultsSheet {
 	private static final String queryItems = "SELECT ID, titel,kuerzel,Gruppe,prio,RefMann,RefFrauOrTx FROM LABORITEMS WHERE deleted='0'";
 	private static final String queryResults = "SELECT ItemID, Datum, Zeit, Resultat, Kommentar FROM LABORWERTE where PatientID=? AND deleted='0'";
 	Patient pat;
-	
+
 	TimeTool[] dateArray;
 	Item[] itemArray;
+	Map<Item, Bucket> recently;
+	Map<Item, Bucket> lastYear;
+	Map<Item, Bucket> older;
 	JdbcLink j;
 	Map<String, Item> items;
 	Map<String, SortedSet<Item>> groups;
@@ -36,57 +39,52 @@ public class LabResultsSheet {
 		j = PersistentObject.getConnection();
 	}
 
-	public void setPatient(Patient pat) throws ElexisException{
-		this.pat=pat;
-		if(pat==null){
-			dateArray=null;
-			rows=null;
-		}else{
+	public void setPatient(Patient pat) throws ElexisException {
+		this.pat = pat;
+		loadItems(false);
+		if (pat == null) {
+			dateArray = null;
+			rows = null;
+		} else {
 			fetch();
 		}
 	}
-	public int getColumnCount(){
-		if(dateArray!=null){
-			return dateArray.length;
-		}else{
-			return 0;
-		}
+
+	public Item[] getItems() {
+		return itemArray;
 	}
-	
-	public Item getItemAt(int row){
-		if(itemArray!=null && row<itemArray.length){
-			return itemArray[row];
-		}else{
+
+	public LabResultsRow[] getLabResults() {
+		return rows == null ? null : rows.values().toArray(new LabResultsRow[0]);
+	}
+
+	public Bucket getRecentBucket(Item item){
+		return recently.get(item);
+	}
+	public Bucket getOneYearBucket(Item item){
+		return lastYear.get(item);
+	}
+	public Bucket getOlderBucket(Item item){
+		return older.get(item);
+	}
+	public Result getValue(int nRow, int nColumn) {
+		if (nColumn < 0 || dateArray == null || nColumn >= dateArray.length) {
 			return null;
 		}
-		
-	}
-	public int getRowCount(){
-		if(rows!=null){
-			return rows.size();
-		}else{
-			return 0;
-		}
-	}
-	
-	public Result getValue(int nRow, int nColumn){
-		if(nColumn<0 || dateArray==null || nColumn>=dateArray.length){
-			return null;
-		}
-		TimeTool date=dateArray[nColumn];
-		LabResultsRow row=(LabResultsRow) rows.values().toArray()[nRow];
-		for(Result res:row.results){
-			if(res.date.equals(date.toString(TimeTool.DATE_COMPACT))){
+		TimeTool date = dateArray[nColumn];
+		LabResultsRow row = (LabResultsRow) rows.values().toArray()[nRow];
+		for (Result res : row.results) {
+			if (res.date.equals(date.toString(TimeTool.DATE_COMPACT))) {
 				return res;
 			}
 		}
 		return null;
 	}
-	
-	public TimeTool[] getDates(){
+
+	public TimeTool[] getDates() {
 		return dateArray;
 	}
-	
+
 	private void loadItems(boolean bReload) throws ElexisException {
 		if (bReload) {
 			items = null;
@@ -100,7 +98,7 @@ public class LabResultsSheet {
 				while (res.next()) {
 					Item item = new Item(res.getString(1), res.getString(2), res.getString(3), res.getString(4),
 							res.getString(5), res.getString(6), res.getString(7));
-					
+
 					SortedSet<Item> itemsInGroup = groups.get(item.gruppe);
 					if (itemsInGroup == null) {
 						itemsInGroup = new TreeSet<Item>();
@@ -109,14 +107,13 @@ public class LabResultsSheet {
 					groups.put(item.gruppe, itemsInGroup);
 					items.put(item.id, item);
 				}
-				List<Item> allItems=new LinkedList<Item>();
-				for(Set<Item> set:groups.values()){
-					for(Item item:set){
+				List<Item> allItems = new LinkedList<Item>();
+				for (Set<Item> set : groups.values()) {
+					for (Item item : set) {
 						allItems.add(item);
 					}
 				}
-				itemArray=allItems.toArray(new Item[0]);
-				
+				itemArray = allItems.toArray(new Item[0]);
 
 			} catch (SQLException ex) {
 				throw new ElexisException("can't fetch Lab Items", ex);
@@ -131,7 +128,15 @@ public class LabResultsSheet {
 
 		PreparedStatement ps = j.getPreparedStatement(queryResults);
 		rows = new TreeMap<>();
-		SortedSet<TimeTool> dates=new TreeSet<>();
+		SortedSet<TimeTool> dates = new TreeSet<>();
+		recently = new TreeMap<Item, Bucket>();
+		lastYear = new TreeMap<Item, Bucket>();
+		older = new TreeMap<Item, Bucket>();
+		TimeTool now = new TimeTool();
+		TimeTool oneMonth = new TimeTool();
+		oneMonth.addDays(-30);
+		TimeTool oneYear = new TimeTool();
+		oneYear.addDays(-365);
 		try {
 			ps.setString(1, pat.getId());
 			ResultSet res = ps.executeQuery();
@@ -142,15 +147,37 @@ public class LabResultsSheet {
 				if (item == null) {
 					item = new Item("?", "?", "ZZZ", "999", "?", "?", "007");
 				}
-				dates.add(new TimeTool(result.date));
+				TimeTool when = new TimeTool(result.date);
+				dates.add(when);
+				Bucket bucket;
+				if (when.isBefore(oneYear)) {
+					bucket = older.get(item);
+					if (bucket == null) {
+						bucket = new Bucket(item);
+						older.put(item, bucket);
+					}
+				} else if (when.isBeforeOrEqual(oneMonth)) {
+					bucket = lastYear.get(item);
+					if (bucket == null) {
+						bucket = new Bucket(item);
+						lastYear.put(item, bucket);
+					}
+				} else {
+					bucket = recently.get(item);
+					if (bucket == null) {
+						bucket = new Bucket(item);
+						recently.put(item, bucket);
+					}
+				}
+				bucket.addResult(result);
 				LabResultsRow row = rows.get(item);
 				if (row == null) {
-					row = new LabResultsRow(item);
+					row = new LabResultsRow(item,pat);
 					rows.put(item, row);
 				}
 				row.add(result);
 			}
-			dateArray=(TimeTool[]) dates.toArray(new TimeTool[0]);
+			dateArray = (TimeTool[]) dates.toArray(new TimeTool[0]);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new ElexisException("error reading database", e);
@@ -158,5 +185,13 @@ public class LabResultsSheet {
 			j.releasePreparedStatement(ps);
 		}
 
+	}
+
+	public Object[] getRows() {
+		if (rows == null) {
+			return new LabResultsRow[0];
+		} else {
+			return rows.values().toArray(new LabResultsRow[0]);
+		}
 	}
 }

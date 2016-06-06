@@ -2,6 +2,7 @@ package ch.elexis.ungrad.labview.model;
 
 public class Result implements Comparable<Result>{
 
+	
 	String itemId, date,time,result,comment;
 	
 	public Result(String id, String dat,String zeit, String res, String com){

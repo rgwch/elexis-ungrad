@@ -12,14 +12,16 @@ public class Item implements Comparable<Item> {
 		psid=titel+kuerzel+refMann+refFrauOrTx;
 	}
 
-	String id;
-	String psid;
-	String titel;
-	String kuerzel;
-	String refMann;
-	String refFrauOrTx;
-	String gruppe;
-	String prio;
+	public String id;
+	public String psid;
+	public String titel;
+	public String kuerzel;
+	public String refMann;
+	public String refFrauOrTx;
+	public String gruppe;
+	public String prio;
+	
+	
 
 	@Override
 	public int compareTo(Item o) {

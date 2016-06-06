@@ -1,39 +1,44 @@
 package ch.elexis.ungrad.labview.views;
 
-import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.command.VisualRefreshCommand;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
+import ch.elexis.core.ui.util.Log;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.labview.controller.Controller;
 
 public class LaborView extends ViewPart implements IActivationListener{
-	Controller controller=new Controller();
-	NatTable nat;
+	Controller controller=new Controller(this);
+	Log log=Log.get("LaborView");
 	
 	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
 			ElexisEvent.EVENT_SELECTED) {
 
 		@Override
 		public void runInUi(ElexisEvent ev) {
-			controller.setPatient((Patient) ev.getObject());
+			try {
+				controller.setPatient((Patient) ev.getObject());
+			} catch (ElexisException e) {
+				log.log(e, "error loading patient data", Log.ERRORS);
+			}
 		}
 	
 
 	};
 	@Override
 	public void createPartControl(Composite parent) {
-		nat=new NatTable(parent,controller.getBaseLayer());
-		nat.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
-		
+		Control ctl=controller.createPartControl(parent);
+		ctl.setLayoutData(SWTHelper.getFillGridData());
 		GlobalEventDispatcher.addActivationListener(this, this);
+	
 	}
 
 	@Override
@@ -42,9 +47,11 @@ public class LaborView extends ViewPart implements IActivationListener{
 		
 	}
 	public void visible(final boolean mode) {
-		controller.setPatient(ElexisEventDispatcher.getSelectedPatient());
-		nat.doCommand(new VisualRefreshCommand());
-		nat.refresh();
+		try {
+			controller.setPatient(ElexisEventDispatcher.getSelectedPatient());
+		} catch (ElexisException e) {
+			log.log(e, "error loading patient data", Log.ERRORS);
+		}
 		if (mode) {
 			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
 		} else {
