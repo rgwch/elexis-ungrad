@@ -9,6 +9,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
 
+import ch.elexis.core.ui.UiDesk;
 import ch.elexis.ungrad.labview.model.Bucket;
 import ch.elexis.ungrad.labview.model.Item;
 import ch.elexis.ungrad.labview.model.LabResultsRow;
@@ -21,8 +22,9 @@ public class MinAvgMaxLabelProvider extends StyledCellLabelProvider {
 	TextStyle normal;
 	Color black=Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
 	Color white=Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
-	Color red=Display.getDefault().getSystemColor(SWT.COLOR_RED);
+	Color red=UiDesk.getColor(UiDesk.COL_RED); //Display.getDefault().getSystemColor(SWT.COLOR_RED);
 
+	
 	public MinAvgMaxLabelProvider(LabTableColumns parent) {
 		this.parent = parent;
 		sheet = parent.getLabResultsSheet();
@@ -55,17 +57,18 @@ public class MinAvgMaxLabelProvider extends StyledCellLabelProvider {
 			StyleRange[] ranges=new StyleRange[3];
 			ranges[0]=new StyleRange(0,text.length(),black,white);
 			ranges[0].font=parent.getSmallerFont();
-			text.append(" ");
+			text.append(" - ");
 			String avg=bucket.getAverageResult();
 			ranges[1]=new StyleRange(text.length(),avg.length(),black,white);
 			ranges[1].font=parent.getDefaultFont();
-			text.append(avg).append(" ");
+			text.append(avg).append(" - ");
 			String max=bucket.getMaxResult();
 			ranges[2]=new StyleRange(text.length(),max.length(),black,white);
 			ranges[2].font=parent.getSmallerFont();
 			text.append(max);
 			cell.setText(text.toString());
 			cell.setStyleRanges(ranges);
+			
 			
 		}
 		super.update(cell);
