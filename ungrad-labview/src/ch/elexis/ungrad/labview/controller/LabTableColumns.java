@@ -5,6 +5,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
 
+import ch.elexis.core.ui.UiDesk;
 import ch.elexis.ungrad.labview.Preferences;
 import ch.elexis.ungrad.labview.model.LabResultsSheet;
 
@@ -24,9 +25,9 @@ public class LabTableColumns {
 			cols[i] = new LabTableColumn(tv);
 		}
 		Display display = Display.getDefault();
-		FontData[] fontData = display.getSystemFont().getFontData();
+		FontData[] fontData = getDefaultFont().getFontData();
 		for (int i = 0; i < fontData.length; ++i) {
-			float h = fontData[i].getHeight() * 3 / 4;
+			float h = fontData[i].getHeight() * 4 / 5;
 			fontData[i].setHeight(Math.round(h));
 		}
 		smallerFont = new Font(display, fontData);
@@ -41,7 +42,7 @@ public class LabTableColumns {
 	}
 
 	public Font getDefaultFont(){
-		return Display.getDefault().getSystemFont();
+		return UiDesk.getFont(ch.elexis.core.constants.Preferences.USR_DEFAULTFONT);
 	}
 	public Font getSmallerFont() {
 		return smallerFont;
@@ -65,13 +66,13 @@ public class LabTableColumns {
 	private void reloadCompact(LabContentProvider lcp) {
 		cols[COL_RECENT].setLabel("aktuell");
 		cols[COL_RECENT].setWidth(100);
-		cols[COL_RECENT].setLabelProvider(new MinAvgMaxLabelProvider(this));
+		cols[COL_RECENT].setLabelProvider(new CondensedViewLabelProvider(this));
 		cols[COL_LASTYEAR].setLabel("letzte 12 Monate");
 		cols[COL_LASTYEAR].setWidth(100);
-		cols[COL_LASTYEAR].setLabelProvider(new MinAvgMaxLabelProvider(this));
+		cols[COL_LASTYEAR].setLabelProvider(new CondensedViewLabelProvider(this));
 		cols[COL_OLDER].setLabel("älter");
 		cols[COL_OLDER].setWidth(100);
-		cols[COL_OLDER].setLabelProvider(new MinAvgMaxLabelProvider(this));
+		cols[COL_OLDER].setLabelProvider(new CondensedViewLabelProvider(this));
 		for (int i = 5; i < cols.length; i++) {
 			cols[i].setWidth(0);
 			cols[i].setLabelProvider(new NullLabelProvider());
