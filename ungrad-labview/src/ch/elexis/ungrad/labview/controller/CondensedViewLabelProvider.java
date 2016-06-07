@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2016 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
 package ch.elexis.ungrad.labview.controller;
 
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
@@ -7,7 +20,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.TableItem;
 
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.ungrad.labview.model.Bucket;
@@ -15,6 +27,12 @@ import ch.elexis.ungrad.labview.model.Item;
 import ch.elexis.ungrad.labview.model.LabResultsRow;
 import ch.elexis.ungrad.labview.model.LabResultsSheet;
 
+/**
+ * An OwnerDraw LablProvider to display lab results in the "coondensed" view. There is a column for most recent lab results, for such older than a month
+ * and for such older than a year. For every group, min, max and avg values are shown-
+ * @author gerry
+ *
+ */
 public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 	final int padding = 4;
 	Font standard;

@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2016 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
 package ch.elexis.ungrad.labview.controller;
 
 import org.eclipse.jface.viewers.TableViewer;
@@ -11,6 +24,12 @@ import ch.elexis.core.ui.UiDesk;
 import ch.elexis.ungrad.labview.Preferences;
 import ch.elexis.ungrad.labview.model.LabResultsSheet;
 
+/**
+ * Host for all Columns in the Table
+ * 
+ * @author gerry
+ *
+ */
 public class LabTableColumns {
 	public static final int COL_RECENT = 2;
 	public static final int COL_LASTYEAR = 3;
@@ -24,7 +43,7 @@ public class LabTableColumns {
 		this.sheet = sheet;
 		cols = new TableViewerColumn[num];
 		for (int i = 0; i < num; i++) {
-			cols[i] = new TableViewerColumn(tv,SWT.NONE);
+			cols[i] = new TableViewerColumn(tv, SWT.NONE);
 			cols[i].getColumn().setResizable(true);
 		}
 		Display display = Display.getDefault();
@@ -40,19 +59,21 @@ public class LabTableColumns {
 		smallerFont.dispose();
 	}
 
-	public int getColumnWidth(int column){
-		if(column<0 || column>cols.length){
+	public int getColumnWidth(int column) {
+		if (column < 0 || column > cols.length) {
 			return 0;
 		}
 		return cols[column].getColumn().getWidth();
 	}
+
 	public LabResultsSheet getLabResultsSheet() {
 		return sheet;
 	}
 
-	public Font getDefaultFont(){
+	public Font getDefaultFont() {
 		return UiDesk.getFont(ch.elexis.core.constants.Preferences.USR_DEFAULTFONT);
 	}
+
 	public Font getSmallerFont() {
 		return smallerFont;
 	}
@@ -75,13 +96,13 @@ public class LabTableColumns {
 	private void reloadCompact(LabContentProvider lcp) {
 		cols[COL_RECENT].getColumn().setText("aktuell");
 		cols[COL_RECENT].getColumn().setWidth(130);
-		cols[COL_RECENT].setLabelProvider(new CondensedViewLabelProvider(this,COL_RECENT));
+		cols[COL_RECENT].setLabelProvider(new CondensedViewLabelProvider(this, COL_RECENT));
 		cols[COL_LASTYEAR].getColumn().setText("letzte 12 Monate");
 		cols[COL_LASTYEAR].getColumn().setWidth(130);
-		cols[COL_LASTYEAR].setLabelProvider(new CondensedViewLabelProvider(this,COL_LASTYEAR));
+		cols[COL_LASTYEAR].setLabelProvider(new CondensedViewLabelProvider(this, COL_LASTYEAR));
 		cols[COL_OLDER].getColumn().setText("älter");
 		cols[COL_OLDER].getColumn().setWidth(130);
-		cols[COL_OLDER].setLabelProvider(new CondensedViewLabelProvider(this,COL_OLDER));
+		cols[COL_OLDER].setLabelProvider(new CondensedViewLabelProvider(this, COL_OLDER));
 		for (int i = 5; i < cols.length; i++) {
 			cols[i].getColumn().setWidth(0);
 			cols[i].setLabelProvider(new NullLabelProvider());

@@ -32,18 +32,19 @@ public class Bucket {
 
 	private void makeBounds(String val, int index) {
 		if (!StringTool.isNothing(val)) {
-			String chopped = val.trim();
+			String chopped = val.replaceAll("\\s", "");
 			if (chopped.startsWith("<")) {
 				refBounds[index] = 0;
 				refBounds[index + 1] = makeFloat(chopped.substring(1));
 			} else if (chopped.startsWith(">")) {
 				refBounds[index] = makeFloat(chopped.substring(1));
+				refBounds[index+1]= Float.MAX_VALUE;
 			} else {
 				String[] bounds = chopped.split("-");
 				if (bounds.length > 0) {
-					refBounds[index] = makeFloat(bounds[0].trim());
+					refBounds[index] = makeFloat(bounds[0]);
 					if (bounds.length == 2) {
-						refBounds[index + 1] = makeFloat(bounds[1].trim());
+						refBounds[index + 1] = makeFloat(bounds[1]);
 					}
 				}
 			}
@@ -94,24 +95,24 @@ public class Bucket {
 
 	float makeFloat(String s){
 		if(s.startsWith("<")){
-			return makeFloatInternal(s.substring(1));
+			return makeFloatInternal(s.substring(1).trim());
 		}else if(s.startsWith(">")){
-			return makeFloatInternal(s.substring(1));
+			return makeFloatInternal(s.substring(1).trim());
 		}else{
 			return makeFloatInternal(s);
 		}
 	}
 	private float makeFloatInternal(String s) {
 		String[] splitted = s.split("[\\.,]");
-		if (splitted[0].matches("[0-9]+")) {
-			String einer = splitted[0];
+		if (splitted[0].matches("\\s*[0-9]+\\s*")) {
+			String einer = splitted[0].trim();
 			String frac = "0";
 			if (splitted.length > 2) {
 				return -1.0f;
 			}
 			if (splitted.length == 2) {
-				if (splitted[1].matches("[0-9]+")) {
-					frac = splitted[1];
+				if (splitted[1].matches("\\s*[0-9]+\\s*")) {
+					frac = splitted[1].trim();
 				} else {
 					return -1.0f;
 				}
