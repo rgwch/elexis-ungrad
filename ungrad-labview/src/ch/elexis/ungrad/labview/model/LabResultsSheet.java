@@ -14,13 +14,14 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import ch.elexis.core.exceptions.ElexisException;
+import ch.elexis.core.types.LabItemTyp;
 import ch.elexis.data.Patient;
 import ch.elexis.data.PersistentObject;
 import ch.rgw.tools.JdbcLink;
 import ch.rgw.tools.TimeTool;
 
 public class LabResultsSheet {
-	private static final String queryItems = "SELECT ID, titel,kuerzel,Gruppe,prio,RefMann,RefFrauOrTx FROM LABORITEMS WHERE deleted='0'";
+	private static final String queryItems = "SELECT ID, titel,kuerzel,Gruppe,prio,RefMann,RefFrauOrTx,Typ FROM LABORITEMS WHERE deleted='0'";
 	private static final String queryResults = "SELECT ItemID, Datum, Zeit, Resultat, Kommentar FROM LABORWERTE where PatientID=? AND deleted='0'";
 	Patient pat;
 
@@ -97,7 +98,7 @@ public class LabResultsSheet {
 				groups = new TreeMap<String, SortedSet<Item>>();
 				while (res.next()) {
 					Item item = new Item(res.getString(1), res.getString(2), res.getString(3), res.getString(4),
-							res.getString(5), res.getString(6), res.getString(7));
+							res.getString(5), res.getString(6), res.getString(7), res.getString(8));
 
 					SortedSet<Item> itemsInGroup = groups.get(item.gruppe);
 					if (itemsInGroup == null) {
@@ -145,7 +146,7 @@ public class LabResultsSheet {
 						res.getString(5));
 				Item item = items.get(result.itemId);
 				if (item == null) {
-					item = new Item("?", "?", "ZZZ", "999", "?", "?", "007");
+					item = new Item("?", "?", "ZZZ", "999", "?", "?", "007",LabItemTyp.TEXT.toString());
 				}
 				TimeTool when = new TimeTool(result.date);
 				dates.add(when);
@@ -153,19 +154,19 @@ public class LabResultsSheet {
 				if (when.isBefore(oneYear)) {
 					bucket = older.get(item);
 					if (bucket == null) {
-						bucket = new Bucket(item);
+						bucket = new Bucket(pat,item);
 						older.put(item, bucket);
 					}
 				} else if (when.isBeforeOrEqual(oneMonth)) {
 					bucket = lastYear.get(item);
 					if (bucket == null) {
-						bucket = new Bucket(item);
+						bucket = new Bucket(pat,item);
 						lastYear.put(item, bucket);
 					}
 				} else {
 					bucket = recently.get(item);
 					if (bucket == null) {
-						bucket = new Bucket(item);
+						bucket = new Bucket(pat,item);
 						recently.put(item, bucket);
 					}
 				}

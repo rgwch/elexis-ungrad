@@ -1,6 +1,7 @@
 package ch.elexis.ungrad.labview.controller;
 
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -8,6 +9,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.TableItem;
 
+import ch.elexis.core.ui.UiDesk;
 import ch.elexis.ungrad.labview.model.Bucket;
 import ch.elexis.ungrad.labview.model.Item;
 import ch.elexis.ungrad.labview.model.LabResultsRow;
@@ -20,6 +22,7 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 	LabTableColumns ltc;
 	int columnIndex;
 	LabResultsSheet sheet;
+	Color black, red;
 
 	public CondensedViewLabelProvider(LabTableColumns ltc, int column) {
 		standard = ltc.getDefaultFont();
@@ -27,6 +30,8 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 		this.ltc = ltc;
 		columnIndex = column;
 		sheet = ltc.getLabResultsSheet();
+		black = UiDesk.getColor(UiDesk.COL_BLACK);
+		red = UiDesk.getColor(UiDesk.COL_RED);
 	}
 
 	@Override
@@ -68,6 +73,7 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 			String avg = bucket.getAverageResult();
 			gc.setFont(standard);
 			Rectangle rCenter = centerText(gc, bounds, avg);
+			gc.setForeground(bucket.isPathologic(avg) ? red : black);
 			gc.drawText(avg, bounds.x + rCenter.x, bounds.y + rCenter.y);
 			if (bucket.getResultCount() > 1) {
 				gc.setFont(smaller);
@@ -75,8 +81,10 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 				Point ptRight = gc.textExtent(right);
 				int yOffset = rCenter.height - ptRight.y;
 				int xOffset = bounds.width - ptRight.x - padding;
+				gc.setForeground(bucket.isPathologic(right) ? red : black);
 				gc.drawText(right, bounds.x + xOffset, bounds.y + rCenter.y + yOffset);
 				String left = bucket.getMinResult();
+				gc.setForeground(bucket.isPathologic(left) ? red : black);
 				gc.drawText(left, bounds.x + padding, bounds.y + rCenter.y + yOffset);
 			}
 		}
