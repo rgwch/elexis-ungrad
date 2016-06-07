@@ -1,7 +1,6 @@
 package ch.elexis.ungrad.labview.controller;
 
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
@@ -38,6 +37,12 @@ public class LabTableColumns {
 		smallerFont.dispose();
 	}
 
+	public int getColumnWidth(int column){
+		if(column<0 || column>cols.length){
+			return 0;
+		}
+		return cols[column].getWidth();
+	}
 	public LabResultsSheet getLabResultsSheet() {
 		return sheet;
 	}
@@ -66,14 +71,14 @@ public class LabTableColumns {
 
 	private void reloadCompact(LabContentProvider lcp) {
 		cols[COL_RECENT].setLabel("aktuell");
-		cols[COL_RECENT].setWidth(100);
-		cols[COL_RECENT].setLabelProvider(new CondensedViewLabelProvider(this));
+		cols[COL_RECENT].setWidth(130);
+		cols[COL_RECENT].setLabelProvider(new CondensedViewLabelProvider(this,COL_RECENT));
 		cols[COL_LASTYEAR].setLabel("letzte 12 Monate");
-		cols[COL_LASTYEAR].setWidth(100);
-		cols[COL_LASTYEAR].setLabelProvider(new CondensedViewLabelProvider(this));
+		cols[COL_LASTYEAR].setWidth(130);
+		cols[COL_LASTYEAR].setLabelProvider(new CondensedViewLabelProvider(this,COL_LASTYEAR));
 		cols[COL_OLDER].setLabel("älter");
-		cols[COL_OLDER].setWidth(100);
-		cols[COL_OLDER].setLabelProvider(new CondensedViewLabelProvider(this));
+		cols[COL_OLDER].setWidth(130);
+		cols[COL_OLDER].setLabelProvider(new CondensedViewLabelProvider(this,COL_OLDER));
 		for (int i = 5; i < cols.length; i++) {
 			cols[i].setWidth(0);
 			cols[i].setLabelProvider(new NullLabelProvider());

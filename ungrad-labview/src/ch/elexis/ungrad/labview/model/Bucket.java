@@ -16,6 +16,10 @@ public class Bucket {
 		results.add(result);
 	}
 	
+	public int getResultCount(){
+		return results.size();
+	}
+	
 	public String getMinResult(){
 		float cmp=Float.MAX_VALUE;
 		for(Result result:results){
