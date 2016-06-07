@@ -11,7 +11,7 @@ public class LabTableColumn {
 	CellLabelProvider clp;
 	int width=0;
 	public LabTableColumn(TableViewer tv){
-		tvc=new TableViewerColumn(tv, SWT.NONE);
+		tvc=new TableViewerColumn(tv, SWT.CENTER);
 		tvc.getColumn().setResizable(true);
 	}
 	public void setLabel(String name){
