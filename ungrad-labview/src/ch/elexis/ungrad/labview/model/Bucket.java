@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2016 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
 package ch.elexis.ungrad.labview.model;
 
 import java.util.ArrayList;
@@ -8,6 +21,12 @@ import ch.elexis.core.types.LabItemTyp;
 import ch.elexis.data.Patient;
 import ch.rgw.tools.StringTool;
 
+/**
+ * A Bucket is a collection of all LabResults for a given LabItem and a given Patient. It can decide, whether a result is pathologic, and it
+ * can perform some statistics.
+ * @author gerry
+ *
+ */
 public class Bucket {
 	final String ntyp = Integer.toString(LabItemTyp.NUMERIC.ordinal());
 
@@ -51,14 +70,26 @@ public class Bucket {
 		}
 	}
 
+	/**
+	 * Add a Result to the bucket
+	 * @param result The Result to add
+	 */
 	void addResult(Result result) {
 		results.add(result);
 	}
 
+	/**
+	 * Get the number of Results in the Bucket.
+	 * @return a positive Integer
+	 */
 	public int getResultCount() {
 		return results.size();
 	}
 
+	/**
+	 * return the numerically lowest Result in the Bucket
+	 * @return a stringified version of the lowest Result
+	 */
 	public String getMinResult() {
 		float cmp = Float.MAX_VALUE;
 		for (Result result : results) {
@@ -70,6 +101,10 @@ public class Bucket {
 		return Float.toString(cmp);
 	}
 
+	/**
+	 * Get the numerically highest Result in the Bucket
+	 * @return a stringified versiuon of the highest Result.
+	 */
 	public String getMaxResult() {
 		float cmp = 0;
 		for (Result result : results) {
@@ -81,6 +116,10 @@ public class Bucket {
 		return Float.toString(cmp);
 	}
 
+	/**
+	 * Get the median value of all Results in the bucket 
+	 * @return a stringified verison of the arithmetic median value.
+	 */
 	public String getAverageResult() {
 		int num = 0;
 		float sum = 0;
@@ -93,7 +132,7 @@ public class Bucket {
 		return Float.toString(ret);
 	}
 
-	float makeFloat(String s){
+	private float makeFloat(String s){
 		if(s.startsWith("<")){
 			return makeFloatInternal(s.substring(1).trim());
 		}else if(s.startsWith(">")){
@@ -126,6 +165,11 @@ public class Bucket {
 		}
 	}
 
+	/**
+	 * Ast whether a (stringified) value is pathologic for the Item in this bucket
+	 * @param value the value to check
+	 * @return true if the value is pathologic (with respect to the norm range of the Item and the gender of the Patient)
+	 */
 	public boolean isPathologic(String value) {
 		String chopped = value.trim();
 		float val = 0f;
