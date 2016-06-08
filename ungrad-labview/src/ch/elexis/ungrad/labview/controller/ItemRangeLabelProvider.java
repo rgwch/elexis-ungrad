@@ -23,6 +23,7 @@ import ch.elexis.ungrad.labview.model.LabResultsRow;
 
 /**
  * LabelProvider for the norm-Range column
+ * 
  * @author gerry
  *
  */
@@ -30,13 +31,17 @@ public class ItemRangeLabelProvider extends CellLabelProvider {
 
 	@Override
 	public void update(ViewerCell cell) {
-		LabResultsRow results=(LabResultsRow) cell.getElement();
-		Item item=results.getItem();
-		Patient pat=results.getPatient();
-		if(pat.getGender()==Gender.FEMALE){
-			cell.setText(item.refFrauOrTx);
+		if (cell.getElement() instanceof LabResultsRow) {
+			LabResultsRow results = (LabResultsRow) cell.getElement();
+			Item item = results.getItem();
+			Patient pat = results.getPatient();
+			if (pat.getGender() == Gender.FEMALE) {
+				cell.setText(item.refFrauOrTx);
+			} else {
+				cell.setText(item.refMann);
+			}
 		}else{
-			cell.setText(item.refMann);
+			cell.setText("");
 		}
 	}
 

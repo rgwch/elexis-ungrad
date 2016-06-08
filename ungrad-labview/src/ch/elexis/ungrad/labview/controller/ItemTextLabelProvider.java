@@ -33,7 +33,7 @@ public class ItemTextLabelProvider extends CellLabelProvider {
 			Item item=row.getItem();
 			cell.setText(item.titel);
 		}else{
-			cell.setText("?");
+			cell.setText("-");
 		}
 	}
 

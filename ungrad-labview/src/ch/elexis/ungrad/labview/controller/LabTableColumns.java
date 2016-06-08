@@ -15,6 +15,8 @@ package ch.elexis.ungrad.labview.controller;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -35,15 +37,15 @@ public class LabTableColumns {
 	public static final int COL_LASTYEAR = 3;
 	public static final int COL_OLDER = 4;
 
-	private TableViewerColumn[] cols;
+	private TreeViewerColumn[] cols;
 	private LabResultsSheet sheet;
 	private Font smallerFont;
 
-	public LabTableColumns(LabResultsSheet sheet, TableViewer tv, int num) {
+	public LabTableColumns(LabResultsSheet sheet, TreeViewer tv, int num) {
 		this.sheet = sheet;
-		cols = new TableViewerColumn[num];
+		cols = new TreeViewerColumn[num];
 		for (int i = 0; i < num; i++) {
-			cols[i] = new TableViewerColumn(tv, SWT.NONE);
+			cols[i] = new TreeViewerColumn(tv, SWT.NONE);
 			cols[i].getColumn().setResizable(true);
 		}
 		Display display = Display.getDefault();

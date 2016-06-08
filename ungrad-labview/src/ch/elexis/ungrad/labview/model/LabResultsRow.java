@@ -18,7 +18,7 @@ import java.util.TreeSet;
 
 import ch.elexis.data.Patient;
 
-public class LabResultsRow {
+public class LabResultsRow implements Comparable{
 	Item item;
 	Patient patient;
 	SortedSet<Result> results;
@@ -43,6 +43,11 @@ public class LabResultsRow {
 	}
 	public Patient getPatient() {
 		return patient;
+	}
+	@Override
+	public int compareTo(Object o) {
+		LabResultsRow r=(LabResultsRow)o;
+		return item.compareTo(r.item);
 	}
 
 }

@@ -13,7 +13,7 @@
  *********************************************************************************/
 package ch.elexis.ungrad.labview.controller;
 
-import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import ch.elexis.core.exceptions.ElexisException;
@@ -23,10 +23,11 @@ import ch.elexis.ungrad.labview.model.LabResultsSheet;
 
 /**
  * The ContentProvider for the condensed view
+ * 
  * @author gerry
  *
  */
-public class LabContentProvider implements IStructuredContentProvider {
+public class LabContentProvider implements ITreeContentProvider {
 	LabResultsSheet lrs = new LabResultsSheet();
 
 	@Override
@@ -41,17 +42,37 @@ public class LabContentProvider implements IStructuredContentProvider {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		LabResultsRow[] items = lrs.getLabResults();
-		if (items == null) {
-			return new LabResultsRow[0];
+		Object[] groups = lrs.getGroups();
+		if (groups == null) {
+			return new String[0];
 		} else {
-			return items;
+			return groups;
 		}
 	}
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
+	}
+
+	@Override
+	public Object[] getChildren(Object element) {
+		return lrs.getRowsForGroup((String) element);
+	}
+
+	@Override
+	public Object getParent(Object element) {
+		LabResultsRow row = (LabResultsRow) element;
+		return row.getItem().gruppe;
+	}
+
+	@Override
+	public boolean hasChildren(Object element) {
+		if (element instanceof String) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

@@ -28,8 +28,11 @@ import ch.elexis.ungrad.labview.model.LabResultsRow;
 import ch.elexis.ungrad.labview.model.LabResultsSheet;
 
 /**
- * An OwnerDraw LablProvider to display lab results in the "coondensed" view. There is a column for most recent lab results, for such older than a month
- * and for such older than a year. For every group, min, max and avg values are shown-
+ * An OwnerDraw LablProvider to display lab results in the "coondensed" view.
+ * There is a column for most recent lab results, for such older than a month
+ * and for such older than a year. For every group, min, max and avg values are
+ * shown-
+ * 
  * @author gerry
  *
  */
@@ -61,50 +64,58 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 
 	@Override
 	protected void paint(Event event, Object element) {
-		LabResultsRow results = (LabResultsRow) element;
-		Item item = results.getItem();
-		Bucket bucket = null;
-		switch (columnIndex) {
-		case LabTableColumns.COL_RECENT:
-			bucket = sheet.getRecentBucket(item);
-			break;
-		case LabTableColumns.COL_LASTYEAR:
-			bucket = sheet.getOneYearBucket(item);
-			break;
-		case LabTableColumns.COL_OLDER:
-			bucket = sheet.getOlderBucket(item);
-			break;
-		default:
-			Rectangle ct = centerText(event.gc, event.getBounds(), "??");
-			event.gc.drawText("??", ct.x, ct.y);
-			return;
-		}
-		if (bucket != null) {
-			GC gc = event.gc;
-			if (item.titel.equals("WBC")) {
-				@SuppressWarnings("unused")
-				int x = 0;
-
+		if (element instanceof LabResultsRow) {
+			LabResultsRow results = (LabResultsRow) element;
+			Item item = results.getItem();
+			Bucket bucket = null;
+			switch (columnIndex) {
+			case LabTableColumns.COL_RECENT:
+				bucket = sheet.getRecentBucket(item);
+				break;
+			case LabTableColumns.COL_LASTYEAR:
+				bucket = sheet.getOneYearBucket(item);
+				break;
+			case LabTableColumns.COL_OLDER:
+				bucket = sheet.getOlderBucket(item);
+				break;
+			default:
+				Rectangle ct = centerText(event.gc, event.getBounds(), "??");
+				event.gc.drawText("??", ct.x, ct.y);
+				return;
 			}
+			if (bucket != null) {
+				GC gc = event.gc;
+				if (item.titel.equals("WBC")) {
+					@SuppressWarnings("unused")
+					int x = 0;
+
+				}
+				Rectangle bounds = event.getBounds();
+				bounds.width = ltc.getColumnWidth(columnIndex);
+				String avg = bucket.getAverageResult();
+				gc.setFont(standard);
+				Rectangle rCenter = centerText(gc, bounds, avg);
+				gc.setForeground(bucket.isPathologic(avg) ? red : black);
+				gc.drawText(avg, bounds.x + rCenter.x, bounds.y + rCenter.y);
+				if (bucket.getResultCount() > 1) {
+					gc.setFont(smaller);
+					String right = bucket.getMaxResult();
+					Point ptRight = gc.textExtent(right);
+					int yOffset = rCenter.height - ptRight.y;
+					int xOffset = bounds.width - ptRight.x - padding;
+					gc.setForeground(bucket.isPathologic(right) ? red : black);
+					gc.drawText(right, bounds.x + xOffset, bounds.y + rCenter.y + yOffset);
+					String left = bucket.getMinResult();
+					gc.setForeground(bucket.isPathologic(left) ? red : black);
+					gc.drawText(left, bounds.x + padding, bounds.y + rCenter.y + yOffset);
+				}
+			}
+		}else{
+			int idx=((String)element).indexOf(' ');
+			String text=((String)element).substring(idx==-1 ? 0 : idx+1);
 			Rectangle bounds = event.getBounds();
 			bounds.width = ltc.getColumnWidth(columnIndex);
-			String avg = bucket.getAverageResult();
-			gc.setFont(standard);
-			Rectangle rCenter = centerText(gc, bounds, avg);
-			gc.setForeground(bucket.isPathologic(avg) ? red : black);
-			gc.drawText(avg, bounds.x + rCenter.x, bounds.y + rCenter.y);
-			if (bucket.getResultCount() > 1) {
-				gc.setFont(smaller);
-				String right = bucket.getMaxResult();
-				Point ptRight = gc.textExtent(right);
-				int yOffset = rCenter.height - ptRight.y;
-				int xOffset = bounds.width - ptRight.x - padding;
-				gc.setForeground(bucket.isPathologic(right) ? red : black);
-				gc.drawText(right, bounds.x + xOffset, bounds.y + rCenter.y + yOffset);
-				String left = bucket.getMinResult();
-				gc.setForeground(bucket.isPathologic(left) ? red : black);
-				gc.drawText(left, bounds.x + padding, bounds.y + rCenter.y + yOffset);
-			}
+			event.gc.drawText(text, 4, 2);
 		}
 	}
 

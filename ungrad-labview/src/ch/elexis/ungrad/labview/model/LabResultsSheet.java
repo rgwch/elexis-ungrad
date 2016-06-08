@@ -57,7 +57,7 @@ public class LabResultsSheet {
 	JdbcLink j;
 	Map<String, Item> items;
 	Map<String, SortedSet<Item>> groups;
-	SortedMap<Item, LabResultsRow> rows;
+	SortedMap<Item, LabResultsRow> rows=new TreeMap<Item,LabResultsRow>();
 
 	@SuppressWarnings("deprecation")
 	public LabResultsSheet() {
@@ -259,6 +259,22 @@ public class LabResultsSheet {
 
 	}
 
+	public Object[] getGroups(){
+		SortedSet<String> groups=new TreeSet<String>();
+		rows.keySet().forEach(key -> groups.add(key.gruppe));
+		return groups.toArray();
+	}
+	
+	public Object[] getRowsForGroup(String group){
+		SortedSet<LabResultsRow> results=new TreeSet<LabResultsRow>();
+		rows.keySet().forEach(key -> {
+			if(key.gruppe.equals(group)){
+				results.add(rows.get(key));
+			}
+		});
+		return results.toArray();
+	}
+	/*
 	public Object[] getRows() {
 		if (rows == null) {
 			return new LabResultsRow[0];
@@ -266,4 +282,5 @@ public class LabResultsSheet {
 			return rows.values().toArray(new LabResultsRow[0]);
 		}
 	}
+	*/
 }
