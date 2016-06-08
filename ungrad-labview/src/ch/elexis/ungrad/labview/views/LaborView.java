@@ -70,7 +70,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
 		} else {
 			ElexisEventDispatcher.getInstance().removeListeners(eeli_pat);
-			// controller.saveState();
+			controller.saveState();
 		}
 	}
 

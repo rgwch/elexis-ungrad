@@ -75,7 +75,6 @@ public class Controller {
 	}
 
 	public void dispose() {
-		saveState();
 		cols.dispose();
 	}
 
