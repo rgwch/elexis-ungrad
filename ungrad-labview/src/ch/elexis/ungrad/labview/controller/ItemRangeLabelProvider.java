@@ -15,6 +15,8 @@ package ch.elexis.ungrad.labview.controller;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 
 import ch.elexis.core.types.Gender;
 import ch.elexis.data.Patient;
@@ -36,11 +38,12 @@ public class ItemRangeLabelProvider extends CellLabelProvider {
 			Item item = results.getItem();
 			Patient pat = results.getPatient();
 			if (pat.getGender() == Gender.FEMALE) {
-				cell.setText(item.refFrauOrTx);
+				cell.setText(item.get("RefFrauOrTx"));
 			} else {
-				cell.setText(item.refMann);
+				cell.setText(item.get("refMann"));
 			}
 		}else{
+			cell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
 			cell.setText("");
 		}
 	}

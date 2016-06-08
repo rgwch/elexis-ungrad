@@ -17,6 +17,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import ch.elexis.data.Patient;
+import ch.rgw.tools.TimeTool;
 
 public class LabResultsRow implements Comparable{
 	Item item;
@@ -38,6 +39,15 @@ public class LabResultsRow implements Comparable{
 			return null;
 		}
 	}
+	public Result get(TimeTool date){
+		for(Result res:results){
+			if(new TimeTool(res.get("datum")).isEqual(date)){
+				return res;
+			}
+		}
+		return null;
+	}
+	
 	public Item getItem(){
 		return item;
 	}

@@ -14,8 +14,14 @@
 package ch.elexis.ungrad.labview.controller;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
 
+import ch.elexis.core.ui.UiDesk;
 import ch.elexis.ungrad.labview.model.Item;
 import ch.elexis.ungrad.labview.model.LabResultsRow;
 
@@ -24,16 +30,25 @@ import ch.elexis.ungrad.labview.model.LabResultsRow;
  * @author gerry
  *
  */
-public class ItemTextLabelProvider extends CellLabelProvider {
-
+public class ItemTextLabelProvider extends StyledCellLabelProvider {
+	private Color headingsBG=Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+	private Color headingsFG=UiDesk.getColor(UiDesk.COL_BLUE);
+	
 	@Override
 	public void update(ViewerCell cell) {
 		if(cell.getElement() instanceof LabResultsRow){
 			LabResultsRow row=(LabResultsRow)cell.getElement();
 			Item item=row.getItem();
-			cell.setText(item.titel);
+			String titel=item.get("titel");
+			cell.setText(titel);
 		}else{
-			cell.setText("-");
+			String titel=(String)cell.getElement();
+			cell.setBackground(headingsBG);
+			cell.setForeground(headingsFG);
+			StyleRange sr=new StyleRange(0,titel.length(),null,null,SWT.BOLD);
+			cell.setStyleRanges(new StyleRange[]{sr});
+			cell.setText(titel);
+			super.update(cell);
 		}
 	}
 

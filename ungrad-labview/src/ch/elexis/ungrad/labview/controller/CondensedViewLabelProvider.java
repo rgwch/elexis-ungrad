@@ -14,11 +14,13 @@
 package ch.elexis.ungrad.labview.controller;
 
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 
 import ch.elexis.core.ui.UiDesk;
@@ -85,11 +87,6 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 			}
 			if (bucket != null) {
 				GC gc = event.gc;
-				if (item.titel.equals("WBC")) {
-					@SuppressWarnings("unused")
-					int x = 0;
-
-				}
 				Rectangle bounds = event.getBounds();
 				bounds.width = ltc.getColumnWidth(columnIndex);
 				String avg = bucket.getAverageResult();
@@ -110,12 +107,11 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 					gc.drawText(left, bounds.x + padding, bounds.y + rCenter.y + yOffset);
 				}
 			}
-		}else{
-			int idx=((String)element).indexOf(' ');
-			String text=((String)element).substring(idx==-1 ? 0 : idx+1);
+		} else {
 			Rectangle bounds = event.getBounds();
 			bounds.width = ltc.getColumnWidth(columnIndex);
-			event.gc.drawText(text, 4, 2);
+			event.gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+			event.gc.fillRectangle(bounds);
 		}
 	}
 

@@ -19,11 +19,14 @@ import java.util.List;
 import ch.elexis.core.types.Gender;
 import ch.elexis.core.types.LabItemTyp;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.Util;
 import ch.rgw.tools.StringTool;
 
 /**
- * A Bucket is a collection of all LabResults for a given LabItem and a given Patient. It can decide, whether a result is pathologic, and it
- * can perform some statistics.
+ * A Bucket is a collection of all LabResults for a given LabItem and a given
+ * Patient. It can decide, whether a result is pathologic, and it can perform
+ * some statistics.
+ * 
  * @author gerry
  *
  */
@@ -41,11 +44,16 @@ public class Bucket {
 	float[] refBounds = new float[4];
 
 	Bucket(Patient patient, Item item) {
+		Util.require(item!=null, "Bucket: item must not be null");
+		Util.require(patient!=null, "Bucket: Patient must not be null");
 		this.item = item;
 		pat = patient;
-		if (item.type.equals(ntyp)) {
-			makeBounds(item.refMann, 0);
-			makeBounds(item.refFrauOrTx, 2);
+		if(item.get("typ")==null){
+			System.out.println("item "+item.get("titel"));
+		}
+		if (item.get("typ").equals(ntyp)) {
+			makeBounds(item.get("refMann"), 0);
+			makeBounds(item.get("refFrauOrTx"), 2);
 		}
 	}
 
@@ -57,7 +65,7 @@ public class Bucket {
 				refBounds[index + 1] = makeFloat(chopped.substring(1));
 			} else if (chopped.startsWith(">")) {
 				refBounds[index] = makeFloat(chopped.substring(1));
-				refBounds[index+1]= Float.MAX_VALUE;
+				refBounds[index + 1] = Float.MAX_VALUE;
 			} else {
 				String[] bounds = chopped.split("-");
 				if (bounds.length > 0) {
@@ -72,7 +80,9 @@ public class Bucket {
 
 	/**
 	 * Add a Result to the bucket
-	 * @param result The Result to add
+	 * 
+	 * @param result
+	 *            The Result to add
 	 */
 	void addResult(Result result) {
 		results.add(result);
@@ -80,6 +90,7 @@ public class Bucket {
 
 	/**
 	 * Get the number of Results in the Bucket.
+	 * 
 	 * @return a positive Integer
 	 */
 	public int getResultCount() {
@@ -88,12 +99,13 @@ public class Bucket {
 
 	/**
 	 * return the numerically lowest Result in the Bucket
+	 * 
 	 * @return a stringified version of the lowest Result
 	 */
 	public String getMinResult() {
 		float cmp = Float.MAX_VALUE;
 		for (Result result : results) {
-			float val = makeFloat(result.result);
+			float val = makeFloat(result.get("resultat"));
 			if (val < cmp) {
 				cmp = val;
 			}
@@ -103,12 +115,13 @@ public class Bucket {
 
 	/**
 	 * Get the numerically highest Result in the Bucket
+	 * 
 	 * @return a stringified versiuon of the highest Result.
 	 */
 	public String getMaxResult() {
 		float cmp = 0;
 		for (Result result : results) {
-			float val = makeFloat(result.result);
+			float val = makeFloat(result.get("resultat"));
 			if (val > cmp) {
 				cmp = val;
 			}
@@ -117,14 +130,15 @@ public class Bucket {
 	}
 
 	/**
-	 * Get the median value of all Results in the bucket 
+	 * Get the median value of all Results in the bucket
+	 * 
 	 * @return a stringified verison of the arithmetic median value.
 	 */
 	public String getAverageResult() {
 		int num = 0;
 		float sum = 0;
 		for (Result result : results) {
-			sum += makeFloat(result.result);
+			sum += makeFloat(result.get("resultat"));
 			num += 1;
 		}
 		float avg = 100 * sum / num;
@@ -132,15 +146,16 @@ public class Bucket {
 		return Float.toString(ret);
 	}
 
-	private float makeFloat(String s){
-		if(s.startsWith("<")){
+	private float makeFloat(String s) {
+		if (s.startsWith("<")) {
 			return makeFloatInternal(s.substring(1).trim());
-		}else if(s.startsWith(">")){
+		} else if (s.startsWith(">")) {
 			return makeFloatInternal(s.substring(1).trim());
-		}else{
+		} else {
 			return makeFloatInternal(s);
 		}
 	}
+
 	private float makeFloatInternal(String s) {
 		String[] splitted = s.split("[\\.,]");
 		if (splitted[0].matches("\\s*[0-9]+\\s*")) {
@@ -166,9 +181,13 @@ public class Bucket {
 	}
 
 	/**
-	 * Ast whether a (stringified) value is pathologic for the Item in this bucket
-	 * @param value the value to check
-	 * @return true if the value is pathologic (with respect to the norm range of the Item and the gender of the Patient)
+	 * Ast whether a (stringified) value is pathologic for the Item in this
+	 * bucket
+	 * 
+	 * @param value
+	 *            the value to check
+	 * @return true if the value is pathologic (with respect to the norm range
+	 *         of the Item and the gender of the Patient)
 	 */
 	public boolean isPathologic(String value) {
 		String chopped = value.trim();

@@ -38,7 +38,7 @@ public class Controller {
 		tv.setContentProvider(lcp);
 		tv.setUseHashlookup(true);
 		Tree tree = tv.getTree();
-		cols = new LabTableColumns(lcp.lrs, tv, 10);
+		cols = new LabTableColumns(lcp.lrs, tv);
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
 		tv.setInput(lcp);

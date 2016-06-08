@@ -13,8 +13,7 @@
  *********************************************************************************/
 package ch.elexis.ungrad.labview.controller;
 
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
@@ -25,6 +24,7 @@ import org.eclipse.swt.widgets.Display;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.ungrad.labview.Preferences;
 import ch.elexis.ungrad.labview.model.LabResultsSheet;
+import ch.rgw.tools.TimeTool;
 
 /**
  * Host for all Columns in the Table
@@ -33,15 +33,17 @@ import ch.elexis.ungrad.labview.model.LabResultsSheet;
  *
  */
 public class LabTableColumns {
-	public static final int COL_RECENT = 2;
-	public static final int COL_LASTYEAR = 3;
-	public static final int COL_OLDER = 4;
+	public static final int COL_LATEST = 2;
+	public static final int COL_RECENT = 3;
+	public static final int COL_LASTYEAR = 4;
+	public static final int COL_OLDER = 5;
+	private final int num = COL_OLDER+1;
 
 	private TreeViewerColumn[] cols;
 	private LabResultsSheet sheet;
 	private Font smallerFont;
 
-	public LabTableColumns(LabResultsSheet sheet, TreeViewer tv, int num) {
+	public LabTableColumns(LabResultsSheet sheet, TreeViewer tv) {
 		this.sheet = sheet;
 		cols = new TreeViewerColumn[num];
 		for (int i = 0; i < num; i++) {
@@ -96,18 +98,21 @@ public class LabTableColumns {
 	}
 
 	private void reloadCompact(LabContentProvider lcp) {
-		cols[COL_RECENT].getColumn().setText("aktuell");
-		cols[COL_RECENT].getColumn().setWidth(130);
-		cols[COL_RECENT].setLabelProvider(new CondensedViewLabelProvider(this, COL_RECENT));
-		cols[COL_LASTYEAR].getColumn().setText("letzte 12 Monate");
-		cols[COL_LASTYEAR].getColumn().setWidth(130);
-		cols[COL_LASTYEAR].setLabelProvider(new CondensedViewLabelProvider(this, COL_LASTYEAR));
-		cols[COL_OLDER].getColumn().setText("älter");
-		cols[COL_OLDER].getColumn().setWidth(130);
-		cols[COL_OLDER].setLabelProvider(new CondensedViewLabelProvider(this, COL_OLDER));
-		for (int i = 5; i < cols.length; i++) {
-			cols[i].getColumn().setWidth(0);
-			cols[i].setLabelProvider(new NullLabelProvider());
+		TimeTool[] dates = lcp.lrs.getDates();
+		if (dates != null && dates.length>0) {
+			TimeTool date=dates[dates.length - 1];
+			defineColumn(cols[COL_LATEST],date.toString(TimeTool.DATE_GER),100,new LatestResultLabelProvider(date));
+		} else {
+			defineColumn(cols[COL_LATEST],"",10,new NullLabelProvider());
 		}
+		defineColumn(cols[COL_RECENT],"letzter Monat",130,new CondensedViewLabelProvider(this,COL_RECENT));
+		defineColumn(cols[COL_LASTYEAR],"letzte 12 Monat",130,new CondensedViewLabelProvider(this,COL_LASTYEAR));
+		defineColumn(cols[COL_OLDER],"älter",130,new CondensedViewLabelProvider(this,COL_OLDER));
+	}
+	
+	private void defineColumn(TreeViewerColumn tvc, String title, int width, CellLabelProvider lp){
+		tvc.getColumn().setText(title);
+		tvc.getColumn().setWidth(width);
+		tvc.setLabelProvider(lp);
 	}
 }

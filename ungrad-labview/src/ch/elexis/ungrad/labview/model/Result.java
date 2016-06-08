@@ -13,32 +13,27 @@
  *********************************************************************************/
 package ch.elexis.ungrad.labview.model;
 
-public class Result implements Comparable<Result>{
+import java.sql.ResultSet;
 
-	
-	String itemId, date,time,result,comment;
-	
-	public Result(String id, String dat,String zeit, String res, String com){
-		itemId=id;
-		date=dat;
-		time=zeit;
-		result=res;
-		comment=com;
+import ch.elexis.ungrad.SimpleObject;
+
+public class Result extends SimpleObject implements Comparable<Result> {
+	public static final String[] fields = { "ItemID", "Datum", "Zeit", "Resultat", "Kommentar" };
+
+	public Result(ResultSet res) {
+		load(res);
 	}
+
 	@Override
 	public int compareTo(Result o) {
-		if(date.equals(o.date)){
-			if(time==null){
-				return 1;
-			}else if(o.time==null){
-				return -1;
-			}else{
-				return time.compareTo(o.time);
-			}
-		}else{
-			return date.compareTo(o.date);
-		}
+		int cdat = compare(o, "datum");
+		return cdat == 0 ? compare(o, "zeit") : cdat;
+
 	}
-	
-	
+
+	@Override
+	public String[] getFields() {
+		return fields;
+	}
+
 }

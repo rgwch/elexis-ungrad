@@ -63,7 +63,7 @@ public class LabContentProvider implements ITreeContentProvider {
 	@Override
 	public Object getParent(Object element) {
 		LabResultsRow row = (LabResultsRow) element;
-		return row.getItem().gruppe;
+		return row.getItem().get("gruppe");
 	}
 
 	@Override

@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import ch.elexis.core.exceptions.ElexisException;
-import ch.elexis.core.types.LabItemTyp;
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.data.Patient;
 import ch.elexis.data.PersistentObject;
@@ -45,7 +44,7 @@ import ch.rgw.tools.TimeTool;
  */
 public class LabResultsSheet {
 	Log log = Log.get("LabResultSheet");
-	private static final String queryItems = "SELECT ID, titel,kuerzel,Gruppe,prio,RefMann,RefFrauOrTx,Typ FROM LABORITEMS WHERE deleted='0'";
+	private static final String queryItems = "SELECT ID, titel,kuerzel,Gruppe,prio,RefMann,RefFrauOrTx,Typ, Einheit FROM LABORITEMS WHERE deleted='0'";
 	private static final String queryResults = "SELECT ItemID, Datum, Zeit, Resultat, Kommentar FROM LABORWERTE where PatientID=? AND deleted='0'";
 	Patient pat;
 
@@ -57,7 +56,7 @@ public class LabResultsSheet {
 	JdbcLink j;
 	Map<String, Item> items;
 	Map<String, SortedSet<Item>> groups;
-	SortedMap<Item, LabResultsRow> rows=new TreeMap<Item,LabResultsRow>();
+	SortedMap<Item, LabResultsRow> rows = new TreeMap<Item, LabResultsRow>();
 
 	@SuppressWarnings("deprecation")
 	public LabResultsSheet() {
@@ -99,7 +98,9 @@ public class LabResultsSheet {
 
 	/**
 	 * Get all LabResults of the current patient
-	 * @return an Array with all LabResultsRows or null if no Patient is selected.
+	 * 
+	 * @return an Array with all LabResultsRows or null if no Patient is
+	 *         selected.
 	 * @see LabResultsRow
 	 */
 	public LabResultsRow[] getLabResults() {
@@ -108,7 +109,9 @@ public class LabResultsSheet {
 
 	/**
 	 * Fetch the Bucket with the latest results (less than a month old)
-	 * @param item The Item whose bucket is to retrieve
+	 * 
+	 * @param item
+	 *            The Item whose bucket is to retrieve
 	 * @return the Bucket
 	 * @see Bucket
 	 */
@@ -117,8 +120,11 @@ public class LabResultsSheet {
 	}
 
 	/**
-	 * Fetch the Bucket with the somewhat older Results (more than a month but less than a year old)
-	 * @param item the Item whose Bucket is to retrieve
+	 * Fetch the Bucket with the somewhat older Results (more than a month but
+	 * less than a year old)
+	 * 
+	 * @param item
+	 *            the Item whose Bucket is to retrieve
 	 * @return the Bucket
 	 * @see Bucket
 	 */
@@ -128,7 +134,9 @@ public class LabResultsSheet {
 
 	/**
 	 * Fetch the Bucket with the older Results (more than a year old)
-	 * @param item The Item whose Bucket is to retrieve
+	 * 
+	 * @param item
+	 *            The Item whose Bucket is to retrieve
 	 * @return the Bucket
 	 */
 	public Bucket getOlderBucket(Item item) {
@@ -142,7 +150,7 @@ public class LabResultsSheet {
 		TimeTool date = dateArray[nColumn];
 		LabResultsRow row = (LabResultsRow) rows.values().toArray()[nRow];
 		for (Result res : row.results) {
-			if (res.date.equals(date.toString(TimeTool.DATE_COMPACT))) {
+			if (res.get("datum").equals(date.toString(TimeTool.DATE_COMPACT))) {
 				return res;
 			}
 		}
@@ -151,6 +159,7 @@ public class LabResultsSheet {
 
 	/**
 	 * Fetch all dates with at least one Lab test for the current patient.
+	 * 
 	 * @return an ordered Array with alld ates
 	 */
 	public TimeTool[] getDates() {
@@ -168,16 +177,15 @@ public class LabResultsSheet {
 				items = new HashMap<String, Item>();
 				groups = new TreeMap<String, SortedSet<Item>>();
 				while (res.next()) {
-					Item item = new Item(res.getString(1), res.getString(2), res.getString(3), res.getString(4),
-							res.getString(5), res.getString(6), res.getString(7), res.getString(8));
+					Item item = new Item(res);
 
-					SortedSet<Item> itemsInGroup = groups.get(item.gruppe);
+					SortedSet<Item> itemsInGroup = groups.get(item.get("gruppe"));
 					if (itemsInGroup == null) {
 						itemsInGroup = new TreeSet<Item>();
 					}
 					itemsInGroup.add(item);
-					groups.put(item.gruppe, itemsInGroup);
-					items.put(item.id, item);
+					groups.put(item.get("gruppe"), itemsInGroup);
+					items.put(item.get("id"), item);
 				}
 				List<Item> allItems = new LinkedList<Item>();
 				for (Set<Item> set : groups.values()) {
@@ -213,13 +221,12 @@ public class LabResultsSheet {
 			ps.setString(1, pat.getId());
 			ResultSet res = ps.executeQuery();
 			while (res.next()) {
-				Result result = new Result(res.getString(1), res.getString(2), res.getString(3), res.getString(4),
-						res.getString(5));
-				Item item = items.get(result.itemId);
+				Result result = new Result(res);
+				Item item = items.get(result.get("itemId"));
 				if (item == null) {
-					item = new Item("?", "?", "ZZZ", "999", "?", "?", "007", LabItemTyp.TEXT.toString());
+					item = new Item("?");
 				}
-				TimeTool when = new TimeTool(result.date);
+				TimeTool when = new TimeTool(result.get("datum"));
 				dates.add(when);
 				Bucket bucket;
 				if (when.isBefore(oneYear)) {
@@ -259,28 +266,24 @@ public class LabResultsSheet {
 
 	}
 
-	public Object[] getGroups(){
-		SortedSet<String> groups=new TreeSet<String>();
-		rows.keySet().forEach(key -> groups.add(key.gruppe));
+	public Object[] getGroups() {
+		SortedSet<String> groups = new TreeSet<String>();
+		rows.keySet().forEach(key -> groups.add(key.get("gruppe")));
 		return groups.toArray();
 	}
-	
-	public Object[] getRowsForGroup(String group){
-		SortedSet<LabResultsRow> results=new TreeSet<LabResultsRow>();
+
+	public Object[] getRowsForGroup(String group) {
+		SortedSet<LabResultsRow> results = new TreeSet<LabResultsRow>();
 		rows.keySet().forEach(key -> {
-			if(key.gruppe.equals(group)){
+			if (key.get("gruppe").equals(group)) {
 				results.add(rows.get(key));
 			}
 		});
 		return results.toArray();
 	}
 	/*
-	public Object[] getRows() {
-		if (rows == null) {
-			return new LabResultsRow[0];
-		} else {
-			return rows.values().toArray(new LabResultsRow[0]);
-		}
-	}
-	*/
+	 * public Object[] getRows() { if (rows == null) { return new
+	 * LabResultsRow[0]; } else { return rows.values().toArray(new
+	 * LabResultsRow[0]); } }
+	 */
 }
