@@ -20,5 +20,6 @@ public class Preferences {
 	public static final Settings cfg = CoreHub.localCfg;
 	public static final String BASE = "ch.elexis.ungrad.labview.";
 	public static final String MODE = BASE + "mode";
+	public static final String COLWIDTHS = BASE + "colwidths";
 
 }

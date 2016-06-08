@@ -13,7 +13,6 @@
  *********************************************************************************/
 package ch.elexis.ungrad.labview.controller;
 
-import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;

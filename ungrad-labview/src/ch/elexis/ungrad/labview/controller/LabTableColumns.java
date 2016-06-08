@@ -20,9 +20,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.TreeColumn;
 
 import ch.elexis.core.ui.UiDesk;
-import ch.elexis.ungrad.labview.Preferences;
 import ch.elexis.ungrad.labview.model.LabResultsSheet;
 import ch.rgw.tools.TimeTool;
 
@@ -38,25 +38,40 @@ public class LabTableColumns {
 	public static final int COL_LASTYEAR = 4;
 	public static final int COL_OLDER = 5;
 	private final int num = COL_OLDER+1;
+	private final String[] captions={"Parameter","Referenz","","letzter Monat","letzte 12 Monate","älter"};
+	private int[] widths={150,150,100,130,130,130};
+	private LatestResultLabelProvider lrlp=new LatestResultLabelProvider();
+	private CellLabelProvider[] labelProviders={
+			new ItemTextLabelProvider(),
+			new ItemRangeLabelProvider(),
+			lrlp,
+			new CondensedViewLabelProvider(this, COL_RECENT),
+			new CondensedViewLabelProvider(this, COL_LASTYEAR),
+			new CondensedViewLabelProvider(this, COL_OLDER)
+	};
 
-	private TreeViewerColumn[] cols;
+	TreeViewerColumn[] cols;
 	private LabResultsSheet sheet;
 	private Font smallerFont;
 
 	public LabTableColumns(LabResultsSheet sheet, TreeViewer tv) {
 		this.sheet = sheet;
-		cols = new TreeViewerColumn[num];
-		for (int i = 0; i < num; i++) {
-			cols[i] = new TreeViewerColumn(tv, SWT.NONE);
-			cols[i].getColumn().setResizable(true);
-		}
 		Display display = Display.getDefault();
 		FontData[] fontData = getDefaultFont().getFontData();
 		for (int i = 0; i < fontData.length; ++i) {
-			float h = fontData[i].getHeight() * 4 / 5;
+			float h = fontData[i].getHeight() * 3f / 4f;
 			fontData[i].setHeight(Math.round(h));
 		}
 		smallerFont = new Font(display, fontData);
+		
+		cols = new TreeViewerColumn[num];
+		
+		for (int i = 0; i < num; i++) {
+			cols[i] = new TreeViewerColumn(tv, SWT.NONE);
+			defineColumn(cols[i],captions[i],widths[i],labelProviders[i]);
+		}
+
+	
 	}
 
 	public void dispose() {
@@ -83,36 +98,22 @@ public class LabTableColumns {
 	}
 
 	public void reload(LabContentProvider lcp) {
-		cols[0].getColumn().setText("Parameter");
-		cols[0].getColumn().setWidth(150);
-		cols[0].setLabelProvider(new ItemTextLabelProvider());
-		cols[1].getColumn().setText("Normbereich");
-		cols[1].getColumn().setWidth(150);
-		cols[1].setLabelProvider(new ItemRangeLabelProvider());
-		String mode = Preferences.cfg.get(Preferences.MODE, "compact");
-		switch (mode) {
-		case "compact":
-			reloadCompact(lcp);
-			break;
-		}
-	}
-
-	private void reloadCompact(LabContentProvider lcp) {
 		TimeTool[] dates = lcp.lrs.getDates();
 		if (dates != null && dates.length>0) {
 			TimeTool date=dates[dates.length - 1];
-			defineColumn(cols[COL_LATEST],date.toString(TimeTool.DATE_GER),100,new LatestResultLabelProvider(date));
+			cols[COL_LATEST].getColumn().setText(date.toString(TimeTool.DATE_GER));
+			lrlp.setDate(date);
 		} else {
-			defineColumn(cols[COL_LATEST],"",10,new NullLabelProvider());
+			cols[COL_LATEST].getColumn().setText("-");
+			lrlp.setDate(null);
 		}
-		defineColumn(cols[COL_RECENT],"letzter Monat",130,new CondensedViewLabelProvider(this,COL_RECENT));
-		defineColumn(cols[COL_LASTYEAR],"letzte 12 Monat",130,new CondensedViewLabelProvider(this,COL_LASTYEAR));
-		defineColumn(cols[COL_OLDER],"älter",130,new CondensedViewLabelProvider(this,COL_OLDER));
 	}
 	
 	private void defineColumn(TreeViewerColumn tvc, String title, int width, CellLabelProvider lp){
-		tvc.getColumn().setText(title);
-		tvc.getColumn().setWidth(width);
+		TreeColumn tc=tvc.getColumn();
+		tc.setText(title);
+		tc.setWidth(width);
+		tc.setResizable(true);
 		tvc.setLabelProvider(lp);
 	}
 }

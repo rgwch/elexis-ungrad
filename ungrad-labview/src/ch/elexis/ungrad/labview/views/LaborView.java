@@ -28,10 +28,10 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.labview.controller.Controller;
 
-public class LaborView extends ViewPart implements IActivationListener{
-	Controller controller=new Controller(this);
-	Log log=Log.get("LaborView");
-	
+public class LaborView extends ViewPart implements IActivationListener {
+	Controller controller = new Controller(this);
+	Log log = Log.get("LaborView");
+
 	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
 			ElexisEvent.EVENT_SELECTED) {
 
@@ -43,22 +43,23 @@ public class LaborView extends ViewPart implements IActivationListener{
 				log.log(e, "error loading patient data", Log.ERRORS);
 			}
 		}
-	
 
 	};
+
 	@Override
 	public void createPartControl(Composite parent) {
-		Control ctl=controller.createPartControl(parent);
+		Control ctl = controller.createPartControl(parent);
 		ctl.setLayoutData(SWTHelper.getFillGridData());
 		GlobalEventDispatcher.addActivationListener(this, this);
-	
+
 	}
 
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	public void visible(final boolean mode) {
 		try {
 			controller.setPatient(ElexisEventDispatcher.getSelectedPatient());
@@ -69,14 +70,19 @@ public class LaborView extends ViewPart implements IActivationListener{
 			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
 		} else {
 			ElexisEventDispatcher.getInstance().removeListeners(eeli_pat);
-			//save(COLUMN_WIDTHS,controller.getColumnWidths());
+			// controller.saveState();
 		}
 	}
 
 	@Override
 	public void activation(boolean mode) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	@Override
+	public void dispose() {
+		controller.dispose();
 	}
 
 }

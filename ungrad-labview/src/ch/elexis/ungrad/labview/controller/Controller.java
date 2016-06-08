@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.labview.Preferences;
 import ch.elexis.ungrad.labview.views.LaborView;
 
 public class Controller {
@@ -33,6 +34,26 @@ public class Controller {
 		this.view = view;
 	}
 
+	public void saveState(){
+		StringBuilder cw=new StringBuilder();
+		for(int i=0;i<cols.cols.length;i++){
+			cw.append(Integer.toString(cols.cols[i].getColumn().getWidth())).append(",");
+		}
+		String widths=cw.substring(0,cw.length()-1);
+		Preferences.cfg.set(Preferences.COLWIDTHS, widths);
+	}
+	
+	public void loadState(){
+		String colWidths=Preferences.cfg.get(Preferences.COLWIDTHS, "150,150,100,130,130,130");
+		int max=cols.cols.length;
+		int i=0;
+		for(String w:colWidths.split(",")){
+			if(i<max){
+			cols.cols[i].getColumn().setWidth(Integer.parseInt(w));
+			}
+		}
+		
+	}
 	public Control createPartControl(Composite parent) {
 		tv = new TreeViewer(parent);
 		tv.setContentProvider(lcp);
@@ -41,7 +62,9 @@ public class Controller {
 		cols = new LabTableColumns(lcp.lrs, tv);
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
+		tv.setAutoExpandLevel(2);
 		tv.setInput(lcp);
+		loadState();
 		return tree;
 	}
 
@@ -52,6 +75,7 @@ public class Controller {
 	}
 
 	public void dispose() {
+		saveState();
 		cols.dispose();
 	}
 

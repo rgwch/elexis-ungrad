@@ -39,27 +39,25 @@ import ch.elexis.ungrad.labview.model.LabResultsSheet;
  *
  */
 public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
-	final int padding = 4;
-	Font standard;
-	Font smaller;
+	final int padding = 8;
+	//Font standard;
+	//Font smaller;
 	LabTableColumns ltc;
 	int columnIndex;
-	LabResultsSheet sheet;
 	Color black, red;
 
 	public CondensedViewLabelProvider(LabTableColumns ltc, int column) {
-		standard = ltc.getDefaultFont();
-		smaller = ltc.getSmallerFont();
+		//standard = ltc.getDefaultFont();
+		//smaller = ltc.getSmallerFont();
 		this.ltc = ltc;
 		columnIndex = column;
-		sheet = ltc.getLabResultsSheet();
 		black = UiDesk.getColor(UiDesk.COL_BLACK);
 		red = UiDesk.getColor(UiDesk.COL_RED);
 	}
 
 	@Override
 	protected void measure(Event event, Object element) {
-		float h = standard.getFontData()[0].height;
+		float h = ltc.getDefaultFont().getFontData()[0].height;
 		int w = 200;
 		event.setBounds(new Rectangle(event.x, event.y, w, Math.round(1.5f * h)));
 	}
@@ -67,6 +65,7 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 	@Override
 	protected void paint(Event event, Object element) {
 		if (element instanceof LabResultsRow) {
+			LabResultsSheet sheet=ltc.getLabResultsSheet();
 			LabResultsRow results = (LabResultsRow) element;
 			Item item = results.getItem();
 			Bucket bucket = null;
@@ -90,16 +89,16 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 				Rectangle bounds = event.getBounds();
 				bounds.width = ltc.getColumnWidth(columnIndex);
 				String avg = bucket.getAverageResult();
-				gc.setFont(standard);
+				gc.setFont(ltc.getDefaultFont());
 				Rectangle rCenter = centerText(gc, bounds, avg);
 				gc.setForeground(bucket.isPathologic(avg) ? red : black);
 				gc.drawText(avg, bounds.x + rCenter.x, bounds.y + rCenter.y);
 				if (bucket.getResultCount() > 1) {
-					gc.setFont(smaller);
+					gc.setFont(ltc.getSmallerFont());
 					String right = bucket.getMaxResult();
 					Point ptRight = gc.textExtent(right);
 					int yOffset = rCenter.height - ptRight.y;
-					int xOffset = bounds.width - ptRight.x - padding;
+					int xOffset = (bounds.width - ptRight.x - padding);
 					gc.setForeground(bucket.isPathologic(right) ? red : black);
 					gc.drawText(right, bounds.x + xOffset, bounds.y + rCenter.y + yOffset);
 					String left = bucket.getMinResult();

@@ -14,8 +14,6 @@
 package ch.elexis.ungrad.labview.model;
 
 import java.sql.ResultSet;
-import java.util.HashMap;
-import java.util.Map;
 
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.ungrad.SimpleObject;

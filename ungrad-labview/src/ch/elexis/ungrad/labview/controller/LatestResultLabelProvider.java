@@ -12,22 +12,26 @@ import ch.rgw.tools.TimeTool;
 public class LatestResultLabelProvider extends CellLabelProvider {
 	private TimeTool myDate;
 
-	public LatestResultLabelProvider(TimeTool date) {
+	public void setDate(TimeTool date) {
 		myDate = date;
 	}
 
 	@Override
 	public void update(ViewerCell cell) {
-		if (cell.getElement() instanceof LabResultsRow) {
-			LabResultsRow row = (LabResultsRow) cell.getElement();
-			Result result = row.get(myDate);
-			if (result != null) {
-				cell.setText(result.get("resultat"));
-			}
+		if (myDate == null) {
+			cell.setText("");
 		} else {
-			cell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
-		}
+			if (cell.getElement() instanceof LabResultsRow) {
+				LabResultsRow row = (LabResultsRow) cell.getElement();
+				Result result = row.get(myDate);
+				if (result != null) {
+					cell.setText(result.get("resultat"));
+				}
+			} else {
+				cell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+			}
 
+		}
 	}
 
 }
