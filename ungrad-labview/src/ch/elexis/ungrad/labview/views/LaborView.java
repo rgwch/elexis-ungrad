@@ -36,7 +36,7 @@ import ch.elexis.ungrad.labview.controller.Controller;
 public class LaborView extends ViewPart implements IActivationListener {
 	Controller controller = new Controller(this);
 	Log log = Log.get("LaborView");
-	private Action exportHtmlAction;
+	private Action exportHtmlAction, viewInBrowserAction;
 
 	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
 			ElexisEvent.EVENT_SELECTED) {
@@ -61,7 +61,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 		GlobalEventDispatcher.addActivationListener(this, this);
 
 	}
-	
+
 	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
@@ -70,12 +70,12 @@ public class LaborView extends ViewPart implements IActivationListener {
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(exportHtmlAction);
+		manager.add(viewInBrowserAction);
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(exportHtmlAction);
 	}
-
 
 	@Override
 	public void setFocus() {
@@ -120,6 +120,17 @@ public class LaborView extends ViewPart implements IActivationListener {
 				controller.createHTML(LaborView.this.getSite().getShell());
 			}
 
+		};
+		viewInBrowserAction = new Action() {
+			{
+				setImageDescriptor(Images.IMG_EYE_WO_SHADOW.getImageDescriptor());
+				setToolTipText("In Browser ansehen");
+			}
+
+			@Override
+			public void run() {
+				controller.runInBrowser();
+			}
 		};
 	}
 }

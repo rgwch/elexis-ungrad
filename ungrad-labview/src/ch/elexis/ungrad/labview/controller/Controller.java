@@ -18,24 +18,28 @@ import java.io.IOException;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Tree;
 
 import ch.elexis.core.exceptions.ElexisException;
+import ch.elexis.core.ui.util.Log;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.labview.Preferences;
 import ch.elexis.ungrad.labview.model.LabResultsRow;
 import ch.elexis.ungrad.labview.model.Result;
 import ch.elexis.ungrad.labview.views.LaborView;
 import ch.rgw.io.FileTool;
+import ch.rgw.tools.TimeTool;
 
 public class Controller {
 	LabContentProvider lcp;
 	LaborView view;
 	TreeViewer tv;
 	LabTableColumns cols;
+	Log log = Log.get("Labview Controller");
 
 	public Controller(LaborView view) {
 		lcp = new LabContentProvider();
@@ -87,37 +91,69 @@ public class Controller {
 		cols.dispose();
 	}
 
+	public boolean runInBrowser() {
+		try {
+			String output = makeHtml();
+			File tmp=File.createTempFile("ungrad", ".html");
+			tmp.deleteOnExit();
+			FileTool.writeTextFile(tmp, output);
+			Program proggie = Program.findProgram("html");
+			if (proggie != null) {
+				proggie.execute(tmp.getAbsolutePath());
+			} else {
+				if (Program.launch(tmp.getAbsolutePath()) == false) {
+					Runtime.getRuntime().exec(tmp.getAbsolutePath());
+				}
+			}
+			return true;
+
+		} catch (Exception ex) {
+			log.log("could not create HTML " + ex.getMessage(), Log.ERRORS);
+			return false;
+		}
+	}
+
 	public boolean createHTML(Composite parent) {
 		FileDialog fd = new FileDialog(parent.getShell(), SWT.SAVE);
 		String file = fd.open();
 		if (file != null) {
-
-			StringBuilder html = new StringBuilder("<html><head></head><body><table>");
-
-			for (Object o : lcp.getElements(this)) {
-				html.append("<tr><th>").append(o.toString()).append("</th></tr>");
-				for (Object l : lcp.getChildren(o)) {
-					if (l instanceof LabResultsRow) {
-						LabResultsRow lr=(LabResultsRow)l;
-						html.append("<tr>");
-						html.append("<td><em>").append(lr.getItem().get("titel")).append("</em></td>");
-						for(Result res:lr.getResults()){
-							html.append("<td>").append(res.get("resultat")).append("</td>");
-						}
-						html.append("</tr>");
-					}
-				}
-			}
-			html.append("</table></body></html>");
 			try {
-				FileTool.writeTextFile(new File(file), html.toString());
+				String output = makeHtml();
+				FileTool.writeTextFile(new File(file), output);
 				return true;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.log(e, "Could not create HTML " + e.getMessage(), Log.ERRORS);
 				return false;
 			}
 		}
 		return false;
+	}
+
+	private String makeHtml() throws IOException {
+		StringBuilder html = new StringBuilder("<table>");
+		TimeTool[] dates = lcp.lrs.getDates();
+		html.append("<tr><th>Parameter</th><th>Referenz</th>");
+		for (TimeTool date : dates) {
+			html.append("<th>").append(date.toString(TimeTool.DATE_GER)).append("</td>");
+		}
+		for (Object o : lcp.getElements(this)) {
+			html.append("<tr><th>").append(o.toString()).append("</th></tr>");
+			for (Object l : lcp.getChildren(o)) {
+				if (l instanceof LabResultsRow) {
+					LabResultsRow lr = (LabResultsRow) l;
+					html.append("<tr>");
+					html.append("<td><em>").append(lr.getItem().get("titel")).append("</em></td><td>")
+							.append(lr.getItem().get("refMann")).append("</td>");
+					for (Result res : lr.getResults()) {
+						html.append("<td>").append(res.get("resultat")).append("</td>");
+					}
+					html.append("</tr>");
+				}
+			}
+		}
+		html.append("</table>");
+		String template = FileTool.readTextFile(new File("/Users/gerry/elexis/laborblatt_beispiel.html"));
+		String output = template.replace("[Laborwerte]", html.toString());
+		return output;
 	}
 }
