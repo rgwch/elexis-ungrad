@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Tree;
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.labview.Preferences;
 import ch.elexis.ungrad.labview.model.LabResultsRow;
 import ch.elexis.ungrad.labview.model.Result;
@@ -40,6 +41,7 @@ public class Controller {
 	TreeViewer tv;
 	LabTableColumns cols;
 	Log log = Log.get("Labview Controller");
+	Resolver resolver = new Resolver();
 
 	public Controller(LaborView view) {
 		lcp = new LabContentProvider();
@@ -94,7 +96,7 @@ public class Controller {
 	public boolean runInBrowser() {
 		try {
 			String output = makeHtml();
-			File tmp=File.createTempFile("ungrad", ".html");
+			File tmp = File.createTempFile("ungrad", ".html");
 			tmp.deleteOnExit();
 			FileTool.writeTextFile(tmp, output);
 			Program proggie = Program.findProgram("html");
@@ -121,7 +123,7 @@ public class Controller {
 				String output = makeHtml();
 				FileTool.writeTextFile(new File(file), output);
 				return true;
-			} catch (IOException e) {
+			} catch (Exception e) {
 				log.log(e, "Could not create HTML " + e.getMessage(), Log.ERRORS);
 				return false;
 			}
@@ -129,7 +131,7 @@ public class Controller {
 		return false;
 	}
 
-	private String makeHtml() throws IOException {
+	private String makeHtml() throws Exception {
 		StringBuilder html = new StringBuilder("<table>");
 		TimeTool[] dates = lcp.lrs.getDates();
 		html.append("<tr><th>Parameter</th><th>Referenz</th>");
@@ -152,7 +154,8 @@ public class Controller {
 			}
 		}
 		html.append("</table>");
-		String template = FileTool.readTextFile(new File("/Users/gerry/elexis/laborblatt_beispiel.html"));
+		String rawTemplate = FileTool.readTextFile(new File("/Users/gerry/elexis/laborblatt_beispiel.html"));
+		String template = resolver.resolve(rawTemplate);
 		String output = template.replace("[Laborwerte]", html.toString());
 		return output;
 	}
