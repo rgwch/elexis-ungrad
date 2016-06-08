@@ -48,6 +48,9 @@ public class LabResultsRow implements Comparable{
 		return null;
 	}
 	
+	public Result[] getResults(){
+		return results.toArray(new Result[0]);
+	}
 	public Item getItem(){
 		return item;
 	}

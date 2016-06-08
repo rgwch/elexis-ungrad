@@ -13,6 +13,7 @@
  *********************************************************************************/
 package ch.elexis.ungrad.labview.views;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.part.ViewPart;
@@ -23,6 +24,7 @@ import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
+import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
@@ -31,6 +33,7 @@ import ch.elexis.ungrad.labview.controller.Controller;
 public class LaborView extends ViewPart implements IActivationListener {
 	Controller controller = new Controller(this);
 	Log log = Log.get("LaborView");
+	private Action exportHtmlAction;
 
 	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
 			ElexisEvent.EVENT_SELECTED) {
@@ -50,6 +53,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 	public void createPartControl(Composite parent) {
 		Control ctl = controller.createPartControl(parent);
 		ctl.setLayoutData(SWTHelper.getFillGridData());
+		makeActions();
 		GlobalEventDispatcher.addActivationListener(this, this);
 
 	}
@@ -85,4 +89,18 @@ public class LaborView extends ViewPart implements IActivationListener {
 		controller.dispose();
 	}
 
+	private void makeActions() {
+		exportHtmlAction = new Action() {
+			{
+				setImageDescriptor(Images.IMG_EXPORT.getImageDescriptor());
+				setToolTipText("Laborblatt als HTML exportieren");
+			}
+
+			@Override
+			public void run() {
+				controller.createHTML(LaborView.this.getSite().getShell());
+			}
+
+		};
+	}
 }
