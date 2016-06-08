@@ -14,8 +14,11 @@
 package ch.elexis.ungrad.labview.views;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.events.ElexisEvent;
@@ -54,9 +57,25 @@ public class LaborView extends ViewPart implements IActivationListener {
 		Control ctl = controller.createPartControl(parent);
 		ctl.setLayoutData(SWTHelper.getFillGridData());
 		makeActions();
+		contributeToActionBars();
 		GlobalEventDispatcher.addActivationListener(this, this);
 
 	}
+	
+	private void contributeToActionBars() {
+		IActionBars bars = getViewSite().getActionBars();
+		fillLocalPullDown(bars.getMenuManager());
+		fillLocalToolBar(bars.getToolBarManager());
+	}
+
+	private void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(exportHtmlAction);
+	}
+
+	private void fillLocalPullDown(IMenuManager manager) {
+		manager.add(exportHtmlAction);
+	}
+
 
 	@Override
 	public void setFocus() {

@@ -100,9 +100,9 @@ public class Controller {
 					if (l instanceof LabResultsRow) {
 						LabResultsRow lr=(LabResultsRow)l;
 						html.append("<tr>");
-						html.append("<td><em>").append(lr.getItem().get("title")).append("</em></td>");
+						html.append("<td><em>").append(lr.getItem().get("titel")).append("</em></td>");
 						for(Result res:lr.getResults()){
-							html.append("<td>").append(res.get("result")).append("</td>");
+							html.append("<td>").append(res.get("resultat")).append("</td>");
 						}
 						html.append("</tr>");
 					}
