@@ -281,9 +281,4 @@ public class LabResultsSheet {
 		});
 		return results.toArray();
 	}
-	/*
-	 * public Object[] getRows() { if (rows == null) { return new
-	 * LabResultsRow[0]; } else { return rows.values().toArray(new
-	 * LabResultsRow[0]); } }
-	 */
 }

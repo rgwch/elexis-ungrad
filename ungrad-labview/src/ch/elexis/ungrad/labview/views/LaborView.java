@@ -117,7 +117,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 
 			@Override
 			public void run() {
-				controller.createHTML(LaborView.this.getSite().getShell());
+				controller.getExporter().createHTML(LaborView.this.getSite().getShell());
 			}
 
 		};
@@ -129,7 +129,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 
 			@Override
 			public void run() {
-				controller.runInBrowser();
+				controller.getExporter().runInBrowser();
 			}
 		};
 	}
