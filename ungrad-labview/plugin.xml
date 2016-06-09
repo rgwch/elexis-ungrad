@@ -10,5 +10,13 @@
             restorable="true">
       </view>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="ch.elexis.ungrad.labview.views.PreferencePage"
+            id="ch.ungrad.labview.preferencePage"
+            name="Ungrad-Labview">
+      </page>
+   </extension>
 
 </plugin>
