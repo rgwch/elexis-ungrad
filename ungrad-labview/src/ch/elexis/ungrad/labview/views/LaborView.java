@@ -16,6 +16,9 @@ package ch.elexis.ungrad.labview.views;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IActionBars;
@@ -54,8 +57,18 @@ public class LaborView extends ViewPart implements IActivationListener {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		Control ctl = controller.createPartControl(parent);
-		ctl.setLayoutData(SWTHelper.getFillGridData());
+		CTabFolder ctf=new CTabFolder(parent, SWT.BOTTOM);
+		ctf.setLayoutData(SWTHelper.getFillGridData());
+		CTabItem ctSummary=new CTabItem(ctf,SWT.NONE);
+		ctSummary.setText("Ansicht");
+		CTabItem ctInput=new CTabItem(ctf,SWT.NONE);
+		ctInput.setText("Eingabe");
+		Control ctlSummary = controller.createSummaryControl(ctf);
+		//ctl.setLayoutData(SWTHelper.getFillGridData());
+		ctSummary.setControl(ctlSummary);
+		Control ctlInput=controller.createInputControl(ctf);
+		ctInput.setControl(ctlInput);
+		ctf.setSelection(ctSummary);
 		makeActions();
 		contributeToActionBars();
 		GlobalEventDispatcher.addActivationListener(this, this);

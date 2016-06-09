@@ -27,7 +27,7 @@ import ch.elexis.ungrad.labview.model.LabResultsSheet;
  * @author gerry
  *		
  */
-public class LabContentProvider implements ITreeContentProvider {
+public class LabSummaryContentProvider implements ITreeContentProvider {
 	LabResultsSheet lrs = new LabResultsSheet();
 	
 	@Override

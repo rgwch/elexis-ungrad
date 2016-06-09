@@ -36,10 +36,10 @@ import ch.rgw.tools.TimeTool;
 
 public class Exporter {
 	private Resolver resolver = new Resolver();
-	private LabContentProvider lcp;
+	private LabSummaryContentProvider lcp;
 	Logger log = Logger.getLogger(getClass().getName());
 	
-	public Exporter(LabContentProvider lcp){
+	public Exporter(LabSummaryContentProvider lcp){
 		this.lcp = lcp;
 	}
 	

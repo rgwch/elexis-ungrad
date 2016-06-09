@@ -42,11 +42,11 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 	final int padding = 8;
 	// Font standard;
 	// Font smaller;
-	LabTableColumns ltc;
+	LabSummaryTableColumns ltc;
 	int columnIndex;
 	Color black, red;
 	
-	public CondensedViewLabelProvider(LabTableColumns ltc, int column){
+	public CondensedViewLabelProvider(LabSummaryTableColumns ltc, int column){
 		// standard = ltc.getDefaultFont();
 		// smaller = ltc.getSmallerFont();
 		this.ltc = ltc;
@@ -71,13 +71,13 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 			Item item = results.getItem();
 			Bucket bucket = null;
 			switch (columnIndex) {
-			case LabTableColumns.COL_RECENT:
+			case LabSummaryTableColumns.COL_RECENT:
 				bucket = sheet.getRecentBucket(item);
 				break;
-			case LabTableColumns.COL_LASTYEAR:
+			case LabSummaryTableColumns.COL_LASTYEAR:
 				bucket = sheet.getOneYearBucket(item);
 				break;
-			case LabTableColumns.COL_OLDER:
+			case LabSummaryTableColumns.COL_OLDER:
 				bucket = sheet.getOlderBucket(item);
 				break;
 			default:
