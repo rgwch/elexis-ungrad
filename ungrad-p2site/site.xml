@@ -6,5 +6,9 @@
    <feature url="features/ch.elexis.omnivore.feature_3.0.0.qualifier.jar" id="ch.elexis.omnivore.feature" version="3.0.0.qualifier">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
+   <feature url="features/ch.elexis.ungrad.labview.feature_1.0.1.qualifier.jar" id="ch.elexis.ungrad.labview.feature" version="1.0.1.qualifier">
+      <category name="ch.elexis.ungrad.findings"/>
+   </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
+   <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
 </site>

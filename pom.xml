@@ -21,7 +21,10 @@
     <modules>
         <module>ungrad-docmgr-lucinda</module>
         <module>ungrad-docmgr-lucinda-feature</module>
-        <!-- module>ungrad-branding</module -->
+        <module>ungrad-labview</module>
+        <module>ungrad-labview-feature</module>
+        <module>ungrad-branding</module>
+        <module>ungrad-branding-feature</module>
         <module>ungrad-p2site</module>
     </modules>
     <repositories>
