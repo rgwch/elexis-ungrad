@@ -16,28 +16,27 @@ package ch.elexis.ungrad.labview.controller;
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.TreeItem;
 
+import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.UiDesk;
+import ch.elexis.data.Patient;
 import ch.elexis.ungrad.labview.model.Bucket;
 import ch.elexis.ungrad.labview.model.Item;
 import ch.elexis.ungrad.labview.model.LabResultsRow;
 import ch.elexis.ungrad.labview.model.LabResultsSheet;
 
 /**
- * An OwnerDraw LablProvider to display lab results in the "coondensed" view.
- * There is a column for most recent lab results, for such older than a month
- * and for such older than a year. For every group, min, max and avg values are
- * shown-
+ * An OwnerDraw LablProvider to display lab results in the "coondensed" view. There is a column for
+ * most recent lab results, for such older than a month and for such older than a year. For every
+ * group, min, max and avg values are shown-
  * 
  * @author gerry
- *
+ * 		
  */
 public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 	final int padding = 8;
@@ -46,8 +45,8 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 	LabTableColumns ltc;
 	int columnIndex;
 	Color black, red;
-
-	public CondensedViewLabelProvider(LabTableColumns ltc, int column) {
+	
+	public CondensedViewLabelProvider(LabTableColumns ltc, int column){
 		// standard = ltc.getDefaultFont();
 		// smaller = ltc.getSmallerFont();
 		this.ltc = ltc;
@@ -55,17 +54,17 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 		black = UiDesk.getColor(UiDesk.COL_BLACK);
 		red = UiDesk.getColor(UiDesk.COL_RED);
 	}
-
+	
 	@Override
-	protected void measure(Event event, Object element) {
+	protected void measure(Event event, Object element){
 		float h = ltc.getDefaultFont().getFontData()[0].height;
 		int w = 200;
 		event.setBounds(new Rectangle(event.x, event.y, w, Math.round(1.5f * h)));
 	}
 	
 	@Override
-	protected void paint(Event event, Object element) {
-		
+	protected void paint(Event event, Object element){
+		Patient actPat = ElexisEventDispatcher.getSelectedPatient();
 		if (element instanceof LabResultsRow) {
 			LabResultsSheet sheet = ltc.getLabResultsSheet();
 			LabResultsRow results = (LabResultsRow) element;
@@ -93,7 +92,7 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 				String avg = bucket.getAverageResult();
 				gc.setFont(ltc.getDefaultFont());
 				Rectangle rCenter = centerText(gc, bounds, avg);
-				gc.setForeground(bucket.isPathologic(avg) ? red : black);
+				gc.setForeground(item.isPathologic(actPat, avg) ? red : black);
 				//gc.setBackground(((TreeItem)event.item)..getBackground(columnIndex));
 				
 				gc.drawText(avg, bounds.x + rCenter.x, bounds.y + rCenter.y);
@@ -103,17 +102,20 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 					Point ptRight = gc.textExtent(right);
 					int yOffset = rCenter.height - ptRight.y;
 					// int xOffset = (bounds.width - ptRight.x - padding);
-					float trailingSpace=(float)bounds.width-(float)rCenter.width-(float)rCenter.x;
-					float remainingSpace=trailingSpace-(float)ptRight.x;
-					float xOffset=(float)bounds.x+(float)rCenter.x+(float)rCenter.width+(remainingSpace/2f);
-					gc.setForeground(bucket.isPathologic(right) ? red : black);
+					float trailingSpace =
+						(float) bounds.width - (float) rCenter.width - (float) rCenter.x;
+					float remainingSpace = trailingSpace - (float) ptRight.x;
+					float xOffset = (float) bounds.x + (float) rCenter.x + (float) rCenter.width
+						+ (remainingSpace / 2f);
+					gc.setForeground(item.isPathologic(actPat, right) ? red : black);
 					gc.drawText(right, Math.round(xOffset), bounds.y + rCenter.y + yOffset);
 					String left = bucket.getMinResult();
-					Point ptLeft=gc.stringExtent(left);
-					float leadingSpace=rCenter.x-ptLeft.x;
-					xOffset=leadingSpace/2;
-					gc.setForeground(bucket.isPathologic(left) ? red : black);
-					gc.drawText(left, Math.round((float)bounds.x + xOffset), bounds.y + rCenter.y + yOffset);
+					Point ptLeft = gc.stringExtent(left);
+					float leadingSpace = rCenter.x - ptLeft.x;
+					xOffset = leadingSpace / 2;
+					gc.setForeground(item.isPathologic(actPat, left) ? red : black);
+					gc.drawText(left, Math.round((float) bounds.x + xOffset),
+						bounds.y + rCenter.y + yOffset);
 				}
 			}
 		} else {
@@ -124,12 +126,11 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 		}
 	}
 	
-
-	Rectangle centerText(GC gc, Rectangle bounds, String text) {
+	Rectangle centerText(GC gc, Rectangle bounds, String text){
 		Point pt = gc.stringExtent(text);
 		float yoffs = ((float) bounds.height - (float) pt.y) / 2f;
 		float xoffs = ((float) bounds.width - (float) pt.x) / 2f;
 		return new Rectangle(Math.round(xoffs), Math.round(yoffs), pt.x, pt.y);
 	}
-
+	
 }

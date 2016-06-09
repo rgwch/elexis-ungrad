@@ -19,29 +19,32 @@ import java.util.TreeSet;
 import ch.elexis.data.Patient;
 import ch.rgw.tools.TimeTool;
 
-public class LabResultsRow implements Comparable{
+public class LabResultsRow implements Comparable<LabResultsRow> {
 	Item item;
 	Patient patient;
 	SortedSet<Result> results;
-
+	
 	public LabResultsRow(Item item, Patient pat){
-		this.item=item;
-		results=new TreeSet<Result>();
-		this.patient=pat;
+		this.item = item;
+		results = new TreeSet<Result>();
+		this.patient = pat;
 	}
+	
 	public void add(Result result){
 		results.add(result);
 	}
+	
 	public Result get(int index){
-		if(results.size()>index){
+		if (results.size() > index) {
 			return (Result) (results.toArray()[index]);
-		}else{
+		} else {
 			return null;
 		}
 	}
+	
 	public Result get(TimeTool date){
-		for(Result res:results){
-			if(new TimeTool(res.get("datum")).isEqual(date)){
+		for (Result res : results) {
+			if (new TimeTool(res.get("datum")).isEqual(date)) {
 				return res;
 			}
 		}
@@ -51,16 +54,18 @@ public class LabResultsRow implements Comparable{
 	public Result[] getResults(){
 		return results.toArray(new Result[0]);
 	}
+	
 	public Item getItem(){
 		return item;
 	}
-	public Patient getPatient() {
+	
+	public Patient getPatient(){
 		return patient;
 	}
+	
 	@Override
-	public int compareTo(Object o) {
-		LabResultsRow r=(LabResultsRow)o;
+	public int compareTo(LabResultsRow r){
 		return item.compareTo(r.item);
 	}
-
+	
 }

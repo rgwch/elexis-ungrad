@@ -42,6 +42,7 @@ public class Exporter {
 			return true;
 
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			log.log(Level.SEVERE, "could not create HTML " + ex.getMessage());
 			return false;
 		}
@@ -86,6 +87,9 @@ public class Exporter {
 		}
 		ret.append("</tr>");
 		for (Object o : lcp.getElements(this)) {
+			if(o.toString().startsWith("00")){
+				continue;
+			}
 			ret.append("<tr><th>").append(o.toString()).append("</th></tr>");
 			for (Object l : lcp.getChildren(o)) {
 				if (l instanceof LabResultsRow) {

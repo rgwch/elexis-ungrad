@@ -25,23 +25,23 @@ import ch.elexis.ungrad.labview.model.LabResultsSheet;
  * The ContentProvider for the condensed view
  * 
  * @author gerry
- *
+ *		
  */
 public class LabContentProvider implements ITreeContentProvider {
 	LabResultsSheet lrs = new LabResultsSheet();
-
+	
 	@Override
-	public void dispose() {
+	public void dispose(){
 		// TODO Auto-generated method stub
-
+		
 	}
-
-	void setPatient(Patient pat) throws ElexisException {
+	
+	void setPatient(Patient pat) throws ElexisException{
 		lrs.setPatient(pat);
 	}
-
+	
 	@Override
-	public Object[] getElements(Object inputElement) {
+	public Object[] getElements(Object inputElement){
 		Object[] groups = lrs.getGroups();
 		if (groups == null) {
 			return new String[0];
@@ -49,30 +49,30 @@ public class LabContentProvider implements ITreeContentProvider {
 			return groups;
 		}
 	}
-
+	
 	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput){
+	
 	}
-
+	
 	@Override
-	public Object[] getChildren(Object element) {
+	public Object[] getChildren(Object element){
 		return lrs.getRowsForGroup((String) element);
 	}
-
+	
 	@Override
-	public Object getParent(Object element) {
+	public Object getParent(Object element){
 		LabResultsRow row = (LabResultsRow) element;
 		return row.getItem().get("gruppe");
 	}
-
+	
 	@Override
-	public boolean hasChildren(Object element) {
+	public boolean hasChildren(Object element){
 		if (element instanceof String) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-
+	
 }
