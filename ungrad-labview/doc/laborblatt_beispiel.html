@@ -4,8 +4,11 @@
 <meta charset="utf-8" />
 <title>Praxis Breite - Laborblatt von [Patient.Name]
 	[Patient.Vorname], [Patient.Geburtsdatum].</title>
+
+<!-- Zwischen <style> und </style> befinden sich die Anweisungen, wie das Laborblatt gestaltet werden soll. -->	
 <style>
 table {
+/* Stil für die Tabelle mit den Laborwerten */
 	border-collapse: collapse;
 	padding: 8px;
 }
@@ -16,6 +19,8 @@ table, th, td {
 }
 
 .rowheader {
+	/* Die erste Spalte mit den Namen der Analysen */
+
 	text-align: left;
 	font-weight: normal;
 	background-color: #e6f7ff;
@@ -23,16 +28,24 @@ table, th, td {
 }
 
 th.group {
+	/* Die Zeilen mit den Gruppennamen */
 	background-color: #e6e6e6;
 }
 
+.pathologic{
+	/* Darstellung pathologischer Werte */
+	color: red;
+}
+
 .ref {
+	/* Darstellung des Referenzbereichs */
 	text-align: left;
 	font-weight: normal;
 	font-style: italic;
 }
 
 td {
+	/* Tabellenzellen, alle gemeinsam */
 	padding: 4px;
 	margin: 2px;
 }
@@ -42,7 +55,7 @@ td {
 	<h1>Praxis Breite, Rietstrasse 30, 8200 Schaffhausen</h1>
 	<h2>Laborblatt von [Patient.Name] [Patient.Vorname], geb.
 		[Patient.Geburtsdatum]</h2>
-	<p>gedruckt am [Datum.heute]</p>
+	<p>gedruckt am [Datum.heute]. Für Rückfragen Tel. 052 624 40 77</p>
 	[Laborwerte]
 </body>
 </html>

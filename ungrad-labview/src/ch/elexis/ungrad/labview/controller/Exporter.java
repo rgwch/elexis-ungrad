@@ -1,3 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2016 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad.labview.controller;
 
 import java.io.File;
@@ -88,9 +102,11 @@ public class Exporter {
 	}
 	
 	private String makeFullGrid(TimeTool[] dates){
+		String[] exclusions=Preferences.cfg.get(Preferences.EXCLUDE,"00,?").split(",");
+
 		StringBuilder ret = new StringBuilder("<table class=\"fullgrid\">");
 		ret.append("<tr><th class=\"rowheader\">Parameter</th><th class=\"ref\">Referenz</th>");
-		int lim = dates.length > 9 ? dates.length - 9 : -1;
+		int lim = dates.length > 8 ? dates.length - 8 : -1;
 		for (int i = dates.length - 1; i > lim; i--) {
 			ret.append("<th>").append(dates[i].toString(TimeTool.DATE_GER)).append("</th>");
 		}
@@ -99,13 +115,16 @@ public class Exporter {
 		}
 		ret.append("</tr>");
 		for (Object o : lcp.getElements(this)) {
-			if (o.toString().startsWith("00") || o.toString().contains("?")) {
+			if(isExcluded(o.toString(),exclusions)){
 				continue;
 			}
 			ret.append("<tr><th class=\"group\" colspan=\""+dates.length+2+"\">").append(o.toString()).append("</th></tr>");
 			for (Object l : lcp.getChildren(o)) {
 				if (l instanceof LabResultsRow) {
 					LabResultsRow lr = (LabResultsRow) l;
+					if(isExcluded(lr.getItem().get("titel"),exclusions)){
+						continue;
+					}
 					ret.append("<tr>");
 					ret.append("<td class=\"rowheader\">").append(lr.getItem().get("titel"))
 						.append("</td><td class=\"ref\">").append(lr.getItem().get("refMann"))
@@ -130,6 +149,16 @@ public class Exporter {
 		}
 		return ret.toString();
 	}
+	
+	private boolean isExcluded(String value, String[] exclusions){
+		for(String excl:exclusions){
+			if(value.contains(excl)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	private String make(LabResultsRow lr, Result res){
 		String raw=res.get("resultat").replaceAll("\\s+", "");
 		if(raw.startsWith("-")){
