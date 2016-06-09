@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 
 import ch.elexis.ungrad.Resolver;
+import ch.elexis.ungrad.labview.model.Bucket;
 import ch.elexis.ungrad.labview.model.LabResultsRow;
 import ch.elexis.ungrad.labview.model.Result;
 import ch.rgw.io.FileTool;
@@ -75,25 +76,35 @@ public class Exporter {
 
 	private String makeFullGrid(TimeTool[] dates) {
 		StringBuilder ret = new StringBuilder("<table class=\"fullgrid\">");
-		ret.append("<tr><th>Parameter</th><th>Referenz</th>");
-		for (int i = dates.length - 1; i > -1; i--) {
+		ret.append("<tr><th class=\"rowheader\">Parameter</th><th class=\"ref\">Referenz</th>");
+		int lim = dates.length > 9 ? dates.length - 9 : -1;
+		for (int i = dates.length - 1; i > lim; i--) {
 			ret.append("<th>").append(dates[i].toString(TimeTool.DATE_GER)).append("</th>");
 		}
+		if (lim > -1) {
+			ret.append("<th>früher</td>");
+		}
+		ret.append("</tr>");
 		for (Object o : lcp.getElements(this)) {
 			ret.append("<tr><th>").append(o.toString()).append("</th></tr>");
 			for (Object l : lcp.getChildren(o)) {
 				if (l instanceof LabResultsRow) {
 					LabResultsRow lr = (LabResultsRow) l;
 					ret.append("<tr>");
-					ret.append("<td><em>").append(lr.getItem().get("titel")).append("</em></td><td>")
-							.append(lr.getItem().get("refMann")).append("</td>");
-					for (int i = dates.length - 1; i > -1; i--) {
+					ret.append("<td class=\"rowheader\">").append(lr.getItem().get("titel"))
+							.append("</td><td class=\"ref\">").append(lr.getItem().get("refMann")).append("</td>");
+					for (int i = dates.length - 1; i > lim; i--) {
 						Result res = lr.get(dates[i]);
-						if(res==null){
+						if (res == null) {
 							ret.append("<td></td>");
-						}else{
+						} else {
 							ret.append("<td>").append(res.get("resultat")).append("</td>");
 						}
+					}
+					if (lim > -1) {
+						Bucket bucket = lcp.lrs.getOlderBucket(lr.getItem());
+						ret.append("<td>").append(bucket.getMinResult()).append(" - ").append(bucket.getAverageResult())
+								.append(" - ").append(bucket.getMaxResult()).append("</td>");
 					}
 					ret.append("</tr>");
 				}
@@ -102,4 +113,28 @@ public class Exporter {
 		}
 		return ret.toString();
 	}
+
+	/*
+	 * private String makeSummaryGrid(TimeTool[] dates) { StringBuilder ret =
+	 * new StringBuilder("<table class=\"fullgrid\">");
+	 * ret.append("<tr><th>Parameter</th><th>Referenz</th>"); int lim =
+	 * dates.length - 9; for (int i = dates.length - 1; i > lim; i--) {
+	 * ret.append("<th>").append(dates[i].toString(TimeTool.DATE_GER)).append(
+	 * "</th>"); } ret.append("<th>früher</th></tr>"); for (Object o :
+	 * lcp.getElements(this)) {
+	 * ret.append("<tr><th>").append(o.toString()).append("</th></tr>"); for
+	 * (Object l : lcp.getChildren(o)) { if (l instanceof LabResultsRow) {
+	 * LabResultsRow lr = (LabResultsRow) l; ret.append("<tr>");
+	 * ret.append("<td><em>").append(lr.getItem().get("titel")).append(
+	 * "</em></td><td>") .append(lr.getItem().get("refMann")).append("</td>");
+	 * for (int i = dates.length - 1; i > lim; i--) { Result res =
+	 * lr.get(dates[i]); if (res == null) { ret.append("<td></td>"); } else {
+	 * ret.append("<td>").append(res.get("resultat")).append("</td>"); } }
+	 * Bucket bucket=lcp.lrs.getOlderBucket(lr.getItem());
+	 * ret.append("<td>").append(bucket.getMinResult()).append(" - "
+	 * ).append(bucket.getAverageResult()).append(" - ")
+	 * .append(bucket.getMaxResult()).append("</td>"); ret.append("</tr>"); } }
+	 * 
+	 * } return ret.toString(); }
+	 */
 }
