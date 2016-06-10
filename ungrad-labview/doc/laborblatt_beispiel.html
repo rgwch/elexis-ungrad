@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!--  Beispiel-Laborblatt für die elexis-ungrad- LabView. 
+      Dieses Blatt wird auch dann verwendet, wenn kein spezifisches Dokument gefunden wird.
+      Ändern oder entfernen Sie bitte nicht diese Datei, sondern verwenden Sie sie als Anregung
+      für eine eigene Vorlage, die Sie irgendwo anderes speichern, und in den Einstellungen des Laborblatts
+      spezifizieren.
+      (c) 2016 by G. Weirich -->
+      
 <html>
 <head>
 <meta charset="utf-8" />
@@ -6,14 +13,24 @@
 	[Patient.Vorname], [Patient.Geburtsdatum].</title>
 
 <!-- Zwischen <style> und </style> befinden sich die Anweisungen, wie das Laborblatt gestaltet werden soll. -->	
+
 <style>
+
+body{
+	/* Definition der Schriftart und -grösse für das ganze Laborblatt */
+	font-family: Helvetica, Sans-Serif;
+	font-style: normal;
+	font-size: 11px;
+}
 table {
 /* Stil für die Tabelle mit den Laborwerten */
 	border-collapse: collapse;
 	padding: 8px;
+	
 }
 
 table, th, td {
+ /* Gemeinsame Formatierung aller Tabellenzellen, kann ev, weiter unten modifiziert werden */
 	border: 1px solid black;
 	text-align: center;
 }
@@ -30,6 +47,7 @@ table, th, td {
 th.group {
 	/* Die Zeilen mit den Gruppennamen */
 	background-color: #e6e6e6;
+	page-break-after: avoid; /* Kein Seitenumbruch direkt nach dem Gruppentitel */
 }
 
 .pathologic{
@@ -49,7 +67,14 @@ td {
 	padding: 4px;
 	margin: 2px;
 }
+
+tr:hover{
+/* Zeile gelb aufleuchten lassen, wenn der Mauszeiger darüber ist */
+	background-color: yellow;
+}
+
 </style>
+<!-- Hier kommt der eigentliche Inhalt des Laborblattes -->
 </head>
 <body>
 	<h1>Praxis Breite, Rietstrasse 30, 8200 Schaffhausen</h1>
