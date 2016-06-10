@@ -25,7 +25,7 @@ import ch.elexis.ungrad.labview.model.LabResultsSheet;
  * The ContentProvider for the condensed view
  * 
  * @author gerry
- *		
+ * 		
  */
 public class LabSummaryContentProvider implements ITreeContentProvider {
 	LabResultsSheet lrs = new LabResultsSheet();
@@ -62,8 +62,12 @@ public class LabSummaryContentProvider implements ITreeContentProvider {
 	
 	@Override
 	public Object getParent(Object element){
-		LabResultsRow row = (LabResultsRow) element;
-		return row.getItem().get("gruppe");
+		if (element instanceof LabResultsRow) {
+			LabResultsRow row = (LabResultsRow) element;
+			return row.getItem().get("gruppe");
+		} else {
+			return null;
+		}
 	}
 	
 	@Override
