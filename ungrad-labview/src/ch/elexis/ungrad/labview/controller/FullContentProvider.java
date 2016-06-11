@@ -5,10 +5,10 @@ import org.eclipse.jface.viewers.Viewer;
 
 import ch.elexis.ungrad.labview.model.LabResultsSheet;
 
-class LabInputContentProvider implements IStructuredContentProvider {
+class FullContentProvider implements IStructuredContentProvider {
 	LabResultsSheet lrs;
 	
-	public LabInputContentProvider(LabResultsSheet lrs) {
+	public FullContentProvider(LabResultsSheet lrs) {
 		this.lrs=lrs;
 	}
 	@Override

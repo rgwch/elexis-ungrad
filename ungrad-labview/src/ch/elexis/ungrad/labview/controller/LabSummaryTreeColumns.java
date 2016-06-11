@@ -32,7 +32,7 @@ import ch.rgw.tools.TimeTool;
  * @author gerry
  *
  */
-public class LabSummaryTableColumns {
+public class LabSummaryTreeColumns {
 	public static final int COL_LATEST = 2;
 	public static final int COL_RECENT = 3;
 	public static final int COL_LASTYEAR = 4;
@@ -54,7 +54,7 @@ public class LabSummaryTableColumns {
 	private LabResultsSheet sheet;
 	private Font smallerFont;
 
-	public LabSummaryTableColumns(LabResultsSheet sheet, TreeViewer tv) {
+	public LabSummaryTreeColumns(LabResultsSheet sheet, TreeViewer tv) {
 		this.sheet = sheet;
 		Display display = Display.getDefault();
 		FontData[] fontData = getDefaultFont().getFontData();

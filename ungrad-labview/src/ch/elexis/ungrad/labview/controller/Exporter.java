@@ -22,7 +22,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
-import org.osgi.framework.Bundle;
 
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -38,12 +37,12 @@ public class Exporter {
 	private Resolver resolver = new Resolver();
 	private LabSummaryContentProvider lcp;
 	Logger log = Logger.getLogger(getClass().getName());
-	
-	public Exporter(LabSummaryContentProvider lcp){
+
+	public Exporter(LabSummaryContentProvider lcp) {
 		this.lcp = lcp;
 	}
-	
-	public boolean runInBrowser(){
+
+	public boolean runInBrowser() {
 		try {
 			String output = makeHtml();
 			File tmp = File.createTempFile("ungrad", ".html");
@@ -58,15 +57,15 @@ public class Exporter {
 				}
 			}
 			return true;
-			
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			log.log(Level.SEVERE, "could not create HTML " + ex.getMessage());
 			return false;
 		}
 	}
-	
-	public boolean createHTML(Composite parent){
+
+	public boolean createHTML(Composite parent) {
 		FileDialog fd = new FileDialog(parent.getShell(), SWT.SAVE);
 		String file = fd.open();
 		if (file != null) {
@@ -81,28 +80,30 @@ public class Exporter {
 		}
 		return false;
 	}
-	
-	private String makeHtml() throws Exception{
+
+	private String makeHtml() throws Exception {
 		StringBuilder html = new StringBuilder("<table>");
 		TimeTool[] dates = lcp.lrs.getDates();
 		html.append(makeFullGrid(dates));
 		html.append("</table>");
-		String fallback = PlatformHelper.getBasePath("ch.elexis.ungrad.labview") + File.separator
-			+ "doc" + File.separator + "laborblatt_beispiel.html";
+		String fallback = PlatformHelper.getBasePath("ch.elexis.ungrad.labview") + File.separator + "doc"
+				+ File.separator + "laborblatt_beispiel.html";
 		File tmpl = new File(Preferences.cfg.get(Preferences.TEMPLATE, fallback));
 		if (!tmpl.exists() || !tmpl.canRead()) {
 			SWTHelper.showError("Vorlage fehlt",
-				"Die Vorlagendatei für den HTML Export wurde nicht gefunden. Bitte unter 'Einstellungen' nachprüfen");
+					"Die Vorlagendatei für den HTML Export wurde nicht gefunden. Bitte unter 'Einstellungen' nachprüfen");
 		}
-		String rawTemplate = FileTool.readTextFile(tmpl); // will throw Exception if not found
+		String rawTemplate = FileTool.readTextFile(tmpl); // will throw
+															// Exception if not
+															// found
 		String template = resolver.resolve(rawTemplate);
 		String output = template.replace("[Laborwerte]", html.toString());
 		return output;
-		
+
 	}
-	
-	private String makeFullGrid(TimeTool[] dates){
-		String[] exclusions=Preferences.cfg.get(Preferences.EXCLUDE,"00,?").split(",");
+
+	private String makeFullGrid(TimeTool[] dates) {
+		String[] exclusions = Preferences.cfg.get(Preferences.EXCLUDE, "00,?").split(",");
 
 		StringBuilder ret = new StringBuilder("<table class=\"fullgrid\">");
 		ret.append("<tr><th class=\"rowheader\">Parameter</th><th class=\"ref\">Referenz</th>");
@@ -115,57 +116,57 @@ public class Exporter {
 		}
 		ret.append("</tr>");
 		for (Object o : lcp.getElements(this)) {
-			if(isExcluded(o.toString(),exclusions)){
+			if (isExcluded(o.toString(), exclusions)) {
 				continue;
 			}
-			ret.append("<tr><th class=\"group\" colspan=\""+dates.length+2+"\">").append(o.toString()).append("</th></tr>");
+			ret.append("<tr><th class=\"group\" colspan=\"" + dates.length + 2 + "\">").append(o.toString())
+					.append("</th></tr>");
 			for (Object l : lcp.getChildren(o)) {
 				if (l instanceof LabResultsRow) {
 					LabResultsRow lr = (LabResultsRow) l;
-					if(isExcluded(lr.getItem().get("titel"),exclusions)){
+					if (isExcluded(lr.getItem().get("titel"), exclusions)) {
 						continue;
 					}
 					ret.append("<tr>");
 					ret.append("<td class=\"rowheader\">").append(lr.getItem().get("titel"))
-						.append("</td><td class=\"ref\">").append(lr.getItem().get("refMann"))
-						.append("</td>");
+							.append("</td><td class=\"ref\">").append(lr.getItem().get("refMann")).append("</td>");
 					for (int i = dates.length - 1; i > lim; i--) {
 						Result res = lr.get(dates[i]);
 						if (res == null) {
 							ret.append("<td></td>");
 						} else {
-							ret.append("<td>").append(make(lr,res)).append("</td>");
+							ret.append("<td>").append(make(lr, res)).append("</td>");
 						}
 					}
 					if (lim > -1) {
 						Bucket bucket = lcp.lrs.getOlderBucket(lr.getItem());
-						ret.append("<td>").append(bucket.getMinResult()).append(" - ")
-							.append(bucket.getMaxResult()).append("</td>");
+						ret.append("<td>").append(bucket.getMinResult()).append(" - ").append(bucket.getMaxResult())
+								.append("</td>");
 					}
 					ret.append("</tr>");
 				}
 			}
-			
+
 		}
 		return ret.toString();
 	}
-	
-	private boolean isExcluded(String value, String[] exclusions){
-		for(String excl:exclusions){
-			if(value.contains(excl)){
+
+	private boolean isExcluded(String value, String[] exclusions) {
+		for (String excl : exclusions) {
+			if (value.contains(excl)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
-	private String make(LabResultsRow lr, Result res){
-		String raw=res.get("resultat").replaceAll("\\s+", "");
-		if(raw.startsWith("-")){
+
+	private String make(LabResultsRow lr, Result res) {
+		String raw = res.get("resultat").replaceAll("\\s+", "");
+		if (raw.startsWith("-")) {
 			return "-";
 		}
-		if(lr.getItem().isPathologic(lr.getPatient(), raw)){
-			return "<span class=\"pathologic\">"+raw+"</span>";
+		if (lr.getItem().isPathologic(lr.getPatient(), raw)) {
+			return "<span class=\"pathologic\">" + raw + "</span>";
 		}
 		return raw;
 	}

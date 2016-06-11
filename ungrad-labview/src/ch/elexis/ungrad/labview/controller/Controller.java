@@ -37,8 +37,8 @@ public class Controller {
 	LabSummaryContentProvider lcp;
 	LaborView view;
 	TreeViewer tvSummary;
-	TableViewer tvInput;
-	LabSummaryTableColumns cols;
+	TreeViewer tvFull;
+	LabSummaryTreeColumns colsSummary;
 	Log log = Log.get("Labview Controller");
 	Resolver resolver = new Resolver();
 
@@ -49,8 +49,8 @@ public class Controller {
 
 	public void saveState() {
 		StringBuilder cw = new StringBuilder();
-		for (int i = 0; i < cols.cols.length; i++) {
-			cw.append(Integer.toString(cols.cols[i].getColumn().getWidth())).append(",");
+		for (int i = 0; i < colsSummary.cols.length; i++) {
+			cw.append(Integer.toString(colsSummary.cols[i].getColumn().getWidth())).append(",");
 		}
 		String widths = cw.substring(0, cw.length() - 1);
 		Preferences.cfg.set(Preferences.COLWIDTHS, widths);
@@ -58,11 +58,11 @@ public class Controller {
 
 	public void loadState() {
 		String colWidths = Preferences.cfg.get(Preferences.COLWIDTHS, "150,150,100,130,130,130");
-		int max = cols.cols.length;
+		int max = colsSummary.cols.length;
 		int i = 0;
 		for (String w : colWidths.split(",")) {
 			if (i < max) {
-				cols.cols[i].getColumn().setWidth(Integer.parseInt(w));
+				colsSummary.cols[i].getColumn().setWidth(Integer.parseInt(w));
 			}
 		}
 
@@ -73,7 +73,7 @@ public class Controller {
 		tvSummary.setContentProvider(lcp);
 		tvSummary.setUseHashlookup(true);
 		Tree tree = tvSummary.getTree();
-		cols = new LabSummaryTableColumns(lcp.lrs, tvSummary);
+		colsSummary = new LabSummaryTreeColumns(lcp.lrs, tvSummary);
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
 		tvSummary.setAutoExpandLevel(2);
@@ -83,17 +83,12 @@ public class Controller {
 	}
 
 	public Control createInputControl(CTabFolder parent) {
-		tvInput = new TableViewer(parent);
-		Table table = tvInput.getTable();
-		table.setLinesVisible(true);
-		table.setHeaderVisible(true);
-		TableViewerColumn tvcTitle = new TableViewerColumn(tvInput, SWT.LEFT);
-		TableViewerColumn tvcValues = new TableViewerColumn(tvInput, SWT.NONE);
-		tvcTitle.getColumn().setText("Parameter");
-		tvcTitle.getColumn().setWidth(100);
-		tvcValues.setEditingSupport(new LabInputEditingSupport(tvInput));
-		tvInput.setContentProvider(new LabInputContentProvider(lcp.lrs));
-		tvInput.setLabelProvider(new LabInputLabelProvider());
+		tvFull = new TreeViewer(parent);
+		Tree tree = tvFull.getTree();
+		tree.setLinesVisible(true);
+		tree.setHeaderVisible(true);
+		tvFull.setContentProvider(new FullContentProvider(lcp.lrs));
+		tvFull.setLabelProvider(new FullLabelProvider());
 		parent.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -103,17 +98,17 @@ public class Controller {
 			}
 
 		});
-		return table;
+		return tree;
 	}
 
 	public void setPatient(Patient pat) throws ElexisException {
 		lcp.setPatient(pat);
-		cols.reload(lcp);
+		colsSummary.reload(lcp);
 		tvSummary.setInput(pat);
 	}
 
 	public void dispose() {
-		cols.dispose();
+		colsSummary.dispose();
 	}
 
 	public Exporter getExporter() {
