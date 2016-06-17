@@ -18,6 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.elexis.core.ui.util.Log;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.ungrad.lucinda.Lucinda;
@@ -38,6 +42,7 @@ public class Sender implements Handler {
 	private List<Document> answers = new ArrayList<Document>();
 	private List<String> onTheWay = new ArrayList<String>();
 	private Lucinda lucinda;
+	private Logger log=LoggerFactory.getLogger(getClass());
 
 	public Sender(Customer customer, List<? extends PersistentObject> list) {
 		toDo = list;
@@ -95,9 +100,13 @@ public class Sender implements Handler {
 											// indexing null
 						String title = order.get("title");
 						String type = order.get("type");
+						log.debug(title);
 						onTheWay.add(po.getId());
 						lucinda.addToIndex(po.getId(), title == null ? "?" : title, //$NON-NLS-1$
 								type == null ? "" : type, order.toMap(), contents, this); //$NON-NLS-1$
+					}else{ // Skipped empty file -> Advance to next
+						log.warn("Skipping empty Document "+order.get("title"));
+						sendNext();
 					}
 				}
 			}
