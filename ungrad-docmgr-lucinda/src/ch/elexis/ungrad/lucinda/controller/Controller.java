@@ -296,7 +296,7 @@ public class Controller implements IProgressController {
 	/**
 	 * Display a progress bar at the bottom of the lucinda view, or add a new
 	 * process to an existing process bar. If more than one process wants to
-	 * dosplay, the values for all processes are added and the sum ist the upper
+	 * display, the values for all processes are added and the sum is the upper
 	 * border of the progress bar.
 	 * 
 	 * @param maximum
@@ -343,10 +343,9 @@ public class Controller implements IProgressController {
 			}
 		} else {
 			visibleProcesses.put(handle, val);
+			actValue += amount;
+			view.showProgress(actValue / div);
 		}
-		actValue += amount;
-		view.showProgress(actValue / div);
-
 	}
 
 	/**
