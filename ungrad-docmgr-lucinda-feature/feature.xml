@@ -37,4 +37,20 @@
          version="0.0.0"
          unpack="false"/>
 
+   <plugin
+         id="ch.elexis.ungrad.docmgr.lucinda.kons"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="ch.elexis.ungrad.docmgr.lucinda.omnivore"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
 </feature>
