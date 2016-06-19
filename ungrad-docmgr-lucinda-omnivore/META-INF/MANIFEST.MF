@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Omnivore Handler for Lucinda
-Bundle-SymbolicName: ungrad-docmgr-lucina-omnivore;singleton:=true
+Bundle-SymbolicName: ch.elexis.ungrad.docmgr.lucinda.omnivore;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: weirich.ch
 Fragment-Host: ch.elexis.ungrad.docmgr-lucinda;bundle-version="1.0.4"

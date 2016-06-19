@@ -22,6 +22,7 @@
         <module>ungrad-docmgr-lucinda</module>
         <module>ungrad-docmgr-lucinda-feature</module>
         <module>ungrad-docmgr-lucinda-omnivore</module>
+        <module>ungrad-docmgr-lucinda-kons</module>
         <module>ungrad-labview</module>
         <module>ungrad-labview-feature</module>
         <module>ungrad-branding</module>
