@@ -32,28 +32,12 @@
     <repositories>
         <repository>
             <id>elexis-core</id>
-            <url>http://download.elexis.info/elexis.3.core/${repo_variant}/</url>
+            <url>http://www.elexis.ch/ungrad/p2/elexis-core/latest</url>
             <layout>p2</layout>
         </repository>
         <repository>
             <id>elexis-base</id>
-            <url>http://download.elexis.info/elexis.3.base/${repo_variant}/</url>
-            <layout>p2</layout>
-        </repository>
-
-        <!--repository>
-      <id>my_local_mirror</id>
-      <url>file:///opt/mirror.4.elexis/target/repository/</url>
-      <layout>p2</layout>
-      </repository-->
-        <repository>
-            <id>mirror.4.elexis.${repo_variant}</id>
-            <url>http://download.elexis.info/mirror.4.elexis/${nonElexisP2variant}/</url>
-            <layout>p2</layout>
-        </repository>
-        <repository>
-            <id>elexis.3.3rdparty.libraries</id>
-            <url>http://download.elexis.info/elexis.3.3rdparty.libraries/${nonElexisP2variant}</url>
+            <url>http://www.elexis.ch/ungrad/p2/elexis-base/latest</url>
             <layout>p2</layout>
         </repository>
     </repositories>
