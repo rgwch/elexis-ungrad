@@ -86,6 +86,15 @@ public class LabResultsSheet {
 		}
 	}
 	
+	public String[] getAllGroups(){
+		return groups.keySet().toArray(new String[0]);
+	}
+	
+	public Item[] getAllItemsForGroup(String group){
+		Set<Item> items=groups.get(group);
+		return items.toArray(new Item[0]);
+	}
+	
 	public void addObserver(IObserver obs){
 		observers.add(obs);
 	}
@@ -208,6 +217,7 @@ public class LabResultsSheet {
 					}
 				}
 				itemArray = allItems.toArray(new Item[0]);
+				
 
 			} catch (SQLException ex) {
 				throw new ElexisException("can't fetch Lab Items", ex);
@@ -279,12 +289,20 @@ public class LabResultsSheet {
 
 	}
 
+	/**
+	 * get a list of Item-Groups for which Results exist in the current context
+	 */
 	public Object[] getGroups() {
 		SortedSet<String> groups = new TreeSet<String>();
 		rows.keySet().forEach(key -> groups.add(key.get("gruppe")));
 		return groups.toArray();
 	}
 
+	/**
+	 * Ger Results of a given group in the current context
+	 * @param group
+	 * @return
+	 */
 	public Object[] getRowsForGroup(String group) {
 		SortedSet<LabResultsRow> results = new TreeSet<LabResultsRow>();
 		rows.keySet().forEach(key -> {

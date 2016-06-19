@@ -42,6 +42,7 @@ public class CondensedViewController implements IObserver {
 	}
 	
 	public void dispose() {
+		controller.getLRS().removeObserver(this);
 		colsSummary.dispose();
 	}
 	

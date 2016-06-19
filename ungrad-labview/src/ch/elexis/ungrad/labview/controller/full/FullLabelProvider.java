@@ -7,6 +7,9 @@ class FullLabelProvider extends TableLabelProvider {
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		
+		if(element instanceof Item){
+			int dateIndex=columnIndex-2;
+		}
 		if(columnIndex==0){
 			return ((Item)element).get("title");
 		}else{

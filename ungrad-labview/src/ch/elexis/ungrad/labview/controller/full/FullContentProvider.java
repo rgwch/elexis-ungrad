@@ -1,8 +1,14 @@
 package ch.elexis.ungrad.labview.controller.full;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+import ch.elexis.ungrad.labview.model.Item;
 import ch.elexis.ungrad.labview.model.LabResultsSheet;
 
 class FullContentProvider implements ITreeContentProvider {
@@ -19,19 +25,24 @@ class FullContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		return lrs.getItems();
+		return lrs.getAllGroups();
+		
 	}
 	@Override
 	public Object[] getChildren(Object parentElement){
-		return new Object[0];
+		return lrs.getAllItemsForGroup(parentElement.toString());
 	}
+	
 	@Override
 	public Object getParent(Object element){
-		// TODO Auto-generated method stub
-		return null;
+		if(element instanceof Item){
+			return ((Item)element).get("gruppe");
+		}else{
+			return null;
+		}
 	}
 	@Override
 	public boolean hasChildren(Object element){
-		return false;
+		return true;
 	}
 }
