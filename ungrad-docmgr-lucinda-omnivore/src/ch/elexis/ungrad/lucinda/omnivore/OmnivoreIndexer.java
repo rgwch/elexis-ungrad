@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.elexis.ungrad.lucinda.model;
+package ch.elexis.ungrad.lucinda.omnivore;
 
 import java.util.List;
 
@@ -26,6 +26,10 @@ import ch.elexis.omnivore.data.DocHandle;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.IProgressController;
+import ch.elexis.ungrad.lucinda.model.ConsultationIndexer;
+import ch.elexis.ungrad.lucinda.model.Customer;
+import ch.elexis.ungrad.lucinda.model.Document;
+import ch.elexis.ungrad.lucinda.model.Sender;
 import ch.rgw.tools.TimeTool;
 
 public class OmnivoreIndexer implements Customer {

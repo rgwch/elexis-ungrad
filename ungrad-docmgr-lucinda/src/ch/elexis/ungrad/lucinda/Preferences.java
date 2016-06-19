@@ -40,7 +40,7 @@ public class Preferences {
 	public static final String SHOW_OMNIVORE = BASE + "showOmnivore"; //$NON-NLS-1$
 	public static final String SHOW_CONS = BASE + "showConsultation"; //$NON-NLS-1$
 	public static final String COLUMN_WIDTHS = BASE + "columnWidths"; //$NON-NLS-1$
-	
+
 	public static final String INBOX_NAME = Messages.Preferences_Inbox_Name;
 	public static final String OMNIVORE_NAME = Messages.Preferences_Omnivore_Name;
 	public static final String KONSULTATION_NAME = Messages.Preferences_Konsultation_Name;
@@ -63,5 +63,13 @@ public class Preferences {
 
 	public static void set(final String key, final String value) {
 		cfg.set(key, value);
+	}
+
+	public static void set(final String key, final boolean value) {
+		set(key, Boolean.toString(value));
+	}
+
+	public static boolean is(final String key) {
+		return Boolean.parseBoolean(get(key, Boolean.toString(false)));
 	}
 }
