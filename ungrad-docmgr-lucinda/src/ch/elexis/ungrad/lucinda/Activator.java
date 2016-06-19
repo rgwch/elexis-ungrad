@@ -23,7 +23,6 @@ import org.osgi.framework.BundleContext;
 
 import ch.elexis.core.data.util.Extensions;
 import ch.elexis.ungrad.lucinda.controller.IProgressController;
-import ch.elexis.ungrad.lucinda.model.ConsultationIndexer;
 import ch.elexis.ungrad.lucinda.model.Document;
 import ch.rgw.lucinda.Handler;
 
@@ -38,7 +37,6 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	private List<Handler> handlers = new ArrayList<>();
-	private ConsultationIndexer consultationIndexer = new ConsultationIndexer();
 	private List<Document> messages = new LinkedList<>();
 	private List<IDocumentHandler> addons;
 	private IProgressController progressController;
@@ -93,13 +91,14 @@ public class Activator extends AbstractUIPlugin {
 		super.stop(context);
 	}
 
+	/*
 	public void syncKons(boolean doSync) {
 		consultationIndexer.setActive(doSync);
 		if (doSync) {
 			consultationIndexer.start(progressController);
 		}
 	}
-/*
+
 	public void syncOmnivore(boolean doSync) {
 		omnivoreIndexer.setActive(doSync);
 		if (doSync) {

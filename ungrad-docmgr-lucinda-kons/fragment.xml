@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension
+         point="ch.elexis.ungrad.lucinda.addon">
+      <Datasource
+            DocumentHandler="ch.elexis.ungrad.docmgr.lucinda.kons.DocumentHandler"
+            name="Konsultationen">
+      </Datasource>
+   </extension>
+
+</fragment>

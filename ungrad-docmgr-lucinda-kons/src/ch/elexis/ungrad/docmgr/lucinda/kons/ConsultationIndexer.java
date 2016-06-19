@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.elexis.ungrad.lucinda.model;
+package ch.elexis.ungrad.docmgr.lucinda.kons;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -28,6 +28,9 @@ import ch.elexis.data.Query;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.IProgressController;
+import ch.elexis.ungrad.lucinda.model.Customer;
+import ch.elexis.ungrad.lucinda.model.Document;
+import ch.elexis.ungrad.lucinda.model.Sender;
 import ch.rgw.tools.TimeTool;
 import ch.rgw.tools.VersionedResource;
 

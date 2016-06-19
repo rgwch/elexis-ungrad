@@ -15,7 +15,6 @@
 package ch.elexis.ungrad.lucinda.view;
 
 import static ch.elexis.ungrad.lucinda.Preferences.COLUMN_WIDTHS;
-import static ch.elexis.ungrad.lucinda.Preferences.INCLUDE_KONS;
 import static ch.elexis.ungrad.lucinda.Preferences.RESTRICT_CURRENT;
 import static ch.elexis.ungrad.lucinda.Preferences.SHOW_CONS;
 import static ch.elexis.ungrad.lucinda.Preferences.SHOW_INBOX;
@@ -29,12 +28,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
-import ch.elexis.admin.AccessControlDefaults;
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
-import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.data.Patient;
@@ -44,36 +41,36 @@ import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.Controller;
 
 public class GlobalView extends ViewPart implements IActivationListener {
-	
+
 	private Controller controller;
-	private Action doubleClickAction, filterCurrentPatAction, showInboxAction, showConsAction;
-	private RestrictedAction indexKonsAction;
-	
-	private final ElexisUiEventListenerImpl eeli_pat =
-		new ElexisUiEventListenerImpl(Patient.class, ElexisEvent.EVENT_SELECTED) {
-			
-			@Override
-			public void runInUi(ElexisEvent ev){
-				controller.changePatient((Patient) ev.getObject());
-			}
-			
-		};
-		
-	public GlobalView(){
+	private Action doubleClickAction, filterCurrentPatAction, showInboxAction;
+
+	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
+			ElexisEvent.EVENT_SELECTED) {
+
+		@Override
+		public void runInUi(ElexisEvent ev) {
+			controller.changePatient((Patient) ev.getObject());
+		}
+
+	};
+
+	public GlobalView() {
 		controller = new Controller();
 	}
-	
+
 	@Override
-	public void createPartControl(Composite parent){
+	public void createPartControl(Composite parent) {
 		/*
-		 * If the view is set to show nothing at all (which is the case e.g. on first launch), set it to show all results.
+		 * If the view is set to show nothing at all (which is the case e.g. on
+		 * first launch), set it to show all results.
 		 */
 		if ((is(SHOW_CONS) || is(SHOW_INBOX) || is(SHOW_OMNIVORE)) == false) {
 			save(SHOW_CONS, true);
 			save(SHOW_OMNIVORE, true);
 			save(SHOW_INBOX, true);
 		}
-		
+
 		makeActions();
 		controller.createView(parent);
 		contributeToActionBars();
@@ -81,8 +78,8 @@ public class GlobalView extends ViewPart implements IActivationListener {
 		controller.setColumnWidths(colWidths);
 		GlobalEventDispatcher.addActivationListener(this, this);
 	}
-	
-	public void visible(final boolean mode){
+
+	public void visible(final boolean mode) {
 		controller.reload();
 		if (mode) {
 			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
@@ -91,91 +88,48 @@ public class GlobalView extends ViewPart implements IActivationListener {
 			save(COLUMN_WIDTHS, controller.getColumnWidths());
 		}
 	}
-	
+
 	@Override
-	public void setFocus(){
+	public void setFocus() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	private void contributeToActionBars(){
+
+	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
-		IMenuManager menu=bars.getMenuManager();
-		IToolBarManager toolbar=bars.getToolBarManager();
+		IMenuManager menu = bars.getMenuManager();
+		IToolBarManager toolbar = bars.getToolBarManager();
 		toolbar.add(filterCurrentPatAction);
 		toolbar.add(showInboxAction);
-		
-		for(IDocumentHandler dh:Activator.getDefault().getAddons()){
-			IAction toolbarAction=dh.getFilterAction(controller);
-			if(toolbarAction!=null){
+
+		for (IDocumentHandler dh : Activator.getDefault().getAddons()) {
+			IAction toolbarAction = dh.getFilterAction(controller);
+			if (toolbarAction != null) {
 				toolbar.add(toolbarAction);
 			}
-			IAction menuAction=dh.getSyncAction(controller);
-			if(menuAction!=null){
+			IAction menuAction = dh.getSyncAction(controller);
+			if (menuAction != null) {
 				menu.add(menuAction);
 			}
 		}
 	}
-	
-	private void fillLocalToolBar(IToolBarManager manager){
-		manager.add(showConsAction);
-	}
-	
-	private void fillLocalPullDown(IMenuManager manager){
-		manager.add(indexKonsAction);
-		manager.add(filterCurrentPatAction);
-		
-	}
-	
-	private void makeActions(){
-		
-		
-		indexKonsAction = new RestrictedAction(AccessControlDefaults.DOCUMENT_CREATE,
-			Messages.GlobalView_synckons_Name, Action.AS_CHECK_BOX) {
+
+	private void makeActions() {
+
+		filterCurrentPatAction = new Action(Messages.GlobalView_actPatient_name, Action.AS_CHECK_BOX) {
 			{
-				setToolTipText(Messages.GlobalView_synckons_tooltip);
-				setImageDescriptor(Images.IMG_GEAR.getImageDescriptor());
+				setToolTipText(Messages.GlobalView_actPatient_tooltip);
+				setImageDescriptor(Images.IMG_PERSON.getImageDescriptor());
 			}
-			
+
 			@Override
-			public void doRun(){
-				Activator.getDefault().syncKons(this.isChecked());
-				save(INCLUDE_KONS, isChecked());
+			public void run() {
+				controller.restrictToCurrentPatient(isChecked());
+				save(RESTRICT_CURRENT, isChecked());
 			}
 		};
-		indexKonsAction.setChecked(is(INCLUDE_KONS));
-		
-		filterCurrentPatAction =
-			new Action(Messages.GlobalView_actPatient_name, Action.AS_CHECK_BOX) {
-				{
-					setToolTipText(Messages.GlobalView_actPatient_tooltip);
-					setImageDescriptor(Images.IMG_PERSON.getImageDescriptor());
-				}
-				
-				@Override
-				public void run(){
-					controller.restrictToCurrentPatient(isChecked());
-					save(RESTRICT_CURRENT, isChecked());
-				}
-			};
 		filterCurrentPatAction.setChecked(is(RESTRICT_CURRENT));
-		/*
-		 * Show results from consultation texts
-		 */
-		showConsAction = new Action(Messages.GlobalView_filterKons_name, Action.AS_CHECK_BOX) {
-			{
-				setToolTipText(Messages.GlobalView_filterKons_tooltip);
-			}
-			
-			@Override
-			public void run(){
-				controller.toggleDoctypeFilter(isChecked(), Preferences.KONSULTATION_NAME);
-				save(SHOW_CONS, isChecked());
-			}
-		};
-		showConsAction.setChecked(is(SHOW_CONS));
-		;
-		
+
 		/*
 		 * Show results from Lucinda Inbox
 		 */
@@ -183,34 +137,35 @@ public class GlobalView extends ViewPart implements IActivationListener {
 			{
 				setToolTipText(Messages.GlobalView_filterInbox_name);
 			}
-			
+
 			@Override
-			public void run(){
+			public void run() {
 				controller.toggleDoctypeFilter(isChecked(), Preferences.INBOX_NAME);
 				save(SHOW_INBOX, isChecked());
 			}
-			
+
 		};
 		showInboxAction.setChecked(is(SHOW_INBOX));
 	}
-	
+
 	@Override
-	public void activation(boolean mode){}
-	
-	private void save(String name, boolean value){
+	public void activation(boolean mode) {
+	}
+
+	private void save(String name, boolean value) {
 		save(name, Boolean.toString(value));
 	}
-	
-	private void save(String name, String value){
+
+	private void save(String name, String value) {
 		Preferences.set(name, value);
 	}
-	
-	private String load(String name){
+
+	private String load(String name) {
 		return Preferences.get(name, Messages.GlobalView_11);
 	}
-	
-	private boolean is(String name){
+
+	private boolean is(String name) {
 		return Boolean.parseBoolean(Preferences.get(name, Boolean.toString(false)));
 	}
-	
+
 }

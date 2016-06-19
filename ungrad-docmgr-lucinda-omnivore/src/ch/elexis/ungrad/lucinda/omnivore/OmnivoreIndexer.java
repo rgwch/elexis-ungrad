@@ -26,14 +26,13 @@ import ch.elexis.omnivore.data.DocHandle;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.IProgressController;
-import ch.elexis.ungrad.lucinda.model.ConsultationIndexer;
 import ch.elexis.ungrad.lucinda.model.Customer;
 import ch.elexis.ungrad.lucinda.model.Document;
 import ch.elexis.ungrad.lucinda.model.Sender;
 import ch.rgw.tools.TimeTool;
 
 public class OmnivoreIndexer implements Customer {
-	Logger log = LoggerFactory.getLogger(ConsultationIndexer.class);
+	Logger log = LoggerFactory.getLogger(OmnivoreIndexer.class);
 	private boolean cont = false;
 	private IProgressController pc;
 	Long progressHandle;
@@ -41,52 +40,57 @@ public class OmnivoreIndexer implements Customer {
 
 	/**
 	 * If active, the Index will run over all Consultations. If bActive==false,
-	 * Indexing will stop after the next Document. 
+	 * Indexing will stop after the next Document.
 	 */
 	public void setActive(boolean bActive) {
 		cont = bActive;
 	}
 
 	/**
-	 * Start indexing. All consultations since last run are fetched from the database.
-	 * A progress indicator and a Sender are initialized
-
+	 * Start indexing. All consultations since last run are fetched from the
+	 * database. A progress indicator and a Sender are initialized
+	 * 
 	 * @See Sender
 	 */
 
 	public void start(IProgressController pc) {
-		this.pc=pc;
+		this.pc = pc;
 		lastCheck = Preferences.get(Preferences.LASTSCAN_OMNI, "20010101"); //$NON-NLS-1$
 		Query<DocHandle> qbe = new Query<DocHandle>(DocHandle.class);
 		qbe.add(DocHandle.FLD_DATE, Query.GREATER_OR_EQUAL, lastCheck);
 		qbe.orderBy(false, DocHandle.FLD_DATE);
 		List<? extends PersistentObject> docs = qbe.execute();
-		progressHandle=pc.initProgress(docs.size());
+		progressHandle = pc.initProgress(docs.size());
 		new Sender(this, docs);
 	}
 
 	/**
-	 * for each hit in the List, the Sender asks its Customer to fill in
-	 * values to store in the index. Mandatory fields are as follows:<ul>
-	 * <li>title: A short text describing the entry. Will show up in search results</li>
-	 * <li>type: A description (one word) of the type of this entry. Well also show up in the results</li>
+	 * for each hit in the List, the Sender asks its Customer to fill in values
+	 * to store in the index. Mandatory fields are as follows:
+	 * <ul>
+	 * <li>title: A short text describing the entry. Will show up in search
+	 * results</li>
+	 * <li>type: A description (one word) of the type of this entry. Well also
+	 * show up in the results</li>
 	 * <li>payload</li> The the text to index, as byte array.</li>
 	 * </ul>
 	 * 
-	 * The following fields are not required, but recommended:<ul>
+	 * The following fields are not required, but recommended:
+	 * <ul>
 	 * <li>lastname: Last name of the concerned patient.</li>
 	 * <li>firstname: First name of the patient.</li>
 	 * <li>birthdate: Date in the form yyyyMMdd</li>
-	 * <li>concern: a standardized description of the patient: lastname_firstname_birthdate.
-	 * this will be used to filter entries of the currently selected patient in searches.</li>
+	 * <li>concern: a standardized description of the patient:
+	 * lastname_firstname_birthdate. this will be used to filter entries of the
+	 * currently selected patient in searches.</li>
 	 * </ul>
 	 * 
-	 * Other fields are optional. 
+	 * Other fields are optional.
 	 * 
-	 * @Returns a Map with the metadata, or null to indicate,that the sender should finish and discard
-	 * remaining objects.
+	 * @Returns a Map with the metadata, or null to indicate,that the sender
+	 *          should finish and discard remaining objects.
 	 */
-	
+
 	@Override
 	public Document specify(PersistentObject po) {
 		DocHandle dh = (DocHandle) po;
@@ -98,9 +102,9 @@ public class OmnivoreIndexer implements Customer {
 			String firstname = get(patient, Patient.FLD_FIRSTNAME);
 			String birthdate = new TimeTool(bdRaw).toString(TimeTool.DATE_COMPACT);
 			String docdate = new TimeTool(dh.getCreationDate()).toString(TimeTool.DATE_COMPACT);
-			if(!(docdate.equals(lastCheck))){
-				lastCheck=docdate;
-				Preferences.set(Preferences.LASTSCAN_OMNI,docdate);
+			if (!(docdate.equals(lastCheck))) {
+				lastCheck = docdate;
+				Preferences.set(Preferences.LASTSCAN_OMNI, docdate);
 			}
 			StringBuilder concern = new StringBuilder().append(lastname).append("_").append(firstname).append("_") //$NON-NLS-1$ //$NON-NLS-2$
 					.append(birthdate);
@@ -136,13 +140,14 @@ public class OmnivoreIndexer implements Customer {
 	}
 
 	/**
-	 * When all elements are processed, or after the customer answered "null" to 
-	 * the call to specify, the Sender calls finished for cleanup.
-	 * Here we note the date of the last document indexed to continue later.
+	 * When all elements are processed, or after the customer answered "null" to
+	 * the call to specify, the Sender calls finished for cleanup. Here we note
+	 * the date of the last document indexed to continue later.
 	 *
-	 * @param messages Lucinda messages sent while transferring.
+	 * @param messages
+	 *            Lucinda messages sent while transferring.
 	 */
-	
+
 	@Override
 	public void finished(List<Document> messages) {
 		Preferences.set(Preferences.LASTSCAN_OMNI, new TimeTool().toString(TimeTool.DATE_COMPACT));

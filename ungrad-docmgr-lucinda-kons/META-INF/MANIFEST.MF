@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Kons extension for Lucinda
+Bundle-SymbolicName: ch.elexis.ungrad.docmgr.lucinda.kons;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: weirich.ch
+Fragment-Host: ch.elexis.ungrad.docmgr-lucinda;bundle-version="1.0.4"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
