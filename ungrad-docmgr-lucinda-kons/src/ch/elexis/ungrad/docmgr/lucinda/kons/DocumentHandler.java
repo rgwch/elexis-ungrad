@@ -16,6 +16,8 @@ import ch.elexis.ungrad.lucinda.view.Messages;
 
 public class DocumentHandler implements IDocumentHandler {
 
+	private ConsultationIndexer indexer=new ConsultationIndexer();
+	
 	@Override
 	public IAction getSyncAction(Controller controller) {
 		IAction indexKonsAction = new RestrictedAction(AccessControlDefaults.DOCUMENT_CREATE,
@@ -27,11 +29,19 @@ public class DocumentHandler implements IDocumentHandler {
 
 			@Override
 			public void doRun() {
-				// Activator.getDefault().syncKons(this.isChecked());
+				if(this.isChecked()){
+					indexer.start(controller);
+				}else{
+					indexer.setActive(false);
+				}
 				Preferences.set(INCLUDE_KONS, isChecked());
 			}
 		};
-		indexKonsAction.setChecked(Preferences.is(INCLUDE_KONS));
+		if(Preferences.is(INCLUDE_KONS)){
+			indexer.start(controller);
+			indexKonsAction.setChecked(true);
+		}
+		
 		return indexKonsAction;
 
 	}

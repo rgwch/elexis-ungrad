@@ -15,6 +15,8 @@
 package ch.elexis.ungrad.docmgr.lucinda.kons;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -39,7 +41,7 @@ public class ConsultationIndexer implements Customer {
 	private boolean cont = false;
 	private IProgressController pc;
 	Long progressHandle;
-	
+	private long lastCheck;
 
 	/**
 	 * If active, the Index will run over all Consultations. If bActive==false,
@@ -50,47 +52,63 @@ public class ConsultationIndexer implements Customer {
 	}
 
 	/**
-	 * Start indexing. All consultations since last run are fetched from the database.
-	 * A progress indicator and a Sender are initialized.
-	 * Note: Possibly, there exist more than Integer.MAX_VALUE consultations. So the 
+	 * Start indexing. All consultations since last run are fetched from the
+	 * database. A progress indicator and a Sender are initialized. Note:
+	 * Possibly, there exist more than Integer.MAX_VALUE consultations. So the
 	 * List.size() call would not be correct.
+	 * 
 	 * @See Sender
 	 */
 	public void start(IProgressController pc) {
-		this.pc=pc;
-		String lastCheck = Preferences.get(Preferences.LASTSCAN_KONS, "20010101"); //$NON-NLS-1$
+		this.pc = pc;
+		try {
+			lastCheck = Long.parseLong(Preferences.get(Preferences.LASTSCAN_KONS, "0")); //$NON-NLS-1$
+		} catch (NumberFormatException nex) {
+			lastCheck = 0L;
+		}
+		StringBuilder querySQL = new StringBuilder("SELECT ID FROM ").append(Konsultation.TABLENAME)
+				.append(" WHERE lastupdate >=").append(lastCheck).append(" AND deleted='0' ORDER BY ")
+				.append("lastupdate");
+
 		Query<Konsultation> qbe = new Query<Konsultation>(Konsultation.class);
-		qbe.add(Konsultation.DATE, Query.GREATER_OR_EQUAL, lastCheck);
-		qbe.orderBy(false, Konsultation.DATE);
-		List<? extends PersistentObject> konsen = qbe.execute();
-		progressHandle=pc.initProgress(konsen.size());
-		new Sender(this, konsen);
+		Collection<Konsultation> konsen = qbe.queryExpression(querySQL.toString(), new LinkedList<Konsultation>());
+
+		progressHandle = pc.initProgress(konsen.size());
+		setActive(true);
+		new Sender(this, (List<? extends PersistentObject>) konsen);
 	}
 
 	/**
-	 * for each hit in the List, the Sender asks its Customer to fill in
-	 * values to store in the index. Mandatory fields are as follows:<ul>
-	 * <li>title: A short text describing the entry. Will show up in search results</li>
-	 * <li>type: A description (one word) of the type of this entry. Well also show up in the results</li>
+	 * for each hit in the List, the Sender asks its Customer to fill in values
+	 * to store in the index. Mandatory fields are as follows:
+	 * <ul>
+	 * <li>title: A short text describing the entry. Will show up in search
+	 * results</li>
+	 * <li>type: A description (one word) of the type of this entry. Well also
+	 * show up in the results</li>
 	 * <li>payload</li> The the text to index, as byte array.</li>
 	 * </ul>
 	 * 
-	 * The following fields are not required, but recommended:<ul>
+	 * The following fields are not required, but recommended:
+	 * <ul>
 	 * <li>lastname: Last name of the concerned patient.</li>
 	 * <li>firstname: First name of the patient.</li>
 	 * <li>birthdate: Date in the form yyyyMMdd</li>
-	 * <li>concern: a standardized description of the patient: lastname_firstname_birthdate.
-	 * this will be used to filter entries of the currently selected patient in searches.</li>
+	 * <li>concern: a standardized description of the patient:
+	 * lastname_firstname_birthdate. this will be used to filter entries of the
+	 * currently selected patient in searches.</li>
 	 * </ul>
 	 * 
-	 * Other fields are optional. 
+	 * Other fields are optional.
 	 * 
-	 * @Returns a Map with the metadata, or null to indicate,that the sender should finish and discard
-	 * remaining objects.
+	 * @Returns a Map with the metadata, or null to indicate,that the sender
+	 *          should finish and discard remaining objects.
 	 */
 	@Override
 	public Document specify(PersistentObject po) {
 		Konsultation kons = (Konsultation) po;
+		long lastDisplayUüdate=System.currentTimeMillis();
+		int numOfUpdates=0;
 		if (cont) {
 			Document meta = new Document();
 			Fall fall = kons.getFall();
@@ -101,14 +119,15 @@ public class ConsultationIndexer implements Customer {
 			String birthdate = new TimeTool(bdRaw).toString(TimeTool.DATE_COMPACT);
 			String konsdate = new TimeTool(kons.getDatum()).toString(TimeTool.DATE_COMPACT);
 			StringBuilder concern = new StringBuilder().append(lastname).append("_").append(firstname).append("_") //$NON-NLS-1$ //$NON-NLS-2$
-					.append(birthdate.substring(6)).append(".").append(birthdate.substring(4,6)).append(".").append(birthdate.substring(0,4)); //$NON-NLS-1$ //$NON-NLS-2$
+					.append(birthdate.substring(6)).append(".").append(birthdate.substring(4, 6)).append(".") //$NON-NLS-1$ //$NON-NLS-2$
+					.append(birthdate.substring(0, 4));
 			try {
 				VersionedResource vr = kons.getEintrag();
 				String text = "<empty>"; //$NON-NLS-1$
 				if (vr != null && vr.getHead() != null) {
 					text = vr.getHead();
 				}
-				
+
 				meta.put("lastname", lastname); //$NON-NLS-1$
 				meta.put("firstname", firstname); //$NON-NLS-1$
 				meta.put("birthdate", birthdate); //$NON-NLS-1$
@@ -126,11 +145,20 @@ public class ConsultationIndexer implements Customer {
 				e.printStackTrace();
 				log.error("error indexing " + kons.getLabel(), e); //$NON-NLS-1$
 			}
-			pc.addProgress(progressHandle, 1);
+			if (kons.getLastUpdate() > lastCheck) {
+				lastCheck = kons.getLastUpdate();
+				Preferences.set(Preferences.LASTSCAN_KONS, Long.toString(lastCheck));
+			}
+			if(System.currentTimeMillis()-1000>lastDisplayUüdate){
+				pc.addProgress(progressHandle, numOfUpdates);
+				numOfUpdates=0;
+				lastDisplayUüdate=System.currentTimeMillis();
+			}else{
+				numOfUpdates+=1;
+			}
 			return meta;
 		} else {
 			pc.addProgress(progressHandle, Integer.MAX_VALUE);
-			Preferences.set(Preferences.LASTSCAN_KONS, new TimeTool(kons.getDatum()).toString(TimeTool.DATE_COMPACT));
 			return null;
 		}
 
@@ -145,15 +173,16 @@ public class ConsultationIndexer implements Customer {
 	}
 
 	/**
-	 * When all elements are processed, or after the customer answered "null" to 
-	 * the call to specify, the Sender calls finished for cleanup.
-	 * Here we note the date of the last consultation indexed to continue later.
+	 * When all elements are processed, or after the customer answered "null" to
+	 * the call to specify, the Sender calls finished for cleanup. Here we note
+	 * the date of the last consultation indexed to continue later.
 	 *
-	 * @param messages Lucinda messages sent while transferring.
+	 * @param messages
+	 *            Lucinda messages sent while transferring.
 	 */
 	@Override
 	public void finished(List<Document> messages) {
-		Preferences.set(Preferences.LASTSCAN_KONS, new TimeTool().toString(TimeTool.DATE_COMPACT));
 		Activator.getDefault().addMessages(messages);
+		Preferences.cfg.flush();
 	}
 }

@@ -14,6 +14,8 @@
 
 package ch.elexis.ungrad.lucinda.omnivore;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -36,7 +38,7 @@ public class OmnivoreIndexer implements Customer {
 	private boolean cont = false;
 	private IProgressController pc;
 	Long progressHandle;
-	private String lastCheck;
+	private long lastCheck;
 
 	/**
 	 * If active, the Index will run over all Consultations. If bActive==false,
@@ -55,13 +57,21 @@ public class OmnivoreIndexer implements Customer {
 
 	public void start(IProgressController pc) {
 		this.pc = pc;
-		lastCheck = Preferences.get(Preferences.LASTSCAN_OMNI, "20010101"); //$NON-NLS-1$
+		try {
+			lastCheck = Long.parseLong(Preferences.get(Preferences.LASTSCAN_OMNI, "0")); //$NON-NLS-1$
+		} catch (NumberFormatException nf) {
+			lastCheck = 0L;
+		}
+		StringBuilder querySQL = new StringBuilder("SELECT ID FROM ").append(DocHandle.TABLENAME)
+				.append(" WHERE lastupdate >=").append(lastCheck).append(" AND deleted='0' ORDER BY ")
+				.append("lastupdate");
+
 		Query<DocHandle> qbe = new Query<DocHandle>(DocHandle.class);
-		qbe.add(DocHandle.FLD_DATE, Query.GREATER_OR_EQUAL, lastCheck);
-		qbe.orderBy(false, DocHandle.FLD_DATE);
-		List<? extends PersistentObject> docs = qbe.execute();
+		Collection<DocHandle> docs = qbe.queryExpression(querySQL.toString(), new LinkedList<DocHandle>());
+
 		progressHandle = pc.initProgress(docs.size());
-		new Sender(this, docs);
+		setActive(true);
+		new Sender(this, (List<? extends PersistentObject>) docs);
 	}
 
 	/**
@@ -102,9 +112,9 @@ public class OmnivoreIndexer implements Customer {
 			String firstname = get(patient, Patient.FLD_FIRSTNAME);
 			String birthdate = new TimeTool(bdRaw).toString(TimeTool.DATE_COMPACT);
 			String docdate = new TimeTool(dh.getCreationDate()).toString(TimeTool.DATE_COMPACT);
-			if (!(docdate.equals(lastCheck))) {
-				lastCheck = docdate;
-				Preferences.set(Preferences.LASTSCAN_OMNI, docdate);
+			if (dh.getLastUpdate() > lastCheck) {
+				lastCheck = dh.getLastUpdate();
+				Preferences.set(Preferences.LASTSCAN_OMNI, Long.toString(lastCheck));
 			}
 			StringBuilder concern = new StringBuilder().append(lastname).append("_").append(firstname).append("_") //$NON-NLS-1$ //$NON-NLS-2$
 					.append(birthdate);
@@ -124,8 +134,6 @@ public class OmnivoreIndexer implements Customer {
 			return meta;
 		} else {
 			pc.addProgress(progressHandle, Integer.MAX_VALUE);
-			Preferences.set(Preferences.LASTSCAN_OMNI,
-					new TimeTool(dh.getCreationDate()).toString(TimeTool.DATE_COMPACT));
 			return null;
 		}
 
@@ -150,8 +158,8 @@ public class OmnivoreIndexer implements Customer {
 
 	@Override
 	public void finished(List<Document> messages) {
-		Preferences.set(Preferences.LASTSCAN_OMNI, new TimeTool().toString(TimeTool.DATE_COMPACT));
 		Activator.getDefault().addMessages(messages);
+		Preferences.cfg.flush();
 	}
 
 }
