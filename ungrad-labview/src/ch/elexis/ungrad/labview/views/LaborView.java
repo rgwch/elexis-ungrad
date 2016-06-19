@@ -57,18 +57,18 @@ public class LaborView extends ViewPart implements IActivationListener {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		CTabFolder ctf=new CTabFolder(parent, SWT.BOTTOM);
-		ctf.setLayoutData(SWTHelper.getFillGridData());
-		CTabItem ctSummary=new CTabItem(ctf,SWT.NONE);
+		CTabFolder cTabFolder=new CTabFolder(parent, SWT.BOTTOM);
+		cTabFolder.setLayoutData(SWTHelper.getFillGridData());
+		CTabItem ctSummary=new CTabItem(cTabFolder,SWT.NONE);
 		ctSummary.setText("Ansicht");
-		CTabItem ctInput=new CTabItem(ctf,SWT.NONE);
-		ctInput.setText("Eingabe");
-		Control ctlSummary = controller.createSummaryControl(ctf);
-		//ctl.setLayoutData(SWTHelper.getFillGridData());
+		CTabItem ctFull=new CTabItem(cTabFolder,SWT.NONE);
+		ctFull.setText("Eingabe");
+		Control ctlSummary = controller.createSummaryControl(cTabFolder);
+		//ctlSummary.setLayoutData(SWTHelper.getFillGridData());
 		ctSummary.setControl(ctlSummary);
-		Control ctlInput=controller.createInputControl(ctf);
-		ctInput.setControl(ctlInput);
-		ctf.setSelection(ctSummary);
+		Control ctlFull=controller.createFullControl(cTabFolder);
+		ctFull.setControl(ctlFull);
+		cTabFolder.setSelection(ctSummary);
 		makeActions();
 		contributeToActionBars();
 		GlobalEventDispatcher.addActivationListener(this, this);

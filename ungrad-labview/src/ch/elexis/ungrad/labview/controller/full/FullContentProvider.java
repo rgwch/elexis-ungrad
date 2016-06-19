@@ -1,4 +1,4 @@
-package ch.elexis.ungrad.labview.controller;
+package ch.elexis.ungrad.labview.controller.full;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;

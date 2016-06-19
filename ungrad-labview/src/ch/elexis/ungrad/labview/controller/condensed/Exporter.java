@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.elexis.ungrad.labview.controller;
+package ch.elexis.ungrad.labview.controller.condensed;
 
 import java.io.File;
 import java.util.logging.Level;
@@ -83,7 +83,7 @@ public class Exporter {
 
 	private String makeHtml() throws Exception {
 		StringBuilder html = new StringBuilder("<table>");
-		TimeTool[] dates = lcp.lrs.getDates();
+		TimeTool[] dates = lcp.getLRS().getDates();
 		html.append(makeFullGrid(dates));
 		html.append("</table>");
 		String fallback = PlatformHelper.getBasePath("ch.elexis.ungrad.labview") + File.separator + "doc"
@@ -139,7 +139,7 @@ public class Exporter {
 						}
 					}
 					if (lim > -1) {
-						Bucket bucket = lcp.lrs.getOlderBucket(lr.getItem());
+						Bucket bucket = lcp.getLRS().getOlderBucket(lr.getItem());
 						ret.append("<td>").append(bucket.getMinResult()).append(" - ").append(bucket.getMaxResult())
 								.append("</td>");
 					}

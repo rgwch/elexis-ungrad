@@ -16,6 +16,7 @@ package ch.elexis.ungrad.labview.model;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +31,7 @@ import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.data.Patient;
 import ch.elexis.data.PersistentObject;
+import ch.elexis.ungrad.IObserver;
 import ch.rgw.tools.JdbcLink;
 import ch.rgw.tools.TimeTool;
 
@@ -57,6 +59,7 @@ public class LabResultsSheet {
 	Map<String, Item> items;
 	Map<String, SortedSet<Item>> groups;
 	SortedMap<Item, LabResultsRow> rows = new TreeMap<Item, LabResultsRow>();
+	List<IObserver> observers=new ArrayList<>();
 
 	@SuppressWarnings("deprecation")
 	public LabResultsSheet() {
@@ -78,6 +81,17 @@ public class LabResultsSheet {
 		} else {
 			fetch();
 		}
+		for(IObserver o:observers){
+			o.signal(pat);
+		}
+	}
+	
+	public void addObserver(IObserver obs){
+		observers.add(obs);
+	}
+	
+	public void removeObserver(IObserver obs){
+		observers.remove(obs);
 	}
 
 	/**

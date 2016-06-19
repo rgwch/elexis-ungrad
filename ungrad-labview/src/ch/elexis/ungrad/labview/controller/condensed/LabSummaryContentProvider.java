@@ -11,7 +11,7 @@
  * Contributors:
  * G. Weirich - initial implementation
  *********************************************************************************/
-package ch.elexis.ungrad.labview.controller;
+package ch.elexis.ungrad.labview.controller.condensed;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -28,12 +28,20 @@ import ch.elexis.ungrad.labview.model.LabResultsSheet;
  * 		
  */
 public class LabSummaryContentProvider implements ITreeContentProvider {
-	LabResultsSheet lrs = new LabResultsSheet();
+	private LabResultsSheet lrs;
 	
 	@Override
 	public void dispose(){
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public LabSummaryContentProvider(LabResultsSheet lrs){
+		this.lrs=lrs;
+	}
+	
+	public LabResultsSheet getLRS(){
+		return lrs;
 	}
 	
 	void setPatient(Patient pat) throws ElexisException{

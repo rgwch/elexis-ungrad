@@ -1,4 +1,4 @@
-package ch.elexis.ungrad.labview.controller;
+package ch.elexis.ungrad.labview.controller.full;
 
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.elexis.ungrad.labview.model.Item;
