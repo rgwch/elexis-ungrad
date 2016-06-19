@@ -16,13 +16,13 @@ package ch.elexis.ungrad.lucinda.view;
 
 import static ch.elexis.ungrad.lucinda.Preferences.COLUMN_WIDTHS;
 import static ch.elexis.ungrad.lucinda.Preferences.INCLUDE_KONS;
-import static ch.elexis.ungrad.lucinda.Preferences.INCLUDE_OMNI;
 import static ch.elexis.ungrad.lucinda.Preferences.RESTRICT_CURRENT;
 import static ch.elexis.ungrad.lucinda.Preferences.SHOW_CONS;
 import static ch.elexis.ungrad.lucinda.Preferences.SHOW_INBOX;
 import static ch.elexis.ungrad.lucinda.Preferences.SHOW_OMNIVORE;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.widgets.Composite;
@@ -39,15 +39,15 @@ import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.lucinda.Activator;
+import ch.elexis.ungrad.lucinda.IDocumentHandler;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.Controller;
 
 public class GlobalView extends ViewPart implements IActivationListener {
 	
 	private Controller controller;
-	private Action doubleClickAction, filterCurrentPatAction, showInboxAction, showConsAction,
-			showOmnivoreAction;
-	private RestrictedAction indexOmnivoreAction, indexKonsAction;
+	private Action doubleClickAction, filterCurrentPatAction, showInboxAction, showConsAction;
+	private RestrictedAction indexKonsAction;
 	
 	private final ElexisUiEventListenerImpl eeli_pat =
 		new ElexisUiEventListenerImpl(Patient.class, ElexisEvent.EVENT_SELECTED) {
@@ -100,39 +100,35 @@ public class GlobalView extends ViewPart implements IActivationListener {
 	
 	private void contributeToActionBars(){
 		IActionBars bars = getViewSite().getActionBars();
-		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
+		IMenuManager menu=bars.getMenuManager();
+		IToolBarManager toolbar=bars.getToolBarManager();
+		toolbar.add(filterCurrentPatAction);
+		toolbar.add(showInboxAction);
+		
+		for(IDocumentHandler dh:Activator.getDefault().getAddons()){
+			IAction toolbarAction=dh.getFilterAction(controller);
+			if(toolbarAction!=null){
+				toolbar.add(toolbarAction);
+			}
+			IAction menuAction=dh.getSyncAction(controller);
+			if(menuAction!=null){
+				menu.add(menuAction);
+			}
+		}
 	}
 	
 	private void fillLocalToolBar(IToolBarManager manager){
-		manager.add(filterCurrentPatAction);
-		manager.add(showInboxAction);
 		manager.add(showConsAction);
-		manager.add(showOmnivoreAction);
 	}
 	
 	private void fillLocalPullDown(IMenuManager manager){
-		manager.add(indexOmnivoreAction);
 		manager.add(indexKonsAction);
 		manager.add(filterCurrentPatAction);
 		
 	}
 	
 	private void makeActions(){
-		indexOmnivoreAction = new RestrictedAction(AccessControlDefaults.DOCUMENT_CREATE,
-			Messages.GlobalView_omnivoreImport_Name, Action.AS_CHECK_BOX) {
-			{
-				setToolTipText(Messages.GlobalView_omnivoreImport_tooltip);
-				setImageDescriptor(Images.IMG_DATABASE.getImageDescriptor());
-			}
-			
-			@Override
-			public void doRun(){
-				Activator.getDefault().syncOmnivore(this.isChecked());
-				save(INCLUDE_OMNI, isChecked());
-			}
-		};
-		indexOmnivoreAction.setChecked(is(INCLUDE_OMNI));
+		
 		
 		indexKonsAction = new RestrictedAction(AccessControlDefaults.DOCUMENT_CREATE,
 			Messages.GlobalView_synckons_Name, Action.AS_CHECK_BOX) {
@@ -180,22 +176,6 @@ public class GlobalView extends ViewPart implements IActivationListener {
 		showConsAction.setChecked(is(SHOW_CONS));
 		;
 		
-		/*
-		 * Show results from Omnivore
-		 */
-		showOmnivoreAction = new Action(Messages.GlobalView_filterOmni_name, Action.AS_CHECK_BOX) {
-			{
-				setToolTipText(Messages.GlobalView_filterOmni_tooltip);
-			}
-			
-			@Override
-			public void run(){
-				controller.toggleDoctypeFilter(isChecked(), Preferences.OMNIVORE_NAME);
-				save(SHOW_OMNIVORE, isChecked());
-			}
-			
-		};
-		showOmnivoreAction.setChecked(is(SHOW_OMNIVORE));
 		/*
 		 * Show results from Lucinda Inbox
 		 */

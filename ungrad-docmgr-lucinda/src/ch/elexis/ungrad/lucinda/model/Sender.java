@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.ungrad.lucinda.Lucinda;
@@ -38,6 +41,7 @@ public class Sender implements Handler {
 	private List<Document> answers = new ArrayList<Document>();
 	private List<String> onTheWay = new ArrayList<String>();
 	private Lucinda lucinda;
+	private Logger log=LoggerFactory.getLogger(getClass());
 
 	public Sender(Customer customer, List<? extends PersistentObject> list) {
 		toDo = list;
@@ -95,35 +99,16 @@ public class Sender implements Handler {
 											// indexing null
 						String title = order.get("title");
 						String type = order.get("type");
+						log.debug(title);
 						onTheWay.add(po.getId());
 						lucinda.addToIndex(po.getId(), title == null ? "?" : title, //$NON-NLS-1$
 								type == null ? "" : type, order.toMap(), contents, this); //$NON-NLS-1$
+					}else{ // Skipped empty file -> Advance to next
+						log.warn("Skipping empty Document "+order.get("title"));
+						sendNext();
 					}
 				}
 			}
 		}
 	}
-}
-
-interface Customer {
-	/**
-	 * Transcode a PersistentObject in a Document reflecting the customer's
-	 * domain.
-	 * 
-	 * @param po
-	 *            A PersistentObject, which is of the Customer's Subtype
-	 * @return A 'Document' containing at least the properties "title" (String),
-	 *         "type" (String), and "payload" (byte[]), and an arbitrary number
-	 *         of arbitrary additional properties. Recommended are: "lastname",
-	 *         "firstname", "birthdate" of the Patient this Document belongs to.
-	 */
-	public Document specify(PersistentObject po);
-
-	/**
-	 * The Sender has finished the job. Do any cleanup
-	 * 
-	 * @param messages
-	 *            All messages received from Lucinda while transmitting
-	 */
-	public void finished(List<Document> messages);
 }

@@ -40,12 +40,12 @@ public class LucindaPrefs extends FieldEditorPreferencePage implements IWorkbenc
 	
 	@Override
 	protected void createFieldEditors(){
-		addField(new StringFieldEditor(Preferences.NETWORK, "Netmask", getFieldEditorParent())); //$NON-NLS-1$
-		addField(new StringFieldEditor(Preferences.MSG, "Message Prefix", getFieldEditorParent())); //$NON-NLS-1$
-		addField(new StringFieldEditor(Preferences.SERVER_ADDR, "Server Address", //$NON-NLS-1$
+		addField(new StringFieldEditor(Preferences.NETWORK, Messages.LucindaPrefs_netmask, getFieldEditorParent())); 
+		addField(new StringFieldEditor(Preferences.MSG, Messages.LucindaPrefs_msgPrefix, getFieldEditorParent())); 
+		addField(new StringFieldEditor(Preferences.SERVER_ADDR, Messages.LucindaPrefs_serverAddress, 
 			getFieldEditorParent()));
 		addField(
-			new StringFieldEditor(Preferences.SERVER_PORT, " Server Port", getFieldEditorParent())); //$NON-NLS-1$
+			new StringFieldEditor(Preferences.SERVER_PORT, Messages.LucindaPrefs_serverPort, getFieldEditorParent()));
 		addField(new MultilineFieldEditor(Preferences.EXCLUDEMETA,
 			Messages.LucindaPrefs_exclude_Metadata, 5, 0, true, getFieldEditorParent()));
 		// addField(new MultilineFieldEditor(Preferences.MACROS, "Makros für das

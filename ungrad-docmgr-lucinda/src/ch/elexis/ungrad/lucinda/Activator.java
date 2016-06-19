@@ -21,10 +21,10 @@ import java.util.List;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import ch.elexis.core.data.util.Extensions;
 import ch.elexis.ungrad.lucinda.controller.IProgressController;
 import ch.elexis.ungrad.lucinda.model.ConsultationIndexer;
 import ch.elexis.ungrad.lucinda.model.Document;
-import ch.elexis.ungrad.lucinda.model.OmnivoreIndexer;
 import ch.rgw.lucinda.Handler;
 
 /**
@@ -39,9 +39,8 @@ public class Activator extends AbstractUIPlugin {
 	private static Activator plugin;
 	private List<Handler> handlers = new ArrayList<>();
 	private ConsultationIndexer consultationIndexer = new ConsultationIndexer();
-	private OmnivoreIndexer omnivoreIndexer = new OmnivoreIndexer();
 	private List<Document> messages = new LinkedList<>();
-
+	private List<IDocumentHandler> addons;
 	private IProgressController progressController;
 
 	/**
@@ -56,16 +55,19 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.
 	 * BundleContext)
 	 */
+	@SuppressWarnings("unchecked")
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		addons=Extensions.getClasses("ch.elexis.ungrad.lucinda.addon", "DocumentHandler");
+		/*
 		if (Preferences.get(Preferences.INCLUDE_KONS, "0").equals("1")) { //$NON-NLS-1$ //$NON-NLS-2$
 			syncKons(true);
 		}
 		if (Preferences.get(Preferences.INCLUDE_OMNI, "0").equals("1")) { //$NON-NLS-1$ //$NON-NLS-2$
 			syncOmnivore(true);
 		}
-
+		*/
 	}
 
 	public void addHandler(Handler handler) {
@@ -74,6 +76,10 @@ public class Activator extends AbstractUIPlugin {
 
 	public void removeHandler(Handler handler) {
 		handlers.remove(handler);
+	}
+	
+	public List<IDocumentHandler> getAddons(){
+		return addons;
 	}
 
 	/*
@@ -93,14 +99,14 @@ public class Activator extends AbstractUIPlugin {
 			consultationIndexer.start(progressController);
 		}
 	}
-
+/*
 	public void syncOmnivore(boolean doSync) {
 		omnivoreIndexer.setActive(doSync);
 		if (doSync) {
 			omnivoreIndexer.start(progressController);
 		}
 	}
-
+*/
 	public void addMessage(Document message) {
 		messages.add(message);
 	}

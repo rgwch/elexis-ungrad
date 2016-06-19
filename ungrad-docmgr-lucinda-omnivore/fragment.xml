@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension
+         point="ch.elexis.ungrad.lucinda.addon">
+      <Datasource
+            DataSource="ch.elexis.ungrad.lucinda.omnivore.DocumentHandler"
+            DocumentHandler="ch.elexis.ungrad.lucinda.omnivore.DocumentHandler"
+            name="Omnivore-Handler">
+      </Datasource>
+   </extension>
+
+</fragment>

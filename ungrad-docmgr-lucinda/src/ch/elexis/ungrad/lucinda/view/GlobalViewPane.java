@@ -93,6 +93,8 @@ public class GlobalViewPane extends Composite {
 			@Override
 			public void run() {
 				progressBar.setVisible(false);
+				progressBar.setSelection(0);
+				progressBar.setMaximum(0);
 			}
 		});
 	}

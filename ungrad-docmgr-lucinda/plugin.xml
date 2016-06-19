@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="ch.elexis.ungrad.lucinda.addon" name="Lucinda Add On" schema="schema/ch.elexis.ungrad.lucinda.addon.exsd"/>
    <extension
          point="org.eclipse.ui.views">
       <view
