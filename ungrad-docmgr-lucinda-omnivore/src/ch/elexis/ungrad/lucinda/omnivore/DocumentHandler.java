@@ -9,7 +9,6 @@ import org.eclipse.jface.action.IAction;
 import ch.elexis.admin.AccessControlDefaults;
 import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.icons.Images;
-import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.IDocumentHandler;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.Controller;
@@ -17,23 +16,34 @@ import ch.elexis.ungrad.lucinda.view.Messages;
 
 public class DocumentHandler implements IDocumentHandler {
 
+	private OmnivoreIndexer indexer = new OmnivoreIndexer();
+
 	@Override
 	public IAction getSyncAction(final Controller controller) {
 		IAction indexOmnivoreAction = new RestrictedAction(AccessControlDefaults.DOCUMENT_CREATE,
 				Messages.GlobalView_omnivoreImport_Name, Action.AS_CHECK_BOX) {
-				{
-					setToolTipText(Messages.GlobalView_omnivoreImport_tooltip);
-					setImageDescriptor(Images.IMG_DATABASE.getImageDescriptor());
+			{
+				setToolTipText(Messages.GlobalView_omnivoreImport_tooltip);
+				setImageDescriptor(Images.IMG_DATABASE.getImageDescriptor());
+			}
+
+			@Override
+			public void doRun() {
+				if (this.isChecked()) {
+					indexer.start(controller);
+				} else {
+					indexer.setActive(false);
 				}
-				
-				@Override
-				public void doRun(){
-					//Activator.getDefault().syncOmnivore(this.isChecked());
-					Preferences.set(INCLUDE_OMNI, isChecked());
-				}
-			};
-			indexOmnivoreAction.setChecked(Preferences.is(INCLUDE_OMNI));
-			return indexOmnivoreAction;
+
+				Preferences.set(INCLUDE_OMNI, isChecked());
+			}
+		};
+		if(Preferences.is(INCLUDE_OMNI)){
+			indexer.start(controller);
+			indexOmnivoreAction.setChecked(true);
+
+		}
+		return indexOmnivoreAction;
 	}
 
 	@Override
@@ -42,17 +52,16 @@ public class DocumentHandler implements IDocumentHandler {
 			{
 				setToolTipText(Messages.GlobalView_filterOmni_tooltip);
 			}
-			
+
 			@Override
-			public void run(){
+			public void run() {
 				controller.toggleDoctypeFilter(isChecked(), Preferences.OMNIVORE_NAME);
 				Preferences.set(SHOW_OMNIVORE, isChecked());
 			}
-			
+
 		};
 		showOmnivoreAction.setChecked(Preferences.is(SHOW_OMNIVORE));
 		return showOmnivoreAction;
 	}
-	
-	
+
 }
