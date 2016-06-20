@@ -40,6 +40,10 @@ public class ItemTextLabelProvider extends StyledCellLabelProvider {
 			Item item=row.getItem();
 			String titel=item.get("titel");
 			cell.setText(titel);
+		}else if(cell.getElement() instanceof Item){
+			Item item=(Item)cell.getElement();
+			cell.setText(item.get("titel"));
+			super.update(cell);
 		}else{
 			String titel=(String)cell.getElement();
 			cell.setBackground(headingsBG);

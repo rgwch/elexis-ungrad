@@ -72,6 +72,7 @@ public class CondensedViewController implements IObserver {
 	@Override
 	public void signal(Object message) {
 		if(message instanceof Patient){
+			colsSummary.reload(lcp);
 			tvSummary.setInput(message);
 		}
 	}

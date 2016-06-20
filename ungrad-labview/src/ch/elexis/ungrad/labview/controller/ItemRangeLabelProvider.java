@@ -22,6 +22,7 @@ import ch.elexis.core.types.Gender;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.labview.model.Item;
 import ch.elexis.ungrad.labview.model.LabResultsRow;
+import ch.elexis.ungrad.labview.model.LabResultsSheet;
 
 /**
  * LabelProvider for the norm-Range column
@@ -30,7 +31,15 @@ import ch.elexis.ungrad.labview.model.LabResultsRow;
  *
  */
 public class ItemRangeLabelProvider extends CellLabelProvider {
-
+	private LabResultsSheet lrs;
+	
+	
+	public ItemRangeLabelProvider(LabResultsSheet lrs){
+		this.lrs=lrs;
+	}
+	public ItemRangeLabelProvider(){
+	}
+	
 	@Override
 	public void update(ViewerCell cell) {
 		if (cell.getElement() instanceof LabResultsRow) {
@@ -42,6 +51,8 @@ public class ItemRangeLabelProvider extends CellLabelProvider {
 			} else {
 				cell.setText(item.get("refMann"));
 			}
+		}else if(cell.getElement() instanceof Item){
+			cell.setText(lrs.getNormRange((Item)cell.getElement()));
 		}else{
 			cell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
 			cell.setText("");
