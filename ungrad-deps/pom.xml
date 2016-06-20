@@ -29,10 +29,13 @@
                                 <!-- specify your depencies here -->
                                 <!-- groupId:artifactId:version -->
                                 <artifact>
-                                    <id>io.vertx:vertx-core:jar:3.2.1</id>
+                                    <id>io.vertx:vertx-core:3.2.1</id>
                                 </artifact>
                                 <artifact>
-                                    <id>junit:junit:jar:4.12</id>
+                                    <id>junit:junit:4.12</id>
+                                </artifact>
+                                <artifact>
+                                    <id>junit:junit:3.8.2</id>
                                 </artifact>
                             </artifacts>
                         </configuration>
