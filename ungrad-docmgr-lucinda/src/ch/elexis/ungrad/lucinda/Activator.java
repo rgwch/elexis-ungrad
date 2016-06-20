@@ -22,7 +22,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import ch.elexis.core.data.util.Extensions;
-import ch.elexis.ungrad.lucinda.controller.IProgressController;
 import ch.elexis.ungrad.lucinda.model.Document;
 import ch.rgw.lucinda.Handler;
 
@@ -30,23 +29,21 @@ import ch.rgw.lucinda.Handler;
  * The activator class controls the plug-in life cycle
  */
 public class Activator extends AbstractUIPlugin {
-
+	
 	// The plug-in ID
 	public static final String PLUGIN_ID = "ch.rgw.elexis.docmgr-lucinda"; //$NON-NLS-1$
-
+	
 	// The shared instance
 	private static Activator plugin;
 	private List<Handler> handlers = new ArrayList<>();
 	private List<Document> messages = new LinkedList<>();
 	private List<IDocumentHandler> addons;
-	private IProgressController progressController;
-
+	
 	/**
 	 * The constructor
 	 */
-	public Activator() {
-	}
-
+	public Activator(){}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -54,10 +51,10 @@ public class Activator extends AbstractUIPlugin {
 	 * BundleContext)
 	 */
 	@SuppressWarnings("unchecked")
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception{
 		super.start(context);
 		plugin = this;
-		addons=Extensions.getClasses("ch.elexis.ungrad.lucinda.addon", "DocumentHandler");
+		addons = Extensions.getClasses("ch.elexis.ungrad.lucinda.addon", "DocumentHandler");
 		/*
 		if (Preferences.get(Preferences.INCLUDE_KONS, "0").equals("1")) { //$NON-NLS-1$ //$NON-NLS-2$
 			syncKons(true);
@@ -67,30 +64,30 @@ public class Activator extends AbstractUIPlugin {
 		}
 		*/
 	}
-
-	public void addHandler(Handler handler) {
+	
+	public void addHandler(Handler handler){
 		handlers.add(handler);
 	}
-
-	public void removeHandler(Handler handler) {
+	
+	public void removeHandler(Handler handler){
 		handlers.remove(handler);
 	}
 	
 	public List<IDocumentHandler> getAddons(){
 		return addons;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.
 	 * BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception{
 		plugin = null;
 		super.stop(context);
 	}
-
+	
 	/*
 	public void syncKons(boolean doSync) {
 		consultationIndexer.setActive(doSync);
@@ -98,37 +95,33 @@ public class Activator extends AbstractUIPlugin {
 			consultationIndexer.start(progressController);
 		}
 	}
-
+	
 	public void syncOmnivore(boolean doSync) {
 		omnivoreIndexer.setActive(doSync);
 		if (doSync) {
 			omnivoreIndexer.start(progressController);
 		}
 	}
-*/
-	public void addMessage(Document message) {
+	*/
+	public void addMessage(Document message){
 		messages.add(message);
 	}
-
-	public void addMessages(List<Document> messages) {
+	
+	public void addMessages(List<Document> messages){
 		this.messages.addAll(messages);
 	}
-
-	public List<Document> getMessages() {
+	
+	public List<Document> getMessages(){
 		return messages;
 	}
-
+	
 	/**
 	 * Returns the shared instance
 	 *
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static Activator getDefault(){
 		return plugin;
 	}
-
-	public void setProgressController(IProgressController controller) {
-		progressController = controller;
-	}
-
+	
 }

@@ -136,6 +136,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 		showInboxAction = new Action(Preferences.INBOX_NAME, Action.AS_CHECK_BOX) {
 			{
 				setToolTipText(Messages.GlobalView_filterInbox_name);
+				setImageDescriptor(Images.IMG_DOCUMENT_TEXT.getImageDescriptor());
 			}
 
 			@Override

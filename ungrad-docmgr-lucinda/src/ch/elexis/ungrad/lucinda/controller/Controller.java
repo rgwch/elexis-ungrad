@@ -49,7 +49,6 @@ import ch.elexis.ungrad.lucinda.model.Document;
 import ch.elexis.ungrad.lucinda.view.GlobalViewPane;
 import ch.elexis.ungrad.lucinda.view.Master;
 import ch.rgw.io.FileTool;
-import ch.rgw.lucinda.Handler;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.TimeTool;
 
@@ -76,7 +75,6 @@ public class Controller implements IProgressController {
 		bRestrictCurrentPatient = Boolean
 				.parseBoolean(Preferences.get(Preferences.RESTRICT_CURRENT, Boolean.toString(false)));
 		cnt = new ContentProvider();
-		Activator.getDefault().setProgressController(this);
 		connect();
 	}
 
