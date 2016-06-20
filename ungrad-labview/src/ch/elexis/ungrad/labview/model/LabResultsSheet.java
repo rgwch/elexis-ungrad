@@ -329,6 +329,10 @@ public class LabResultsSheet {
 		}
 	}
 	
+	public boolean isPathologic(Item item, Result result){
+		return item.isPathologic(pat, result.get("resultat"));
+	}
+	
 	public Result getResultForDate(Item item, TimeTool date){
 		LabResultsRow row = rows.get(item);
 		if (row == null) {

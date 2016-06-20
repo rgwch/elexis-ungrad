@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeColumn;
 
 import ch.elexis.core.ui.UiDesk;
-import ch.elexis.ungrad.labview.controller.CondensedViewLabelProvider;
 import ch.elexis.ungrad.labview.controller.ItemRangeLabelProvider;
 import ch.elexis.ungrad.labview.controller.ItemTextLabelProvider;
 import ch.elexis.ungrad.labview.model.LabResultsSheet;

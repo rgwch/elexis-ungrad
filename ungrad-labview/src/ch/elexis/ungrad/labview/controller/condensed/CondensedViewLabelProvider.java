@@ -11,7 +11,7 @@
  * Contributors:
  * G. Weirich - initial implementation
  *********************************************************************************/
-package ch.elexis.ungrad.labview.controller;
+package ch.elexis.ungrad.labview.controller.condensed;
 
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.swt.SWT;
@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.Event;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.data.Patient;
-import ch.elexis.ungrad.labview.controller.condensed.LabSummaryTreeColumns;
 import ch.elexis.ungrad.labview.model.Bucket;
 import ch.elexis.ungrad.labview.model.Item;
 import ch.elexis.ungrad.labview.model.LabResultsRow;
