@@ -28,13 +28,12 @@ import ch.elexis.ungrad.lucinda.Lucinda;
 import ch.rgw.lucinda.Handler;
 
 /**
- * The Sender takes a List of PersistentObjects from its creating customer and
- * sends them asynchroneously to Lucinda. Each Object gets "specified" by the
- * customer, i.e. the customer transforms the PersistentObject into a map of
- * properties to persist.
+ * The Sender takes a List of PersistentObjects from its creating customer and sends them
+ * asynchroneously to Lucinda. Each Object gets "specified" by the customer, i.e. the customer
+ * transforms the PersistentObject into a map of properties to persist.
  * 
  * @author gerry
- *
+ *		
  */
 public class Sender implements Handler {
 	private List<? extends PersistentObject> toDo;
@@ -42,9 +41,9 @@ public class Sender implements Handler {
 	private List<Document> answers = new ArrayList<Document>();
 	private List<String> onTheWay = new ArrayList<String>();
 	private Lucinda lucinda;
-	private Logger log=LoggerFactory.getLogger(getClass());
-
-	public Sender(Customer customer, List<? extends PersistentObject> list) {
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
+	public Sender(Customer customer, List<? extends PersistentObject> list){
 		toDo = list;
 		this.customer = customer;
 		lucinda = new Lucinda();
@@ -55,39 +54,37 @@ public class Sender implements Handler {
 				break;
 			default:
 				SWTHelper.showError("Lucinda",
-						"unexpected answer " + result.get("status") + ", " + result.get("message"));
+					"unexpected answer " + result.get("status") + ", " + result.get("message"));
 			}
 		});
 	}
-
+	
 	/**
-	 * Lucinda will signal each transfer of a Document. We use these signals to
-	 * keep track of how many Documents are still on the way. If no more
-	 * Documents are waiting and no more Documents are on the way, then we tell
-	 * our customer, that we finished the job.
+	 * Lucinda will signal each transfer of a Document. We use these signals to keep track of how
+	 * many Documents are still on the way. If no more Documents are waiting and no more Documents
+	 * are on the way, then we tell our customer, that we finished the job.
 	 */
 	@Override
-	public void signal(Map<String, Object> message) {
-		if (message.get("status").equals("ok")) {
-			answers.add(new Document(message));
-			onTheWay.remove(message.get("_id")); //$NON-NLS-1$
-			if (toDo.isEmpty() && onTheWay.isEmpty()) {
-				customer.finished(answers);
-				lucinda.disconnect();
-			}
-			sendNext();
-		} else {
+	public void signal(Map<String, Object> message){
+		if (!message.get("status").equals("ok")) {
 			SWTHelper.showError("Lucinda Sender " + message.get("status"),
-					(String) message.get("message") + "; " + message.get("title"));
+				(String) message.get("message") + "; " + message.get("title"));
 		}
+		answers.add(new Document(message));
+		onTheWay.remove(message.get("_id")); //$NON-NLS-1$
+		if (toDo.isEmpty() && onTheWay.isEmpty()) {
+			customer.finished(answers);
+			lucinda.disconnect();
+		}
+		sendNext();
 	}
-
+	
 	/*
 	 * Send the next Document to Lucinda. We don't check for duplicates here,
 	 * since Lucinda won't add duplicates to the index. (It will update existing
 	 * documents instead)
 	 */
-	private void sendNext() {
+	private void sendNext(){
 		if (!toDo.isEmpty()) {
 			PersistentObject po = toDo.remove(0);
 			if (po.exists()) {
@@ -103,9 +100,9 @@ public class Sender implements Handler {
 						log.debug(title);
 						onTheWay.add(po.getId());
 						lucinda.addToIndex(po.getId(), title == null ? "?" : title, //$NON-NLS-1$
-								type == null ? "" : type, order.toMap(), contents, this); //$NON-NLS-1$
-					}else{ // Skipped empty file -> Advance to next
-						log.warn("Skipping empty Document "+order.get("title"));
+							type == null ? "" : type, order.toMap(), contents, this); //$NON-NLS-1$
+					} else { // Skipped empty file -> Advance to next
+						log.warn("Skipping empty Document " + order.get("title"));
 						sendNext();
 					}
 				}
