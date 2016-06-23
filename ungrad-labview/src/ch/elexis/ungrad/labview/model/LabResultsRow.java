@@ -85,4 +85,22 @@ public class LabResultsRow implements Comparable<LabResultsRow> {
 		return false;
 	}
 
+	public Result[] getBoundsBefore(TimeTool limit) {
+		Result[] minmax=new Result[2];
+		float min=Float.MAX_VALUE;
+		float max=0f;
+		for(Result result:results){
+			float cmp=Item.makeFloat(result.get("resultat"));
+			if(cmp>max){
+				max=cmp;
+				minmax[1]=result;
+			}
+			if(cmp<min){
+				min=cmp;
+				minmax[0]=result;
+			}
+		}
+		return minmax;
+	}
+
 }

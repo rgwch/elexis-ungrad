@@ -27,7 +27,7 @@ public class SmartTreeColumns {
 			tc.dispose();
 		}
 		TimeTool[] dates = svc.getLRS().getDates();
-		int cLen=Math.min(dates.length, 6)+3;
+		int cLen = Math.min(dates.length, 6) + 3;
 		cols = new TreeViewerColumn[cLen];
 		for (int i = 0; i < 2; i++) {
 			cols[i] = new TreeViewerColumn(tv, SWT.NONE);
@@ -36,17 +36,16 @@ public class SmartTreeColumns {
 		}
 		cols[0].setLabelProvider(new ItemTextLabelProvider());
 		cols[1].setLabelProvider(new ItemRangeLabelProvider(svc.getLRS()));
-		for (int i = cLen-2; i > -1; i--) {
+		for (int i = cLen - 2; i > -1; i--) {
 			cols[i + 2] = new TreeViewerColumn(tv, SWT.NONE);
 			cols[i + 2].getColumn().setText(dates[i].toString(TimeTool.DATE_GER));
 			cols[i + 2].getColumn().setWidth(80);
 			cols[i + 2].setLabelProvider(new DefaultResultLabelProvider(svc, dates[i]));
 		}
-		cols[cLen-1]=new TreeViewerColumn(tv, SWT.NONE);
-		cols[cLen-1].getColumn().setText("früher");
-		cols[cLen-1].getColumn().setWidth(100);
-		cols[cLen-1].setLabelProvider(new SmartSummaryLabelProvider(svc,6));
+		cols[cLen - 1] = new TreeViewerColumn(tv, SWT.NONE);
+		cols[cLen - 1].getColumn().setText("früher");
+		cols[cLen - 1].getColumn().setWidth(100);
+		cols[cLen - 1].setLabelProvider(new SmartSummaryLabelProvider(svc, dates[cLen - 2]));
 	}
-	
 
 }

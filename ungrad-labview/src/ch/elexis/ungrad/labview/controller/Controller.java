@@ -24,6 +24,7 @@ import ch.elexis.ungrad.labview.Preferences;
 import ch.elexis.ungrad.labview.controller.condensed.CondensedViewController;
 import ch.elexis.ungrad.labview.controller.condensed.Exporter;
 import ch.elexis.ungrad.labview.controller.full.FullViewController;
+import ch.elexis.ungrad.labview.controller.smart.SmartViewController;
 import ch.elexis.ungrad.labview.model.LabResultsSheet;
 import ch.elexis.ungrad.labview.views.LaborView;
 
@@ -35,6 +36,7 @@ public class Controller {
 	Resolver resolver = new Resolver();
 	CondensedViewController ctlCond=new CondensedViewController(this);
 	FullViewController ctlFull=new FullViewController(this);
+	SmartViewController ctlSmart=new SmartViewController(this);
 	
 
 	public Controller(LaborView view) {
@@ -53,6 +55,9 @@ public class Controller {
 		return ctlFull.createControl(ctf);
 	}
 	
+	public Control createSmartControl(CTabFolder ctf){
+		return ctlSmart.createControl(ctf);
+	}
 	public void saveState() {
 		Preferences.cfg.set(Preferences.CONDVIEW, ctlCond.getState());
 	}
