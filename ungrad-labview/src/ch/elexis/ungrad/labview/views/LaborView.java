@@ -59,6 +59,9 @@ public class LaborView extends ViewPart implements IActivationListener {
 	public void createPartControl(Composite parent) {
 		CTabFolder cTabFolder=new CTabFolder(parent, SWT.BOTTOM);
 		cTabFolder.setLayoutData(SWTHelper.getFillGridData());
+		CTabItem ctSmart=new CTabItem(cTabFolder,SWT.NONE);
+		ctSmart.setText("Kompakt");
+		ctSmart.setControl(controller.createSmartControl(cTabFolder));
 		CTabItem ctSummary=new CTabItem(cTabFolder,SWT.NONE);
 		ctSummary.setText("Ansicht");
 		CTabItem ctFull=new CTabItem(cTabFolder,SWT.NONE);
