@@ -11,7 +11,7 @@
  * Contributors:
  * G. Weirich - initial implementation
  *********************************************************************************/
-package ch.elexis.ungrad.labview.controller.full;
+package ch.elexis.ungrad.labview.controller;
 
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -23,38 +23,36 @@ import ch.elexis.ungrad.labview.model.Item;
 import ch.elexis.ungrad.labview.model.Result;
 import ch.rgw.tools.TimeTool;
 
-class FullLabelProvider extends StyledCellLabelProvider {
-	FullViewController fvc;
+public class DefaultResultLabelProvider extends StyledCellLabelProvider {
+	Controller ctl;
 	TimeTool myDate;
 	Color black, red;
-	
-	public FullLabelProvider(FullViewController fvc, TimeTool date){
-		this.fvc = fvc;
+
+	public DefaultResultLabelProvider(Controller fvc, TimeTool date) {
+		this.ctl = fvc;
 		myDate = date;
 		black = UiDesk.getColor(UiDesk.COL_BLACK);
 		red = UiDesk.getColor(UiDesk.COL_RED);
-		
+
 	}
-	
-	public void setDate(TimeTool date){
+
+	public void setDate(TimeTool date) {
 		myDate = date;
 	}
-	
+
 	@Override
-	public void update(ViewerCell cell){
-		
+	public void update(ViewerCell cell) {
+
 		if (cell.getElement() instanceof Item) {
 			Item item = (Item) cell.getElement();
-			Result result = fvc.getLRS().getResultForDate(item, myDate);
+			Result result = ctl.getLRS().getResultForDate(item, myDate);
 			if (result == null) {
 				cell.setText("");
 			} else {
 				String res = result.get("resultat");
-				if (fvc.getLRS().isPathologic(item, result)) {
+				if (ctl.getLRS().isPathologic(item, result)) {
 					StyleRange sr = new StyleRange(0, res.length(), red, cell.getBackground());
-					cell.setStyleRanges(new StyleRange[] {
-						sr
-					});
+					cell.setStyleRanges(new StyleRange[] { sr });
 				}
 				cell.setText(res);
 			}

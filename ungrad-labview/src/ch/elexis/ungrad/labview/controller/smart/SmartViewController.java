@@ -2,6 +2,7 @@ package ch.elexis.ungrad.labview.controller.smart;
 
 import ch.elexis.ungrad.IObserver;
 import ch.elexis.ungrad.labview.controller.Controller;
+import ch.elexis.ungrad.labview.model.LabResultsSheet;
 
 public class SmartViewController implements IObserver {
 
@@ -16,6 +17,9 @@ public class SmartViewController implements IObserver {
 	@Override
 	public void signal(Object message) {
 
+	}
+	public LabResultsSheet getLRS() {
+		return controller.getLRS();
 	}
 
 }

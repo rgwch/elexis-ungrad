@@ -27,16 +27,16 @@ public class FullViewController implements IObserver {
 	TreeViewer tvFull;
 	Controller controller;
 	FullDisplayTreeColumns fdtc;
-	
-	public FullViewController(Controller parent){
+
+	public FullViewController(Controller parent) {
 		controller = parent;
 	}
-	
-	public LabResultsSheet getLRS(){
+
+	public LabResultsSheet getLRS() {
 		return controller.getLRS();
 	}
-	
-	public Control createControl(Composite parent){
+
+	public Control createControl(Composite parent) {
 		tvFull = new TreeViewer(parent);
 		Tree tree = tvFull.getTree();
 		tree.setLinesVisible(true);
@@ -46,11 +46,11 @@ public class FullViewController implements IObserver {
 		controller.getLRS().addObserver(this);
 		return tree;
 	}
-	
+
 	@Override
-	public void signal(Object message){
+	public void signal(Object message) {
 		if (message instanceof Patient) {
-			fdtc.reload(this);
+			fdtc.reload(controller);
 			tvFull.setInput(message);
 		}
 	}
