@@ -26,30 +26,37 @@ import ch.elexis.ungrad.labview.model.LabResultsRow;
 
 /**
  * LabelProvider for the Item title
+ * 
  * @author gerry
  *
  */
 public class ItemTextLabelProvider extends StyledCellLabelProvider {
-	private Color headingsBG=Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
-	private Color headingsFG=UiDesk.getColor(UiDesk.COL_BLUE);
-	
+	private Color headingsBG = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+	private Color headingsFG = UiDesk.getColor(UiDesk.COL_BLUE);
+	private Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
+
 	@Override
 	public void update(ViewerCell cell) {
-		if(cell.getElement() instanceof LabResultsRow){
-			LabResultsRow row=(LabResultsRow)cell.getElement();
-			Item item=row.getItem();
-			String titel=item.get("titel");
+		if (cell.getElement() instanceof LabResultsRow) {
+			LabResultsRow row = (LabResultsRow) cell.getElement();
+			Item item = row.getItem();
+			String titel = item.get("titel");
+			if (row.hasRelevantResults()) {
+				StyleRange sr = new StyleRange(0, titel.length(), red, null);
+				cell.setStyleRanges(new StyleRange[] { sr });
+			}
 			cell.setText(titel);
-		}else if(cell.getElement() instanceof Item){
-			Item item=(Item)cell.getElement();
+			super.update(cell);
+		} else if (cell.getElement() instanceof Item) {
+			Item item = (Item) cell.getElement();
 			cell.setText(item.get("titel"));
 			super.update(cell);
-		}else{
-			String titel=(String)cell.getElement();
+		} else {
+			String titel = (String) cell.getElement();
 			cell.setBackground(headingsBG);
 			cell.setForeground(headingsFG);
-			StyleRange sr=new StyleRange(0,titel.length(),null,null,SWT.BOLD);
-			cell.setStyleRanges(new StyleRange[]{sr});
+			StyleRange sr = new StyleRange(0, titel.length(), null, null, SWT.BOLD);
+			cell.setStyleRanges(new StyleRange[] { sr });
 			cell.setText(titel);
 			super.update(cell);
 		}

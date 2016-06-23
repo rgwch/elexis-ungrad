@@ -68,4 +68,21 @@ public class LabResultsRow implements Comparable<LabResultsRow> {
 		return item.compareTo(r.item);
 	}
 	
+	public boolean hasRelevantResults(){
+		TimeTool now =new TimeTool();
+		now.add(TimeTool.HOUR, -365*24);
+		TimeTool cmp=new TimeTool();
+		for(Result result:results){
+			if(cmp.set(result.get("datum"))){
+				if(cmp.isAfter(now)){
+					if(item.isPathologic(patient, result.get("resultat"))){
+						return true;
+					}
+				}
+			}
+		
+		}
+		return false;
+	}
+
 }
