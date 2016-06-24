@@ -1,5 +1,8 @@
 package ch.elexis.ungrad.labview.controller.full;
 
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.TextCellEditor;
 /*******************************************************************************
  * Copyright (c) 2016 by G. Weirich
  *
@@ -22,6 +25,8 @@ import ch.elexis.ungrad.labview.controller.Controller;
 import ch.elexis.ungrad.labview.controller.DateResultLabelProvider;
 import ch.elexis.ungrad.labview.controller.ItemRangeLabelProvider;
 import ch.elexis.ungrad.labview.controller.ItemTextLabelProvider;
+import ch.elexis.ungrad.labview.model.Item;
+import ch.elexis.ungrad.labview.model.LabResultsSheet;
 import ch.rgw.tools.TimeTool;
 
 public class FullDisplayTreeColumns {
@@ -29,9 +34,11 @@ public class FullDisplayTreeColumns {
 	TreeViewerColumn[] cols;
 	String[] headings = { "Parameter", "Referenz" };
 	int[] widths = { 150, 120 };
+	TextCellEditor tce;
 
 	public FullDisplayTreeColumns(TreeViewer tv) {
 		this.tv = tv;
+		tce=new TextCellEditor(tv.getTree());
 	}
 
 	public void reload(Controller ctl) {
@@ -52,6 +59,36 @@ public class FullDisplayTreeColumns {
 			cols[i + 2].getColumn().setText(dates[i].toString(TimeTool.DATE_GER));
 			cols[i + 2].getColumn().setWidth(80);
 			cols[i + 2].setLabelProvider(new DateResultLabelProvider(ctl, dates[i]));
+			cols[i+2].setEditingSupport(createEditingSupportFor(cols[i+2], ctl.getLRS(), dates[i]));
 		}
+	}
+	
+	private EditingSupport createEditingSupportFor(TreeViewerColumn tvc, LabResultsSheet lrs, TimeTool colDate){
+		return new EditingSupport(tv) {
+			
+			@Override
+			protected void setValue(Object element, Object value) {
+				
+			}
+			
+			@Override
+			protected Object getValue(Object element) {
+				if(element instanceof Item){
+					return lrs.getResultForDate((Item) element, colDate);
+				}else{
+					return "";
+				}
+			}
+			
+			@Override
+			protected CellEditor getCellEditor(Object element) {
+				return tce;
+			}
+			
+			@Override
+			protected boolean canEdit(Object element) {
+				return element instanceof Item;
+			}
+		};
 	}
 }
