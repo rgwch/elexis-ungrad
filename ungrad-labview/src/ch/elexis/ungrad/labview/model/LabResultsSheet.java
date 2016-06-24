@@ -331,6 +331,9 @@ public class LabResultsSheet {
 	}
 
 	public boolean isPathologic(Item item, Result result) {
+		if(item==null || result==null){
+			return false;
+		}
 		return item.isPathologic(pat, result.get("resultat"));
 	}
 

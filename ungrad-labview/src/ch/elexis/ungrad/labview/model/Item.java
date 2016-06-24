@@ -28,35 +28,34 @@ public class Item extends SimpleObject implements Comparable<Item> {
 	static final int UPPER_BOUND_MALE = 1;
 	static final int LOWER_BOUND_FEMALE = 2;
 	static final int UPPER_BOUND_FEMALE = 3;
-	
+
 	Log log = Log.get(getClass().getName());
-	
-	private static final String[] fields = {
-		"ID", "titel", "kuerzel", "Gruppe", "prio", "RefMann", "RefFrauOrTx", "Typ", "Einheit"
-	};
-	
+
+	private static final String[] fields = { "ID", "titel", "kuerzel", "Gruppe", "prio", "RefMann", "RefFrauOrTx",
+			"Typ", "Einheit" };
+
 	private float[] refBounds = new float[4];
-	
+
 	@Override
-	public String[] getFields(){
+	public String[] getFields() {
 		return fields;
 	}
-	
-	public Item(ResultSet res){
+
+	public Item(ResultSet res) {
 		load(res);
 		if (get("typ").equals(ntyp)) {
 			makeBounds(get("refMann"), LOWER_BOUND_MALE);
 			makeBounds(get("refFrauOrTx"), LOWER_BOUND_FEMALE);
 		}
 	}
-	
-	public Item(String id){
+
+	public Item(String id) {
 		for (String field : fields) {
 			props.put(field.toLowerCase(), "?");
 		}
 	}
-	
-	private void makeBounds(String val, int index){
+
+	private void makeBounds(String val, int index) {
 		if (!StringTool.isNothing(val)) {
 			String chopped = val.replaceAll("\\s", "");
 			if (chopped.startsWith("<")) {
@@ -76,10 +75,10 @@ public class Item extends SimpleObject implements Comparable<Item> {
 			}
 		}
 	}
-	
+
 	/**
-	 * Make a positive float from a string. We don't use just Float.parseFloat(), because we want to
-	 * handle:
+	 * Make a positive float from a string. We don't use just
+	 * Float.parseFloat(), because we want to handle:
 	 * <ul>
 	 * <li>, or . as dezimal separator</li>
 	 * <li>leading &lt; or &gt; symbols</li>
@@ -88,9 +87,10 @@ public class Item extends SimpleObject implements Comparable<Item> {
 	 * 
 	 * @param s
 	 *            the String to parse
-	 * @return the float (which is 0.0 or higher) or -1f if the String could not be parsed
+	 * @return the float (which is 0.0 or higher) or -1f if the String could not
+	 *         be parsed
 	 */
-	public static float makeFloat(String raw){
+	public static float makeFloat(String raw) {
 		String s = raw.replaceAll("[\\s]", "");
 		if (s.startsWith("<")) {
 			return makeFloatInternal(s.substring(1));
@@ -100,8 +100,8 @@ public class Item extends SimpleObject implements Comparable<Item> {
 			return makeFloatInternal(s);
 		}
 	}
-	
-	private static float makeFloatInternal(String s){
+
+	private static float makeFloatInternal(String s) {
 		String[] splitted = s.split("[\\.,]");
 		if (splitted[0].matches("\\s*[0-9]+\\s*")) {
 			String einer = splitted[0].trim();
@@ -124,16 +124,20 @@ public class Item extends SimpleObject implements Comparable<Item> {
 			return -1.0f;
 		}
 	}
-	
+
 	/**
-	 * Ast whether a (stringified) value is pathologic for the Item in this bucket
+	 * Ast whether a (stringified) value is pathologic for the Item in this
+	 * bucket
 	 * 
 	 * @param value
 	 *            the value to check
-	 * @return true if the value is pathologic (with respect to the norm range of the Item and the
-	 *         gender of the Patient)
+	 * @return true if the value is pathologic (with respect to the norm range
+	 *         of the Item and the gender of the Patient)
 	 */
-	public boolean isPathologic(Patient pat, String value){
+	public boolean isPathologic(Patient pat, String value) {
+		if (value == null) {
+			return false;
+		}
 		String chopped = value.trim();
 		float val = 0f;
 		if (chopped.startsWith("<")) {
@@ -153,11 +157,11 @@ public class Item extends SimpleObject implements Comparable<Item> {
 			return false;
 		}
 	}
-	
+
 	@Override
-	public int compareTo(Item o){
+	public int compareTo(Item o) {
 		int gcomp = compare(o, "gruppe");
 		return gcomp == 0 ? compare(o, "prio") : gcomp;
 	}
-	
+
 }

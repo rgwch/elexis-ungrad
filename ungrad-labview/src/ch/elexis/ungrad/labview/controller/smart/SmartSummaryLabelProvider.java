@@ -23,12 +23,10 @@ public class SmartSummaryLabelProvider extends StyledCellLabelProvider {
 			LabResultsRow lr = (LabResultsRow) cell.getElement();
 			Result[] minmax = lr.getBoundsBefore(limit);
 			StringBuilder result = new StringBuilder("");
-			if (minmax != null) {
-				if (minmax[0].equals(minmax[1])) {
-					result.append(minmax[0].get("resultat"));
-				} else {
-					result.append(minmax[0].get("resultat"))
-					.append("-")
+			if (minmax != null && minmax[0]!=null) {
+				result.append(minmax[0].get("resultat"));
+				if (!minmax[0].equals(minmax[1]) && minmax[1]!= null) {
+					result.append("-")
 					.append(minmax[1].get("resultat"));
 				}
 			}

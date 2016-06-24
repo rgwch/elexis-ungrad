@@ -19,7 +19,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.TreeColumn;
 
 import ch.elexis.ungrad.labview.controller.Controller;
-import ch.elexis.ungrad.labview.controller.DefaultResultLabelProvider;
+import ch.elexis.ungrad.labview.controller.DateResultLabelProvider;
 import ch.elexis.ungrad.labview.controller.ItemRangeLabelProvider;
 import ch.elexis.ungrad.labview.controller.ItemTextLabelProvider;
 import ch.rgw.tools.TimeTool;
@@ -51,7 +51,7 @@ public class FullDisplayTreeColumns {
 			cols[i + 2] = new TreeViewerColumn(tv, SWT.NONE);
 			cols[i + 2].getColumn().setText(dates[i].toString(TimeTool.DATE_GER));
 			cols[i + 2].getColumn().setWidth(80);
-			cols[i + 2].setLabelProvider(new DefaultResultLabelProvider(ctl, dates[i]));
+			cols[i + 2].setLabelProvider(new DateResultLabelProvider(ctl, dates[i]));
 		}
 	}
 }
