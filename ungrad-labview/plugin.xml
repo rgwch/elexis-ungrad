@@ -5,14 +5,16 @@
          point="org.eclipse.ui.views">
       <view
             class="ch.elexis.ungrad.labview.views.LaborView"
+            icon="icons/lab24.png"
             id="ch.elexis.ungrad.labview.display"
-            name="Labor"
+            name="LabView"
             restorable="true">
       </view>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            category="ch.elexis.LaborPref"
             class="ch.elexis.ungrad.labview.views.PreferencePage"
             id="ch.ungrad.labview.preferencePage"
             name="Ungrad-Labview">

@@ -23,26 +23,26 @@ public class LabResultsRow implements Comparable<LabResultsRow> {
 	Item item;
 	Patient patient;
 	SortedSet<Result> results;
-	
-	public LabResultsRow(Item item, Patient pat){
+
+	public LabResultsRow(Item item, Patient pat) {
 		this.item = item;
 		results = new TreeSet<Result>();
 		this.patient = pat;
 	}
-	
-	public void add(Result result){
+
+	public void add(Result result) {
 		results.add(result);
 	}
-	
-	public Result get(int index){
+
+	public Result get(int index) {
 		if (results.size() > index) {
 			return (Result) (results.toArray()[index]);
 		} else {
 			return null;
 		}
 	}
-	
-	public Result get(TimeTool date){
+
+	public Result get(TimeTool date) {
 		for (Result res : results) {
 			if (new TimeTool(res.get("datum")).isEqual(date)) {
 				return res;
@@ -50,54 +50,59 @@ public class LabResultsRow implements Comparable<LabResultsRow> {
 		}
 		return null;
 	}
-	
-	public Result[] getResults(){
+
+	public Result[] getResults() {
 		return results.toArray(new Result[0]);
 	}
-	
-	public Item getItem(){
+
+	public Item getItem() {
 		return item;
 	}
-	
-	public Patient getPatient(){
+
+	public Patient getPatient() {
 		return patient;
 	}
-	
+
 	@Override
-	public int compareTo(LabResultsRow r){
+	public int compareTo(LabResultsRow r) {
 		return item.compareTo(r.item);
 	}
-	
-	public boolean hasRelevantResults(){
-		TimeTool now =new TimeTool();
-		now.add(TimeTool.HOUR, -365*24);
-		TimeTool cmp=new TimeTool();
-		for(Result result:results){
-			if(cmp.set(result.get("datum"))){
-				if(cmp.isAfter(now)){
-					if(item.isPathologic(patient, result.get("resultat"))){
+
+	public boolean hasRelevantResults() {
+		TimeTool now = new TimeTool();
+		now.add(TimeTool.HOUR, -365 * 24);
+		TimeTool cmp = new TimeTool();
+		for (Result result : results) {
+			if (cmp.set(result.get("datum"))) {
+				if (cmp.isAfter(now)) {
+					if (item.isPathologic(patient, result.get("resultat"))) {
 						return true;
 					}
 				}
 			}
-		
+
 		}
 		return false;
 	}
 
 	public Result[] getBoundsBefore(TimeTool limit) {
-		Result[] minmax=new Result[2];
-		float min=Float.MAX_VALUE;
-		float max=0f;
-		for(Result result:results){
-			float cmp=Item.makeFloat(result.get("resultat"));
-			if(cmp>max){
-				max=cmp;
-				minmax[1]=result;
-			}
-			if(cmp<min){
-				min=cmp;
-				minmax[0]=result;
+		String lim=limit.toString(TimeTool.DATE_GER);
+		Result[] minmax = new Result[2];
+		float min = Float.MAX_VALUE;
+		float max = 0f;
+		for (Result result : results) {
+			TimeTool date = new TimeTool(result.get("datum"));
+			String check=date.toString(TimeTool.DATE_GER);
+			if (date.isBefore(limit)) {
+				float cmp = Item.makeFloat(result.get("resultat"));
+				if (cmp > max) {
+					max = cmp;
+					minmax[1] = result;
+				}
+				if (cmp < min) {
+					min = cmp;
+					minmax[0] = result;
+				}
 			}
 		}
 		return minmax;

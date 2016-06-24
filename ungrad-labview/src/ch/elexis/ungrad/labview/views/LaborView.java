@@ -29,8 +29,10 @@ import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
+import ch.elexis.core.ui.constants.ExtensionPointConstantsUi;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
+import ch.elexis.core.ui.util.Importer;
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
@@ -39,7 +41,7 @@ import ch.elexis.ungrad.labview.controller.Controller;
 public class LaborView extends ViewPart implements IActivationListener {
 	Controller controller = new Controller(this);
 	Log log = Log.get("LaborView");
-	private Action exportHtmlAction, viewInBrowserAction;
+	private Action exportHtmlAction, viewInBrowserAction, importAction;
 
 	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
 			ElexisEvent.EVENT_SELECTED) {
@@ -57,21 +59,21 @@ public class LaborView extends ViewPart implements IActivationListener {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		CTabFolder cTabFolder=new CTabFolder(parent, SWT.BOTTOM);
+		CTabFolder cTabFolder = new CTabFolder(parent, SWT.BOTTOM);
 		cTabFolder.setLayoutData(SWTHelper.getFillGridData());
-		CTabItem ctSmart=new CTabItem(cTabFolder,SWT.NONE);
+		CTabItem ctSmart = new CTabItem(cTabFolder, SWT.NONE);
 		ctSmart.setText("Kompakt");
 		ctSmart.setControl(controller.createSmartControl(cTabFolder));
-		CTabItem ctSummary=new CTabItem(cTabFolder,SWT.NONE);
-		ctSummary.setText("Ansicht");
-		CTabItem ctFull=new CTabItem(cTabFolder,SWT.NONE);
-		ctFull.setText("Eingabe");
+		CTabItem ctSummary = new CTabItem(cTabFolder, SWT.NONE);
+		ctSummary.setText("Synopsis");
+		CTabItem ctFull = new CTabItem(cTabFolder, SWT.NONE);
+		ctFull.setText("Voll");
 		Control ctlSummary = controller.createSummaryControl(cTabFolder);
-		//ctlSummary.setLayoutData(SWTHelper.getFillGridData());
+		// ctlSummary.setLayoutData(SWTHelper.getFillGridData());
 		ctSummary.setControl(ctlSummary);
-		Control ctlFull=controller.createFullControl(cTabFolder);
+		Control ctlFull = controller.createFullControl(cTabFolder);
 		ctFull.setControl(ctlFull);
-		cTabFolder.setSelection(ctSummary);
+		cTabFolder.setSelection(ctSmart);
 		makeActions();
 		contributeToActionBars();
 		GlobalEventDispatcher.addActivationListener(this, this);
@@ -87,6 +89,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(exportHtmlAction);
 		manager.add(viewInBrowserAction);
+		manager.add(importAction);
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
@@ -127,7 +130,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 	private void makeActions() {
 		exportHtmlAction = new Action() {
 			{
-				setImageDescriptor(Images.IMG_EXPORT.getImageDescriptor());
+				setImageDescriptor(Images.IMG_WEB.getImageDescriptor());
 				setToolTipText("Laborblatt als HTML exportieren");
 			}
 
@@ -146,6 +149,22 @@ public class LaborView extends ViewPart implements IActivationListener {
 			@Override
 			public void run() {
 				controller.getExporter().runInBrowser();
+			}
+		};
+		importAction = new Action("Labordaten import") {
+			{
+				setImageDescriptor(Images.IMG_IMPORT.getImageDescriptor());
+				setToolTipText("Resultate importieren");
+			}
+
+			@Override
+			public void run() {
+				Importer imp = new Importer(getViewSite().getShell(), ExtensionPointConstantsUi.LABORDATENIMPORT); // $NON-NLS-1$
+				imp.create();
+				imp.setMessage("Bitte Datenquelle auswählen");
+				imp.getShell().setText("Labordaten import");
+				imp.setTitle("Labor Auswahl");
+				imp.open();
 			}
 		};
 	}

@@ -46,6 +46,7 @@ public class SmartViewController implements IObserver {
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
 		stc = new SmartTreeColumns(tvSmart);
+		tvSmart.setAutoExpandLevel(2);
 		tvSmart.setInput(scp);
 		return tree;
 	}

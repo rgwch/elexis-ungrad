@@ -12,7 +12,7 @@ import ch.elexis.ungrad.labview.controller.ItemTextLabelProvider;
 import ch.rgw.tools.TimeTool;
 
 public class SmartTreeColumns {
-	int numColumns = 6;
+	int numColumns = 7;
 	TreeViewer tv;
 	TreeViewerColumn[] cols;
 	String[] headings = { "Parameter", "Referenz" };
@@ -34,7 +34,7 @@ public class SmartTreeColumns {
 			extra = 1;
 			cLen = numColumns;
 		}
-		cols = new TreeViewerColumn[cLen + colOffset];
+		cols = new TreeViewerColumn[cLen + colOffset + extra];
 		for (int i = 0; i < 2; i++) {
 			cols[i] = new TreeViewerColumn(tv, SWT.NONE);
 			cols[i].getColumn().setText(headings[i]);
@@ -54,7 +54,7 @@ public class SmartTreeColumns {
 			cols[cols.length - 1] = new TreeViewerColumn(tv, SWT.NONE);
 			cols[cols.length - 1].getColumn().setText("früher");
 			cols[cols.length - 1].getColumn().setWidth(100);
-			cols[cols.length - 1].setLabelProvider(new SmartSummaryLabelProvider(svc, dates[dates.length - 1 - cLen]));
+			cols[cols.length - 1].setLabelProvider(new SmartSummaryLabelProvider(svc, dates[dates.length - cLen + 1]));
 		}
 	}
 
