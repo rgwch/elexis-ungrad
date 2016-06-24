@@ -49,15 +49,19 @@ public class DateResultLabelProvider extends StyledCellLabelProvider {
 	}
 
 	private void styleCell(ViewerCell cell, Item item, Result result) {
-		String display = result.get("resultat");
-		if (display == null) {
-			display = "";
+		if (result == null) {
+			cell.setText("");
+		} else {
+			String display = result.get("resultat");
+			if (display == null) {
+				display = "";
+			}
+			if (controller.getLRS().isPathologic(item, result)) {
+				StyleRange sr = new StyleRange(0, display.length(), red, cell.getBackground());
+				cell.setStyleRanges(new StyleRange[] { sr });
+			}
+			cell.setText(display);
 		}
-		if (controller.getLRS().isPathologic(item, result)) {
-			StyleRange sr = new StyleRange(0, display.length(), red, cell.getBackground());
-			cell.setStyleRanges(new StyleRange[] { sr });
-		}
-		cell.setText(display);
 	}
 
 	@Override
