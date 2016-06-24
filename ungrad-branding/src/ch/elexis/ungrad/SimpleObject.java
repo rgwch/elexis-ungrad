@@ -33,6 +33,9 @@ public abstract class SimpleObject {
 		throw new Error("Internal error: Bad field requested " + field);
 	}
 
+	public void set(String field, String value){
+		props.put(field.toLowerCase(),value);
+	}
 	protected int compare(SimpleObject other, String field){
 		if(get(field)==null){
 			if(other.get(field)==null){

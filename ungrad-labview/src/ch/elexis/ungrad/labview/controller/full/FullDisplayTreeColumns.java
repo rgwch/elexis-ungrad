@@ -34,11 +34,11 @@ public class FullDisplayTreeColumns {
 	TreeViewerColumn[] cols;
 	String[] headings = { "Parameter", "Referenz" };
 	int[] widths = { 150, 120 };
-	TextCellEditor tce;
+	LabResultEditor lce;
 
 	public FullDisplayTreeColumns(TreeViewer tv) {
 		this.tv = tv;
-		tce=new TextCellEditor(tv.getTree());
+		lce = new LabResultEditor(tv.getTree());
 	}
 
 	public void reload(Controller ctl) {
@@ -59,32 +59,33 @@ public class FullDisplayTreeColumns {
 			cols[i + 2].getColumn().setText(dates[i].toString(TimeTool.DATE_GER));
 			cols[i + 2].getColumn().setWidth(80);
 			cols[i + 2].setLabelProvider(new DateResultLabelProvider(ctl, dates[i]));
-			cols[i+2].setEditingSupport(createEditingSupportFor(cols[i+2], ctl.getLRS(), dates[i]));
+			cols[i + 2].setEditingSupport(createEditingSupportFor(cols[i + 2], ctl.getLRS(), dates[i]));
 		}
 	}
-	
-	private EditingSupport createEditingSupportFor(TreeViewerColumn tvc, LabResultsSheet lrs, TimeTool colDate){
+
+	private EditingSupport createEditingSupportFor(TreeViewerColumn tvc, LabResultsSheet lrs, TimeTool colDate) {
 		return new EditingSupport(tv) {
-			
+
 			@Override
 			protected void setValue(Object element, Object value) {
-				
+
 			}
-			
+
 			@Override
 			protected Object getValue(Object element) {
-				if(element instanceof Item){
+				if (element instanceof Item) {
+					//return "yeah";
 					return lrs.getResultForDate((Item) element, colDate);
-				}else{
+				} else {
 					return "";
 				}
 			}
-			
+
 			@Override
 			protected CellEditor getCellEditor(Object element) {
-				return tce;
+				return lce;
 			}
-			
+
 			@Override
 			protected boolean canEdit(Object element) {
 				return element instanceof Item;
