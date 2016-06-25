@@ -256,7 +256,7 @@ public class LabResultsSheet {
 	 */
 	private void fetch() throws ElexisException {
 		loadItems(false);
-
+		resultDates.clear();
 		PreparedStatement ps = j.getPreparedStatement(queryResults);
 		rows = new TreeMap<>();
 		recently = new TreeMap<Item, Bucket>();

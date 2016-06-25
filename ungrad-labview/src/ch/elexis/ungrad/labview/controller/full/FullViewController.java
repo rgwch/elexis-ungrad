@@ -85,6 +85,7 @@ public class FullViewController implements IObserver {
 					result.set("Datum", colDate.toString(TimeTool.DATE_COMPACT));
 					result.set("Zeit", colDate.toString(TimeTool.TIME_SMALL));
 					getLRS().addResult(result);
+					tvFull.update(element, null);
 				}
 			}
 
