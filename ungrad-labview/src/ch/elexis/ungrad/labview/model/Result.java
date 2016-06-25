@@ -18,10 +18,10 @@ import java.sql.ResultSet;
 import ch.elexis.ungrad.SimpleObject;
 
 public class Result extends SimpleObject implements Comparable<Result> {
-	public static final String[] fields = { "ItemID", "Datum", "Zeit", "Resultat", "Kommentar" };
+	public static final String[] fields = { "ID","ItemID", "Datum", "Zeit", "Resultat", "Kommentar" };
 
 	public Result(float result){
-		props.put("item",Float.toString(result));
+		set("Resultat",Float.toString(result));
 	}
 	public Result(ResultSet res) {
 		load(res);
