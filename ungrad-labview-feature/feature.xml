@@ -5,8 +5,8 @@
       version="1.0.1.qualifier"
       provider-name="rgw.ch">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description url="http://github.com/rgwch/elexis-ungrad">
+      An alternative lab result viewer
    </description>
 
    <copyright url="http://www.example.com/copyright">
