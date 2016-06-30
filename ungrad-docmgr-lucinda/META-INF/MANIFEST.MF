@@ -12,10 +12,10 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  ch.elexis.core.ui;bundle-version="3.2.0",
  org.eclipse.ui;bundle-version="3.8.2",
  ch.elexis.core.ui.icons;bundle-version="3.2.0",
- ch.elexis.omnivore;bundle-version="3.0.0",
- slf4j.api;bundle-version="1.7.21"
+ ch.elexis.omnivore;bundle-version="3.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/lucinda-client-0.5.0-SNAPSHOT.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: ch.rgw.lucinda
+Import-Package: org.slf4j;version="1.7.2"
