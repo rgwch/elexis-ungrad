@@ -6,10 +6,22 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="ch.elexis.core.application.ElexisApp"
-            name="Elesxis Ungrad">
+            name="Elexis Ungrad">
          <property
                name="appName"
-               value="Elesxis Ungrad">
+               value="Elexis Ungrad">
+         </property>
+         <property
+               name="aboutImage"
+               value="rsc/logo_about250.png">
+         </property>
+         <property
+               name="aboutText"
+               value="Copyright (c) 2005-2016 by G. Weirich, elexis.info and others">
+         </property>
+         <property
+               name="windowImages"
+               value="rsc/elexis16.png,rsc/elexis32.png,rsc/elexis48.png">
          </property>
       </product>
    </extension>
