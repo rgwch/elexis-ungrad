@@ -17,6 +17,12 @@ public interface Customer {
 	 *         "firstname", "birthdate" of the Patient this Document belongs to.
 	 */
 	public Document specify(PersistentObject po);
+	
+	/**
+	 * Signal the Customer that a document was indexed successfully
+	 * @param id
+	 */
+	public void success(String id);
 
 	/**
 	 * The Sender has finished the job. Do any cleanup

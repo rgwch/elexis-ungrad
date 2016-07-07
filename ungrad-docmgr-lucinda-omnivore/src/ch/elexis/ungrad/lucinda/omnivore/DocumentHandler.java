@@ -6,9 +6,11 @@ import static ch.elexis.ungrad.lucinda.Preferences.SHOW_OMNIVORE;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import ch.elexis.admin.AccessControlDefaults;
+import ch.elexis.core.ui.Hub;
 import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.ungrad.lucinda.IDocumentHandler;
@@ -39,7 +41,14 @@ public class DocumentHandler implements IDocumentHandler {
 			@Override
 			public void doRun(){
 				if (this.isChecked()) {
-					indexer.start(controller);
+					ImportSettings dlg=new ImportSettings(Hub.getActiveShell());
+					dlg.create();
+					if(dlg.open()==Window.OK){
+						indexer.start(controller);
+					}else{
+						this.setChecked(false);
+						indexer.setActive(false);
+					}
 				} else {
 					indexer.setActive(false);
 				}

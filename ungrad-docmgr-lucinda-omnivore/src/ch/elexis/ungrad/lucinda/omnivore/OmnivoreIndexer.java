@@ -36,6 +36,7 @@ import ch.rgw.tools.TimeTool;
 public class OmnivoreIndexer implements Customer {
 	Logger log = LoggerFactory.getLogger(OmnivoreIndexer.class);
 	private boolean cont = false;
+	private boolean bMove = false;
 	private IProgressController pc;
 	Long progressHandle;
 	private long lastCheck;
@@ -62,6 +63,7 @@ public class OmnivoreIndexer implements Customer {
 		} catch (NumberFormatException nf) {
 			lastCheck = 0L;
 		}
+		bMove=Preferences.is(Preferences.OMNIVORE_MOVE);
 		StringBuilder querySQL = new StringBuilder("SELECT ID FROM ").append(DocHandle.TABLENAME)
 				.append(" WHERE lastupdate >=").append(lastCheck).append(" AND deleted='0' ORDER BY ")
 				.append("lastupdate");
@@ -71,7 +73,7 @@ public class OmnivoreIndexer implements Customer {
 
 		progressHandle = pc.initProgress(docs.size());
 		setActive(true);
-		new Sender(this, (List<? extends PersistentObject>) docs);
+		new Sender(this, (List<? extends PersistentObject>) docs, bMove);
 	}
 
 	/**
@@ -160,6 +162,21 @@ public class OmnivoreIndexer implements Customer {
 	public void finished(List<Document> messages) {
 		Activator.getDefault().addMessages(messages);
 		Preferences.cfg.flush();
+	}
+
+	/**
+	 * A Document was indexed successfully. 
+	 * if bMove: The document is removed from Omnivore.
+	 * 
+	 */
+	@Override
+	public void success(String id) {
+		if (bMove) {
+			DocHandle dh = DocHandle.load(id);
+			if (dh != null && dh.isValid()) {
+				dh.delete();
+			}
+		}
 	}
 
 }

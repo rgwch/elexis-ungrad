@@ -75,7 +75,7 @@ public class ConsultationIndexer implements Customer {
 
 		progressHandle = pc.initProgress(konsen.size());
 		setActive(true);
-		new Sender(this, (List<? extends PersistentObject>) konsen);
+		new Sender(this, (List<? extends PersistentObject>) konsen, false);
 	}
 
 	/**
@@ -184,5 +184,11 @@ public class ConsultationIndexer implements Customer {
 	public void finished(List<Document> messages) {
 		Activator.getDefault().addMessages(messages);
 		Preferences.cfg.flush();
+	}
+
+	@Override
+	public void success(String id) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -51,13 +51,13 @@ public class Lucinda {
 		if (!connected) {
 			String prefix = Preferences.get(Preferences.MSG, "ch.rgw.lucinda"); //$NON-NLS-1$
 			String network = Preferences.get(Preferences.NETWORK, ""); //$NON-NLS-1$
-			if(network.isEmpty()){
+			if (network.isEmpty()) {
 				String server = Preferences.get(Preferences.SERVER_ADDR, "127.0.0.1"); //$NON-NLS-1$
-				if(!server.isEmpty()){
-					String[] srv=server.split("\\.");
-					if(srv.length==4){
-						srv[3]="*";
-						network=StringTool.join(srv, ".");
+				if (!server.isEmpty()) {
+					String[] srv = server.split("\\.");
+					if (srv.length == 4) {
+						srv[3] = "*";
+						network = StringTool.join(srv, ".");
 					}
 				}
 			}
@@ -91,8 +91,14 @@ public class Lucinda {
 		client.get(id, ha);
 	}
 
-	public void addToIndex(String id, String title, String type, Map<String,Object> meta, byte[] contents, Handler handler) {
-		client.addToIndex(id, title, type, meta, contents, handler);
+	public void addToIndex(String id, String title, String type, Map<String, Object> meta, byte[] contents,
+			Handler handler, boolean bCopy) {
+		if (bCopy) {
+
+			client.addFile(id, title, type, meta, contents, handler);
+		} else {
+			client.addToIndex(id, title, type, meta, contents, handler);
+		}
 	}
 
 	class LucindaHandler implements Handler {
