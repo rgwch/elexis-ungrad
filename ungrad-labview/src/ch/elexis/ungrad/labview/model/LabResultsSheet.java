@@ -96,6 +96,10 @@ public class LabResultsSheet {
 		}
 	}
 
+	public void reload() throws ElexisException{
+		loadItems(true);
+		setPatient(pat);
+	}
 	public String[] getAllGroups() {
 		return groups.keySet().toArray(new String[0]);
 	}
