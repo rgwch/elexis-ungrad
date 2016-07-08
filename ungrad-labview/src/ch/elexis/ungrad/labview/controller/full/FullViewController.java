@@ -13,7 +13,7 @@
  *********************************************************************************/
 package ch.elexis.ungrad.labview.controller.full;
 
-import java.util.logging.Logger;
+import java.util.List;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -37,12 +37,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.LabItem;
+import ch.elexis.data.LabResult;
 import ch.elexis.data.Patient;
+import ch.elexis.data.Query;
 import ch.elexis.ungrad.IObserver;
 import ch.elexis.ungrad.labview.controller.Controller;
 import ch.elexis.ungrad.labview.model.Item;
@@ -56,8 +59,8 @@ public class FullViewController implements IObserver {
 	FullDisplayTreeColumns fdtc;
 	TreeViewerFocusCellManager focusManager;
 	TextCellEditor tce;
-	private IAction organizeItemAction, toGroupAction;
-	private Logger log=Logger.getLogger(getClass().getName());
+	private IAction organizeItemAction, toGroupAction, combineAction;
+	private org.slf4j.Logger log = LoggerFactory.getLogger(this.getClass());
 	
 	public FullViewController(Controller parent){
 		controller = parent;
@@ -107,33 +110,71 @@ public class FullViewController implements IObserver {
 				});
 				if (dlg.open() == Window.OK) {
 					String result = dlg.getValue();
-					for(String group:allGroups){
-						if(group.startsWith(result)){
-							doMove(sel.toArray(),group);
+					for (String group : allGroups) {
+						if (group.startsWith(result)) {
+							doMove(sel.toArray(), group);
 						}
 					}
 				}
 			}
 		};
+		combineAction = new Action("Items zusammenführen") {
+			{
+				setImageDescriptor(Images.IMG_MOVETOLOWERLIST.getImageDescriptor());
+			}
+			
+			@Override
+			public void run(){
+				IStructuredSelection sel = (IStructuredSelection) tvFull.getSelection();
+				if (SWTHelper.askYesNo("Items kombinieren",
+					"Wollen Sie wirklich diese " + sel.size() + " Items kombinieren?")) {
+					doCombine(sel.toArray());
+				}
+			}
+		};
 		
 	}
+	
 	private void doMove(Object[] objects, String group){
-		for(Object o:objects){
-			if(o instanceof Item){
-				Item item=(Item)o;
-				String id=item.get("id");
-				LabItem li=LabItem.load(id);
-				if(li!=null && li.isValid()){
+		for (Object o : objects) {
+			if (o instanceof Item) {
+				Item item = (Item) o;
+				String id = item.get("id");
+				LabItem li = LabItem.load(id);
+				if (li != null && li.isValid()) {
 					li.set(LabItem.GROUP, group);
 				}
 			}
 		}
-		try{
+		try {
 			getLRS().reload();
-		}catch(ElexisException eex){
-			log.severe("could not reload LabItems "+eex.getMessage());
+		} catch (ElexisException eex) {
+			log.error("could not reload LabItems " + eex.getMessage(), eex);
 		}
 	}
+	
+	private void doCombine(Object[] objects){
+		Item target = (Item) objects[0];
+		LabItem targetLI = LabItem.load(target.get("id"));
+		log.info("combining " + objects.length + " LabItems into " + targetLI.getLabel());
+		if (targetLI != null && targetLI.isValid()) {
+			for (int i = 1; i < objects.length; i++) {
+				Item it = (Item) objects[i];
+				LabItem li = LabItem.load(it.get("id"));
+				log.info("processing " + li.getLabel());
+				Query<LabResult> qbe = new Query<LabResult>(LabResult.class);
+				qbe.add(LabResult.ITEM_ID, Query.EQUALS, li.getId());
+				List<LabResult> lrs=qbe.execute();
+				if(SWTHelper.askYesNo("Laborresultate zusammenführen", "Wirklich "+lrs.size()+" Resultate aus "+li.getLabel()+" nach "+targetLI.getLabel()+" verschieben?")){
+					for (LabResult lr : qbe.execute()) {
+						//lr.set(LabResult.ITEM_ID, targetLI.getId());
+						log.debug("converting " + lr.getLabel());
+					}	
+				}
+			}
+		}
+	}
+	
 	public LabResultsSheet getLRS(){
 		return controller.getLRS();
 	}
@@ -152,9 +193,49 @@ public class FullViewController implements IObserver {
 			
 			@Override
 			public void selectionChanged(SelectionChangedEvent event){
-				boolean bEnable = !tvFull.getSelection().isEmpty();
-				organizeItemAction.setEnabled(bEnable);
-				toGroupAction.setEnabled(bEnable);
+				IStructuredSelection sel = (IStructuredSelection) tvFull.getSelection();
+				if (sel.isEmpty()) {
+					organizeItemAction.setEnabled(false);
+					toGroupAction.setEnabled(false);
+					combineAction.setEnabled(false);
+				} else if (sel.size() == 1) {
+					combineAction.setEnabled(false);
+					if (sel.getFirstElement() instanceof String) {
+						organizeItemAction.setEnabled(true);
+						toGroupAction.setEnabled(false);
+					} else {
+						organizeItemAction.setEnabled(false);
+						toGroupAction.setEnabled(true);
+					}
+				} else {
+					organizeItemAction.setEnabled(false);
+					toGroupAction.setEnabled(false);
+					combineAction.setEnabled(false);
+					Object[] objects = sel.toArray();
+					Item cmb = null;
+					boolean tgPossible = true;
+					boolean cmPossible = true;
+					for (Object o : objects) {
+						if (o instanceof String) {
+							return;
+						}
+						if (o instanceof Item) {
+							Item item = (Item) o;
+							if (cmb == null || cmb.isEqual(item)) {
+								cmb = item;
+							} else {
+								cmPossible = false;
+								break;
+							}
+						}
+					}
+					if (tgPossible) {
+						toGroupAction.setEnabled(true);
+					}
+					if (cmPossible) {
+						combineAction.setEnabled(true);
+					}
+				}
 			}
 		});
 		tvFull.getTree().setMenu(createContextMenu(tvFull.getTree()));
@@ -178,6 +259,7 @@ public class FullViewController implements IObserver {
 			public void menuAboutToShow(IMenuManager manager){
 				mgr.add(organizeItemAction);
 				mgr.add(toGroupAction);
+				mgr.add(combineAction);
 			}
 		});
 		return mgr.createContextMenu(parent);

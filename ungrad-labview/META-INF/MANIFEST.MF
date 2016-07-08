@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ungrad Labview
 Bundle-SymbolicName: ch.elexis.ungrad.labview;singleton:=true
-Bundle-Version: 1.0.1.qualifier
+Bundle-Version: 1.0.2.qualifier
 Require-Bundle: ch.elexis.core;bundle-version="3.2.0",
  ch.elexis.core.data;bundle-version="3.2.0",
  ch.rgw.utility;bundle-version="3.2.0",
@@ -12,3 +12,4 @@ Require-Bundle: ch.elexis.core;bundle-version="3.2.0",
  ch.elexis.ungrad.branding;bundle-version="0.0.1",
  ch.elexis.core.ui.icons;bundle-version="3.2.0"
 Bundle-Vendor: G. Weirich
+Import-Package: org.slf4j;version="1.7.2"

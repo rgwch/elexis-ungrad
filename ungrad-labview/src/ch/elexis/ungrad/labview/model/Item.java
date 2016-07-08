@@ -30,15 +30,19 @@ public class Item extends SimpleObject implements Comparable<Item> {
 	static final int UPPER_BOUND_FEMALE = 3;
 
 	Log log = Log.get(getClass().getName());
+	
 
-	private static final String[] fields = { "ID", "titel", "kuerzel", "Gruppe", "prio", "RefMann", "RefFrauOrTx",
-			"Typ", "Einheit" };
+	private static final String[] fields = { "ID", "titel", "kuerzel", "Gruppe", "prio", "RefMann", "RefFrauOrTx", "Typ", "Einheit"};
 
 	private float[] refBounds = new float[4];
 
 	@Override
 	public String[] getFields() {
 		return fields;
+	}
+	
+	public float[] getRefRange(){
+		return refBounds;
 	}
 
 	public Item(ResultSet res) {
@@ -164,4 +168,17 @@ public class Item extends SimpleObject implements Comparable<Item> {
 		return gcomp == 0 ? compare(o, "prio") : gcomp;
 	}
 
+	public boolean isEqual(Item o){
+		if(get("einheit").equals(o.get("einheit"))){
+			for(int i=0;i<refBounds.length;i++){
+				if(refBounds[i]!=o.refBounds[i]){
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	
 }
