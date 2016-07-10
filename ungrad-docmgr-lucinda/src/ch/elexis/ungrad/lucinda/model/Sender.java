@@ -19,9 +19,11 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.PersistentObject;
+import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Handler;
 import ch.elexis.ungrad.lucinda.Lucinda;
 import io.vertx.core.json.JsonObject;
@@ -81,8 +83,14 @@ public class Sender implements Handler {
 	public void signal(JsonObject message) {
 		String id = message.getString("_id"); //$NON-NLS-1$
 		if (!message.getString("status").equals("ok")) {
-			SWTHelper.showError("Lucinda Sender " + message.getString("status"),
-					message.getString("message") + "; " + message.getString("title"));
+			/*
+			 * SWTHelper.showError("Lucinda Sender " +
+			 * message.getString("status"), message.getString("message") + "; "
+			 * + message.getString("title"));
+			 */
+			log.error("*** Lucinda Sender " + message.getString("status") + message.getString("message") + "; "
+					+ message.getString("title"));
+			Activator.getDefault().addMessage(message);
 		} else {
 			customer.success(id);
 		}

@@ -105,7 +105,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 		manager.add(exportHtmlAction);
 		manager.add(viewInBrowserAction);
 		manager.add(importAction);
-		manager.add(removeEmptyItemsAction);
+		//manager.add(removeEmptyItemsAction);
 	}
 	
 	private void fillLocalPullDown(IMenuManager manager){
@@ -148,7 +148,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 		exportHtmlAction = new Action() {
 			{
 				setImageDescriptor(Images.IMG_WEB.getImageDescriptor());
-				setToolTipText("Laborblatt als HTML exportieren");
+				setToolTipText("Laborblatt exportieren");
 			}
 			
 			@Override
@@ -185,7 +185,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 				imp.open();
 			}
 		};
-		removeEmptyItemsAction = new RestrictedAction(AccessControlDefaults.DELETE_LABITEMS,"Unbenutzte Items entfernen") {
+		removeEmptyItemsAction = new RestrictedAction(AccessControlDefaults.DELETE_LABITEMS,"Aufräumen") {
 			{
 				setToolTipText("Ungebrauchte Items und Gruppen löschen");
 				Bundle bundle=FrameworkUtil.getBundle(this.getClass());
