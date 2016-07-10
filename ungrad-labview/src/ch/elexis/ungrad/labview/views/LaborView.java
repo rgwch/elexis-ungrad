@@ -13,11 +13,16 @@
  *********************************************************************************/
 package ch.elexis.ungrad.labview.views;
 
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -26,12 +31,17 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
+import ch.elexis.admin.ACE;
+import ch.elexis.admin.AccessControlDefaults;
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
+import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.constants.ExtensionPointConstantsUi;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
@@ -39,12 +49,13 @@ import ch.elexis.core.ui.util.Importer;
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
+import ch.elexis.data.Query;
 import ch.elexis.ungrad.labview.controller.Controller;
 
 public class LaborView extends ViewPart implements IActivationListener {
 	Controller controller = new Controller(this);
 	Log log = Log.get("LaborView");
-	private Action exportHtmlAction, viewInBrowserAction, importAction;
+	private Action exportHtmlAction, viewInBrowserAction, importAction, removeEmptyItemsAction;
 	
 	private final ElexisUiEventListenerImpl eeli_pat =
 		new ElexisUiEventListenerImpl(Patient.class, ElexisEvent.EVENT_SELECTED) {
@@ -94,10 +105,12 @@ public class LaborView extends ViewPart implements IActivationListener {
 		manager.add(exportHtmlAction);
 		manager.add(viewInBrowserAction);
 		manager.add(importAction);
+		manager.add(removeEmptyItemsAction);
 	}
 	
 	private void fillLocalPullDown(IMenuManager manager){
 		manager.add(exportHtmlAction);
+		manager.add(removeEmptyItemsAction);
 	}
 	
 	@Override
@@ -170,6 +183,21 @@ public class LaborView extends ViewPart implements IActivationListener {
 				imp.getShell().setText("Labordaten import");
 				imp.setTitle("Labor Auswahl");
 				imp.open();
+			}
+		};
+		removeEmptyItemsAction = new RestrictedAction(AccessControlDefaults.DELETE_LABITEMS,"Unbenutzte Items entfernen") {
+			{
+				setToolTipText("Ungebrauchte Items und Gruppen löschen");
+				Bundle bundle=FrameworkUtil.getBundle(this.getClass());
+				URL url=FileLocator.find(bundle,new Path("icons/edit-clear24.png"),null);
+				setImageDescriptor(ImageDescriptor.createFromURL(url));
+			}	
+			@Override
+			public void doRun() {
+				if(SWTHelper.askYesNo("Laboritems aufräumen", "Alle Laboritems entfernen, für die keine Resultate existieren. (Das kann sehr lange dauern)")){
+					controller.purgeLabItems();
+				}
+				
 			}
 		};
 	}

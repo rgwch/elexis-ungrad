@@ -13,12 +13,23 @@
  *********************************************************************************/
 package ch.elexis.ungrad.labview.controller;
 
+import java.util.List;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.widgets.Control;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.exceptions.ElexisException;
-import ch.elexis.core.ui.util.Log;
+import ch.elexis.data.LabItem;
+import ch.elexis.data.LabResult;
 import ch.elexis.data.Patient;
+import ch.elexis.data.PersistentObject;
+import ch.elexis.data.Query;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.labview.Preferences;
 import ch.elexis.ungrad.labview.controller.condensed.CondensedViewController;
@@ -32,7 +43,7 @@ public class Controller {
 	
 	LaborView view;
 	LabResultsSheet lrs=new LabResultsSheet();
-	Log log = Log.get("Labview Controller");
+	Logger log = LoggerFactory.getLogger("Labview Controller");
 	Resolver resolver = new Resolver();
 	CondensedViewController ctlCond=new CondensedViewController(this);
 	FullViewController ctlFull=new FullViewController(this);
@@ -86,7 +97,37 @@ public class Controller {
 		return ctlCond.getExporter();
 	}
 
-	
+	@SuppressWarnings("deprecation")
+	public void purgeLabItems(){
+		Job job=new Job("purge lab items"){
+
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				PersistentObject.getConnection().exec("DELETE FROM LABORWERTE WHERE deleted='1'");
+				PersistentObject.getConnection().exec("DELETE FROM LABORITEMS WHERE deleted='1'");
+				Query<LabItem> qbe=new Query<LabItem>(LabItem.class);
+				List<LabItem> items=qbe.execute();
+				monitor.beginTask("purge unusedlab items", items.size());
+				for (LabItem li:items){
+					Query<LabResult> qlr=new Query<LabResult>(LabResult.class);
+					qlr.add(LabResult.ITEM_ID, Query.EQUALS, li.getId());
+					if(qlr.execute().isEmpty()){
+						log.info("deleting "+li.getLabel());
+						li.delete();
+					}
+					if(monitor.isCanceled()){
+						return Status.CANCEL_STATUS;
+					}
+					monitor.worked(1);
+				}		
+				return Status.OK_STATUS;
+			}
+			
+		};
+		job.setPriority(Job.LONG);
+		job.setUser(true);
+		job.schedule();
+	}
 
 	
 }
