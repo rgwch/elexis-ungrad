@@ -14,11 +14,11 @@
 
 package ch.elexis.ungrad.lucinda;
 
-import java.util.Map;
+import io.vertx.core.json.JsonObject;
 
 /**
  * Created by gerry on 11.05.16.
  */
 public interface Handler {
-  public void signal(Map<String,Object> detail);
+	public void signal(JsonObject detail);
 }

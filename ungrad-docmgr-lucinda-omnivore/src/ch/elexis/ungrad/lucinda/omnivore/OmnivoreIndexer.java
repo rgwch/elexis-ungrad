@@ -29,10 +29,10 @@ import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.IProgressController;
 import ch.elexis.ungrad.lucinda.model.Customer;
-import ch.elexis.ungrad.lucinda.model.Document;
 import ch.elexis.ungrad.lucinda.model.Sender;
 import ch.rgw.tools.JdbcLink;
 import ch.rgw.tools.TimeTool;
+import io.vertx.core.json.JsonObject;
 
 public class OmnivoreIndexer implements Customer {
 	Logger log = LoggerFactory.getLogger(OmnivoreIndexer.class);
@@ -64,18 +64,17 @@ public class OmnivoreIndexer implements Customer {
 		} catch (NumberFormatException nf) {
 			lastCheck = 0L;
 		}
-		bMove=Preferences.is(Preferences.OMNIVORE_MOVE);
+		bMove = Preferences.is(Preferences.OMNIVORE_MOVE);
 		StringBuilder querySQL = new StringBuilder("SELECT ID FROM ").append(DocHandle.TABLENAME)
 				.append(" WHERE lastupdate >=").append(lastCheck);
-		String excludes=Preferences.get(Preferences.OMNIVORE_EXCLUDE, "");
-		if(excludes.length()>0){
-			String[] ex=excludes.split(",");
-			for(String e:ex){
+		String excludes = Preferences.get(Preferences.OMNIVORE_EXCLUDE, "");
+		if (excludes.length() > 0) {
+			String[] ex = excludes.split(",");
+			for (String e : ex) {
 				querySQL.append(" AND Category <>").append(JdbcLink.wrap(e));
 			}
 		}
-		querySQL.append(" AND deleted='0' ORDER BY ")
-				.append("lastupdate");
+		querySQL.append(" AND deleted='0' ORDER BY ").append("lastupdate");
 
 		Query<DocHandle> qbe = new Query<DocHandle>(DocHandle.class);
 		Collection<DocHandle> docs = qbe.queryExpression(querySQL.toString(), new LinkedList<DocHandle>());
@@ -108,15 +107,15 @@ public class OmnivoreIndexer implements Customer {
 	 * 
 	 * Other fields are optional.
 	 * 
-	 * @Returns a Map with the metadata, or null to indicate,that the sender
-	 *          should finish and discard remaining objects.
+	 * @Returns JsonObject with the metadata, or null to indicate,that the
+	 *          sender should finish and discard remaining objects.
 	 */
 
 	@Override
-	public Document specify(PersistentObject po) {
+	public JsonObject specify(PersistentObject po) {
 		DocHandle dh = (DocHandle) po;
 		if (cont) {
-			Document meta = new Document();
+			JsonObject meta = new JsonObject();
 			Patient patient = dh.getPatient();
 			String bdRaw = get(patient, Patient.FLD_DOB);
 			String lastname = get(patient, Patient.FLD_NAME);
@@ -169,14 +168,14 @@ public class OmnivoreIndexer implements Customer {
 	 */
 
 	@Override
-	public void finished(List<Document> messages) {
+	public void finished(List<JsonObject> messages) {
 		Activator.getDefault().addMessages(messages);
 		Preferences.cfg.flush();
 	}
 
 	/**
-	 * A Document was indexed successfully. 
-	 * if bMove: The document is removed from Omnivore.
+	 * A Document was indexed successfully. if bMove: The document is removed
+	 * from Omnivore.
 	 * 
 	 */
 	@Override

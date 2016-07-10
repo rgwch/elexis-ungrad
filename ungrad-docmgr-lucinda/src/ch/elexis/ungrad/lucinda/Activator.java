@@ -22,7 +22,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import ch.elexis.core.data.util.Extensions;
-import ch.elexis.ungrad.lucinda.model.Document;
+import io.vertx.core.json.JsonObject;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -35,7 +35,7 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	private List<Handler> handlers = new ArrayList<>();
-	private List<Document> messages = new LinkedList<>();
+	private List<JsonObject> messages = new LinkedList<>();
 	private List<IDocumentHandler> addons;
 
 	/**
@@ -80,15 +80,15 @@ public class Activator extends AbstractUIPlugin {
 		super.stop(context);
 	}
 
-	public void addMessage(Document message) {
+	public void addMessage(JsonObject message) {
 		messages.add(message);
 	}
 
-	public void addMessages(List<Document> messages) {
+	public void addMessages(List<JsonObject> messages) {
 		this.messages.addAll(messages);
 	}
 
-	public List<Document> getMessages() {
+	public List<JsonObject> getMessages() {
 		return messages;
 	}
 

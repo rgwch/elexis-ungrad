@@ -31,10 +31,10 @@ import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.IProgressController;
 import ch.elexis.ungrad.lucinda.model.Customer;
-import ch.elexis.ungrad.lucinda.model.Document;
 import ch.elexis.ungrad.lucinda.model.Sender;
 import ch.rgw.tools.TimeTool;
 import ch.rgw.tools.VersionedResource;
+import io.vertx.core.json.JsonObject;
 
 public class ConsultationIndexer implements Customer {
 	Logger log = LoggerFactory.getLogger(ConsultationIndexer.class);
@@ -105,12 +105,12 @@ public class ConsultationIndexer implements Customer {
 	 *          should finish and discard remaining objects.
 	 */
 	@Override
-	public Document specify(PersistentObject po) {
+	public JsonObject specify(PersistentObject po) {
 		Konsultation kons = (Konsultation) po;
-		long lastDisplayUüdate=System.currentTimeMillis();
-		int numOfUpdates=0;
+		long lastDisplayUüdate = System.currentTimeMillis();
+		int numOfUpdates = 0;
 		if (cont) {
-			Document meta = new Document();
+			JsonObject meta = new JsonObject();
 			Fall fall = kons.getFall();
 			Patient patient = fall.getPatient();
 			String bdRaw = get(patient, Patient.FLD_DOB);
@@ -149,12 +149,12 @@ public class ConsultationIndexer implements Customer {
 				lastCheck = kons.getLastUpdate();
 				Preferences.set(Preferences.LASTSCAN_KONS, Long.toString(lastCheck));
 			}
-			if(System.currentTimeMillis()-1000>lastDisplayUüdate){
+			if (System.currentTimeMillis() - 1000 > lastDisplayUüdate) {
 				pc.addProgress(progressHandle, numOfUpdates);
-				numOfUpdates=0;
-				lastDisplayUüdate=System.currentTimeMillis();
-			}else{
-				numOfUpdates+=1;
+				numOfUpdates = 0;
+				lastDisplayUüdate = System.currentTimeMillis();
+			} else {
+				numOfUpdates += 1;
 			}
 			return meta;
 		} else {
@@ -181,7 +181,7 @@ public class ConsultationIndexer implements Customer {
 	 *            Lucinda messages sent while transferring.
 	 */
 	@Override
-	public void finished(List<Document> messages) {
+	public void finished(List<JsonObject> messages) {
 		Activator.getDefault().addMessages(messages);
 		Preferences.cfg.flush();
 	}
@@ -189,6 +189,6 @@ public class ConsultationIndexer implements Customer {
 	@Override
 	public void success(String id) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

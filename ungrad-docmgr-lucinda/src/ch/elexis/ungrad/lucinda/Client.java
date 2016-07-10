@@ -16,8 +16,6 @@ package ch.elexis.ungrad.lucinda;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import io.vertx.core.Vertx;
@@ -81,10 +79,10 @@ public class Client {
 			if (response.statusCode() == 200) {
 				response.bodyHandler(buffer -> {
 					JsonObject result = buffer.toJsonObject();
-					handler.signal(result.getMap());
+					handler.signal(result);
 				});
 			} else if (response.statusCode() == 204) { // Empty result
-				Map<String, Object> result = add(make("status:ok"), "result", new ArrayList<Object>());
+				JsonObject result = make("status:ok").put("result", new ArrayList<Object>());
 				handler.signal(result);
 			} else {
 				handler.signal(make("status:error", "message:" + response.statusMessage()));
@@ -105,7 +103,7 @@ public class Client {
 			if (response.statusCode() == 200) {
 				response.bodyHandler(buffer -> {
 					byte[] file = buffer.getBytes();
-					handler.signal(add(make("status:ok"), "result", file));
+					handler.signal(make("status:ok").put("result", file));
 				});
 			} else if (response.statusCode() == 404) {
 				handler.signal(make("status:not found"));
@@ -141,17 +139,17 @@ public class Client {
 	 * @param handler
 	 *            Handler to call after indexing
 	 */
-	public void addToIndex(final String id, final String title, final String doctype, Map<String, Object> metadata,
+	public void addToIndex(final String id, final String title, final String doctype, JsonObject metadata,
 			final byte[] contents, final Handler handler) {
 
 		try {
 			JsonObject envelope = prepare(id, title, doctype, metadata, contents);
 			http.post(api + "index", response -> {
-				if (response.statusCode() == 200) {
-					handler.signal(make("status:ok"));
-				} else {
-					handler.signal(make("status:error", "message:" + response.statusMessage()));
-				}
+				response.bodyHandler(buffer -> {
+					JsonObject answer = buffer.toJsonObject();
+					handler.signal(answer);
+
+				});
 			}).end(envelope.encode());
 
 		} catch (IOException ex) {
@@ -186,8 +184,8 @@ public class Client {
 	 * @param handler
 	 *            Handler to call after the import
 	 */
-	public void addFile(final String uid, final String filename, final String concern, final String doctype, Map<String, Object> metadata,
-			final byte[] contents, final Handler handler) {
+	public void addFile(final String uid, final String filename, final String concern, final String doctype,
+			JsonObject metadata, final byte[] contents, final Handler handler) {
 
 		try {
 			JsonObject envelope = prepare(uid, filename, doctype, metadata, contents);
@@ -197,12 +195,7 @@ public class Client {
 			http.post(api + "addfile", response -> {
 				response.bodyHandler(buffer -> {
 					JsonObject result = buffer.toJsonObject();
-					if (response.statusCode() == 201) {
-						handler.signal(add(result.getMap(), "status", "ok"));
-					} else {
-						handler.signal(make("status:error", "message:" + response.statusMessage()));
-					}
-
+					handler.signal(result);
 				});
 			}).end(envelope.encode());
 
@@ -213,10 +206,10 @@ public class Client {
 		}
 	}
 
-	private JsonObject prepare(final String id, final String title, final String doctype, Map<String, Object> metadata,
+	private JsonObject prepare(final String id, final String title, final String doctype, JsonObject metadata,
 			final byte[] contents) throws IOException {
 		if (metadata == null) {
-			metadata = new HashMap<>();
+			metadata = new JsonObject();
 		}
 		if (!id.isEmpty()) {
 			metadata.put("_id", id);
@@ -225,7 +218,7 @@ public class Client {
 		metadata.put("lucinda_doctype", doctype);
 		metadata.put("filename", title);
 		metadata.put("payload", contents);
-		return new JsonObject(metadata);
+		return metadata;
 	}
 
 	public void shutDown() {
@@ -233,9 +226,11 @@ public class Client {
 		http.close();
 	}
 
-	/* syntactic sugar to create and initialize a Map with a single call */
-	private Map<String, Object> make(String... params) {
-		Map<String, Object> ret = new HashMap<>();
+	/*
+	 * syntactic sugar to create and initialize a JsonObject with a single call
+	 */
+	private JsonObject make(String... params) {
+		JsonObject ret = new JsonObject();
 		for (String param : params) {
 			String[] p = param.split(":");
 			ret.put(p[0], p[1]);
@@ -243,9 +238,4 @@ public class Client {
 		return ret;
 	}
 
-	/* syntactic sugar to allow fluent api */
-	private Map<String, Object> add(Map<String, Object> orig, String key, Object value) {
-		orig.put(key, value);
-		return orig;
-	}
 }

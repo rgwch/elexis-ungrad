@@ -14,7 +14,6 @@
 
 package ch.elexis.ungrad.lucinda.view;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
@@ -31,17 +30,20 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.rgw.tools.StringTool;
+import io.vertx.core.json.JsonObject;
 
 /**
- * The Detail-Subview shows metadata of the document selected in the Master-Subview.
+ * The Detail-Subview shows metadata of the document selected in the
+ * Master-Subview.
+ * 
  * @author gerry
  *
  */
 public class Detail extends Composite {
 	TableViewer tv;
 	private String[] exclusions;;
-	
-	public Detail(Composite parent){
+
+	public Detail(Composite parent) {
 		super(parent, SWT.NONE);
 		setLayout(new FillLayout());
 		tv = new TableViewer(this, SWT.NONE);
@@ -51,38 +53,39 @@ public class Detail extends Composite {
 		tv.getTable().setLinesVisible(true);
 		tc1.setWidth(200);
 		tc1.setText("key"); //$NON-NLS-1$
-		
+
 		TableViewerColumn tvc2 = new TableViewerColumn(tv, SWT.NONE);
 		TableColumn tc2 = tvc2.getColumn();
 		tc2.setWidth(100);
 		tc2.setText("value"); //$NON-NLS-1$
-		
+
 		tv.setContentProvider(new IStructuredContentProvider() {
 			/*
-			 * We'll recheck exclusions on every changed object, in case the user edited the list
+			 * We'll recheck exclusions on every changed object, in case the
+			 * user edited the list
 			 */
 			@Override
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput){
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 				exclusions = CoreHub.localCfg.get(Preferences.EXCLUDEMETA, "").split(","); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
+
 			@Override
-			public void dispose(){}
-			
+			public void dispose() {
+			}
+
 			@SuppressWarnings("unchecked")
 			@Override
-			public Object[] getElements(Object inputElement){
-				Map<String, Object> el = (Map<String, Object>) inputElement;
-				Stream<Entry<String, Object>> filtered =
-					el.entrySet().stream().filter(e -> isNotExcluded(e));
+			public Object[] getElements(Object inputElement) {
+				JsonObject el = (JsonObject) inputElement;
+				Stream<Entry<String, Object>> filtered = el.getMap().entrySet().stream().filter(e -> isNotExcluded(e));
 				return filtered.toArray();
 			}
 		});
 		tv.setLabelProvider(new TableLabelProvider() {
-			
+
 			@SuppressWarnings("unchecked")
 			@Override
-			public String getColumnText(Object element, int columnIndex){
+			public String getColumnText(Object element, int columnIndex) {
 				Entry<String, Object> en = (Entry<String, Object>) element;
 				if (columnIndex == 0) {
 					return en.getKey();
@@ -90,21 +93,21 @@ public class Detail extends Composite {
 					return en.getValue().toString();
 				}
 			}
-			
+
 		});
-		
+
 	}
-	
-	public void setInput(Object input){
+
+	public void setInput(Object input) {
 		tv.setInput(input);
 	}
-	
-	/* show only items not in the exclude-List*/
-	private boolean isNotExcluded(Entry<String, Object> e){
+
+	/* show only items not in the exclude-List */
+	private boolean isNotExcluded(Entry<String, Object> e) {
 		if (exclusions == null) {
 			return true;
 		}
 		return (StringTool.getIndex(exclusions, e.getKey()) == -1);
-		
+
 	}
 }

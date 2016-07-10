@@ -42,7 +42,7 @@ public class ImportSettings extends TitleAreaDialog {
 		tExclude.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
 		tExclude.setText(Preferences.get(Preferences.OMNIVORE_EXCLUDE, ""));
 		Label lbMove=new Label(ctl,SWT.NONE);
-		lbMove.setText("Dokumente aus Omnivore löschen");
+		lbMove.setText("Dokumente nach Lucinda verschieben und aus Omnivore löschen");
 		cbMove=new Button(ctl, SWT.CHECK);
 		cbMove.setSelection(Preferences.is(Preferences.OMNIVORE_MOVE));
 		return ctl;

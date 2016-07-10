@@ -3,6 +3,7 @@ package ch.elexis.ungrad.lucinda.model;
 import java.util.List;
 
 import ch.elexis.data.PersistentObject;
+import io.vertx.core.json.JsonObject;
 
 public interface Customer {
 	/**
@@ -16,10 +17,11 @@ public interface Customer {
 	 *         of arbitrary additional properties. Recommended are: "lastname",
 	 *         "firstname", "birthdate" of the Patient this Document belongs to.
 	 */
-	public Document specify(PersistentObject po);
-	
+	public JsonObject specify(PersistentObject po);
+
 	/**
 	 * Signal the Customer that a document was indexed successfully
+	 * 
 	 * @param id
 	 */
 	public void success(String id);
@@ -30,5 +32,5 @@ public interface Customer {
 	 * @param messages
 	 *            All messages received from Lucinda while transmitting
 	 */
-	public void finished(List<Document> messages);
+	public void finished(List<JsonObject> messages);
 }

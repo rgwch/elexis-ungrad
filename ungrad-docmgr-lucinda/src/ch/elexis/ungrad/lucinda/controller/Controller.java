@@ -16,9 +16,7 @@ package ch.elexis.ungrad.lucinda.controller;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -45,12 +43,13 @@ import ch.elexis.omnivore.data.DocHandle;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Lucinda;
 import ch.elexis.ungrad.lucinda.Preferences;
-import ch.elexis.ungrad.lucinda.model.Document;
 import ch.elexis.ungrad.lucinda.view.GlobalViewPane;
 import ch.elexis.ungrad.lucinda.view.Master;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.TimeTool;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 /**
  * Controlle for the Lucinda View
@@ -80,7 +79,7 @@ public class Controller implements IProgressController {
 
 	private void connect() {
 		lucinda.connect(result -> {
-			switch ((String) result.get("status")) {
+			switch (result.getString("status")) {
 			case "connected":
 				view.setConnected(true);
 				break;
@@ -114,9 +113,9 @@ public class Controller implements IProgressController {
 			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 				if (!sel.isEmpty()) {
-					Document doc = new Document(sel.getFirstElement());
-					if (doc.get(Preferences.FLD_LUCINDA_DOCTYPE).equals(Preferences.KONSULTATION_NAME)) {
-						Konsultation kons = Konsultation.load(doc.get(Preferences.FLD_ID));
+					JsonObject doc = (JsonObject) sel.getFirstElement();
+					if (doc.getString(Preferences.FLD_LUCINDA_DOCTYPE).equals(Preferences.KONSULTATION_NAME)) {
+						Konsultation kons = Konsultation.load(doc.getString(Preferences.FLD_ID));
 						if (kons.exists()) {
 							ElexisEventDispatcher.fireSelectionEvent(kons);
 						}
@@ -139,9 +138,8 @@ public class Controller implements IProgressController {
 		return new LucindaLabelProvider();
 	}
 
-	@SuppressWarnings("rawtypes")
 	public void clear() {
-		viewer.setInput(new ArrayList());
+		viewer.setInput(new JsonArray());
 	}
 
 	int cPatWidth = 0;
@@ -170,9 +168,9 @@ public class Controller implements IProgressController {
 	 */
 	public void runQuery(String input) {
 		lucinda.query(buildQuery(input), result -> {
-			if (result.get("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
-				@SuppressWarnings("rawtypes")
-				List queryResult = (List) result.get("result"); //$NON-NLS-1$
+			if (result.getString("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
+				JsonArray queryResult = result.getJsonArray("result"); //$NON-NLS-1$
+
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -180,7 +178,7 @@ public class Controller implements IProgressController {
 					}
 				});
 			} else {
-				Activator.getDefault().addMessage(new Document(result));
+				Activator.getDefault().addMessage(result);
 			}
 		});
 
@@ -221,20 +219,20 @@ public class Controller implements IProgressController {
 		return q.toString();
 	}
 
-	public void loadDocument(final Document doc) {
-		String doctype = doc.get(Preferences.FLD_LUCINDA_DOCTYPE);
+	public void loadDocument(final JsonObject doc) {
+		String doctype = doc.getString(Preferences.FLD_LUCINDA_DOCTYPE);
 
 		if (doctype.equalsIgnoreCase(Preferences.INBOX_NAME)) {
-			lucinda.get(doc.get(Preferences.FLD_ID), result -> {
-				if (result.get("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
+			lucinda.get(doc.getString(Preferences.FLD_ID), result -> {
+				if (result.getString("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
 					@SuppressWarnings("unused")
-					byte[] contents = (byte[]) result.get("result"); //$NON-NLS-1$
-					String ext = FileTool.getExtension(doc.get("url")); //$NON-NLS-1$
+					byte[] contents = (byte[]) result.getBinary("result"); //$NON-NLS-1$
+					String ext = FileTool.getExtension(doc.getString("url")); //$NON-NLS-1$
 					launchViewerForDocument(contents, ext);
 				}
 			});
 		} else if (doctype.equalsIgnoreCase(Preferences.KONSULTATION_NAME)) {
-			Konsultation kons = Konsultation.load(doc.get(Preferences.FLD_ID));
+			Konsultation kons = Konsultation.load(doc.getString(Preferences.FLD_ID));
 			if (kons.exists()) {
 				String entry = kons.getEintrag().getHead();
 				if (entry.startsWith("<")) {
@@ -244,15 +242,15 @@ public class Controller implements IProgressController {
 				launchViewerForDocument(entry.getBytes(), "txt"); //$NON-NLS-1$
 			} else {
 				SWTHelper.showError(Messages.Controller_cons_not_found_caption,
-						MessageFormat.format(Messages.Controller_cons_not_found_text, doc.get("title"))); // $NON-NLS-2$
+						MessageFormat.format(Messages.Controller_cons_not_found_text, doc.getString("title"))); // $NON-NLS-2$
 			}
 		} else if (doctype.equalsIgnoreCase(Preferences.OMNIVORE_NAME)) {
-			DocHandle dh = DocHandle.load(doc.get(Preferences.FLD_ID));
+			DocHandle dh = DocHandle.load(doc.getString(Preferences.FLD_ID));
 			if (dh.exists()) {
 				dh.execute();
 			} else {
 				SWTHelper.showError(Messages.Controller_omnivore_not_found_caption,
-						Messages.Controller_omnivore_not_found_text, doc.get("title")); //$NON-NLS-1$
+						Messages.Controller_omnivore_not_found_text, doc.getString("title")); //$NON-NLS-1$
 			}
 		} else {
 

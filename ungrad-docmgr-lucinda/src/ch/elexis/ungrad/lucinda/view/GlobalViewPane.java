@@ -14,8 +14,6 @@
 
 package ch.elexis.ungrad.lucinda.view;
 
-import java.util.HashMap;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.layout.FormAttachment;
@@ -27,7 +25,7 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.ungrad.lucinda.controller.Controller;
-import ch.elexis.ungrad.lucinda.model.Document;
+import io.vertx.core.json.JsonObject;
 
 public class GlobalViewPane extends Composite {
 	private SashForm sashForm;
@@ -101,7 +99,7 @@ public class GlobalViewPane extends Composite {
 
 	public void setSelection(Object element) {
 		if (element == null) {
-			detail.setInput(new HashMap<String, Object>());
+			detail.setInput(new JsonObject());
 		} else {
 			detail.setInput(element);
 		}
@@ -121,7 +119,7 @@ public class GlobalViewPane extends Composite {
 	}
 
 	public void loadDocument(Object element) {
-		controller.loadDocument(new Document(element));
+		controller.loadDocument((JsonObject) element);
 	}
 
 }

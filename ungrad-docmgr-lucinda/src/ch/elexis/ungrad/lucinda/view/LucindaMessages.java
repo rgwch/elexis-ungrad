@@ -1,6 +1,5 @@
 package ch.elexis.ungrad.lucinda.view;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -15,7 +14,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Handler;
-import ch.elexis.ungrad.lucinda.model.Document;
+import io.vertx.core.json.JsonObject;
 
 public class LucindaMessages extends ViewPart implements Handler {
 	private TreeViewer tv;
@@ -40,7 +39,7 @@ public class LucindaMessages extends ViewPart implements Handler {
 
 			@Override
 			public boolean hasChildren(Object element) {
-				if (element instanceof Document) {
+				if (element instanceof JsonObject) {
 					return true;
 				} else {
 					return false;
@@ -59,8 +58,8 @@ public class LucindaMessages extends ViewPart implements Handler {
 
 			@Override
 			public Object[] getChildren(Object parentElement) {
-				Document doc = (Document) parentElement;
-				Set<Entry<String, Object>> entries = doc.toMap().entrySet();
+				JsonObject doc = (JsonObject) parentElement;
+				Set<Entry<String, Object>> entries = doc.getMap().entrySet();
 				return entries.toArray();
 			}
 		});
@@ -69,8 +68,8 @@ public class LucindaMessages extends ViewPart implements Handler {
 
 			@Override
 			public String getText(Object element) {
-				if (element instanceof Document) {
-					return ((Document) element).get("status"); //$NON-NLS-1$
+				if (element instanceof JsonObject) {
+					return ((JsonObject) element).getString("status"); //$NON-NLS-1$
 				} else if (element instanceof Entry) {
 					Entry e = (Entry) element;
 					return e.getKey() + ": " + e.getValue(); //$NON-NLS-1$
@@ -93,12 +92,12 @@ public class LucindaMessages extends ViewPart implements Handler {
 	}
 
 	@Override
-	public void signal(Map<String, Object> msg) {
+	public void signal(JsonObject msg) {
 		Display.getDefault().asyncExec(new Runnable() {
 
 			@Override
 			public void run() {
-				tv.add("/", new Document(msg)); //$NON-NLS-1$
+				tv.add("/", msg); //$NON-NLS-1$
 			}
 
 		});

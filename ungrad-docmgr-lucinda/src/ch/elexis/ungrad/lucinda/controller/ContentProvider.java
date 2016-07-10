@@ -14,31 +14,33 @@
 
 package ch.elexis.ungrad.lucinda.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+import io.vertx.core.json.JsonArray;
+
 public class ContentProvider implements IStructuredContentProvider {
-	
+
 	@Override
-	public void dispose(){
+	public void dispose() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput){
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
-	public Object[] getElements(Object inputElement){
-		@SuppressWarnings("unchecked")
-		List<Map<String, Object>> values = (List<Map<String, Object>>) inputElement;
-		return values.toArray();
+	public Object[] getElements(Object inputElement) {
+		JsonArray values = (JsonArray) inputElement;
+		Object[] ret = new Object[values.size()];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = values.getJsonObject(i);
+		}
+		return ret;
 	}
-	
+
 }

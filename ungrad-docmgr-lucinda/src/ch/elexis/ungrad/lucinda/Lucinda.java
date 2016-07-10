@@ -13,9 +13,8 @@
  *********************************************************************************/
 package ch.elexis.ungrad.lucinda;
 
-import java.util.Map;
-
 import ch.rgw.io.FileTool;
+import io.vertx.core.json.JsonObject;
 
 public class Lucinda {
 	private Client client;
@@ -50,18 +49,18 @@ public class Lucinda {
 		client.get(id, ha);
 	}
 
-	public void addToIndex(String id, String title, String type, Map<String, Object> meta, byte[] contents,
-			Handler handler, boolean bCopy) {
+	public void addToIndex(String id, String title, String type, JsonObject meta, byte[] contents, Handler handler,
+			boolean bCopy) {
 		if (bCopy) {
-			String filetype = (String) meta.get("filetype");
+			String filetype = meta.getString("filetype");
 			if (filetype != null) {
 				String ext = FileTool.getExtension(filetype);
 				if (ext.length() == 0) {
 					ext = filetype;
 				}
-				title += "."+ext;
+				title += "." + ext;
 			}
-			client.addFile(id, title, (String) meta.get("concern"), type, meta, contents, handler);
+			client.addFile(id, title, meta.getString("concern"), type, meta, contents, handler);
 		} else {
 			client.addToIndex(id, title, type, meta, contents, handler);
 		}
