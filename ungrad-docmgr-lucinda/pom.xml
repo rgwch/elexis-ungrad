@@ -9,34 +9,5 @@
     <artifactId>ch.elexis.ungrad.docmgr-lucinda</artifactId>
     <packaging>eclipse-plugin</packaging>
     <groupId>ch.rgw</groupId>
-    <version>1.1.0-SNAPSHOT</version>
-    <properties>
-        <clientlib>lucinda-client-0.5.0-SNAPSHOT.jar</clientlib>
-    </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <configuration>
-                            <tasks>
-                            <!-- copy todir="lib">
-                            	<fileset dir="../lucinda-client/target">
-                            		<include name="lucinda-client*.jar"></include>
-                            	</fileset>
-                            <copy -->
-                                <get src="http://www.elexis.ch/ungrad/products/lucinda/latest/${clientlib}" dest="lib/${clientlib}"/>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-  
-</project>
+    <version>1.2.0-SNAPSHOT</version>
+    </project>

@@ -38,7 +38,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.ui.icons.Images;
-import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.controller.DocumentSorter;
 
 public class Master extends Composite {
@@ -52,7 +51,8 @@ public class Master extends Composite {
 	public static int COLUMN_NAME = 1;
 	public static int COLUMN_DATE = 2;
 	public static int COLUMN_DOC = 3;
-	String[] columnTitles = { Messages.Master_col_caption_type, Messages.Master_col_caption_patient, Messages.Master_col_caption_date, Messages.Master_col_caption_doc };
+	String[] columnTitles = { Messages.Master_col_caption_type, Messages.Master_col_caption_patient,
+			Messages.Master_col_caption_date, Messages.Master_col_caption_doc };
 	int[] columnWidths = { 50, 100, 100, 150 };
 
 	Master(final Composite parent, final GlobalViewPane gvp) {
@@ -172,7 +172,7 @@ public class Master extends Composite {
 			}
 		});
 
-		setConnected(false,false,false);
+		setConnected(false);
 
 	}
 
@@ -186,7 +186,6 @@ public class Master extends Composite {
 		}
 	}
 
-	
 	private void addHeaderListener(final TableColumn tc, int index) {
 		tc.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -202,19 +201,13 @@ public class Master extends Composite {
 		});
 	}
 
-	public void setConnected(boolean bConnected, boolean hasBusApi, boolean hasRestApi) {
+	public void setConnected(boolean bConnected) {
 		Display.getDefault().asyncExec(new Runnable() {
 
 			@Override
 			public void run() {
 				if (bConnected) {
 					StringBuilder sb = new StringBuilder(Messages.Master_connected_tooltip);
-					if (hasBusApi) {
-						sb.append("EventBus "); //$NON-NLS-1$
-					}
-					if (hasRestApi) {
-						sb.append("REST"); //$NON-NLS-1$
-					}
 					sb.append(Messages.Master_connected_tooltip2);
 					lblConnection.setImage(Images.IMG_BULLET_GREEN.getImage());
 					lblConnection.setToolTipText(sb.toString());

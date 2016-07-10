@@ -31,6 +31,7 @@ import ch.elexis.ungrad.lucinda.controller.IProgressController;
 import ch.elexis.ungrad.lucinda.model.Customer;
 import ch.elexis.ungrad.lucinda.model.Document;
 import ch.elexis.ungrad.lucinda.model.Sender;
+import ch.rgw.tools.JdbcLink;
 import ch.rgw.tools.TimeTool;
 
 public class OmnivoreIndexer implements Customer {
@@ -65,7 +66,15 @@ public class OmnivoreIndexer implements Customer {
 		}
 		bMove=Preferences.is(Preferences.OMNIVORE_MOVE);
 		StringBuilder querySQL = new StringBuilder("SELECT ID FROM ").append(DocHandle.TABLENAME)
-				.append(" WHERE lastupdate >=").append(lastCheck).append(" AND deleted='0' ORDER BY ")
+				.append(" WHERE lastupdate >=").append(lastCheck);
+		String excludes=Preferences.get(Preferences.OMNIVORE_EXCLUDE, "");
+		if(excludes.length()>0){
+			String[] ex=excludes.split(",");
+			for(String e:ex){
+				querySQL.append(" AND Category <>").append(JdbcLink.wrap(e));
+			}
+		}
+		querySQL.append(" AND deleted='0' ORDER BY ")
 				.append("lastupdate");
 
 		Query<DocHandle> qbe = new Query<DocHandle>(DocHandle.class);
@@ -112,7 +121,7 @@ public class OmnivoreIndexer implements Customer {
 			String bdRaw = get(patient, Patient.FLD_DOB);
 			String lastname = get(patient, Patient.FLD_NAME);
 			String firstname = get(patient, Patient.FLD_FIRSTNAME);
-			String birthdate = new TimeTool(bdRaw).toString(TimeTool.DATE_COMPACT);
+			String birthdate = new TimeTool(bdRaw).toString(TimeTool.DATE_GER);
 			String docdate = new TimeTool(dh.getCreationDate()).toString(TimeTool.DATE_COMPACT);
 			if (dh.getLastUpdate() > lastCheck) {
 				lastCheck = dh.getLastUpdate();
@@ -132,6 +141,7 @@ public class OmnivoreIndexer implements Customer {
 			meta.put("concern", concern.toString()); //$NON-NLS-1$
 			meta.put("title", dh.getTitle()); //$NON-NLS-1$
 			meta.put("type", Preferences.OMNIVORE_NAME); //$NON-NLS-1$
+			meta.put("filetype", dh.getMimetype());
 			pc.addProgress(progressHandle, 1);
 			return meta;
 		} else {

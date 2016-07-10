@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.PersistentObject;
+import ch.elexis.ungrad.lucinda.Handler;
 import ch.elexis.ungrad.lucinda.Lucinda;
-import ch.rgw.lucinda.Handler;
 
 /**
  * The Sender takes a List of PersistentObjects from its creating customer and

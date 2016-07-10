@@ -82,8 +82,7 @@ public class Controller implements IProgressController {
 		lucinda.connect(result -> {
 			switch ((String) result.get("status")) {
 			case "connected":
-			case "Rest OK":
-				view.setConnected(true, lucinda.isBusAPI(), lucinda.isRestAPI());
+				view.setConnected(true);
 				break;
 			}
 		});
@@ -92,7 +91,7 @@ public class Controller implements IProgressController {
 
 	public void reconnect() {
 		clear();
-		view.setConnected(false, false, false);
+		view.setConnected(false);
 		lucinda.disconnect();
 		connect();
 	}
