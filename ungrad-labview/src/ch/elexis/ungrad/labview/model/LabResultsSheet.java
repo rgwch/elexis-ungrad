@@ -27,10 +27,13 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.eclipse.swt.widgets.Display;
+
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.jdt.NonNull;
 import ch.elexis.core.types.Gender;
 import ch.elexis.core.ui.util.Log;
+import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.ungrad.IObserver;
