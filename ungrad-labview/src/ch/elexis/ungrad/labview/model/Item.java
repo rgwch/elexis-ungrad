@@ -122,7 +122,15 @@ public class Item extends SimpleObject implements Comparable<Item> {
 	}
 
 	public boolean isEqual(Item o){
-		if(get("einheit").equals(o.get("einheit"))){
+		String u=get("einheit");
+		String ou=o.get("einheit");
+		if(u==null && ou!=null){
+				return false;
+		}
+		if(u!=null && ou== null){
+			return false;
+		}
+		if(o==null || o.equals(ou)){
 			for(int i=0;i<refBounds.length;i++){
 				if(refBounds[i]!=o.refBounds[i]){
 					return false;

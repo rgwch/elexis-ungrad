@@ -17,23 +17,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.eclipse.swt.widgets.Display;
-
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.jdt.NonNull;
 import ch.elexis.core.types.Gender;
 import ch.elexis.core.ui.util.Log;
-import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.ungrad.IObserver;
@@ -58,14 +54,13 @@ public class LabResultsSheet {
 	Patient pat;
 	
 	TimeTool[] dateArray;
-	Item[] itemArray;
 	Map<Item, Bucket> recently;
 	Map<Item, Bucket> lastYear;
 	Map<Item, Bucket> older;
 	JdbcLink j;
-	Map<String, Item> items;
-	Map<String, SortedSet<Item>> groups;
-	SortedMap<Item, LabResultsRow> rows = new TreeMap<Item, LabResultsRow>();
+	Map<String, Item> allItemsByID;
+	Map<String, List<Item>> groups;
+	SortedMap<Item, LabResultsRow> itemsWithResults = new TreeMap<Item, LabResultsRow>();
 	SortedSet<TimeTool> resultDates = new TreeSet<>();
 	List<IObserver> observers = new ArrayList<>();
 	TimeTool oneMonth = new TimeTool();
@@ -91,7 +86,7 @@ public class LabResultsSheet {
 		loadItems(false);
 		if (pat == null) {
 			dateArray = null;
-			rows = null;
+			itemsWithResults = null;
 		} else {
 			fetch();
 		}
@@ -109,17 +104,40 @@ public class LabResultsSheet {
 		return groups.keySet().toArray(new String[0]);
 	}
 	
+	/**
+	 * Fetch all Items that belong to a group
+	 * 
+	 * @param group
+	 *            the group to query
+	 * @return An Item[] which may be empty but is never null
+	 */
 	public Item[] getAllItemsForGroup(String group){
 		Util.require(group != null, "group must not be null");
-		Set<Item> items = groups.get(group);
-		return (items == null) ? new Item[0] : items.toArray(new Item[0]);
+		List<Item> items = groups.get(group);
+		if (items == null) {
+			return new Item[0];
+		} else {
+			Collections.sort(items);
+			return items.toArray(new Item[0]);
+		}
 	}
 	
+	/**
+	 * Register an Observer that will be notified when the LabResultSheet reloads
+	 * 
+	 * @param obs
+	 *            The Observer to register
+	 */
 	public void addObserver(IObserver obs){
 		Util.require(obs != null, "Observer must not be null");
 		observers.add(obs);
 	}
 	
+	/**
+	 * Unregister a previously registered Obsever
+	 * 
+	 * @param obs
+	 */
 	public void removeObserver(IObserver obs){
 		Util.require(obs != null, "Observer must not be null");
 		observers.remove(obs);
@@ -131,14 +149,19 @@ public class LabResultsSheet {
 	 * @return an ordered Array with all items
 	 */
 	public Item[] getItems(){
-		if (itemArray == null) {
+		if (allItemsByID == null) {
 			try {
 				loadItems(true);
 			} catch (ElexisException e) {
 				log.log(e, "could not load LabItems", Log.ERRORS);
 			}
 		}
-		return itemArray;
+		List<Item> list = new ArrayList<Item>(allItemsByID.size());
+		for (Item it : allItemsByID.values()) {
+			list.add(it);
+		}
+		Collections.sort(list);
+		return list.toArray(new Item[0]);
 	}
 	
 	/**
@@ -148,7 +171,8 @@ public class LabResultsSheet {
 	 * @see LabResultsRow
 	 */
 	public LabResultsRow[] getLabResults(){
-		return rows == null ? null : rows.values().toArray(new LabResultsRow[0]);
+		return itemsWithResults == null ? null
+				: itemsWithResults.values().toArray(new LabResultsRow[0]);
 	}
 	
 	/**
@@ -191,7 +215,7 @@ public class LabResultsSheet {
 			return null;
 		}
 		TimeTool date = dateArray[nColumn];
-		LabResultsRow row = (LabResultsRow) rows.values().toArray()[nRow];
+		LabResultsRow row = (LabResultsRow) itemsWithResults.values().toArray()[nRow];
 		for (Result res : row.results) {
 			if (res.get("datum").equals(date.toString(TimeTool.DATE_COMPACT))) {
 				return res;
@@ -219,32 +243,34 @@ public class LabResultsSheet {
 	 */
 	private void loadItems(boolean bReload) throws ElexisException{
 		if (bReload) {
-			items = null;
+			allItemsByID = null;
 		}
-		if (items == null) {
+		if (allItemsByID == null) {
 			PreparedStatement psItems = j.getPreparedStatement(queryItems);
 			try {
 				ResultSet res = psItems.executeQuery();
-				items = new HashMap<String, Item>();
-				groups = new TreeMap<String, SortedSet<Item>>();
+				allItemsByID = new HashMap<String, Item>();
+				groups = new TreeMap<String, List<Item>>();
 				while (res.next()) {
 					Item item = new Item(res);
 					
-					SortedSet<Item> itemsInGroup = groups.get(item.get("gruppe"));
+					List<Item> itemsInGroup = groups.get(item.get("gruppe"));
 					if (itemsInGroup == null) {
-						itemsInGroup = new TreeSet<Item>();
+						itemsInGroup = new ArrayList<Item>();
 					}
 					itemsInGroup.add(item);
 					groups.put(item.get("gruppe"), itemsInGroup);
-					items.put(item.get("id"), item);
+					allItemsByID.put(item.get("id"), item);
 				}
+				/*
 				List<Item> allItems = new LinkedList<Item>();
-				for (Set<Item> set : groups.values()) {
+				for (List<Item> set : groups.values()) {
 					for (Item item : set) {
 						allItems.add(item);
 					}
 				}
 				itemArray = allItems.toArray(new Item[0]);
+				*/
 				
 			} catch (SQLException ex) {
 				throw new ElexisException("can't fetch Lab Items", ex);
@@ -264,7 +290,7 @@ public class LabResultsSheet {
 		loadItems(false);
 		resultDates.clear();
 		PreparedStatement ps = j.getPreparedStatement(queryResults);
-		rows = new TreeMap<>();
+		itemsWithResults = new TreeMap<>();
 		recently = new TreeMap<Item, Bucket>();
 		lastYear = new TreeMap<Item, Bucket>();
 		older = new TreeMap<Item, Bucket>();
@@ -286,7 +312,7 @@ public class LabResultsSheet {
 	}
 	
 	public void addResult(Result result){
-		Item item = items.get(result.get("itemId"));
+		Item item = allItemsByID.get(result.get("itemId"));
 		if (item == null) {
 			item = new Item("?");
 		}
@@ -313,26 +339,26 @@ public class LabResultsSheet {
 			}
 		}
 		bucket.addResult(result);
-		LabResultsRow row = rows.get(item);
+		LabResultsRow row = itemsWithResults.get(item);
 		if (row == null) {
 			row = new LabResultsRow(item, pat);
-			rows.put(item, row);
+			itemsWithResults.put(item, row);
 		}
 		row.add(result);
 		
 	}
 	
 	/**
-	 * get a list of Item-Groups for which Results exist in the current context
+	 * get a list of Item-Groups for which Results exist for the current Patient
 	 */
 	public Object[] getGroups(){
 		SortedSet<String> groups = new TreeSet<String>();
-		rows.keySet().forEach(key -> groups.add(key.get("gruppe")));
+		itemsWithResults.keySet().forEach(key -> groups.add(key.get("gruppe")));
 		return groups.toArray();
 	}
 	
 	/**
-	 * Ger Results of a given group in the current context
+	 * Get Results of a given group in the current context
 	 * 
 	 * @param group
 	 * @return
@@ -340,17 +366,18 @@ public class LabResultsSheet {
 	@NonNull
 	public Object[] getRowsForGroup(String group){
 		Util.require(group != null, "group must not be null");
-		SortedSet<LabResultsRow> results = new TreeSet<LabResultsRow>();
-		rows.keySet().forEach(key -> {
+		List<LabResultsRow> results = new ArrayList<LabResultsRow>();
+		itemsWithResults.keySet().forEach(key -> {
 			if (key.get("gruppe").equals(group)) {
-				LabResultsRow r = rows.get(key);
+				LabResultsRow r = itemsWithResults.get(key);
 				if (r == null) {
 					log.log("Null value for " + key.get("Titel"), Log.ERRORS);
 				} else {
-					results.add(rows.get(key));
+					results.add(itemsWithResults.get(key));
 				}
 			}
 		});
+		Collections.sort(results);
 		return results.toArray();
 	}
 	
@@ -370,7 +397,7 @@ public class LabResultsSheet {
 	}
 	
 	public Result getResultForDate(Item item, TimeTool date){
-		LabResultsRow row = rows.get(item);
+		LabResultsRow row = itemsWithResults.get(item);
 		if (row == null) {
 			return null;
 		} else {
