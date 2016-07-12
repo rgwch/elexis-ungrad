@@ -194,7 +194,7 @@ public class Master extends Composite {
 					tc.setData("direction", false); //$NON-NLS-1$
 				}
 				boolean bDirec = !(Boolean) tc.getData("direction"); //$NON-NLS-1$
-				tableViewer.setSorter(new DocumentSorter(index, bDirec));
+				tableViewer.setSorter(new DocumentSorter(index, bDirec,tc.getText().equals(Messages.Master_col_caption_date)));
 				tc.setData("direction", bDirec); //$NON-NLS-1$
 			}
 

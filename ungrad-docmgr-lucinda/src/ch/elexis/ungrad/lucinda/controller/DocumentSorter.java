@@ -19,25 +19,40 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
+import ch.rgw.tools.TimeTool;
 
 public class DocumentSorter extends ViewerSorter {
 	int index;
 	boolean bIncreasing;
+	boolean isDate;
 	
-	public DocumentSorter(int index, boolean bIncreasing){
-		this.index=index;
-		this.bIncreasing=bIncreasing;
+	public DocumentSorter(int index, boolean bIncreasing, boolean isDate){
+		this.index = index;
+		this.bIncreasing = bIncreasing;
+		this.isDate = isDate;
 	}
+	
 	@Override
-	public int compare(Viewer viewer, Object e1, Object e2) {
-		String s1=((TableLabelProvider)((TableViewer)viewer).getLabelProvider()).getColumnText(e1, index).toLowerCase();
-		String s2=((TableLabelProvider)((TableViewer)viewer).getLabelProvider()).getColumnText(e2, index).toLowerCase();
-		if(bIncreasing){
-			return s1.compareTo(s2);
-		}else{
-			return s2.compareTo(s1);
+	public int compare(Viewer viewer, Object e1, Object e2){
+		String s1 = ((TableLabelProvider) ((TableViewer) viewer).getLabelProvider())
+			.getColumnText(e1, index).toLowerCase();
+		String s2 = ((TableLabelProvider) ((TableViewer) viewer).getLabelProvider())
+			.getColumnText(e2, index).toLowerCase();
+		if (isDate) {
+			TimeTool t1 = new TimeTool(s1);
+			TimeTool t2 = new TimeTool(s2);
+			if (bIncreasing) {
+				return (t1.compareTo(t2));
+			} else {
+				return (t2.compareTo(t1));
+			}
+		} else {
+			if (bIncreasing) {
+				return s1.compareTo(s2);
+			} else {
+				return s2.compareTo(s1);
+			}
 		}
 	}
-
 	
 }
