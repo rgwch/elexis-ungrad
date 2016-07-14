@@ -28,7 +28,6 @@ import java.util.TreeSet;
 
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.jdt.NonNull;
-import ch.elexis.core.types.Gender;
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.data.Patient;
 import ch.elexis.data.PersistentObject;
@@ -382,7 +381,7 @@ public class LabResultsSheet {
 	}
 	
 	public String getNormRange(Item item){
-		if (pat.getGender() == Gender.FEMALE) {
+		if (!pat.getGeschlecht().equals("m")) {
 			return item.get("refFrauOrTx");
 		} else {
 			return item.get("refMann");

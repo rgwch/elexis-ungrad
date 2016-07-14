@@ -15,15 +15,14 @@ package ch.elexis.ungrad.labview.model;
 
 import java.sql.ResultSet;
 
-import ch.elexis.core.types.Gender;
-import ch.elexis.core.types.LabItemTyp;
 import ch.elexis.core.ui.util.Log;
+import ch.elexis.data.LabItem;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.SimpleObject;
 import ch.rgw.tools.StringTool;
 
 public class Item extends SimpleObject implements Comparable<Item> {
-	final String ntyp = Integer.toString(LabItemTyp.NUMERIC.ordinal());
+	//final String ntyp = Integer.toString(LabItemTyp.NUMERIC.ordinal());
 	static final int LOWER_BOUND_MALE = 0;
 	static final int UPPER_BOUND_MALE = 1;
 	static final int LOWER_BOUND_FEMALE = 2;
@@ -47,7 +46,7 @@ public class Item extends SimpleObject implements Comparable<Item> {
 
 	public Item(ResultSet res) {
 		load(res);
-		if (get("typ").equals(ntyp)) {
+		if (get("typ").equals(LabItem.typ.NUMERIC.toString())) {
 			makeBounds(get("refMann"), LOWER_BOUND_MALE);
 			makeBounds(get("refFrauOrTx"), LOWER_BOUND_FEMALE);
 		}
@@ -105,7 +104,7 @@ public class Item extends SimpleObject implements Comparable<Item> {
 			val = makeFloat(chopped);
 		}
 		int index = LOWER_BOUND_MALE;
-		if (pat.getGender() == Gender.FEMALE) {
+		if (!pat.getGeschlecht().equals("m")) {
 			index = LOWER_BOUND_FEMALE;
 		}
 		if ((val < refBounds[index]) || (val > refBounds[index + 1])) {
