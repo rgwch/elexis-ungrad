@@ -16,7 +16,6 @@ package ch.elexis.ungrad.labview.model;
 import java.sql.ResultSet;
 
 import ch.elexis.core.ui.util.Log;
-import ch.elexis.data.LabItem;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.SimpleObject;
 import ch.rgw.tools.StringTool;
@@ -27,38 +26,39 @@ public class Item extends SimpleObject implements Comparable<Item> {
 	static final int UPPER_BOUND_MALE = 1;
 	static final int LOWER_BOUND_FEMALE = 2;
 	static final int UPPER_BOUND_FEMALE = 3;
-
+	
 	Log log = Log.get(getClass().getName());
 	
-
-	private static final String[] fields = { "ID", "titel", "kuerzel", "Gruppe", "prio", "RefMann", "RefFrauOrTx", "Typ", "Einheit"};
-
+	private static final String[] fields = {
+		"ID", "titel", "kuerzel", "Gruppe", "prio", "RefMann", "RefFrauOrTx", "Typ", "Einheit"
+	};
+	
 	private float[] refBounds = new float[4];
-
+	
 	@Override
-	public String[] getFields() {
+	public String[] getFields(){
 		return fields;
 	}
 	
 	public float[] getRefRange(){
 		return refBounds;
 	}
-
-	public Item(ResultSet res) {
+	
+	public Item(ResultSet res){
 		load(res);
-		if (get("typ").equals(LabItem.typ.NUMERIC.toString())) {
+		if (get("typ").equals("1")) {
 			makeBounds(get("refMann"), LOWER_BOUND_MALE);
 			makeBounds(get("refFrauOrTx"), LOWER_BOUND_FEMALE);
 		}
 	}
-
-	public Item(String id) {
+	
+	public Item(String id){
 		for (String field : fields) {
 			props.put(field.toLowerCase(), "?");
 		}
 	}
-
-	private void makeBounds(String val, int index) {
+	
+	private void makeBounds(String val, int index){
 		if (!StringTool.isNothing(val)) {
 			String chopped = val.replaceAll("\\s", "");
 			if (chopped.startsWith("<")) {
@@ -78,19 +78,16 @@ public class Item extends SimpleObject implements Comparable<Item> {
 			}
 		}
 	}
-
 	
-
 	/**
-	 * Ask whether a (stringified) value is pathologic for the Item in this
-	 * bucket
+	 * Ask whether a (stringified) value is pathologic for the Item in this bucket
 	 * 
 	 * @param value
 	 *            the value to check
-	 * @return true if the value is pathologic (with respect to the norm range
-	 *         of the Item and the gender of the Patient)
+	 * @return true if the value is pathologic (with respect to the norm range of the Item and the
+	 *         gender of the Patient)
 	 */
-	public boolean isPathologic(Patient pat, String value) {
+	public boolean isPathologic(Patient pat, String value){
 		if (value == null) {
 			return false;
 		}
@@ -113,25 +110,25 @@ public class Item extends SimpleObject implements Comparable<Item> {
 			return false;
 		}
 	}
-
+	
 	@Override
-	public int compareTo(Item o) {
+	public int compareTo(Item o){
 		int gcomp = compare(o, "gruppe");
 		return gcomp == 0 ? compare(o, "prio") : gcomp;
 	}
-
+	
 	public boolean isEqual(Item o){
-		String u=get("einheit");
-		String ou=o.get("einheit");
-		if(u==null && ou!=null){
-				return false;
-		}
-		if(u!=null && ou== null){
+		String u = get("einheit");
+		String ou = o.get("einheit");
+		if (u == null && ou != null) {
 			return false;
 		}
-		if(o==null || o.equals(ou)){
-			for(int i=0;i<refBounds.length;i++){
-				if(refBounds[i]!=o.refBounds[i]){
+		if (u != null && ou == null) {
+			return false;
+		}
+		if (o == null || o.equals(ou)) {
+			for (int i = 0; i < refBounds.length; i++) {
+				if (refBounds[i] != o.refBounds[i]) {
 					return false;
 				}
 			}
@@ -139,6 +136,5 @@ public class Item extends SimpleObject implements Comparable<Item> {
 		}
 		return false;
 	}
-	
 	
 }
