@@ -21,16 +21,17 @@
 
    <requires>
       <import plugin="org.eclipse.core.runtime" version="3.8.0" match="greaterOrEqual"/>
-      <import plugin="ch.elexis.core" version="3.2.0" match="greaterOrEqual"/>
-      <import plugin="ch.rgw.utility" version="3.2.0" match="greaterOrEqual"/>
-      <import plugin="ch.elexis.core.data" version="3.2.0" match="greaterOrEqual"/>
-      <import plugin="ch.elexis.core.ui" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui" version="3.8.2" match="greaterOrEqual"/>
-      <import plugin="ch.elexis.core.ui.icons" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="ch.elexis.omnivore" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="io.vertx.core" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="org.slf4j.api"/>
       <import plugin="ch.elexis.ungrad.docmgr-lucinda" version="1.0.4" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.core" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="ch.rgw.utility" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.core.data" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.core.ui" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.core.ui.icons" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="com.fasterxml.jackson.core.jackson-core" version="2.7.4" match="greaterOrEqual"/>
    </requires>
 
    <plugin
