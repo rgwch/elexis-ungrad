@@ -59,7 +59,7 @@ public class LucindaLabelProvider extends TableLabelProvider {
 	 * @return
 	 */
 	public TimeTool getDate(JsonObject jo) {
-		TimeTool tt = try_date(jo.getString("creation-date")); //$NON-NLS-1$
+		TimeTool tt = try_date(jo.getString("last-modified")); //$NON-NLS-1$
 		if (tt == null) {
 			tt = try_date(jo.getString("meta:creation-date")); //$NON-NLS-1$
 		}
@@ -76,7 +76,7 @@ public class LucindaLabelProvider extends TableLabelProvider {
 			tt = try_date(jo.getString("last-save-date")); //$NON-NLS-1$
 		}
 		if (tt == null) {
-			tt = try_date(jo.getString("last-modified")); //$NON-NLS-1$
+			tt = try_date(jo.getString("creation-date")); //$NON-NLS-1$
 		}
 		if (tt == null) {
 			tt = try_date(jo.getString("parseDate")); //$NON-NLS-1$
