@@ -47,6 +47,7 @@ import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.LabItem;
+import ch.elexis.data.LabMapping;
 import ch.elexis.data.LabResult;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Query;
@@ -232,6 +233,7 @@ public class FullViewController implements IObserver {
 						log.debug("converting " + lr.getLabel());
 						lr.set(LabResult.ITEM_ID, targetLI.getId());
 					}
+					
 					li.delete();
 				}
 			}
