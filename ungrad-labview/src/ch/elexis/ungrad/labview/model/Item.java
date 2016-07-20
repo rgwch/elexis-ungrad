@@ -46,7 +46,7 @@ public class Item extends SimpleObject implements Comparable<Item> {
 	
 	public Item(ResultSet res){
 		load(res);
-		if (get("typ").equals("1")) {
+		if (get("typ").equals("0")) {
 			makeBounds(get("refMann"), LOWER_BOUND_MALE);
 			makeBounds(get("refFrauOrTx"), LOWER_BOUND_FEMALE);
 		}

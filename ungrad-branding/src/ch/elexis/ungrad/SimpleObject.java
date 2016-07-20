@@ -10,14 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import ch.rgw.tools.StringTool;
 
-
 public abstract class SimpleObject {
 	public abstract String[] getFields();
-
+	
 	protected Map<String, String> props = new HashMap<>();
-	protected  Logger log = LoggerFactory.getLogger(getClass().getName());
-
-	protected void load(ResultSet res) {
+	protected Logger log = LoggerFactory.getLogger(getClass().getName());
+	
+	protected void load(ResultSet res){
 		for (String field : getFields()) {
 			try {
 				props.put(field.toLowerCase(), res.getString(field));
@@ -25,10 +24,18 @@ public abstract class SimpleObject {
 				log.error("Illegal field name " + field);
 			}
 		}
-
+		
 	}
-
-	public String get(String field) {
+	
+	public String dump(){
+		StringBuilder sb=new StringBuilder();
+		for(String field:getFields()){
+			sb.append(field).append(":").append(get(field)).append(",");
+		}
+		return sb.substring(0, sb.length()-1);
+	}
+	
+	public String get(String field){
 		for (String f : getFields()) {
 			if (f.equalsIgnoreCase(field)) {
 				return props.get(field.toLowerCase());
@@ -36,12 +43,12 @@ public abstract class SimpleObject {
 		}
 		throw new Error("Internal error: Bad field requested " + field);
 	}
-
-	public void set(String field, String value) {
+	
+	public void set(String field, String value){
 		props.put(field.toLowerCase(), value);
 	}
-
-	protected int compare(SimpleObject other, String field) {
+	
+	protected int compare(SimpleObject other, String field){
 		if (get(field) == null) {
 			if (other.get(field) == null) {
 				return 0;
@@ -64,10 +71,10 @@ public abstract class SimpleObject {
 			}
 		}
 	}
-
+	
 	/**
-	 * Make a positive float from a string. We don't use just
-	 * Float.parseFloat(), because we want to handle:
+	 * Make a positive float from a string. We don't use just Float.parseFloat(), because we want to
+	 * handle:
 	 * <ul>
 	 * <li>, or . as dezimal separator</li>
 	 * <li>leading &lt; or &gt; symbols</li>
@@ -76,10 +83,9 @@ public abstract class SimpleObject {
 	 * 
 	 * @param s
 	 *            the String to parse
-	 * @return the float (which is 0.0 or higher) or -1f if the String could not
-	 *         be parsed
+	 * @return the float (which is 0.0 or higher) or -1f if the String could not be parsed
 	 */
-	public static float makeFloat(String raw) {
+	public static float makeFloat(String raw){
 		String s = raw.replaceAll("[\\s]", "");
 		if (s.startsWith("<")) {
 			return makeFloatInternal(s.substring(1));
@@ -89,28 +95,37 @@ public abstract class SimpleObject {
 			return makeFloatInternal(s);
 		}
 	}
-
-	private static float makeFloatInternal(String s) {
-		String[] splitted = s.split("[\\.,]");
-		if (splitted[0].matches("\\s*[0-9]+\\s*")) {
-			String einer = splitted[0].trim();
-			String frac = "0";
-			if (splitted.length > 2) {
-				return -1.0f;
-			}
-			if (splitted.length == 2) {
-				if (splitted[1].matches("\\s*[0-9]+\\s*")) {
-					frac = splitted[1].trim();
+	
+	private static float makeFloatInternal(String s){
+		if (s == null || s.length() == 0) {
+			return 0f;
+		} else {
+			String[] splitted = s.split("[\\.,]");
+			if (splitted.length < 1) {
+				System.out.println("Bad value: " + s);
+				return -1f;
+			} else {
+				if (splitted[0].matches("\\s*[0-9]+\\s*")) {
+					String einer = splitted[0].trim();
+					String frac = "0";
+					if (splitted.length > 2) {
+						return -1.0f;
+					}
+					if (splitted.length == 2) {
+						if (splitted[1].matches("\\s*[0-9]+\\s*")) {
+							frac = splitted[1].trim();
+						} else {
+							return -1.0f;
+						}
+					}
+					frac = StringTool.pad(StringTool.RIGHTS, '0', frac, 3);
+					float fr = ((float) Integer.parseInt(frac)) / 1000f;
+					float ret = (float) Integer.parseInt(einer) + fr;
+					return ret;
 				} else {
 					return -1.0f;
 				}
 			}
-			frac = StringTool.pad(StringTool.RIGHTS, '0', frac, 3);
-			float fr = ((float) Integer.parseInt(frac)) / 1000f;
-			float ret = (float) Integer.parseInt(einer) + fr;
-			return ret;
-		} else {
-			return -1.0f;
 		}
 	}
 }

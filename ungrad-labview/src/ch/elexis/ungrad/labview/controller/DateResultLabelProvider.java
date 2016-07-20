@@ -57,6 +57,8 @@ public class DateResultLabelProvider extends StyledCellLabelProvider {
 				display = "";
 			}
 			if (controller.getLRS().isPathologic(item, result)) {
+				// System.out.println(item.dump());
+				// System.out.println(result.dump());
 				StyleRange sr = new StyleRange(0, display.length(), red, cell.getBackground());
 				cell.setStyleRanges(new StyleRange[] { sr });
 			}
