@@ -261,15 +261,6 @@ public class LabResultsSheet {
 					groups.put(item.get("gruppe"), itemsInGroup);
 					allItemsByID.put(item.get("id"), item);
 				}
-				/*
-				List<Item> allItems = new LinkedList<Item>();
-				for (List<Item> set : groups.values()) {
-					for (Item item : set) {
-						allItems.add(item);
-					}
-				}
-				itemArray = allItems.toArray(new Item[0]);
-				*/
 				
 			} catch (SQLException ex) {
 				throw new ElexisException("can't fetch Lab Items", ex);
