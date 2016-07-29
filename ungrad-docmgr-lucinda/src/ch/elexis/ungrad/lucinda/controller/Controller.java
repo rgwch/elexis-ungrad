@@ -269,23 +269,32 @@ public class Controller implements IProgressController {
 	 */
 
 	public void launchViewerForDocument(byte[] cnt, String ext) {
-		try {
-			File temp = File.createTempFile("_lucinda_", "_." + ext); //$NON-NLS-1$ //$NON-NLS-2$
-			temp.deleteOnExit();
-			FileTool.writeFile(temp, cnt);
-			Program proggie = Program.findProgram(ext);
-			if (proggie != null) {
-				proggie.execute(temp.getAbsolutePath());
-			} else {
-				if (Program.launch(temp.getAbsolutePath()) == false) {
-					Runtime.getRuntime().exec(temp.getAbsolutePath());
-				}
-			}
+		Display.getDefault().asyncExec(new Runnable(){
 
-		} catch (Exception ex) {
-			ExHandler.handle(ex);
-			SWTHelper.showError(Messages.Controller_could_not_launch_file, ex.getMessage());
-		}
+			@Override
+			public void run(){
+				try {
+					
+					File temp = File.createTempFile("lucinda_", "." + ext); //$NON-NLS-1$ //$NON-NLS-2$
+					temp.deleteOnExit();
+					FileTool.writeFile(temp, cnt);
+					Program proggie = Program.findProgram(ext);
+					if (proggie != null) {
+						proggie.execute(temp.getAbsolutePath());
+					} else {
+						if (Program.launch(temp.getAbsolutePath()) == false) {
+							Runtime.getRuntime().exec(temp.getAbsolutePath());
+						}
+					}
+
+				} catch (Exception ex) {
+					ExHandler.handle(ex);
+					SWTHelper.showError(Messages.Controller_could_not_launch_file, ex.getMessage());
+				}		
+			}
+			
+		});
+	
 	}
 
 	/**
