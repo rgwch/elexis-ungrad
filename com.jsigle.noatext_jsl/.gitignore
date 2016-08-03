@@ -22,10 +22,9 @@ shadow*
 ###################
 *.com
 *.class
-*.dll
 *.exe
 *.o
-*.so
+
 #
 # Packages #
 ############
