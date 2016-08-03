@@ -45,7 +45,8 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	
 	public Preferences(){
 		super(GRID);
-		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
+		cfg=CoreHub.globalCfg;
+		setPreferenceStore(new SettingsPreferenceStore(cfg));
 	}
 	
 	@Override
