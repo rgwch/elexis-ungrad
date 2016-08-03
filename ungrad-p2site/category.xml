@@ -18,4 +18,5 @@
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>
+   <category-def name="ch.elexis.ungrad.financial" label="Finanzen"/>
 </site>
