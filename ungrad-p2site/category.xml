@@ -15,6 +15,9 @@
    <feature url="features/com.jsigle.noatext_jsl.feature_1.0.0.qualifier.jar" id="com.jsigle.noatext_jsl.feature" version="1.0.0.qualifier">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
+   <feature url="features/ch.berchtold.privatrechnung.feature_1.0.0.qualifier.jar" id="ch.berchtold.privatrechnung.feature" version="1.0.0.qualifier">
+      <category name="ch.elexis.ungrad.financial"/>
+   </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>
