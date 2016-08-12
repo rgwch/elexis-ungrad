@@ -383,4 +383,17 @@ public class FullViewController implements IObserver {
 			}
 		};
 	}
+
+	public void dispose(){
+		controller.getLRS().removeObserver(this);
+	}
+
+	public String getState(){
+		return "";
+	}
+
+	public void setState(String string){
+		// TODO Auto-generated method stub
+		
+	}
 }

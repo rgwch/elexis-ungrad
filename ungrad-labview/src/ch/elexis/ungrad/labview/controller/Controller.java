@@ -72,16 +72,24 @@ public class Controller {
 
 	public void saveState() {
 		Preferences.cfg.set(Preferences.CONDVIEW, ctlCond.getState());
+		Preferences.cfg.set(Preferences.FULLVIEW, ctlFull.getState());
+		Preferences.cfg.set(Preferences.SMARTVIEW, ctlSmart.getState());
+
 	}
 
 	public void loadState() {
 		String colWidths = Preferences.cfg.get(Preferences.CONDVIEW, "150,150,100,130,130,130");
 		ctlCond.setState(colWidths);
+		ctlFull.setState(Preferences.cfg.get(Preferences.FULLVIEW, ""));
+		ctlSmart.setState(Preferences.cfg.get(Preferences.SMARTVIEW,""));
 
 	}
 
 	public void dispose() {
+		saveState();
 		ctlCond.dispose();
+		ctlFull.dispose();
+		ctlSmart.dispose();
 	}
 
 	public void setPatient(Patient pat) throws ElexisException {

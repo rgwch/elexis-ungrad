@@ -91,7 +91,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 		makeActions();
 		contributeToActionBars();
 		GlobalEventDispatcher.addActivationListener(this, this);
-		
+		controller.loadState();
 	}
 	
 		

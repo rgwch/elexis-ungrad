@@ -23,6 +23,7 @@ public class Preferences {
 	// public static final String COLWIDTHS = BASE + "colwidths";
 	public static final String CONDVIEW = BASE + "condView";
 	public static final String FULLVIEW = BASE + "fullView";
+	public static final String SMARTVIEW = BASE + "smartView";
 	public static final String TEMPLATE = BASE + "template";
 	public static final String EXCLUDE = BASE + "exclusions";
 	
