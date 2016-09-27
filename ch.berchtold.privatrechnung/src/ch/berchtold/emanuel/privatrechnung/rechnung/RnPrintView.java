@@ -126,10 +126,10 @@ public class RnPrintView extends ViewPart {
 				BerchtoldPrivatrechnungTextTemplateRequirement.getESRTemplate(), Brief.RECHNUNG,
 				adressat, rn.getNr());
 			fillFields();
-			ESR esr = new ESR(CoreHub.localCfg.get(PreferenceConstants.esrIdentity + "/" + id, ""),
-				CoreHub.localCfg.get(PreferenceConstants.esrUser + "/" + id, ""), rn.getRnId(), 27);
+			ESR esr = new ESR(CoreHub.mandantCfg.get(PreferenceConstants.esrIdentity + "/" + id, ""),
+				CoreHub.mandantCfg.get(PreferenceConstants.esrUser + "/" + id, ""), rn.getRnId(), 27);
 			Kontakt bank =
-				Kontakt.load(CoreHub.localCfg.get(PreferenceConstants.cfgBank + "/" + id, ""));
+				Kontakt.load(CoreHub.mandantCfg.get(PreferenceConstants.cfgBank + "/" + id, ""));
 			if (!bank.isValid()) {
 				SWTHelper.showError("Keine Bank",
 					"Bitte geben Sie eine Bank für die Zahlungen ein");
@@ -152,13 +152,13 @@ public class RnPrintView extends ViewPart {
 			pos = tc.getPlugin().insertText(pos,
 				"_____________________________________\nSumme\t\t\t" + sum.getAmountAsString(),
 				SWT.LEFT);
-			tc.getPlugin().print(CoreHub.localCfg.get("Drucker/A4ESR/Name", null), null, false);
+			tc.getPlugin().print(CoreHub.mandantCfg.get("Drucker/A4ESR/Name", null), null, false);
 		}
 		if (props.get("Detail").equals(Boolean.toString(true))) {
 			// Seite Detail
 			double cmAvail =
-				CoreHub.localCfg.get(PreferenceConstants.cfgTemplateBillHeight + "/" + id, 15.0);
-			String toPrinter = CoreHub.localCfg.get("Drucker/A4/Name", null);
+				CoreHub.mandantCfg.get(PreferenceConstants.cfgTemplateBillHeight + "/" + id, 15.0);
+			String toPrinter = CoreHub.mandantCfg.get("Drucker/A4/Name", null);
 			tc.createFromTemplateName(null,
 				BerchtoldPrivatrechnungTextTemplateRequirement.getBill1Template(), Brief.RECHNUNG,
 				adressat, rn.getNr());
@@ -198,7 +198,7 @@ public class RnPrintView extends ViewPart {
 						
 						insertPage(++page, adressat, rn);
 						pos = tc.getPlugin().insertText("[Leistungen]", "\n", SWT.LEFT); //$NON-NLS-1$ //$NON-NLS-2$
-						cmAvail = CoreHub.localCfg
+						cmAvail = CoreHub.mandantCfg
 							.get(PreferenceConstants.cfgTemplateBill2Height + "/" + id, 20.0);
 						
 					}

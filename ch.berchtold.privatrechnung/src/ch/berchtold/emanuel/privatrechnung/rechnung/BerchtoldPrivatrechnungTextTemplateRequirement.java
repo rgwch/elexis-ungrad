@@ -42,7 +42,7 @@ public class BerchtoldPrivatrechnungTextTemplateRequirement implements ITextTemp
 		Mandant sm = ElexisEventDispatcher.getSelectedMandator();
 		if (sm == null)
 			return StringConstants.EMPTY;
-		return CoreHub.localCfg.get(PreferenceConstants.cfgTemplateBill + "/" + sm.getId(),
+		return CoreHub.mandantCfg.get(PreferenceConstants.cfgTemplateBill + "/" + sm.getId(),
 			StringConstants.EMPTY);
 	}
 	
@@ -50,7 +50,7 @@ public class BerchtoldPrivatrechnungTextTemplateRequirement implements ITextTemp
 		Mandant sm = ElexisEventDispatcher.getSelectedMandator();
 		if (sm == null)
 			return StringConstants.EMPTY;
-		return CoreHub.localCfg.get(PreferenceConstants.cfgTemplateBill2 + "/" + sm.getId(),
+		return CoreHub.mandantCfg.get(PreferenceConstants.cfgTemplateBill2 + "/" + sm.getId(),
 			StringConstants.EMPTY);
 	}
 	
@@ -58,7 +58,7 @@ public class BerchtoldPrivatrechnungTextTemplateRequirement implements ITextTemp
 		Mandant sm = ElexisEventDispatcher.getSelectedMandator();
 		if (sm == null)
 			return StringConstants.EMPTY;
-		return CoreHub.localCfg.get(PreferenceConstants.cfgTemplateESR + "/" + sm.getId(),
+		return CoreHub.mandantCfg.get(PreferenceConstants.cfgTemplateESR + "/" + sm.getId(),
 			StringConstants.EMPTY);
 	}
 	

@@ -45,7 +45,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	
 	public Preferences(){
 		super(GRID);
-		cfg=CoreHub.localCfg;
+		cfg=CoreHub.mandantCfg;
 		setPreferenceStore(new SettingsPreferenceStore(cfg));
 	}
 	
@@ -68,7 +68,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 			"Vorlage weitere Seiten", getFieldEditorParent());
 		if2nd = new IntegerFieldEditor(PreferenceConstants.cfgTemplateBill2Height,
 			"Verfügbare Höhe Folgeseiten (cm)", getFieldEditorParent());
-		kfBank = new KontaktFieldEditor(CoreHub.localCfg, PreferenceConstants.cfgBank, "Bank",
+		kfBank = new KontaktFieldEditor(CoreHub.mandantCfg, PreferenceConstants.cfgBank, "Bank",
 			getFieldEditorParent());
 		sfESRNr = new StringFieldEditor(PreferenceConstants.esrIdentity, "ESR-Teilnehmernummer",
 			getFieldEditorParent());
@@ -155,7 +155,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		if (selected != null) {
 			flush(selected);
 		}
-		CoreHub.localCfg.flush();
+		CoreHub.mandantCfg.flush();
 		return true;
 	}
 	
