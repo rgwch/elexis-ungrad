@@ -48,6 +48,9 @@ public class Preferences {
 	public static final String KONSULTATION_NAME = Messages.Preferences_Konsultation_Name;
 	public static final String FLD_ID = "_id"; //$NON-NLS-1$
 	public static final String FLD_LUCINDA_DOCTYPE = "lucinda_doctype"; //$NON-NLS-1$
+	
+	public static final String AQUIRE_ACTION_SCRIPT=BASE+"aquire_action"; //$NON-NLS-1$
+	public static final String AQUIRE_ACTION_NAME="Aquire";
 
 	public List<String> getNetworks() {
 		ArrayList<String> ret = new ArrayList<String>();
