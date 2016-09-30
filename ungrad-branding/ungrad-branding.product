@@ -27,11 +27,10 @@
       <macosx icon="/ungrad-product/rsc/elexis-mac.icns"/>
       <solaris/>
       <win useIco="true">
-         <ico path="/ungrad-product/rsc/elexis.ico"/>
+         <ico path="/ungrad-product/rsc/icon.ico"/>
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
@@ -39,7 +38,6 @@
    <plugins>
       <plugin id="bouncycastle.bcprov-jdk14"/>
       <plugin id="ch.elexis.base.ch.diagnosecodes"/>
-      <plugin id="ch.elexis.base.ch.ticode"/>
       <plugin id="ch.elexis.core"/>
       <plugin id="ch.elexis.core.data"/>
       <plugin id="ch.elexis.core.data.tests" fragment="true"/>
@@ -50,16 +48,32 @@
       <plugin id="ch.elexis.core.ui.tests" fragment="true"/>
       <plugin id="ch.elexis.omnivore"/>
       <plugin id="ch.elexis.ungrad.docmgr-lucinda"/>
+      <plugin id="ch.elexis.ungrad.docmgr.lucinda.kons" fragment="true"/>
+      <plugin id="ch.elexis.ungrad.docmgr.lucinda.omnivore" fragment="true"/>
       <plugin id="ch.qos.logback.classic"/>
       <plugin id="ch.qos.logback.core"/>
       <plugin id="ch.qos.logback.slf4j" fragment="true"/>
       <plugin id="ch.rgw.utility"/>
       <plugin id="ch.rgw.utility.tests" fragment="true"/>
-      <plugin id="com.eclipsesource.jaxrs.consumer"/>
-      <plugin id="com.eclipsesource.jaxrs.jersey-min"/>
+      <plugin id="com.fasterxml.jackson.core.jackson-annotations"/>
+      <plugin id="com.fasterxml.jackson.core.jackson-core"/>
+      <plugin id="com.fasterxml.jackson.core.jackson-databind"/>
       <plugin id="com.google.guava"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="com.mysql.jdbc"/>
+      <plugin id="io.netty.buffer"/>
+      <plugin id="io.netty.codec"/>
+      <plugin id="io.netty.codec-dns"/>
+      <plugin id="io.netty.codec-http"/>
+      <plugin id="io.netty.codec-http2"/>
+      <plugin id="io.netty.codec-socks"/>
+      <plugin id="io.netty.common"/>
+      <plugin id="io.netty.handler"/>
+      <plugin id="io.netty.handler-proxy"/>
+      <plugin id="io.netty.resolver"/>
+      <plugin id="io.netty.resolver-dns"/>
+      <plugin id="io.netty.transport"/>
+      <plugin id="io.vertx.core"/>
       <plugin id="org.apache.commons.codec"/>
       <plugin id="org.apache.commons.dbcp"/>
       <plugin id="org.apache.commons.lang"/>
@@ -71,7 +85,21 @@
       <plugin id="org.eclipse.core.databinding.observable"/>
       <plugin id="org.eclipse.core.databinding.property"/>
       <plugin id="org.eclipse.core.expressions"/>
+      <plugin id="org.eclipse.core.filesystem"/>
+      <plugin id="org.eclipse.core.filesystem.aix.ppc" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.aix.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.hpux.ia64_32" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.ppc" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.solaris.sparc" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.jobs"/>
+      <plugin id="org.eclipse.core.resources"/>
+      <plugin id="org.eclipse.core.resources.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
       <plugin id="org.eclipse.emf.common"/>
@@ -107,6 +135,7 @@
       <plugin id="org.eclipse.ui.cocoa" fragment="true"/>
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.workbench"/>
+      <plugin id="org.eclipse.ui.workbench.compatibility" fragment="true"/>
       <plugin id="org.h2"/>
       <plugin id="org.hamcrest.core"/>
       <plugin id="org.jdom"/>
