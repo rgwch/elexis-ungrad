@@ -27,6 +27,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.swt.widgets.Composite;
@@ -119,6 +120,9 @@ public class GlobalView extends ViewPart implements IActivationListener {
 				menu.add(menuAction);
 			}
 		}
+		toolbar.add(new Separator());
+		toolbar.add(aquireAction);
+		
 	}
 	
 	private void makeActions(){

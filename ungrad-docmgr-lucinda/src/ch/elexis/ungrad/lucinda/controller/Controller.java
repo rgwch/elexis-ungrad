@@ -310,10 +310,10 @@ public class Controller implements IProgressController {
 				StringBuilder sbConcern = new StringBuilder();
 				String bdatec = bdate.toString(TimeTool.DATE_COMPACT);
 				sbConcern.append(name).append("_").append(fname).append("_")
-					.append(bdatec.substring(6, 7)).append(".").append(bdatec.substring(4, 5))
-					.append(".").append(bdatec.substring(0, 3));
+					.append(bdatec.substring(6, 8)).append(".").append(bdatec.substring(4, 6))
+					.append(".").append(bdatec.substring(0, 4));
 				Runtime.getRuntime().exec(new String[] {
-					Preferences.AQUIRE_ACTION_SCRIPT, sbConcern.toString(), title
+					Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT,""), sbConcern.toString(), title
 				});
 			}
 			
