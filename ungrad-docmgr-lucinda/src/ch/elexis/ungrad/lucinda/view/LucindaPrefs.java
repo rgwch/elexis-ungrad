@@ -16,13 +16,13 @@ package ch.elexis.ungrad.lucinda.view;
 
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
-import ch.elexis.core.ui.preferences.inputs.FileSelectorField;
 import ch.elexis.core.ui.preferences.inputs.MultilineFieldEditor;
 import ch.elexis.ungrad.lucinda.Preferences;
 
@@ -45,6 +45,8 @@ public class LucindaPrefs extends FieldEditorPreferencePage implements IWorkbenc
 		addField(new StringFieldEditor(Preferences.SERVER_ADDR, Messages.LucindaPrefs_serverAddress,
 			getFieldEditorParent()));
 		addField(new StringFieldEditor(Preferences.SERVER_PORT, Messages.LucindaPrefs_serverPort,
+			getFieldEditorParent()));
+		addField(new IntegerFieldEditor(Preferences.MAXIMUM_HITS, "maximum hit count",
 			getFieldEditorParent()));
 		addField(new FileFieldEditor(Preferences.AQUIRE_ACTION_SCRIPT, "Aquire script",
 			getFieldEditorParent()));

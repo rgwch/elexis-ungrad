@@ -2,7 +2,7 @@
 <feature
       id="com.jsigle.noatext_jsl.feature"
       label="Jsigle NOAText"
-      version="1.0.0.qualifier"
+      version="3.1.0.qualifier"
       provider-name="J. Sigle">
 
    <description url="http://www.example.com/description">

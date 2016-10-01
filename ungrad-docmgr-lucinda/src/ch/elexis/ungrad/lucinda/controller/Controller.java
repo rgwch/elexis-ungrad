@@ -125,6 +125,7 @@ public class Controller implements IProgressController {
 				
 			}
 		});
+		changePatient(ElexisEventDispatcher.getSelectedPatient());
 		return view;
 	}
 	
@@ -226,7 +227,6 @@ public class Controller implements IProgressController {
 		if (doctype.equalsIgnoreCase(Preferences.INBOX_NAME)) {
 			lucinda.get(doc.getString(Preferences.FLD_ID), result -> {
 				if (result.getString("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
-					@SuppressWarnings("unused")
 					byte[] contents = (byte[]) result.getBinary("result"); //$NON-NLS-1$
 					String ext = FileTool.getExtension(doc.getString("url")); //$NON-NLS-1$
 					launchViewerForDocument(contents, ext);
@@ -313,7 +313,8 @@ public class Controller implements IProgressController {
 					.append(bdatec.substring(6, 8)).append(".").append(bdatec.substring(4, 6))
 					.append(".").append(bdatec.substring(0, 4));
 				Runtime.getRuntime().exec(new String[] {
-					Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT,""), sbConcern.toString(), title
+					Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT, ""), sbConcern.toString(),
+					title
 				});
 			}
 			

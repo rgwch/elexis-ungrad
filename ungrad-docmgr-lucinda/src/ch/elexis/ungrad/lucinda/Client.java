@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+idea * Copyright (c) 2016 by G. Weirich
  * <p/>
  * <p/>
  * All rights reserved. This program and the accompanying materials

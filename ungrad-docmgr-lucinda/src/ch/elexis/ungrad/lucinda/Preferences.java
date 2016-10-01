@@ -36,6 +36,7 @@ public class Preferences {
 	public static final String SERVER_ADDR = BASE + "serverAddr"; //$NON-NLS-1$
 	public static final String SERVER_PORT = BASE + "serverPort"; //$NON-NLS-1$
 	public static final String RESTRICT_CURRENT = BASE + "restrictToCurrentPatient"; //$NON-NLS-1$
+	public static final String MAXIMUM_HITS=BASE+"maximumHitNumber"; //$NON-NLS-1$
 	public static final String SHOW_INBOX = BASE + "showInbox"; //$NON-NLS-1$
 	public static final String SHOW_OMNIVORE = BASE + "showOmnivore"; //$NON-NLS-1$
 	public static final String SHOW_CONS = BASE + "showConsultation"; //$NON-NLS-1$
@@ -52,6 +53,7 @@ public class Preferences {
 	public static final String AQUIRE_ACTION_SCRIPT=BASE+"aquire_action"; //$NON-NLS-1$
 	public static final String AQUIRE_ACTION_NAME="Aquire";
 
+	 
 	public List<String> getNetworks() {
 		ArrayList<String> ret = new ArrayList<String>();
 		for (String ip : NetTool.IPs) {
