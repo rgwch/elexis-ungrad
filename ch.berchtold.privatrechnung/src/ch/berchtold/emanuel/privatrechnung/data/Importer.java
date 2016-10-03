@@ -13,6 +13,8 @@
 package ch.berchtold.emanuel.privatrechnung.data;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
 
@@ -128,18 +130,23 @@ public class Importer extends ImporterPage {
 	
 	private Result<String> importExcel(final String file, final IProgressMonitor mon){
 		ExcelWrapper xl = new ExcelWrapper();
-		if (!xl.load(file, 0)) {
-			return new Result<String>(Result.SEVERITY.ERROR, 1, "Bad file format", file, true);
+		try {
+			if (!xl.load(new FileInputStream(file), 0)) {
+				return new Result<String>(Result.SEVERITY.ERROR, 1, "Bad file format", file, true);
+			}
+			xl.setFieldTypes(new Class[] {
+				String.class, String.class, String.class, Integer.class, Integer.class, Integer.class,
+				TimeTool.class, TimeTool.class, Double.class
+			});
+			for (int i = xl.getFirstRow(); i <= xl.getLastRow(); i++) {
+				List<String> row = xl.getRow(i);
+				importLine(row.toArray(new String[0]));
+			}
+			return new Result<String>("OK");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return new Result<String>("File not found "+file);
 		}
-		xl.setFieldTypes(new Class[] {
-			String.class, String.class, String.class, Integer.class, Integer.class, Integer.class,
-			TimeTool.class, TimeTool.class, Double.class
-		});
-		for (int i = xl.getFirstRow(); i <= xl.getLastRow(); i++) {
-			List<String> row = xl.getRow(i);
-			importLine(row.toArray(new String[0]));
-		}
-		return new Result<String>("OK");
 	}
 	
 	private Result<String> importCSV(final String file, final IProgressMonitor mon){
