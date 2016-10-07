@@ -15,7 +15,6 @@ package ch.elexis.ungrad.labview.model;
 
 import java.sql.ResultSet;
 
-import ch.elexis.core.ui.util.Log;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.SimpleObject;
 import ch.rgw.tools.StringTool;
@@ -27,7 +26,7 @@ public class Item extends SimpleObject implements Comparable<Item> {
 	static final int LOWER_BOUND_FEMALE = 2;
 	static final int UPPER_BOUND_FEMALE = 3;
 	
-	Log log = Log.get(getClass().getName());
+	//Log log = Log.get(getClass().getName());
 	
 	private static final String[] fields = {
 		"ID", "titel", "kuerzel", "Gruppe", "prio", "RefMann", "RefFrauOrTx", "Typ", "Einheit"
@@ -46,8 +45,8 @@ public class Item extends SimpleObject implements Comparable<Item> {
 	
 	public Item(ResultSet res){
 		load(res);
-		if(get("typ")==null){
-			set("typ","NULL");
+		if (get("typ") == null) {
+			set("typ", "NULL");
 		}
 		if (get("typ").equals("0")) {
 			makeBounds(get("refMann"), LOWER_BOUND_MALE);

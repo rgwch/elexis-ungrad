@@ -17,7 +17,7 @@ public abstract class SimpleObject {
 	protected Logger log = LoggerFactory.getLogger(getClass().getName());
 	
 	protected void load(ResultSet res){
-		Util.require(res!=null, "ResultSet must not be null");
+		Util.require(res != null, "ResultSet must not be null");
 		for (String field : getFields()) {
 			try {
 				props.put(field.toLowerCase(), res.getString(field));
@@ -29,27 +29,28 @@ public abstract class SimpleObject {
 	}
 	
 	public String dump(){
-		StringBuilder sb=new StringBuilder();
-		for(String field:getFields()){
+		StringBuilder sb = new StringBuilder();
+		for (String field : getFields()) {
 			sb.append(field).append(":").append(get(field)).append(",");
 		}
-		return sb.substring(0, sb.length()-1);
+		return sb.substring(0, sb.length() - 1);
 	}
 	
 	public String get(String field){
-		Util.require(field!=null, "field name must not be null");
+		Util.require(field != null, "field name must not be null");
 		for (String f : getFields()) {
 			if (f.equalsIgnoreCase(field)) {
-				String res= props.get(field.toLowerCase());
-				return res==null ? "" : res;
+				String res = props.get(field.toLowerCase());
+				return res == null ? "" : res;
 			}
 		}
 		throw new Error("Internal error: Bad field requested " + field);
 	}
 	
+	@SuppressWarnings("null")
 	public void set(String field, String value){
-		Util.require(field!=null, "field name must not be null");
-		Util.require(value!=null, "value must not be null");
+		Util.require(field != null, "field name must not be null");
+		Util.require(value != null, "value must not be null");
 		props.put(field.toLowerCase(), value);
 	}
 	
@@ -91,7 +92,7 @@ public abstract class SimpleObject {
 	 * @return the float (which is 0.0 or higher) or -1f if the String could not be parsed
 	 */
 	public static float makeFloat(String raw){
-		Util.require(raw!=null, "Raw must not be null");
+		Util.require(raw != null, "Raw must not be null");
 		String s = raw.replaceAll("[\\s]", "");
 		if (s.startsWith("<")) {
 			return makeFloatInternal(s.substring(1));

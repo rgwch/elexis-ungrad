@@ -15,11 +15,9 @@
 package ch.elexis.ungrad.labview.controller.smart;
 
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +86,7 @@ public class SmartViewController implements IObserver {
 		for (int w : stc.widths) {
 			ret.append(Integer.toString(w)).append(",");
 		}
-		return ret.substring(0,ret.length() - 1);
+		return ret.substring(0, ret.length() - 1);
 	}
 	
 	public void setState(String parms){

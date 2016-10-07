@@ -42,7 +42,7 @@ import ch.rgw.tools.TimeTool;
  * it keeps LabItems cached and collects data for the selected patient in a single database call.
  * 
  * @author gerry
- * 		
+ * 
  */
 public class LabResultsSheet {
 	Log log = Log.get("LabResultSheet");

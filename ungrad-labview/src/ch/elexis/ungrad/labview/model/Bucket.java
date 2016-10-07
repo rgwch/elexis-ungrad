@@ -23,7 +23,7 @@ import ch.elexis.ungrad.Util;
  * decide, whether a result is pathologic, and it can perform some statistics.
  * 
  * @author gerry
- * 		
+ * 
  */
 public class Bucket {
 	

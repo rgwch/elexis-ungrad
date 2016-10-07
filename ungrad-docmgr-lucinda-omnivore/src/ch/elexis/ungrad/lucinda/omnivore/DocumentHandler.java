@@ -1,3 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2016 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad.lucinda.omnivore;
 
 import static ch.elexis.ungrad.lucinda.Preferences.INCLUDE_OMNI;
@@ -17,10 +31,14 @@ import ch.elexis.ungrad.lucinda.IDocumentHandler;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.Controller;
 import ch.elexis.ungrad.lucinda.view.Messages;
-
+/**
+ * A DocumentHandler for Omnivore Documents
+ * @author gerry
+ *
+ */
 public class DocumentHandler implements IDocumentHandler {
 	
-	private OmnivoreIndexer indexer = new OmnivoreIndexer();
+	final private OmnivoreIndexer indexer = new OmnivoreIndexer();
 	private ImageDescriptor icon;
 	
 	public DocumentHandler(){

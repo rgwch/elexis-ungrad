@@ -1,15 +1,14 @@
 /*******************************************************************************
-idea * Copyright (c) 2016 by G. Weirich
- * <p/>
- * <p/>
+ * Copyright (c) 2016 by G. Weirich
+ * 
+ * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * <p/>
- * <p/>
+ * 
  * Contributors:
- * G. Weirich - initial implementation
+ * 		G. Weirich - initial implementation
  ******************************************************************************/
 
 package ch.elexis.ungrad.lucinda;
@@ -35,8 +34,8 @@ public class Client {
 	private Logger log = Logger.getLogger("Lucinda Client");
 	private HttpClient http;
 	private VertxOptions vertxOptions = new VertxOptions().setMaxEventLoopExecuteTime(10000000000L)
-			.setBlockedThreadCheckInterval(3000);
-
+		.setBlockedThreadCheckInterval(3000);
+	
 	/**
 	 * Connect to a Lucinda Server (REST only. Server address provided)
 	 *
@@ -47,9 +46,10 @@ public class Client {
 	 * @param handler
 	 *            The handler to call for lucinda related messages
 	 */
-	public void connect(final String server_ip, final int port, final Handler handler) {
+	public void connect(final String server_ip, final int port, final Handler handler){
 		vertx = Vertx.vertx(vertxOptions);
-		HttpClientOptions hop = new HttpClientOptions().setDefaultHost(server_ip).setDefaultPort(port)
+		HttpClientOptions hop =
+			new HttpClientOptions().setDefaultHost(server_ip).setDefaultPort(port)
 				.setTryUseCompression(true).setKeepAlive(false).setIdleTimeout(300);
 		http = vertx.createHttpClient(hop);
 		HttpClientRequest htr = http.request(HttpMethod.GET, api + "ping", response -> {
@@ -66,7 +66,7 @@ public class Client {
 		});
 		htr.end();
 	}
-
+	
 	/**
 	 * Search the index
 	 *
@@ -74,7 +74,7 @@ public class Client {
 	 *            What to search
 	 * @param handler
 	 */
-	public void query(final String queryPhrase, final Handler handler) {
+	public void query(final String queryPhrase, final Handler handler){
 		http.post(api + "query", response -> {
 			if (response.statusCode() == 200) {
 				response.bodyHandler(buffer -> {
@@ -82,15 +82,15 @@ public class Client {
 					handler.signal(result);
 				});
 			} else if (response.statusCode() == 204) { // Empty result
-				JsonObject result = make("status:ok").put("result", new ArrayList<Object>());
+				JsonObject result = make("status:ok").put("result", new ArrayList<>());
 				handler.signal(result);
 			} else {
 				handler.signal(make("status:error", "message:" + response.statusMessage()));
 			}
 		}).end(queryPhrase);
-
+		
 	}
-
+	
 	/**
 	 * retrieve a document from its id
 	 *
@@ -98,7 +98,7 @@ public class Client {
 	 *            uinique id of the document
 	 * @param handler
 	 */
-	public void get(final String id, final Handler handler) {
+	public void get(final String id, final Handler handler){
 		http.getNow(api + "get/" + id, response -> {
 			if (response.statusCode() == 200) {
 				response.bodyHandler(buffer -> {
@@ -112,81 +112,77 @@ public class Client {
 			}
 		});
 	}
-
+	
 	/**
-	 * Add a document to the index. Note: The document itself will not be
-	 * stored, only parsed and added to the index. The caller must handle it by
-	 * itself and make sure, that it can retrieve the document with the given id
+	 * Add a document to the index. Note: The document itself will not be stored, only parsed and
+	 * added to the index. The caller must handle it by itself and make sure, that it can retrieve
+	 * the document with the given id
 	 *
 	 * @param id
-	 *            unique id for the document. The caller should be able to
-	 *            retrieve or reconstruct the document later with this id
+	 *            unique id for the document. The caller should be able to retrieve or reconstruct
+	 *            the document later with this id
 	 * @param title
 	 *            A title for the document.
 	 * @param doctype
-	 *            a random document type (this is not the mime-type but rather
-	 *            some application dependent organizational attribute)
+	 *            a random document type (this is not the mime-type but rather some application
+	 *            dependent organizational attribute)
 	 * @param metadata
-	 *            application defined metadata. These are stored with the index
-	 *            and can be queried for. Example: If there is an attribute
-	 *            "author: john doe", a later query can search for "author:
-	 *            john*"
+	 *            application defined metadata. These are stored with the index and can be queried
+	 *            for. Example: If there is an attribute "author: john doe", a later query can
+	 *            search for "author: john*"
 	 * @param contents
-	 *            The file contents parse. Many file types are supported and
-	 *            recognized by content (not by file extension), such as .odt,
-	 *            .doc, .pdf, tif. Image files are parsed through OCR and any
-	 *            found text is indexed
+	 *            The file contents parse. Many file types are supported and recognized by content
+	 *            (not by file extension), such as .odt, .doc, .pdf, tif. Image files are parsed
+	 *            through OCR and any found text is indexed
 	 * @param handler
 	 *            Handler to call after indexing
 	 */
-	public void addToIndex(final String id, final String title, final String doctype, JsonObject metadata,
-			final byte[] contents, final Handler handler) {
-
+	public void addToIndex(final String id, final String title, final String doctype,
+		JsonObject metadata, final byte[] contents, final Handler handler){
+		
 		try {
 			JsonObject envelope = prepare(id, title, doctype, metadata, contents);
 			http.post(api + "index", response -> {
 				response.bodyHandler(buffer -> {
 					JsonObject answer = buffer.toJsonObject();
 					handler.signal(answer);
-
+					
 				});
 			}).end(envelope.encode());
-
+			
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			handler.signal(make("status:error", "message:" + ex.getMessage()));
 		}
-
+		
 	}
-
+	
 	/**
 	 * Add a file to the Lucinda store and index.
 	 *
 	 * @param filename
 	 *            Name for the file to write (no path, only filename)
 	 * @param concern
-	 *            some grouping hint for the file (e.g. name of the group). The
-	 *            file will be stored in a subdirectory of that name. if concern
-	 *            is null, the base directory for imports is used.
+	 *            some grouping hint for the file (e.g. name of the group). The file will be stored
+	 *            in a subdirectory of that name. if concern is null, the base directory for imports
+	 *            is used.
 	 * @param doctype
-	 *            a random document type (this is not the mime-type but rather
-	 *            some application dependent organizational attribute)
+	 *            a random document type (this is not the mime-type but rather some application
+	 *            dependent organizational attribute)
 	 * @param metadata
-	 *            application defined metadata. These are stored with the index
-	 *            and can be queried for. Example: If there is an attribute
-	 *            "author: john doe", a later query can search for "author:
-	 *            john*"
+	 *            application defined metadata. These are stored with the index and can be queried
+	 *            for. Example: If there is an attribute "author: john doe", a later query can
+	 *            search for "author: john*"
 	 * @param contents
-	 *            The file contents parse. Many file types are supported and
-	 *            recognized by content (not by file extension), such as .odt,
-	 *            .doc, .pdf, tif. Image files are parsed through OCR and any
-	 *            found text is indexed
+	 *            The file contents to parse. Many file types are supported and recognized by content
+	 *            (not by file extension), such as .odt, .doc, .pdf, tif. Image files are parsed
+	 *            through OCR and any found text is indexed
 	 * @param handler
 	 *            Handler to call after the import
 	 */
-	public void addFile(final String uid, final String filename, final String concern, final String doctype,
-			JsonObject metadata, final byte[] contents, final Handler handler) {
-
+	public void addFile(final String uid, final String filename, final String concern,
+		final String doctype, JsonObject metadata, final byte[] contents, final Handler handler){
+		
 		try {
 			JsonObject envelope = prepare(uid, filename, doctype, metadata, contents);
 			if (concern != null) {
@@ -198,16 +194,16 @@ public class Client {
 					handler.signal(result);
 				});
 			}).end(envelope.encode());
-
+			
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			handler.signal(make("status:error", "message:" + ex.getMessage()));
-
+			
 		}
 	}
-
-	private JsonObject prepare(final String id, final String title, final String doctype, JsonObject metadata,
-			final byte[] contents) throws IOException {
+	
+	private JsonObject prepare(final String id, final String title, final String doctype,
+		JsonObject metadata, final byte[] contents) throws IOException{
 		if (metadata == null) {
 			metadata = new JsonObject();
 		}
@@ -220,16 +216,16 @@ public class Client {
 		metadata.put("payload", contents);
 		return metadata;
 	}
-
-	public void shutDown() {
+	
+	public void shutDown(){
 		vertx.close();
 		http.close();
 	}
-
+	
 	/*
 	 * syntactic sugar to create and initialize a JsonObject with a single call
 	 */
-	private JsonObject make(String... params) {
+	private JsonObject make(String... params){
 		JsonObject ret = new JsonObject();
 		for (String param : params) {
 			String[] p = param.split(":");
@@ -237,5 +233,5 @@ public class Client {
 		}
 		return ret;
 	}
-
+	
 }

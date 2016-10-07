@@ -34,6 +34,11 @@ import ch.rgw.tools.JdbcLink;
 import ch.rgw.tools.TimeTool;
 import io.vertx.core.json.JsonObject;
 
+/**
+ * A Lucinda Indexer Customer for Omnivore Documents
+ * @author gerry
+ *
+ */
 public class OmnivoreIndexer implements Customer {
 	Logger log = LoggerFactory.getLogger(OmnivoreIndexer.class);
 	private boolean cont = false;
@@ -44,7 +49,7 @@ public class OmnivoreIndexer implements Customer {
 
 	/**
 	 * If active, the Index will run over all Consultations. If bActive==false,
-	 * Indexing will stop after the next Document.
+	 * indexing will stop after the next Document.
 	 */
 	public void setActive(boolean bActive) {
 		cont = bActive;
@@ -53,7 +58,8 @@ public class OmnivoreIndexer implements Customer {
 	/**
 	 * Start indexing. All consultations since last run are fetched from the
 	 * database. A progress indicator and a Sender are initialized
-	 * 
+	 * We use the lastupdate field to check where we ware, which is probably not accurate with older
+	 * databases where that field didn't exist yet.
 	 * @See Sender
 	 */
 
@@ -174,7 +180,7 @@ public class OmnivoreIndexer implements Customer {
 	}
 
 	/**
-	 * A Document was indexed successfully. if bMove: The document is removed
+	 * A Document was indexed successfully. if bMove: remove document from omnivore
 	 * from Omnivore.
 	 * 
 	 */

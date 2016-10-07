@@ -18,25 +18,28 @@ import java.sql.ResultSet;
 import ch.elexis.ungrad.SimpleObject;
 
 public class Result extends SimpleObject implements Comparable<Result> {
-	public static final String[] fields = { "ID","ItemID", "Datum", "Zeit", "Resultat", "Kommentar" };
-
+	public static final String[] fields = {
+		"ID", "ItemID", "Datum", "Zeit", "Resultat", "Kommentar"
+	};
+	
 	public Result(float result){
-		set("Resultat",Float.toString(result));
+		set("Resultat", Float.toString(result));
 	}
-	public Result(ResultSet res) {
+	
+	public Result(ResultSet res){
 		load(res);
 	}
-
+	
 	@Override
-	public int compareTo(Result o) {
+	public int compareTo(Result o){
 		int cdat = compare(o, "datum");
 		return cdat == 0 ? compare(o, "zeit") : cdat;
-
+		
 	}
-
+	
 	@Override
-	public String[] getFields() {
+	public String[] getFields(){
 		return fields;
 	}
-
+	
 }

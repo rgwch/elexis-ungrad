@@ -8,8 +8,8 @@ import ch.elexis.data.Person;
 public class Util {
 	static Logger log = LoggerFactory.getLogger("elexis ungrad Util");
 	static final String msg = "Requirement failed: ";
-
-	public static void require(boolean it, String desc) {
+	
+	public static void require(boolean it, String desc){
 		if (it == false) {
 			log.error(msg + desc);
 			throw new Error(msg + desc);
@@ -17,7 +17,7 @@ public class Util {
 	}
 	
 	public static final boolean isFemale(Person p){
-		if(p.getGeschlecht().equalsIgnoreCase("m")){
+		if (p.getGeschlecht().equalsIgnoreCase("m")) {
 			return false;
 		}
 		return true;

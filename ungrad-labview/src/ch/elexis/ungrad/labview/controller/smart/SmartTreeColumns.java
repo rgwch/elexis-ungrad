@@ -1,3 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2016 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad.labview.controller.smart;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -13,7 +27,7 @@ import ch.rgw.tools.TimeTool;
 
 public class SmartTreeColumns {
 	static final int DEFAULT_WIDTH = 100;
-	static final int MAX_WIDTH=300;
+	static final int MAX_WIDTH = 300;
 	int numColumns = 7;
 	TreeViewer tv;
 	TreeViewerColumn[] cols;
@@ -42,7 +56,7 @@ public class SmartTreeColumns {
 				widths = new int[cols.length];
 			}
 			
-			for (int i = 0; i < cols.length-1; i++) {
+			for (int i = 0; i < cols.length - 1; i++) {
 				widths[i] = widths[i] == 0 ? colWidth : widths[i];
 				if (cols[i] != null) {
 					TreeColumn tc = cols[i].getColumn();

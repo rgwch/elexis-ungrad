@@ -65,7 +65,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 			}
 			
 		};
-		
+	
 	@Override
 	public void createPartControl(Composite parent){
 		CTabFolder cTabFolder = new CTabFolder(parent, SWT.BOTTOM);
@@ -89,7 +89,6 @@ public class LaborView extends ViewPart implements IActivationListener {
 		controller.loadState();
 	}
 	
-		
 	private void contributeToActionBars(){
 		IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
@@ -180,20 +179,23 @@ public class LaborView extends ViewPart implements IActivationListener {
 				imp.open();
 			}
 		};
-		removeEmptyItemsAction = new RestrictedAction(AccessControlDefaults.DELETE_LABITEMS,"Aufräumen") {
-			{
-				setToolTipText("Ungebrauchte Items und Gruppen löschen");
-				Bundle bundle=FrameworkUtil.getBundle(this.getClass());
-				URL url=FileLocator.find(bundle,new Path("icons/edit-clear24.png"),null);
-				setImageDescriptor(ImageDescriptor.createFromURL(url));
-			}	
-			@Override
-			public void doRun() {
-				if(SWTHelper.askYesNo("Laboritems aufräumen", "Alle Laboritems entfernen, für die keine Resultate existieren. (Das kann sehr lange dauern)")){
-					controller.purgeLabItems();
+		removeEmptyItemsAction =
+			new RestrictedAction(AccessControlDefaults.DELETE_LABITEMS, "Aufräumen") {
+				{
+					setToolTipText("Ungebrauchte Items und Gruppen löschen");
+					Bundle bundle = FrameworkUtil.getBundle(this.getClass());
+					URL url = FileLocator.find(bundle, new Path("icons/edit-clear24.png"), null);
+					setImageDescriptor(ImageDescriptor.createFromURL(url));
 				}
 				
-			}
-		};
+				@Override
+				public void doRun(){
+					if (SWTHelper.askYesNo("Laboritems aufräumen",
+						"Alle Laboritems entfernen, für die keine Resultate existieren. (Das kann sehr lange dauern)")) {
+						controller.purgeLabItems();
+					}
+					
+				}
+			};
 	}
 }
