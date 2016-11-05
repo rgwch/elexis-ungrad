@@ -273,7 +273,11 @@ public class KassenbuchEintrag extends PersistentObject implements Comparable<Ka
 			if (s1.length < s2.length) {
 				return -1;
 			}
-			return s1[1].compareTo(s2[1]);
+			if (s1.length > 1) {
+				return s1[1].compareTo(s2[1]);
+			} else {
+				return 0;
+			}
 		}
 		return res;
 	}
