@@ -21,7 +21,6 @@ import static ch.elexis.ungrad.lucinda.Preferences.SHOW_INBOX;
 import static ch.elexis.ungrad.lucinda.Preferences.SHOW_OMNIVORE;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -46,7 +45,6 @@ import ch.elexis.ungrad.lucinda.IDocumentHandler;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.Controller;
 import ch.rgw.tools.StringTool;
-import io.vertx.core.json.JsonObject;
 
 public class GlobalView extends ViewPart implements IActivationListener {
 	
