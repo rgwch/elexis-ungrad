@@ -31,7 +31,7 @@ import ch.rgw.tools.VersionInfo;
  */
 public class KassenbuchEintrag extends PersistentObject implements Comparable<KassenbuchEintrag> {
 	private static final String TABLENAME = "CH_ELEXIS_KASSENBUCH";
-	public static final String VERSION = "1.1.0";
+	public static final String VERSION = "1.2.0";
 	public static final String CATEGORIES = "ChElexisKassenbuchKategorien";
 	public static final String CATEGORY_SEPARATOR = "##";
 	private static final String createDB = "CREATE TABLE " + TABLENAME + "("
@@ -43,7 +43,7 @@ public class KassenbuchEintrag extends PersistentObject implements Comparable<Ka
 	
 	static {
 		addMapping(TABLENAME, "Betrag=Amount", "Text=Entry", "Datum=S:D:Date", "Saldo=Total",
-			"BelegNr=Nr", "Kategorie=Category");
+			"BelegNr=Nr", "Kategorie=Category", "PaymentMode");
 		KassenbuchEintrag version = KassenbuchEintrag.load("1");
 		if (!version.exists()) {
 			createOrModifyTable(createDB);
@@ -56,6 +56,9 @@ public class KassenbuchEintrag extends PersistentObject implements Comparable<Ka
 				}
 				if (vi.isOlder("1.1.0")) {
 					createOrModifyTable("ALTER TABLE " + TABLENAME + " ADD Category VARCHAR(80);");
+				}
+				if(vi.isOlder("1.2.0")){
+					createOrModifyTable("ALTER TABLE "+TABLENAME+" ADD lastupdate BIGINT, ADD PaymentMode VARCHAR(250)");
 				}
 				version.set("Text", VERSION);
 			}

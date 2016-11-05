@@ -33,10 +33,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
@@ -54,7 +55,7 @@ import ch.rgw.tools.Money;
 import ch.rgw.tools.TimeTool;
 
 public class KassenView extends ViewPart implements IActivationListener, HeartListener {
-	ScrolledForm form;
+	Form form;
 	FormToolkit tk;
 	TableViewer tv;
 	TableColumn[] tc;
@@ -72,12 +73,13 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 	public void createPartControl(Composite parent){
 		parent.setLayout(new GridLayout());
 		tk = UiDesk.getToolkit();
-		form = tk.createScrolledForm(parent);
+		form = tk.createForm(parent);
 		Composite body = form.getBody();
 		body.setLayout(new FillLayout());
 		form.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
+		//parent.setLayout(new FillLayout());
 		tc = new TableColumn[tableHeaders.length];
-		Table table = new Table(body, SWT.SINGLE | SWT.FULL_SELECTION);
+		Table table = new Table(body, SWT.SINGLE | SWT.FULL_SELECTION | SWT.V_SCROLL);
 		for (int i = 0; i < tc.length; i++) {
 			tc[i] = new TableColumn(table, SWT.NONE);
 			tc[i].setText(tableHeaders[i]);
@@ -355,7 +357,12 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 	}
 	
 	public void heartbeat(){
-		tv.refresh();
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				tv.refresh();
+			}
+		});
 	}
 	
 }
