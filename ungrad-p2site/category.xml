@@ -18,6 +18,9 @@
    <feature url="features/com.jsigle.noatext_jsl.feature_3.1.0.qualifier.jar" id="com.jsigle.noatext_jsl.feature" version="3.1.0.qualifier">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
+   <feature url="features/ch.elexis.kassenbuch.feature_3.1.0.jar" id="ch.elexis.kassenbuch.feature" version="3.1.0">
+      <category name="ch.elexis.ungrad.financial"/>
+   </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>

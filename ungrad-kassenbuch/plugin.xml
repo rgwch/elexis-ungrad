@@ -7,10 +7,10 @@
             category="ch.elexis.buchhaltung.kategorie"
             class="ch.elexis.buchhaltung.kassenbuch.KassenView"
             icon="icons/sparschwein.ico"
-            id="ch.elexis.kassenbuch"
+            id="ch.elexis.ungrad.kassenbuch"
             name="Kassenbuch"/>
       <category
-            id="ch.elexis.buchhaltung.kategorie"
+            id="ch.elexis.ungrad.buchhaltung.kategorie"
             name="Buchhaltung"/>
    </extension>
    <extension

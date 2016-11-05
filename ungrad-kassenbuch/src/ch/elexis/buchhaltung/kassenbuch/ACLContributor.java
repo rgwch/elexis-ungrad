@@ -28,15 +28,12 @@ public class ACLContributor implements IACLContributor {
 	public static final ACE STORNO = new ACE(KB, "Storno");
 	public static final ACE VIEW = new ACE(KB, "Display");
 	
-	public String[] reject(String[] acl){
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	@Override
 	public ACE[] getACL(){
-		// TODO Auto-generated method stub
-		return null;
+		return new ACE[]{
+			KB,BOOKING,STORNO,VIEW
+		};
 	}
 	
 	@Override

@@ -20,6 +20,8 @@
     </properties>
     <packaging>pom</packaging>
     <modules>
+        <module>ungrad-kassenbuch</module>
+        <module>ungrad-kassenbuch-feature</module>
         <module>ungrad-docmgr-lucinda</module>
         <module>ungrad-docmgr-lucinda-feature</module>
         <module>ungrad-docmgr-lucinda-omnivore</module>

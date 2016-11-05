@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Kassenbuch Plugin für Ungrad
-Bundle-SymbolicName: ch.elexis.kassenbuch;singleton:=true
-Bundle-Version: 3.1.0
+Bundle-SymbolicName: ch.elexis.ungrad.kassenbuch;singleton:=true
+Bundle-Version: 3.1.0.qualifier
 Bundle-Vendor: rgw.ch
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
