@@ -22,6 +22,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -31,6 +33,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
@@ -68,16 +71,16 @@ public class Controller implements IProgressController {
 	int actValue;
 	private Lucinda lucinda;
 	private Set<String> allowed_doctypes = new TreeSet<>();
-	
-	public Controller(){
+
+	public Controller() {
 		lucinda = new Lucinda();
 		bRestrictCurrentPatient = Boolean
-			.parseBoolean(Preferences.get(Preferences.RESTRICT_CURRENT, Boolean.toString(false)));
+				.parseBoolean(Preferences.get(Preferences.RESTRICT_CURRENT, Boolean.toString(false)));
 		cnt = new ContentProvider();
 		connect();
 	}
-	
-	private void connect(){
+
+	private void connect() {
 		lucinda.connect(result -> {
 			switch (result.getString("status")) {
 			case "connected":
@@ -85,17 +88,17 @@ public class Controller implements IProgressController {
 				break;
 			}
 		});
-		
+
 	}
-	
-	public void reconnect(){
+
+	public void reconnect() {
 		clear();
 		view.setConnected(false);
 		lucinda.disconnect();
 		connect();
 	}
-	
-	public Composite createView(Composite parent){
+
+	public Composite createView(Composite parent) {
 		if (Preferences.cfg.get(Preferences.SHOW_CONS, true)) {
 			allowed_doctypes.add(Preferences.KONSULTATION_NAME);
 		}
@@ -105,48 +108,47 @@ public class Controller implements IProgressController {
 		if (Preferences.cfg.get(Preferences.SHOW_INBOX, true)) {
 			allowed_doctypes.add(Preferences.INBOX_NAME);
 		}
-		
+
 		view = new GlobalViewPane(parent, this);
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			
+
 			@Override
-			public void selectionChanged(SelectionChangedEvent event){
+			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 				if (!sel.isEmpty()) {
 					JsonObject doc = (JsonObject) sel.getFirstElement();
-					if (doc.getString(Preferences.FLD_LUCINDA_DOCTYPE)
-						.equals(Preferences.KONSULTATION_NAME)) {
+					if (doc.getString(Preferences.FLD_LUCINDA_DOCTYPE).equals(Preferences.KONSULTATION_NAME)) {
 						Konsultation kons = Konsultation.load(doc.getString(Preferences.FLD_ID));
 						if (kons.exists()) {
 							ElexisEventDispatcher.fireSelectionEvent(kons);
 						}
 					}
 				}
-				
+
 			}
 		});
 		changePatient(ElexisEventDispatcher.getSelectedPatient());
 		return view;
 	}
-	
-	public IStructuredContentProvider getContentProvider(TableViewer tv){
+
+	public IStructuredContentProvider getContentProvider(TableViewer tv) {
 		viewer = tv;
 		// tv.addFilter(docFilter);
 		return cnt;
-		
+
 	}
-	
-	public LabelProvider getLabelProvider(){
+
+	public LabelProvider getLabelProvider() {
 		return new LucindaLabelProvider();
 	}
-	
-	public void clear(){
+
+	public void clear() {
 		viewer.setInput(new JsonArray());
 	}
-	
+
 	int cPatWidth = 0;
-	
-	public void restrictToCurrentPatient(boolean bRestrict){
+
+	public void restrictToCurrentPatient(boolean bRestrict) {
 		bRestrictCurrentPatient = bRestrict;
 		TableColumn tc = viewer.getTable().getColumn(Master.COLUMN_NAME);
 		if (bRestrict) {
@@ -157,25 +159,25 @@ public class Controller implements IProgressController {
 		}
 		runQuery(view.getSearchField().getText());
 	}
-	
-	public void reload(){
+
+	public void reload() {
 		runQuery(view.getSearchField().getText());
 	}
-	
+
 	/**
 	 * Send a query to the lucinda server.
 	 * 
 	 * @param input
 	 *            Query String
 	 */
-	public void runQuery(String input){
+	public void runQuery(String input) {
 		lucinda.query(buildQuery(input), result -> {
 			if (result.getString("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
 				JsonArray queryResult = result.getJsonArray("result"); //$NON-NLS-1$
-				
+
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
-					public void run(){
+					public void run() {
 						viewer.setInput(queryResult);
 					}
 				});
@@ -183,9 +185,9 @@ public class Controller implements IProgressController {
 				Activator.getDefault().addMessage(result);
 			}
 		});
-		
+
 	}
-	
+
 	/*
 	 * Compose a query from the user's supplied query string and the query
 	 * refiners, such as doctypes and restrict to Patient.
@@ -194,17 +196,17 @@ public class Controller implements IProgressController {
 	 * 
 	 * @return the reined query
 	 */
-	private String buildQuery(String input){
+	private String buildQuery(String input) {
 		StringBuilder q = new StringBuilder();
 		if (bRestrictCurrentPatient) {
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
 			if (pat != null) {
 				q.append("+lastname:").append(pat.getName()).append(" +firstname:") //$NON-NLS-1$//$NON-NLS-2$
-					.append(pat.getVorname()).append(" +birthdate:") //$NON-NLS-1$
-					.append(new TimeTool(pat.getGeburtsdatum()).toString(TimeTool.DATE_COMPACT));
+						.append(pat.getVorname()).append(" +birthdate:") //$NON-NLS-1$
+						.append(new TimeTool(pat.getGeburtsdatum()).toString(TimeTool.DATE_COMPACT));
 			}
 		}
-		
+
 		if (allowed_doctypes.isEmpty()) {
 			q.append(" -lucinda_doctype:*"); //$NON-NLS-1$
 		} else {
@@ -220,10 +222,10 @@ public class Controller implements IProgressController {
 		q.append(input); // $NON-NLS-1$
 		return q.toString();
 	}
-	
-	public void loadDocument(final JsonObject doc){
+
+	public void loadDocument(final JsonObject doc) {
 		String doctype = doc.getString(Preferences.FLD_LUCINDA_DOCTYPE);
-		
+
 		if (doctype.equalsIgnoreCase(Preferences.INBOX_NAME)) {
 			lucinda.get(doc.getString(Preferences.FLD_ID), result -> {
 				if (result.getString("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -242,8 +244,8 @@ public class Controller implements IProgressController {
 				}
 				launchViewerForDocument(entry.getBytes(), "txt"); //$NON-NLS-1$
 			} else {
-				SWTHelper.showError(Messages.Controller_cons_not_found_caption, MessageFormat
-					.format(Messages.Controller_cons_not_found_text, doc.getString("title"))); // $NON-NLS-2$
+				SWTHelper.showError(Messages.Controller_cons_not_found_caption,
+						MessageFormat.format(Messages.Controller_cons_not_found_text, doc.getString("title"))); // $NON-NLS-2$
 			}
 		} else if (doctype.equalsIgnoreCase(Preferences.OMNIVORE_NAME)) {
 			DocHandle dh = DocHandle.load(doc.getString(Preferences.FLD_ID));
@@ -251,16 +253,16 @@ public class Controller implements IProgressController {
 				dh.execute();
 			} else {
 				SWTHelper.showError(Messages.Controller_omnivore_not_found_caption,
-					Messages.Controller_omnivore_not_found_text, doc.getString("title")); //$NON-NLS-1$
+						Messages.Controller_omnivore_not_found_text, doc.getString("title")); //$NON-NLS-1$
 			}
 		} else {
-			
+
 			SWTHelper.showError(Messages.Controller_unknown_type_caption,
-				MessageFormat.format(Messages.Controller_unknown_type_text, doctype));
+					MessageFormat.format(Messages.Controller_unknown_type_text, doctype));
 		}
-		
+
 	}
-	
+
 	/*
 	 * @Override public void signal(Map<String, Object> message) { switch
 	 * ((String) message.get("status")) { //$NON-NLS-1$ case "connected":
@@ -268,14 +270,14 @@ public class Controller implements IProgressController {
 	 * lucinda.isRestAPI()); break; case "disconnected": //$NON-NLS-1$
 	 * view.setConnected(false, false, false); break; } }
 	 */
-	
-	public void launchViewerForDocument(byte[] cnt, String ext){
+
+	public void launchViewerForDocument(byte[] cnt, String ext) {
 		Display.getDefault().asyncExec(new Runnable() {
-			
+
 			@Override
-			public void run(){
+			public void run() {
 				try {
-					
+
 					File temp = File.createTempFile("lucinda_", "." + ext); //$NON-NLS-1$ //$NON-NLS-2$
 					temp.deleteOnExit();
 					FileTool.writeFile(temp, cnt);
@@ -287,18 +289,18 @@ public class Controller implements IProgressController {
 							Runtime.getRuntime().exec(temp.getAbsolutePath());
 						}
 					}
-					
+
 				} catch (Exception ex) {
 					ExHandler.handle(ex);
 					SWTHelper.showError(Messages.Controller_could_not_launch_file, ex.getMessage());
 				}
 			}
-			
+
 		});
-		
+
 	}
-	
-	public void launchAquireScript(String title){
+
+	public void launchAquireScript(Shell shell) {
 		try {
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
 			if (pat == null) {
@@ -309,32 +311,37 @@ public class Controller implements IProgressController {
 				TimeTool bdate = new TimeTool(pat.getGeburtsdatum());
 				StringBuilder sbConcern = new StringBuilder();
 				String bdatec = bdate.toString(TimeTool.DATE_COMPACT);
-				sbConcern.append(name).append("_").append(fname).append("_")
-					.append(bdatec.substring(6, 8)).append(".").append(bdatec.substring(4, 6))
-					.append(".").append(bdatec.substring(0, 4));
-				Runtime.getRuntime().exec(new String[] {
-					Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT, ""), sbConcern.toString(),
-					title
-				});
+				sbConcern.append(name).append("_").append(fname).append("_").append(bdatec.substring(6, 8)).append(".")
+						.append(bdatec.substring(4, 6)).append(".").append(bdatec.substring(0, 4));
+				InputDialog id = new InputDialog(shell, "Document title", "Please enter a title for the document", "",
+						null);
+				if (id.open() == Dialog.OK) {
+					String title = id.getValue();
+					Runtime.getRuntime().exec(new String[] { Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT, ""),
+							sbConcern.toString(), title });
+
+				}
+
 			}
-			
+
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
 			SWTHelper.showError("Could not launch script", ex.getMessage());
 		}
 	}
-	
+
 	/**
-	 * Display a progress bar at the bottom of the lucinda view, or add a new process to an existing
-	 * process bar. If more than one process wants to display, the values for all processes are
-	 * added and the sum is the upper border of the progress bar.
+	 * Display a progress bar at the bottom of the lucinda view, or add a new
+	 * process to an existing process bar. If more than one process wants to
+	 * display, the values for all processes are added and the sum is the upper
+	 * border of the progress bar.
 	 * 
 	 * @param maximum
 	 *            the value to reach
 	 * @return a Handle to use for later addProgrss Calls
 	 * @see addProgress
 	 */
-	public Long initProgress(int maximum){
+	public Long initProgress(int maximum) {
 		Long proc = System.currentTimeMillis() + new Random().nextLong();
 		visibleProcesses.put(proc, maximum);
 		long val = 0;
@@ -346,21 +353,22 @@ public class Controller implements IProgressController {
 		}
 		int amount = (int) (val / div);
 		view.initProgress(amount);
-		
+
 		return proc;
 	}
-	
+
 	/**
 	 * show progress.
 	 * 
 	 * @param the
 	 *            Handle as received from initProgress
 	 * @param amount
-	 *            the amount of work done since the last call. I the accumulated amount of all calls
-	 *            to addProgress is higher than the maximum value, the progress bar is hidden.
+	 *            the amount of work done since the last call. I the accumulated
+	 *            amount of all calls to addProgress is higher than the maximum
+	 *            value, the progress bar is hidden.
 	 * 
 	 */
-	public void addProgress(Long handle, int amount){
+	public void addProgress(Long handle, int amount) {
 		Integer val = visibleProcesses.get(handle);
 		val -= amount;
 		if (val <= 0) {
@@ -376,7 +384,7 @@ public class Controller implements IProgressController {
 			view.showProgress(actValue / div);
 		}
 	}
-	
+
 	/**
 	 * Doctype filter
 	 * 
@@ -385,7 +393,7 @@ public class Controller implements IProgressController {
 	 * @param doctype
 	 *            the doctype to filter (lucinda_doctype)
 	 */
-	public void toggleDoctypeFilter(boolean bOn, String doctype){
+	public void toggleDoctypeFilter(boolean bOn, String doctype) {
 		if (bOn) {
 			allowed_doctypes.add(doctype);
 		} else {
@@ -393,8 +401,8 @@ public class Controller implements IProgressController {
 		}
 		reload();
 	}
-	
-	public void changePatient(Patient object){
+
+	public void changePatient(Patient object) {
 		if (bRestrictCurrentPatient) {
 			Text text = view.getSearchField();
 			String q = text.getText();
@@ -404,8 +412,8 @@ public class Controller implements IProgressController {
 			runQuery(q);
 		}
 	}
-	
-	public void setColumnWidths(String widths){
+
+	public void setColumnWidths(String widths) {
 		TableColumn[] tcs = viewer.getTable().getColumns();
 		String[] cw = widths.split(","); //$NON-NLS-1$
 		if (cw.length == tcs.length) {
@@ -419,8 +427,8 @@ public class Controller implements IProgressController {
 			}
 		}
 	}
-	
-	public String getColumnWidths(){
+
+	public String getColumnWidths() {
 		TableColumn[] tcs = viewer.getTable().getColumns();
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < tcs.length; i++) {
@@ -428,5 +436,5 @@ public class Controller implements IProgressController {
 		}
 		return sb.substring(0, sb.length() - 1);
 	}
-	
+
 }

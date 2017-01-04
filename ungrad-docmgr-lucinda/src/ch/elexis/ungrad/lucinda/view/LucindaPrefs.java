@@ -54,6 +54,7 @@ public class LucindaPrefs extends FieldEditorPreferencePage implements IWorkbenc
 			Messages.LucindaPrefs_exclude_Metadata, 5, 0, true, getFieldEditorParent()));
 		// addField(new MultilineFieldEditor(Preferences.MACROS, "Makros für das
 		// Suchfeld", 5,0,true,getFieldEditorParent()));
+		
 	}
 	
 }
