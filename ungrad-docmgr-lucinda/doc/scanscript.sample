@@ -1,8 +1,10 @@
 #! /bin/bash
-# Script für Lucinda, um direkt ins passende Zielverzeichnis zu scannen.
-# Das Script wird mit den Parametern "Patient" und "Titel" aufgerufen, wobei "Patient" die Form name_vorname_dd.mm.yy hat, und Titel irgendein Text ist.
+# Script für Elexis-docmgr-Lucinda, um bei klick auf den "Scan"Button direkt ins passende Zielverzeichnis zu scannen.
+# Das Script wird mit den Parametern "Patient" und "Titel" aufgerufen, wobei "Patient" die Form 
+# name_vorname_dd.mm.yy hat, und Titel irgendein Text ist.
 
-# Verzeichnisse definieren. "dest" ist das Lucinda-Verzeichnis auf dem Server. Der aktuelle user muss die Rechte zum Erstellen von Unterverzeichnissen und Dateien haben
+# Verzeichnisse definieren. "dest" ist das Lucinda-Verzeichnis auf dem Server. Der aktuelle user muss die Rechte 
+# zum Erstellen von Unterverzeichnissen und Dateien haben
 
 dest=/mnt/berichte
 scandir=/home/user/autoscan
