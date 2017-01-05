@@ -36,6 +36,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.text.model.Samdas;
@@ -71,6 +73,7 @@ public class Controller implements IProgressController {
 	int actValue;
 	private Lucinda lucinda;
 	private Set<String> allowed_doctypes = new TreeSet<>();
+	private Logger log=LoggerFactory.getLogger(Controller.class);
 
 	public Controller() {
 		lucinda = new Lucinda();
@@ -300,6 +303,10 @@ public class Controller implements IProgressController {
 
 	}
 
+	/**
+	 * Launch a script to acquire a document from tze scanner
+	 * @param shell
+	 */
 	public void launchAquireScript(Shell shell) {
 		try {
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
@@ -317,8 +324,12 @@ public class Controller implements IProgressController {
 						null);
 				if (id.open() == Dialog.OK) {
 					String title = id.getValue();
-					Runtime.getRuntime().exec(new String[] { Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT, ""),
+					Process proc=Runtime.getRuntime().exec(new String[] { Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT, ""),
 							sbConcern.toString(), title });
+					int result=proc.waitFor();
+					if(result!=0){
+						log.error("could not launch aquire script");
+					}
 
 				}
 
