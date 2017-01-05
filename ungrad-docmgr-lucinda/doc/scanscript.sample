@@ -1,0 +1,47 @@
+#! /bin/bash
+# Script für Lucinda, um direkt ins passende Zielverzeichnis zu scannen.
+# Das Script wird mit den Parametern "Patient" und "Titel" aufgerufen, wobei "Patient" die Form name_vorname_dd.mm.yy hat, und Titel irgendein Text ist.
+
+# Verzeichnisse definieren. "dest" ist das Lucinda-Verzeichnis auf dem Server. Der aktuelle user muss die Rechte zum Erstellen von Unterverzeichnissen und Dateien haben
+
+dest=/mnt/berichte
+scandir=/home/user/autoscan
+log=/home/user/apps/scan.log
+
+rm -rf ${scandir}
+mkdir -p ${scandir}
+mkdir -p ${dest}/${1}
+
+echo sending ${2}.pdf to ${dest}/${1}>$log
+
+# Dokument(e) scannen. Hier im Beispiel aus dem doppelseitigen Multipage-Feeder. Muss an
+# vorhandenen Scanner angepasst werden
+cd $scandir
+scanimage -d epjitsu --format=tiff --batch --mode=Color --page-width=210 --page-height=297 --source="ADF Duplex">>$log
+rc=$?; if [[ $rc != 0 ]]; then
+	echo scanimage failed with error code $rc>>$log
+	exit $rc
+fi
+
+# Alle gescannten Seiten zu einem multipage-tiff kombinieren.
+tiffcp -c lzw out*.tif output.tif>>$log
+rc=$?; if [[ $rc != 0 ]]; then
+	echo tiffcp failed with code $rc>>$log
+	exit $rc
+fi
+
+# Das Multipage-tiff in ein PDF umwandeln
+tiff2pdf -o "$2.pdf" output.tif>>$log
+rc=$?; if [[ $rc != 0 ]]; then
+	echo tiff2pdf failed with code $rc>>$log
+	exit $rc
+fi
+
+# Das PDF ins Zielverzeichnis schieben.
+mv "$2.pdf" "${dest}/${1}/$2.pdf">>$log
+rc=$?; if [[ $rc != 0 ]]; then
+	echo move file failed with code $rc>>log
+	exit $rc
+fi
+
+echo success>>$log
