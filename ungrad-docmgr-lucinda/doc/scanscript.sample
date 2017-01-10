@@ -1,43 +1,52 @@
 #! /bin/bash
-# Script für Lucinda, um direkt ins passende Zielverzeichnis zu scannen.
-# Das Script wird mit den Parametern "Patient" und "Titel" aufgerufen, wobei "Patient" die Form name_vorname_dd.mm.yy hat, und Titel irgendein Text ist.
+# Script für das Elexis-Lucinda Plugin, um direkt ins passende Zielverzeichnis zu scannen.
+# Benötigte Pakete: sane,ghostscript,imagemagick
+# Elexis-Docmgr-Lucinda ruft bei Klick auf den Importbutton dieses Script mit den Parametern "Patient" und "Titel" auf,
+# wobei "Patient" die Form name_vorname_dd.mm.yy hat, und Titel irgendein vom Anwender eingegebener Text ist.
+# Verzeichnisse und "scanimage"-Zeile müssen natürlich an die eigenen Gegebenheiten angepasst werden
 
-# Verzeichnisse definieren. "dest" ist das Lucinda-Verzeichnis auf dem Server. Der aktuelle user muss die Rechte zum Erstellen von Unterverzeichnissen und Dateien haben
-
+# Verzeichnisse definieren. dest ist das Lucinda-Verzeichnis auf dem Server
 dest=/mnt/berichte
-scandir=/home/user/autoscan
-log=/home/user/apps/scan.log
+scandir=/home/gerry/autoscan
+log=/home/gerry/apps/scan.log
 
+# Definierten Ausgangszustand erstellen
 rm -rf ${scandir}
 mkdir -p ${scandir}
 mkdir -p ${dest}/${1}
 
 echo sending ${2}.pdf to ${dest}/${1}>$log
 
-# Dokument(e) scannen. Hier im Beispiel aus dem doppelseitigen Multipage-Feeder. Muss an
-# vorhandenen Scanner angepasst werden
+# Erster Schritt: alle Seiten in einzelne .tif-Files scannen
 cd $scandir
-scanimage -d epjitsu --format=tiff --batch --mode=Color --page-width=210 --page-height=297 --source="ADF Duplex">>$log
+scanimage -d epjitsu --format=tiff --batch --mode=Color --resolution=300 --page-width=210 --page-height=297 --source="ADF Duplex">>$log
 rc=$?; if [[ $rc != 0 ]]; then
-	echo scanimage failed with error code $rc>>$log
+	echo scanimage faild with error code $rc>>$log
 	exit $rc
 fi
 
-# Alle gescannten Seiten zu einem multipage-tiff kombinieren.
+#Zweiter Schritt: Alle .tif-Files kombinieren
 tiffcp -c lzw out*.tif output.tif>>$log
 rc=$?; if [[ $rc != 0 ]]; then
 	echo tiffcp failed with code $rc>>$log
 	exit $rc
 fi
 
-# Das Multipage-tiff in ein PDF umwandeln
-tiff2pdf -o "$2.pdf" output.tif>>$log
+#Dritter Schritt: .tif nach .pdf wandeln
+tiff2pdf -o raw.pdf output.tif>>$log
 rc=$?; if [[ $rc != 0 ]]; then
 	echo tiff2pdf failed with code $rc>>$log
 	exit $rc
 fi
 
-# Das PDF ins Zielverzeichnis schieben.
+#Vierter Schritt: Dateigrösse des resultierenden PDF optimieren
+gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile="$2.pdf" raw.pdf
+rc=$?; if [[ $rc != 0 ]]; then
+	echo ghostscript failed with code $rc>>$log
+	exit $rc
+fi
+
+# Fünfter Schritt: Datei ins Zielverzeichnis schieben
 mv "$2.pdf" "${dest}/${1}/$2.pdf">>$log
 rc=$?; if [[ $rc != 0 ]]; then
 	echo move file failed with code $rc>>log
