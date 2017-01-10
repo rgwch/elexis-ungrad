@@ -5,7 +5,9 @@
 # wobei "Patient" die Form name_vorname_dd.mm.yy hat, und Titel irgendein vom Anwender eingegebener Text ist.
 # Verzeichnisse und "scanimage"-Zeile müssen natürlich an die eigenen Gegebenheiten angepasst werden
 
-# Verzeichnisse definieren. dest ist das Lucinda-Verzeichnis auf dem Server
+# Verzeichnisse definieren. "dest" ist das Lucinda-Verzeichnis auf dem Server. Der aktuelle user muss die Rechte
+# zum Erstellen von Unterverzeichnissen und Dateien haben
+
 dest=/mnt/berichte
 scandir=/home/gerry/autoscan
 log=/home/gerry/apps/scan.log
