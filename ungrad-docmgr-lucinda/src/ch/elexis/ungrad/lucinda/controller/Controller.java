@@ -313,17 +313,17 @@ public class Controller implements IProgressController {
 			if (pat == null) {
 				throw new Exception("No patient selected");
 			} else {
-				String name = pat.getName();
-				String fname = pat.getVorname();
+				String[] name = pat.getName().split("[ -]+");
+				String[] fname = pat.getVorname().split("[ -]+");
 				TimeTool bdate = new TimeTool(pat.getGeburtsdatum());
 				StringBuilder sbConcern = new StringBuilder();
 				String bdatec = bdate.toString(TimeTool.DATE_COMPACT);
-				sbConcern.append(name).append("_").append(fname).append("_").append(bdatec.substring(6, 8)).append(".")
+				sbConcern.append(name[0]).append("_").append(fname[0]).append("_").append(bdatec.substring(6, 8)).append(".")
 						.append(bdatec.substring(4, 6)).append(".").append(bdatec.substring(0, 4));
 				InputDialog id = new InputDialog(shell, "Document title", "Please enter a title for the document", "",
 						null);
 				if (id.open() == Dialog.OK) {
-					String title = id.getValue();
+					String title = id.getValue().replaceAll("[\\/\\:\\- ]", "_");
 					Process proc=Runtime.getRuntime().exec(new String[] { Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT, ""),
 							sbConcern.toString(), title });
 					int result=proc.waitFor();
