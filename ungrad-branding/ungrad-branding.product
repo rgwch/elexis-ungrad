@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Elexis Ungrad" uid="ch.elexis.ungrad.product" id="ch.elexis.ungrad.branding.product" application="ch.elexis.core.application.ElexisApp" version="0.0.1" useFeatures="false" includeLaunchers="true">
+<product name="Elexis Ungrad" uid="ch.elexis.ungrad.product" id="ch.elexis.ungrad.branding.product" application="ch.elexis.core.application.ElexisApp" version="0.1.0" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/ungrad-product/rsc/logo_about250.png"/>
@@ -25,7 +25,6 @@
    <launcher name="Elexis">
       <linux icon="/ungrad-product/rsc/icon.xpm"/>
       <macosx icon="/ungrad-product/rsc/elexis-mac.icns"/>
-      <solaris/>
       <win useIco="true">
          <ico path="/ungrad-product/rsc/icon.ico"/>
          <bmp/>

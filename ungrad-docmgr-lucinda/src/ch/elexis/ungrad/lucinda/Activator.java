@@ -24,6 +24,7 @@ import org.osgi.framework.BundleContext;
 import ch.elexis.core.data.util.Extensions;
 import io.vertx.core.json.JsonObject;
 
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -37,7 +38,8 @@ public class Activator extends AbstractUIPlugin {
 	private List<Handler> handlers = new ArrayList<>();
 	private List<JsonObject> messages = new LinkedList<>();
 	private List<IDocumentHandler> addons;
-
+	
+	
 	/**
 	 * The constructor
 	 */
