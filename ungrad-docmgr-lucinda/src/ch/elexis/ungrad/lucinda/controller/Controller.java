@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2018 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -44,7 +44,6 @@ import ch.elexis.core.text.model.Samdas;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Patient;
-import ch.elexis.omnivore.data.DocHandle;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Lucinda;
 import ch.elexis.ungrad.lucinda.Preferences;
@@ -75,6 +74,7 @@ public class Controller implements IProgressController {
 	private Set<String> allowed_doctypes = new TreeSet<>();
 	private Logger log=LoggerFactory.getLogger(Controller.class);
 
+	
 	public Controller() {
 		lucinda = new Lucinda();
 		bRestrictCurrentPatient = Boolean
@@ -251,7 +251,7 @@ public class Controller implements IProgressController {
 						MessageFormat.format(Messages.Controller_cons_not_found_text, doc.getString("title"))); // $NON-NLS-2$
 			}
 		} else if (doctype.equalsIgnoreCase(Preferences.OMNIVORE_NAME)) {
-			DocHandle dh = DocHandle.load(doc.getString(Preferences.FLD_ID));
+			ch.elexis.omnivore.data.DocHandle dh = ch.elexis.omnivore.data.DocHandle.load(doc.getString(Preferences.FLD_ID));
 			if (dh.exists()) {
 				dh.execute();
 			} else {

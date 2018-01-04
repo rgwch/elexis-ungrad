@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2018 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import ch.elexis.data.Patient;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.data.Query;
-import ch.elexis.omnivore.data.DocHandle;
+import ch.elexis.omnivore.data.*;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.IProgressController;

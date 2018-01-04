@@ -6,7 +6,7 @@
     <artifactId>elexis-ungrad-aggregator</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <properties>
-        <tycho-version>0.25.0</tycho-version>
+        <tycho-version>1.0.0</tycho-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tycho-extras.version>${tycho-version}</tycho-extras.version>
         <juno-repo.url>http://download.eclipse.org/releases/juno</juno-repo.url>
@@ -32,12 +32,12 @@
         <module>ungrad-branding-feature</module>
         <module>com.jsigle.noatext_jsl</module>
         <module>com.jsigle.noatext_jsl.feature</module>
-        <module>ch.berchtold.privatrechnung</module>
-        <module>ch.berchtold.privatrechnung.feature</module>
+        <!-- module>ch.berchtold.privatrechnung</module>
+        <module>ch.berchtold.privatrechnung.feature</module -->
         <module>ungrad-p2site</module>
     </modules>
     <repositories>
-        <repository>
+        <!-- repository>
             <id>elexis-core</id>
             <url>http://www.elexis.ch/ungrad/p2/elexis-core/latest</url>
             <layout>p2</layout>
@@ -46,40 +46,26 @@
             <id>elexis-base</id>
             <url>http://www.elexis.ch/ungrad/p2/elexis-base/latest</url>
             <layout>p2</layout>
-        </repository>
+        </repository -->
         <repository>
           <id>elexis-ungrad</id>
           <url>http://www.elexis.ch/ungrad/p2/dependencies/latest</url>
           <layout>p2</layout>
         </repository>
+        <repository>
+          <id>elexis-base-local</id>
+          <url>file:///home/gerry/git/elexis-3-base/ch.elexis.base.p2site/target/repository</url>
+          <layout>p2</layout>
+        </repository>
+        <repository>
+          <id>elexis-core-local</id>
+          <url>file:///home/gerry/git/elexis-3-core/ch.elexis.core.p2site/target/repository</url>
+          <layout>p2</layout>
+          
+        </repository>
     </repositories>
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.github.goldin</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>0.2.5</version>
-                <executions>
-                    <execution>
-                        <id>set-properties</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>set-properties</goal>
-                        </goals>
-                        <configuration>
-                            <properties>
-                                <property>
-                                    <name>timestamp_format</name>
-                                    <value>{{"'" +
-                                        "${repo_variant}".substring(0,1).replaceFirst('s','a').replaceFirst('p','r')+"'yyyyMMdd-HHmm"
-                                        }}
-                                    </value>
-                                </property>
-                            </properties>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
                 <artifactId>tycho-p2-plugin</artifactId>
