@@ -16,5 +16,19 @@
             id="ch.elexis.ungrad.labenter.views.manualentries">
       </view>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="ch.elexis.ungrad.labenter.preferences.PreferencePage"
+            id="ch.elexis.ungrad.labenter.preferences.PreferencePage"
+            name="Laboreingabe">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="ch.elexis.ungrad.labenter.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>

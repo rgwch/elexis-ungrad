@@ -5,5 +5,9 @@ Bundle-SymbolicName: ch.elexis.ungrad.labenter;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: weirich@elexis.ch
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ui
+ org.eclipse.ui,
+ ch.rgw.utility;bundle-version="3.4.0",
+ ch.elexis.core.ui;bundle-version="3.2.0",
+ ch.elexis.core.data;bundle-version="3.4.0",
+ ch.elexis.core.ui.laboratory;bundle-version="3.2.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
