@@ -32,6 +32,8 @@
         <module>ungrad-branding-feature</module>
         <module>com.jsigle.noatext_jsl</module>
         <module>com.jsigle.noatext_jsl.feature</module>
+        <module>ungrad-labenter</module>
+        <module>ungrad-labenter-feature</module>
         <!-- module>ch.berchtold.privatrechnung</module>
         <module>ch.berchtold.privatrechnung.feature</module -->
         <module>ungrad-p2site</module>
@@ -54,12 +56,12 @@
         </repository>
         <repository>
           <id>elexis-base-local</id>
-          <url>file:///home/gerry/git/elexis-3-base/ch.elexis.base.p2site/target/repository</url>
+          <url>file:../elexis-3-base/ch.elexis.base.p2site/target/repository</url>
           <layout>p2</layout>
         </repository>
         <repository>
           <id>elexis-core-local</id>
-          <url>file:///home/gerry/git/elexis-3-core/ch.elexis.core.p2site/target/repository</url>
+          <url>file:../elexis-3-core/ch.elexis.core.p2site/target/repository</url>
           <layout>p2</layout>
           
         </repository>

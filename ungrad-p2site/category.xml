@@ -3,23 +3,20 @@
    <feature url="features/ch.elexis.ungrad.docmgr-lucinda.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.docmgr-lucinda.feature" version="1.0.0.qualifier" os="linux,macosx,win32" ws="cocoa,gtk,win32">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
-   <!-- feature url="features/ch.elexis.omnivore.feature_3.0.0.qualifier.jar" id="ch.elexis.omnivore.feature" version="3.0.0.qualifier">
-      <category name="ch.elexis.ungrad.docmgr"/>
-   </feature -->
    <feature url="features/ch.elexis.ungrad.labview.feature_1.0.1.qualifier.jar" id="ch.elexis.ungrad.labview.feature" version="1.0.1.qualifier">
       <category name="ch.elexis.ungrad.findings"/>
    </feature>
    <feature url="features/ch.elexis.ungrad.branding.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.branding.feature" version="1.0.0.qualifier">
       <category name="ch.elexis.ungrad.common"/>
    </feature>
-   <!-- feature url="features/ch.berchtold.privatrechnung.feature_1.0.0.qualifier.jar" id="ch.berchtold.privatrechnung.feature" version="1.0.0.qualifier">
-      <category name="ch.elexis.ungrad.financial"/>
-   </feature -->
    <feature url="features/com.jsigle.noatext_jsl.feature_3.1.0.qualifier.jar" id="com.jsigle.noatext_jsl.feature" version="3.1.0.qualifier">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
    <feature url="features/ch.elexis.ungrad.kassenbuch.feature_3.1.0.qualifier.jar" id="ch.elexis.ungrad.kassenbuch.feature" version="3.1.0.qualifier">
       <category name="ch.elexis.ungrad.financial"/>
+   </feature>
+   <feature url="features/ch.elexis.ungrad.labenter.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.labenter.feature" version="1.0.0.qualifier">
+      <category name="ch.elexis.ungrad.findings"/>
    </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
