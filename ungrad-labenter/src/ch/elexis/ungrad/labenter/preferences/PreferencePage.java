@@ -41,7 +41,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	 */
 	public void createFieldEditors() {
 
-		addField(new ItemsEditor("Items", "labItems", getFieldEditorParent()));
+		addField(new ItemsEditor(PreferenceConstants.P_ITEMS, "labItems", getFieldEditorParent()));
 		/*
 		 * addField(new DirectoryFieldEditor(PreferenceConstants.P_PATH,
 		 * "&Directory preference:", getFieldEditorParent())); addField( new

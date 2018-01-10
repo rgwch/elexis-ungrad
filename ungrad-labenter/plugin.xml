@@ -12,7 +12,7 @@
             name="Laboreingabe"
             icon="icons/sample.gif"
             category="ch.elexis.ungrad.labenter"
-            class="ch.elexis.ungrad.labenter.views.manualentries"
+            class="ch.elexis.ungrad.labenter.views.ManualLabEntry"
             id="ch.elexis.ungrad.labenter.views.manualentries">
       </view>
    </extension>
