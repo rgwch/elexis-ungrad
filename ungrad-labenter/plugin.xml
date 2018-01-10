@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Labor"
+            id="ch.elexis.ungrad.labenter">
+      </category>
+      <view
+            name="Laboreingabe"
+            icon="icons/sample.gif"
+            category="ch.elexis.ungrad.labenter"
+            class="ch.elexis.ungrad.labenter.views.manualentries"
+            id="ch.elexis.ungrad.labenter.views.manualentries">
+      </view>
+   </extension>
+
+</plugin>
