@@ -114,4 +114,11 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
 	}
 
+	@Override
+	public boolean performOk() {
+		((SettingsPreferenceStore)getPreferenceStore()).flush();
+		return super.performOk();
+	}
+	
+
 }

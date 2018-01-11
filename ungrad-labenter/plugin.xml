@@ -10,7 +10,7 @@
       </category>
       <view
             name="Laboreingabe"
-            icon="icons/sample.gif"
+            icon="icons/report_edit.png"
             category="ch.elexis.ungrad.labenter"
             class="ch.elexis.ungrad.labenter.views.ManualLabEntry"
             id="ch.elexis.ungrad.labenter.views.manualentries">
@@ -19,6 +19,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
+      		catogory="ch.elexis.LaborPref"
             class="ch.elexis.ungrad.labenter.preferences.PreferencePage"
             id="ch.elexis.ungrad.labenter.preferences.PreferencePage"
             name="Laboreingabe">
