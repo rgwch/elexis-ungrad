@@ -11,8 +11,10 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.forms.widgets.Form;
@@ -34,25 +36,27 @@ import ch.elexis.ungrad.labenter.views.LabEntryTable.Element;
 import ch.rgw.tools.TimeTool;
 
 /**
- * This sample class demonstrates how to plug-in a new workbench view. The view shows data obtained
- * from the model. The sample creates a dummy model on the fly, but a real implementation would
- * connect to the model available either in this or another plug-in (e.g. the workspace). The view
- * is connected to the model using a content provider.
+ * This sample class demonstrates how to plug-in a new workbench view. The view
+ * shows data obtained from the model. The sample creates a dummy model on the
+ * fly, but a real implementation would connect to the model available either in
+ * this or another plug-in (e.g. the workspace). The view is connected to the
+ * model using a content provider.
  * <p>
- * The view uses a label provider to define how model objects should be presented in the view. Each
- * view can present the same model objects using different labels and icons, if needed.
- * Alternatively, a single label provider can be shared between views in order to ensure that
- * objects of the same type are presented in the same way everywhere.
+ * The view uses a label provider to define how model objects should be
+ * presented in the view. Each view can present the same model objects using
+ * different labels and icons, if needed. Alternatively, a single label provider
+ * can be shared between views in order to ensure that objects of the same type
+ * are presented in the same way everywhere.
  * <p>
  */
 
 public class ManualLabEntry extends ViewPart implements IActivationListener {
-	
+
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID = "ch.elexis.ungrad.labenter.views.manualentries";
-	
+
 	private TableViewer viewer;
 	private IAction changeDateAction;
 	private IAction sendValuesAction;
@@ -62,26 +66,27 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 	private Form form;
 	private Patient pat;
 	private LabEntryTable let;
-	
-	private final ElexisUiEventListenerImpl eeli_pat =
-		new ElexisUiEventListenerImpl(Patient.class, ElexisEvent.EVENT_SELECTED) {
-			
-			@Override
-			public void runInUi(ElexisEvent ev){
-				setLabel();
-			}
-			
-		};
-	
+
+	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
+			ElexisEvent.EVENT_SELECTED) {
+
+		@Override
+		public void runInUi(ElexisEvent ev) {
+			setLabel();
+		}
+
+	};
+
 	/**
 	 * The constructor.
 	 */
-	public ManualLabEntry(){}
-	
+	public ManualLabEntry() {
+	}
+
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize it.
 	 */
-	public void createPartControl(Composite parent){
+	public void createPartControl(Composite parent) {
 		setTitleImage(Images.IMG_EDIT.getImage());
 		tk = UiDesk.getToolkit();
 		form = tk.createForm(parent);
@@ -96,20 +101,20 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 		hookDoubleClickAction();
 		contributeToActionBars();
 		GlobalEventDispatcher.addActivationListener(this, this);
-		
+
 	}
-	
-	private void setLabel(){
+
+	private void setLabel() {
 		pat = ElexisEventDispatcher.getSelectedPatient();
 		String lab = pat == null ? "Kein Patient gewählt" : pat.getLabel();
 		form.setText("Labor von " + lab + ", vom " + actDate.toString(TimeTool.DATE_GER));
 	}
-	
-	private void hookContextMenu(){
+
+	private void hookContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager){
+			public void menuAboutToShow(IMenuManager manager) {
 				ManualLabEntry.this.fillContextMenu(manager);
 			}
 		});
@@ -117,59 +122,59 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 		viewer.getControl().setMenu(menu);
 		getSite().registerContextMenu(menuMgr, viewer);
 	}
-	
-	private void contributeToActionBars(){
+
+	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
 		fillLocalToolBar(bars.getToolBarManager());
 	}
-	
-	private void fillLocalPullDown(IMenuManager manager){
-		/*
-		 * manager.add(action1); manager.add(new Separator()); manager.add(action2);
-		 */
+
+	private void fillLocalPullDown(IMenuManager manager) {
+		manager.add(changeDateAction);
+		manager.add(sendValuesAction);
+		manager.add(clearAction);
 	}
-	
-	private void fillContextMenu(IMenuManager manager){
+
+	private void fillContextMenu(IMenuManager manager) {
 		/*
 		 * manager.add(action1); manager.add(action2); // Other plug-ins can contribute
 		 * there actions here manager.add(new
 		 * Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		 */
 	}
-	
-	private void fillLocalToolBar(IToolBarManager manager){
-		
+
+	private void fillLocalToolBar(IToolBarManager manager) {
+
 		manager.add(changeDateAction);
 		manager.add(sendValuesAction);
 		manager.add(clearAction);
-		
+
 	}
-	
-	public void visible(final boolean mode){
+
+	public void visible(final boolean mode) {
 		if (mode) {
 			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
 		} else {
 			ElexisEventDispatcher.getInstance().removeListeners(eeli_pat);
 		}
 	}
-	
-	private void clearFields(){
+
+	private void clearFields() {
 		for (Element el : let.elements) {
 			el.value = "";
 		}
 		viewer.setInput(let.elements);
 	}
-	
-	private void makeActions(){
+
+	private void makeActions() {
 		changeDateAction = new Action() {
 			{
 				setText("Anderes Datum");
 				setToolTipText("Datum für diese Laborwerte eingeben");
 				setImageDescriptor(Images.IMG_CALENDAR.getImageDescriptor());
 			}
-			
-			public void run(){
+
+			public void run() {
 				DateSelectorDialog dsl = new DateSelectorDialog(getViewSite().getShell());
 				if (dsl.open() == Dialog.OK) {
 					actDate = dsl.getSelectedDate();
@@ -177,24 +182,30 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 				}
 			}
 		};
-		
+
 		sendValuesAction = new Action() {
 			{
 				setText("Absenden");
 				setToolTipText("Diese Werte speichern");
 				setImageDescriptor(Images.IMG_EDIT_DONE.getImageDescriptor());
 			}
-			
-			public void run(){
+
+			public void run() {
 				if (pat == null) {
 					showMessage("Es ist kein Patient ausgewählt");
-					
+
 				} else {
-					for (Element el : let.elements) {
-						if (!el.value.isEmpty()) {
-							new LabResult(pat, actDate, el.item, el.value, "");
+					BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+						public void run() {
+							for (Element el : let.elements) {
+								if (!el.value.isEmpty()) {
+									new LabResult(pat, actDate, el.item, el.value, "");
+								}
+							}
+							showMessage("ok");
+							clearFields();
 						}
-					}
+					});
 				}
 			}
 		};
@@ -204,37 +215,37 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 				setToolTipText("Formulareingaben leeren");
 				setImageDescriptor(Images.IMG_CLEAR.getImageDescriptor());
 			}
-			
-			public void run(){
+
+			public void run() {
 				clearFields();
 			}
 		};
-		
+
 	}
-	
-	private void hookDoubleClickAction(){
+
+	private void hookDoubleClickAction() {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event){
+			public void doubleClick(DoubleClickEvent event) {
 				// doubleClickAction.run();
 			}
 		});
 	}
-	
-	private void showMessage(String message){
+
+	private void showMessage(String message) {
 		MessageDialog.openInformation(viewer.getControl().getShell(), "Laboreingabe", message);
 	}
-	
+
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
-	public void setFocus(){
+	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-	
+
 	@Override
-	public void activation(boolean mode){
+	public void activation(boolean mode) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 }

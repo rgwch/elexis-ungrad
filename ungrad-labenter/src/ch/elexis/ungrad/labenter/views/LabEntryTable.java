@@ -3,9 +3,12 @@ package ch.elexis.ungrad.labenter.views;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
@@ -44,6 +47,9 @@ public class LabEntryTable {
 			}
 			
 		});
+		TableViewerEditor.create(viewer,
+				new ColumnViewerEditorActivationStrategy(viewer),
+				ColumnViewerEditor.TABBING_VERTICAL);
 		createColumns(parent, viewer);
 		viewer.setInput(elements);
 	}
@@ -69,12 +75,12 @@ public class LabEntryTable {
 		});
 		tvc = createColumn("Wert", 50, 1);
 		tvc.setLabelProvider(new ColumnLabelProvider() {
-			
+			/*
 			@Override
 			public String getText(Object element){
 				return ((Element) element).value;
 			}
-			
+			*/
 			@Override
 			public void update(ViewerCell cell){
 				cell.setText(((Element) cell.getElement()).value);
@@ -113,6 +119,13 @@ public class LabEntryTable {
 		protected void setValue(Object element, Object userInputValue){
 			((Element) element).value = String.valueOf(userInputValue);
 			viewer.update(element, null);
+			/*
+			int idx=viewer.getTable().getSelectionIndex();
+			if(idx<elements.length-1) {
+				Element nextelem=elements[idx+1];
+				viewer.editElement(nextelem, 1);
+			}
+			*/
 		}
 	}
 	
