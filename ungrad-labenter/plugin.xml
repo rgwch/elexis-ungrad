@@ -4,14 +4,10 @@
 
    <extension
          point="org.eclipse.ui.views">
-      <category
-            name="Labor"
-            id="ch.elexis.ungrad.labenter">
-      </category>
       <view
             name="Laboreingabe"
             icon="icons/report_edit.png"
-            category="ch.elexis.ungrad.labenter"
+            category="ch.elexis.messungenKategorie"
             class="ch.elexis.ungrad.labenter.views.ManualLabEntry"
             id="ch.elexis.ungrad.labenter.views.manualentries">
       </view>
