@@ -39,22 +39,22 @@
         <module>ungrad-p2site</module>
     </modules>
     <repositories>
-        <!-- repository>
+        <repository>
             <id>elexis-core</id>
-            <url>http://www.elexis.ch/ungrad/p2/elexis-core/latest</url>
+            <url>http://www.elexis.ch/ungrad2018/p2/elexis-core/latest</url>
             <layout>p2</layout>
         </repository>
         <repository>
             <id>elexis-base</id>
-            <url>http://www.elexis.ch/ungrad/p2/elexis-base/latest</url>
+            <url>http://www.elexis.ch/ungrad2018/p2/elexis-base/latest</url>
             <layout>p2</layout>
-        </repository -->
+        </repository>
         <repository>
           <id>elexis-ungrad</id>
           <url>http://www.elexis.ch/ungrad/p2/dependencies/latest</url>
           <layout>p2</layout>
         </repository>
-        <repository>
+        <!-- repository>
           <id>elexis-base-local</id>
           <url>file:../elexis-3-base/ch.elexis.base.p2site/target/repository</url>
           <layout>p2</layout>
@@ -64,7 +64,7 @@
           <url>file:../elexis-3-core/ch.elexis.core.p2site/target/repository</url>
           <layout>p2</layout>
           
-        </repository>
+        </repository -->
     </repositories>
     <build>
         <plugins>
