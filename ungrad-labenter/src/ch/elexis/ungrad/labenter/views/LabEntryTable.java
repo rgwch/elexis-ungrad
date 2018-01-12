@@ -4,14 +4,22 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
+import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -34,11 +42,27 @@ public class LabEntryTable {
 			elements[i] = new Element(itemlist[i]);
 		}
 		
-		Table table = new Table(parent, SWT.NONE);
+		Table table = new Table(parent, SWT.NONE /*SWT.FULL_SELECTION*/);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 		table.setLayoutData(SWTHelper.getFillGridData());
 		viewer = new TableViewer(table);
+		createColumns(parent, viewer);
+		/*
+		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(viewer,new FocusCellOwnerDrawHighlighter(viewer));
+		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
+		    protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
+		        return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL 
+		            || event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION                                   
+		            || (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR) 
+		            || event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
+		       }
+		};
+		*/
+		
+		TableViewerEditor.create(viewer, new ColumnViewerEditorActivationStrategy(viewer),
+			ColumnViewerEditor.TABBING_VERTICAL|ColumnViewerEditor.KEYBOARD_ACTIVATION);
+		
 		viewer.setContentProvider(new ArrayContentProvider() {
 			
 			@Override
@@ -47,10 +71,6 @@ public class LabEntryTable {
 			}
 			
 		});
-		TableViewerEditor.create(viewer,
-				new ColumnViewerEditorActivationStrategy(viewer),
-				ColumnViewerEditor.TABBING_VERTICAL);
-		createColumns(parent, viewer);
 		viewer.setInput(elements);
 	}
 	
@@ -98,6 +118,28 @@ public class LabEntryTable {
 			super(viewer);
 			this.viewer = viewer;
 			this.editor = new TextCellEditor(viewer.getTable());
+			
+			this.editor.getControl().addTraverseListener(new TraverseListener() {
+				
+				@Override
+				public void keyTraversed(TraverseEvent te){
+					int idx=viewer.getTable().getSelectionIndex();
+					
+					switch (te.detail) {
+					case SWT.TRAVERSE_TAB_NEXT:
+						te.doit = true;
+						break;
+			
+					case SWT.TRAVERSE_ARROW_NEXT:
+						te.doit=true;
+						viewer.editElement(viewer.getElementAt(idx+1),1 );
+						break;
+					default:
+						System.out.println(te.detail);
+					}
+				}
+			});
+			
 		}
 		
 		@Override
@@ -132,7 +174,7 @@ public class LabEntryTable {
 	class Element {
 		Element(String itemId){
 			this.item = LabItem.load(itemId);
-			this.label = item.getKuerzel()+" ("+item.getReferenceMale()+") "+item.getUnit();
+			this.label = item.getKuerzel() + " (" + item.getReferenceMale() + ") " + item.getUnit();
 			this.value = "";
 		}
 		
