@@ -1,3 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2018 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad.labenter.preferences;
 
 import java.util.ArrayList;
@@ -5,15 +19,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.preference.*;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.ListEditor;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.data.LabItem;
-import ch.rgw.tools.StringTool;
-
-import org.eclipse.ui.IWorkbench;
 
 /**
  * This class represents a preference page that is contributed to the
@@ -85,9 +98,9 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
 		@Override
 		protected String getNewInputObject() {
-			LabItemSelector lis=new LabItemSelector(getShell());
-			if(lis.open()==Dialog.OK) {
-				LabItem it=lis.result;
+			LabItemSelector lis = new LabItemSelector(getShell());
+			if (lis.open() == Dialog.OK) {
+				LabItem it = lis.result;
 				map.put(it.getLabel(), it.getId());
 				return it.getLabel();
 			}
@@ -116,9 +129,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
 	@Override
 	public boolean performOk() {
-		((SettingsPreferenceStore)getPreferenceStore()).flush();
+		((SettingsPreferenceStore) getPreferenceStore()).flush();
 		return super.performOk();
 	}
-	
 
 }
