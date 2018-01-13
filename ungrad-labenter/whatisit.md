@@ -8,7 +8,7 @@ Now it's simple:
 
 * Define the lab results in Preferences->Laboreingabe. Klick "New.." to see a list af alle lab items defined in the system and pick one by one those you need to enter manually. Then you can order them as you like.
 
-* Open the view Messungen/Laboreingabe and you'll see the formerly defined items. Now just enter the values, use the arrow down key to save and go to the next item. As you finished (or any time) select the corresponding patient and the correct date and click the "save" toolbar button.
+* Open the view Messungen/Laboreingabe and you'll see the formerly defined items. Now just enter the values, use the tab key to save and go to the next item. As you finished (or any time) select the corresponding patient and the correct date and click the "save" toolbar button.
 
 
 ## Notes

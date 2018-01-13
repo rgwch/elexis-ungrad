@@ -117,9 +117,9 @@ public class LabEntryTable {
 					int idx = viewer.getTable().getSelectionIndex();
 
 					switch (te.detail) {
-					case SWT.TRAVERSE_RETURN:
+					// case SWT.TRAVERSE_RETURN:
 					case SWT.TRAVERSE_TAB_NEXT:
-					case SWT.TRAVERSE_ARROW_NEXT:
+					// case SWT.TRAVERSE_ARROW_NEXT:
 						te.doit = true;
 						viewer.editElement(viewer.getElementAt(idx + 1), 1);
 						break;
