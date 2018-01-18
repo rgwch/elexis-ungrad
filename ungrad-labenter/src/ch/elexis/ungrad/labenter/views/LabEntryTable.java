@@ -28,8 +28,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -67,6 +65,17 @@ public class LabEntryTable {
 			@Override
 			public Object[] getElements(Object inputElement){
 				return (Object[]) inputElement;
+			}
+			
+		});
+		viewer.getTable().addKeyListener(new KeyAdapter() {
+			
+			@Override
+			public void keyPressed(KeyEvent e){
+				if (e.keyCode == SWT.CR) {
+					int idx = viewer.getTable().getSelectionIndex();
+					viewer.editElement(viewer.getElementAt(idx), 1);
+				}
 			}
 			
 		});
@@ -112,26 +121,6 @@ public class LabEntryTable {
 			this.viewer = viewer;
 			this.editor = new TextCellEditor(viewer.getTable());
 			
-			/*
-			this.editor.getControl().addTraverseListener(new TraverseListener() {
-			
-				@Override
-				public void keyTraversed(TraverseEvent te) {
-					int idx = viewer.getTable().getSelectionIndex();
-			
-					switch (te.detail) {
-					// case SWT.TRAVERSE_RETURN:
-					case SWT.TRAVERSE_TAB_NEXT:
-					// case SWT.TRAVERSE_ARROW_NEXT:
-						te.doit = true;
-						viewer.editElement(viewer.getElementAt(idx + 1), 1);
-						break;
-					default:
-						System.out.println(te.detail);
-					}
-				}
-			});
-			*/
 			this.editor.getControl().addKeyListener(new KeyAdapter() {
 				
 				@Override
