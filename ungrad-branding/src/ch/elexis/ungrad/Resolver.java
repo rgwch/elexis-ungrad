@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2016-2018 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
 package ch.elexis.ungrad;
 
 import java.util.regex.Matcher;
@@ -8,8 +21,19 @@ import ch.elexis.core.model.IPersistentObject;
 import ch.elexis.core.ui.text.TextContainer;
 import ch.rgw.tools.TimeTool;
 
+/**
+ * Resolve Elexis-Variables such as [Patient.Name] with the currently selected respective items
+ * @author gerry
+ *
+ */
 public class Resolver {
 	
+	/**
+	 * Resolve Variables in a String
+	 * @param raw The input Stting vontaining Placeholders
+	 * @return The String with resolved placeholders
+	 * @throws Exception If a Var references a class that could not be found in the running Elexis installation.
+	 */
 	public String resolve(String raw) throws Exception{
 		Pattern pat = Pattern.compile(TextContainer.MATCH_TEMPLATE);
 		StringBuffer sb = new StringBuffer();
