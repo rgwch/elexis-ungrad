@@ -1,13 +1,26 @@
 package ch.elexis.ungrad.qrbills;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Collection;
 import java.util.Properties;
 
-import ch.elexis.core.data.events.ElexisEventDispatcher;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+
+import ch.elexis.TarmedRechnung.Messages;
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter;
+import ch.elexis.core.data.preferences.CorePreferenceInitializer;
 import ch.elexis.core.data.util.PlatformHelper;
+import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
@@ -19,7 +32,7 @@ import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
 
 public class QR_Outputter implements IRnOutputter {
-
+	String outputDir;
 	
 	public QR_Outputter(){
 		// TODO Auto-generated constructor stub
@@ -41,9 +54,30 @@ public class QR_Outputter implements IRnOutputter {
 	}
 	
 	@Override
-	public Object createSettingsControl(Object parent){
-		// TODO Auto-generated method stub
-		return null;
+	public Control createSettingsControl(final Object parent){
+		final Composite parentInc = (Composite) parent;
+		Composite ret = new Composite(parentInc, SWT.NONE);
+		ret.setLayout(new GridLayout(2, false));
+		Label l = new Label(ret, SWT.NONE);
+		l.setText(Messages.XMLExporter_PleaseEnterOutputDirectoryForBills);
+		l.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		final Text text = new Text(ret, SWT.READ_ONLY | SWT.BORDER);
+		text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
+		Button b = new Button(ret, SWT.PUSH);
+		b.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e){
+				outputDir = new DirectoryDialog(parentInc.getShell(), SWT.OPEN).open();
+				CoreHub.localCfg.set(PreferenceConstants.RNN_DIR, outputDir);
+				text.setText(outputDir);
+			}
+		});
+		b.setText(Messages.XMLExporter_Change);
+		outputDir =
+			CoreHub.localCfg.get(PreferenceConstants.RNN_DIR,
+				CorePreferenceInitializer.getDefaultDBPath());
+		text.setText(outputDir);
+		return ret;
 	}
 	
 	@Override
@@ -71,7 +105,7 @@ public class QR_Outputter implements IRnOutputter {
 					String cookedHTML=resolver.resolve(rawHTML);
 					String svg = qr.generate(rn);
 					String finished=cookedHTML.replaceAll("QRCODE", svg);
-					FileTool.writeTextFile(new File("/home/gerry/test.html"), finished);
+					FileTool.writeTextFile(new File(outputDir,rn.getRnId()+".html"), finished);
 					res.add(new Result<Rechnung>(rn));
 				} catch (Exception ex) {
 					ExHandler.handle(ex);

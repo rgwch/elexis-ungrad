@@ -1,8 +1,36 @@
 <html>
-    <body>
-        <h1>[Patient.Name] [Patient.Vorname]</h1>
-        <p>
-            <div>QRCODE</div>
-        </p>
-    </body>
+<head>
+<style>
+#header{
+	color: green;
+	text-align: center;
+}
+#addressfield{
+	position:absolute;
+	right:10mm;
+	top:50mm;
+	background-color:light-gray;
+}
+
+#qrzone{
+	position:absolute;
+	left: 100mm;
+	top: 200mm;
+}
+</style>
+</head>
+<body>
+	<div id="header">
+		<h1>Praxis Breite - Rietstrasse 30 - 8200 Schaffhausen</h1>
+		<p>Tel.: 052 624 40 77  e-mail: praxis-breite@hin.ch</p>
+	</div>
+	<div id="addressfield">
+	[Patient.Name] [Patient.Vorname]<br />
+	[Patient.Strasse]<br />
+	[Patient.Plz] [Patient.Ort]<br />		
+	</div>
+	<p></p>
+	<div id="qrzone">QRCODE</div>
+	<p></p>
+</body>
 </html>

@@ -1,6 +1,7 @@
 package ch.elexis.ungrad.qrbills;
 
 import java.awt.image.BufferedImage;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import ch.elexis.TarmedRechnung.Messages;
@@ -90,9 +91,16 @@ public class QR_Generator {
 		String qriban=StringTool.pad(StringTool.LEFT, '0', StringTool.addModulo10(rn.getNr()), 27);
 		sb.append(qriban).append(StringConstants.CRLF);
 		sb.append("Memo");
-		List<QrSegment> segments = QrSegment.makeSegments(sb.toString());
-		QrCode result = QrCode.encodeSegments(segments, ecc);
-		return toSvgString(result);
+		QrCode result;
+		//try {
+			List<QrSegment> segments=QrSegment.makeSegments(sb.toString());
+			result = QrCode.encodeSegments(segments, ecc, VERSION, VERSION, -1, false);
+			return toSvgString(result);
+		/*} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}*/
 	}
 	
 	private void addKontakt(Kontakt k, StringBuilder sb) {
@@ -128,11 +136,12 @@ public class QR_Generator {
 	}
 	private String toSvgString(QrCode qr){
 		StringBuilder sb = new StringBuilder();
+
 		//sb.append("<svg width=\"200\" height=\"200\">");
 		sb.append(String.format(
-			"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 %1$d %1$d\" stroke=\"none\" width=\"47mm\" height=\"47mm\">\n",
+			"<svg width=\"47mm\" height=\"47mm\" viewBox=\"0 0 %1$d %1$d\">\n",
 			size + border * 2));
-		sb.append("<rect width=\"100mm\" height=\"100mm\" fill=\"#AAAAAA\"/>\n");
+		sb.append("<rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\"/>\n");
 		sb.append("<path d=\"");
 		boolean head = true;
 		for (int y = -border; y < size + border; y++) {
