@@ -139,7 +139,7 @@ public class QR_Generator {
 
 		//sb.append("<svg width=\"200\" height=\"200\">");
 		sb.append(String.format(
-			"<svg width=\"47mm\" height=\"47mm\" viewBox=\"0 0 %1$d %1$d\">\n",
+			"<svg width=\"80mm\" height=\"80mm\" viewBox=\"0 0 %1$d %1$d\">\n",
 			size + border * 2));
 		sb.append("<rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\"/>\n");
 		sb.append("<path d=\"");

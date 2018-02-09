@@ -1,28 +1,58 @@
-<html>
+<!DOCTYPE html>
+<html lang="de">
 
 <head>
+  <meta charset="utf-8" />
   <style>
+    @page{
+      size: A4 portrait;
+      margin-top: 10mm;
+    }
+    #container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 210mm;
+      height: 297mm;
+      font-size: 10pt;
+    }
+
     #header {
       color: green;
       text-align: center;
+      padding-bottom: 0;
+      padding-top: 0;
+    }
+    
+    h1{
+      font-size: 12pt;
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
 
+    table,tr,td{
+      padding-bottom:0;
+      padding-top:0;
+      margin-bottom:0;
+      margin-top:0;
+    }
     #datum {
       position: absolute;
-      right: 10mm;
-      top: 40mm;
+      right: 20mm;
+      top: 24mm;
     }
 
     #absender {
       position: absolute;
       left: 10mm;
-      top: 40mm;
+      top: 24mm;
+      margin-right: 20px;
     }
 
     #addressfield {
       position: absolute;
-      right: 10mm;
-      top: 50mm;
+      right: 20mm;
+      top: 45mm;
       background-color: light-gray;
     }
 
@@ -31,8 +61,14 @@
       background-color: gainsboro;
       left: 10mm;
       top: 70mm;
+      padding:5px;
     }
 
+    #maintext{
+      position: absolute;
+      left: 10mm;
+      top: 100mm;
+    }
     #qrzone {
       position: absolute;
       left: 100mm;
@@ -42,62 +78,69 @@
 </head>
 
 <body>
-  <!-- Die Kopfzeile -->
-  <div id="header">
-    <h1>Praxis [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</h1>
-    <span>[Mandant.Strasse] [Mandant.Plz] [Mandant.Ort] Tel.: [Mandant.Telefon1] e-mail: [Mandant.E-Mail]</span>
+  <div id="container">
+    <!-- Die Kopfzeile -->
+    <div id="header">
+      <h1>Praxis [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</h1>
+      <span>[Mandant.Strasse] [Mandant.Plz] [Mandant.Ort] Tel.: [Mandant.Telefon1] e-mail: [Mandant.E-Mail]</span>
+      <hr />
+    </div>
+
+    <div id="datum">
+      [Mandant.Ort], [Datum.heute]
+    </div>
+
+    <div id="absender">
+      [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]
+      <br /> Facharzt für [Mandant.TarmedSpezialität]
+      <br /> ZSR-Nr. [Mandant.KSK]
+    </div>
+
+    <div id="addressfield">
+      [Adressat.Anschrift]
+      <br />
+    </div>
+
+    <div id="rn_ident">
+        <table>
+          <tr>
+            <td>
+              Für: [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Rechnungs-Nummer:
+            </td>
+            <td>
+              [Rechnung.RnNummer]
+            </td>
+          </tr>
+          <tr>
+            <td>Rechnungs-Datum:</td>
+            <td>[Rechnung.RnDatum]</td>
+          </tr>
+          <tr>
+            <td>Behandlungen von:</td>
+            <td>[Rechnung.RnDatumVon]</td>
+          </tr>
+          <tr>
+            <td>Behandlungen bis:</td>
+            <td>[Rechnung.RnDatumBis]</td>
+          </tr>
+  
+        </table>
+      </div>
+  
+      <div id="maintext">
+      <h1>Honorar-Rechnung</h1>
+      <p>Diese Seite ist für Ihre Unterlagen bestimmt. Bitte senden Sie den beiliegenden Rückerstattungs-Beleg an Ihre Krankenkasse. 
+        Bitte um Begleichung innert 30 Tagen.
+      </p>
+    </div>
+    
+      <div id="qrzone">QRCODE</div>
   </div>
-
-  <div id="datum">
-    [Mandant.Ort], [Datum.heute]
-  </div>
-
-  <div id="absender">
-    [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]
-    <br /> Facharzt für [Mandant.TarmedSpezialität]
-    <br /> ZSR-Nr. [Mandant.KSK]
-  </div>
-
-  <div id="addressfield">
-    [Adressat.Anschrift]
-    <br />
-  </div>
-
-  <div id="rn_ident">
-    <table>
-      <tr>
-        <td>
-          Für: [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
-          <br />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          Rechnungs-Nummer:
-        </td>
-        <td>
-          [Rechnung.RnNummer]
-        </td>
-      </tr>
-      <tr>
-        <td>Rechnungs-Datum:</td>
-        <td>[Rechnung.RnDatum]</td>
-      </tr>
-      <tr>
-        <td>Behandlungen von:</td>
-        <td>[Rechnung.RnDatumVon]</td>
-      </tr>
-      <tr>
-        <td>Behandlungen bis:</td>
-        <td>[Rechnung.RnDatumBis]</td>
-      </tr>
-
-    </table>
-  </div>
-
-
-  <div id="qrzone">QRCODE</div>
-  <p></p>
 </body>
 
 </html>
