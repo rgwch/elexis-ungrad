@@ -1,36 +1,103 @@
 <html>
-<head>
-<style>
-#header{
-	color: green;
-	text-align: center;
-}
-#addressfield{
-	position:absolute;
-	right:10mm;
-	top:50mm;
-	background-color:light-gray;
-}
 
-#qrzone{
-	position:absolute;
-	left: 100mm;
-	top: 200mm;
-}
-</style>
+<head>
+  <style>
+    #header {
+      color: green;
+      text-align: center;
+    }
+
+    #datum {
+      position: absolute;
+      right: 10mm;
+      top: 40mm;
+    }
+
+    #absender {
+      position: absolute;
+      left: 10mm;
+      top: 40mm;
+    }
+
+    #addressfield {
+      position: absolute;
+      right: 10mm;
+      top: 50mm;
+      background-color: light-gray;
+    }
+
+    #rn_ident {
+      position: absolute;
+      background-color: gainsboro;
+      left: 10mm;
+      top: 70mm;
+    }
+
+    #qrzone {
+      position: absolute;
+      left: 100mm;
+      top: 200mm;
+    }
+  </style>
 </head>
+
 <body>
-	<div id="header">
-		<h1>Praxis Breite - Rietstrasse 30 - 8200 Schaffhausen</h1>
-		<p>Tel.: 052 624 40 77  e-mail: praxis-breite@hin.ch</p>
-	</div>
-	<div id="addressfield">
-	[Patient.Name] [Patient.Vorname]<br />
-	[Patient.Strasse]<br />
-	[Patient.Plz] [Patient.Ort]<br />		
-	</div>
-	<p></p>
-	<div id="qrzone">QRCODE</div>
-	<p></p>
+  <!-- Die Kopfzeile -->
+  <div id="header">
+    <h1>Praxis [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</h1>
+    <span>[Mandant.Strasse] [Mandant.Plz] [Mandant.Ort] Tel.: [Mandant.Telefon1] e-mail: [Mandant.E-Mail]</span>
+  </div>
+
+  <div id="datum">
+    [Mandant.Ort], [Datum.heute]
+  </div>
+
+  <div id="absender">
+    [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]
+    <br /> Facharzt für [Mandant.TarmedSpezialität]
+    <br /> ZSR-Nr. [Mandant.KSK]
+  </div>
+
+  <div id="addressfield">
+    [Adressat.Anschrift]
+    <br />
+  </div>
+
+  <div id="rn_ident">
+    <table>
+      <tr>
+        <td>
+          Für: [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
+          <br />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Rechnungs-Nummer:
+        </td>
+        <td>
+          [Rechnung.RnNummer]
+        </td>
+      </tr>
+      <tr>
+        <td>Rechnungs-Datum:</td>
+        <td>[Rechnung.RnDatum]</td>
+      </tr>
+      <tr>
+        <td>Behandlungen von:</td>
+        <td>[Rechnung.RnDatumVon]</td>
+      </tr>
+      <tr>
+        <td>Behandlungen bis:</td>
+        <td>[Rechnung.RnDatumBis]</td>
+      </tr>
+
+    </table>
+  </div>
+
+
+  <div id="qrzone">QRCODE</div>
+  <p></p>
 </body>
+
 </html>

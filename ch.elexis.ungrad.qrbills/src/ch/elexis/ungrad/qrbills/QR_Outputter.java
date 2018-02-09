@@ -2,6 +2,8 @@ package ch.elexis.ungrad.qrbills;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.swt.SWT;
@@ -20,6 +22,7 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.data.preferences.CorePreferenceInitializer;
 import ch.elexis.core.data.util.PlatformHelper;
+import ch.elexis.core.model.IPersistentObject;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Kontakt;
@@ -33,9 +36,9 @@ import ch.rgw.tools.Result.SEVERITY;
 
 public class QR_Outputter implements IRnOutputter {
 	String outputDir;
+	Map<String, IPersistentObject> replacer=new HashMap<>();
 	
 	public QR_Outputter(){
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
@@ -89,7 +92,6 @@ public class QR_Outputter implements IRnOutputter {
 	@Override
 	public Result<Rechnung> doOutput(TYPE type, Collection<Rechnung> rnn, Properties props){
 		Result<Rechnung> res = new Result<Rechnung>();
-		Resolver resolver=new Resolver();
 		QR_Generator qr = new QR_Generator();
 		String template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator
 			+ "rsc" + File.separator + "qrbill_template_page1.html";
@@ -102,6 +104,9 @@ public class QR_Outputter implements IRnOutputter {
 					Fall fall=rn.getFall();
 					Patient patient=fall.getPatient();
 					Kontakt biller=rn.getMandant().getRechnungssteller();
+					replacer.put("Adressat", rn.getFall().getPatient());
+					Resolver resolver=new Resolver(replacer,true);
+					
 					String cookedHTML=resolver.resolve(rawHTML);
 					String svg = qr.generate(rn);
 					String finished=cookedHTML.replaceAll("QRCODE", svg);
