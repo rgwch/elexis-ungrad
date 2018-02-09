@@ -116,6 +116,7 @@ public class QR_Outputter implements IRnOutputter {
 							.replace("[AMOUNT]", bill.amount.getAmountAsString())
 							.replace("[IBAN]", bill.IBAN)
 							.replace("[BILLER]", bill.biller_address)
+							.replace("[INFO]", Integer.toString(bill.numCons)+" Konsultationen")
 							.replace("[ADDRESSEE]", bill.addressee)
 							.replace("[DUE]", bill.dateDue);
 					
