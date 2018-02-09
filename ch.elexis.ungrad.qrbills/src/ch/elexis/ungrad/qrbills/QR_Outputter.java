@@ -34,12 +34,17 @@ import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
 
+/**
+ * An Elexis-IRnOutputter for ISO 20022 conformant bills. Embeds a QR Code in a HTML template and writes the result in a html
+ * file. (To be converted to pdf or to print directly, whatever). 
+ * @author gerry
+ *
+ */
 public class QR_Outputter implements IRnOutputter {
 	String outputDir;
-	Map<String, IPersistentObject> replacer=new HashMap<>();
+	Map<String, IPersistentObject> replacer = new HashMap<>();
 	
-	public QR_Outputter(){
-	}
+	public QR_Outputter(){}
 	
 	@Override
 	public String getDescription(){
@@ -76,9 +81,8 @@ public class QR_Outputter implements IRnOutputter {
 			}
 		});
 		b.setText(Messages.XMLExporter_Change);
-		outputDir =
-			CoreHub.localCfg.get(PreferenceConstants.RNN_DIR,
-				CorePreferenceInitializer.getDefaultDBPath());
+		outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR,
+			CorePreferenceInitializer.getDefaultDBPath());
 		text.setText(outputDir);
 		return ret;
 	}
@@ -101,16 +105,16 @@ public class QR_Outputter implements IRnOutputter {
 			
 			for (Rechnung rn : rnn) {
 				try {
-					Fall fall=rn.getFall();
-					Patient patient=fall.getPatient();
-					Kontakt biller=rn.getMandant().getRechnungssteller();
+					Fall fall = rn.getFall();
+					Patient patient = fall.getPatient();
+					Kontakt biller = rn.getMandant().getRechnungssteller();
 					replacer.put("Adressat", rn.getFall().getPatient());
-					Resolver resolver=new Resolver(replacer,true);
+					Resolver resolver = new Resolver(replacer, true);
 					
-					String cookedHTML=resolver.resolve(rawHTML);
+					String cookedHTML = resolver.resolve(rawHTML);
 					String svg = qr.generate(rn);
-					String finished=cookedHTML.replaceAll("QRCODE", svg);
-					FileTool.writeTextFile(new File(outputDir,rn.getRnId()+".html"), finished);
+					String finished = cookedHTML.replaceAll("QRCODE", svg);
+					FileTool.writeTextFile(new File(outputDir, rn.getRnId() + ".html"), finished);
 					res.add(new Result<Rechnung>(rn));
 				} catch (Exception ex) {
 					ExHandler.handle(ex);

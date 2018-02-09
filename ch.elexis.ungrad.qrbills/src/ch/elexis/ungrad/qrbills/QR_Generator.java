@@ -1,7 +1,5 @@
 package ch.elexis.ungrad.qrbills;
 
-import java.awt.image.BufferedImage;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import ch.elexis.TarmedRechnung.Messages;
@@ -9,7 +7,6 @@ import ch.elexis.TarmedRechnung.TarmedACL;
 import ch.elexis.core.constants.StringConstants;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Rechnung;
-import ch.elexis.tarmedprefs.TarmedRequirements;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 import io.nayuki.qrcodegen.QrCode;
@@ -61,85 +58,91 @@ public class QR_Generator {
 	
 	};
 	
-	
+	/**
+	 * Generate an iso 20022 conformant QR-Code (which is, in fact, an iso 18004 conformant QR-Code with
+	 * some restrictions, some predefinitioons and a swiss cross in the center.
+	 * @param rn the bill to take the data from
+	 * @return an SVG Image with the QR Code.
+	 */
 	public String generate(Rechnung rn){
-		String iban = "CH13001223455666"; // todo
+		String iban = "CH130012234556661fake"; // todo, set and use real IBAN
 		Kontakt rnSteller = rn.getMandant().getRechnungssteller();
-		TarmedACL ta=TarmedACL.getInstance();
+		TarmedACL ta = TarmedACL.getInstance();
 		StringBuilder sb = new StringBuilder();
-		sb.append("SPC\r\n")
-			.append("0100\r\n")
-			.append("1\r\n")
-			.append(iban).append(StringConstants.CRLF);
+		sb.append("SPC\r\n").append("0100\r\n").append("1\r\n").append(iban)
+			.append(StringConstants.CRLF);
 		
-		String curr =
-				(String) rnSteller.getExtInfoStoredObjectByKey(
-					Messages.XMLExporter_Currency);
-			if (StringTool.isNothing(curr)) {
-				curr = "CHF"; //$NON-NLS-1$
-			}
-		Kontakt bank=Kontakt.load(rnSteller.getInfoString(ta.RNBANK));
+		String curr = (String) rnSteller.getExtInfoStoredObjectByKey(Messages.XMLExporter_Currency);
+		if (StringTool.isNothing(curr)) {
+			curr = "CHF"; //$NON-NLS-1$
+		}
+		Kontakt bank = Kontakt.load(rnSteller.getInfoString(ta.RNBANK));
 		addKontakt(bank, sb);
-		addKontakt(rnSteller,sb);	
+		addKontakt(rnSteller, sb);
 		appendOptional(sb, rn.getBetrag().getAmountAsString());
 		appendOptional(sb, curr);
-		TimeTool now=new TimeTool();
+		TimeTool now = new TimeTool();
 		now.addDays(30);
-		appendOptional(sb,now.toString(TimeTool.DATE_MYSQL));
+		appendOptional(sb, now.toString(TimeTool.DATE_MYSQL));
 		addKontakt(rn.getFall().getPatient(), sb);
 		sb.append("QRR").append(StringConstants.CRLF);
-		String qriban=StringTool.pad(StringTool.LEFT, '0', StringTool.addModulo10(rn.getNr()), 27);
+		String qriban =
+			StringTool.pad(StringTool.LEFT, '0', StringTool.addModulo10(rn.getNr()), 27);
 		sb.append(qriban).append(StringConstants.CRLF);
 		sb.append("Memo");
 		QrCode result;
-		//try {
-			List<QrSegment> segments=QrSegment.makeSegments(sb.toString());
-			result = QrCode.encodeSegments(segments, ecc, VERSION, VERSION, -1, false);
-			return toSvgString(result);
-		/*} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}*/
+		List<QrSegment> segments = QrSegment.makeSegments(sb.toString());
+		result = QrCode.encodeSegments(segments, ecc, VERSION, VERSION, -1, false);
+		return toSvgString(result);
 	}
 	
-	private void addKontakt(Kontakt k, StringBuilder sb) {
+	/*
+	 * Add Kontakt data ISO 20022 conformant (separate street name and buding Nr). This is a quick hack that works only, if the building number
+	 * starts with a digit.
+	 */
+	private void addKontakt(Kontakt k, StringBuilder sb){
 		sb.append(k.getLabel()).append(StringConstants.CRLF);
-		String straddr=k.get(Kontakt.FLD_STREET);
-		if(StringTool.isNothing(straddr)) {
+		String straddr = k.get(Kontakt.FLD_STREET);
+		if (StringTool.isNothing(straddr)) {
 			sb.append(StringConstants.CRLF);
 			sb.append(StringConstants.CRLF);
-		}else {
-			String[] strnr=straddr.split(" [0-9]");
+		} else {
+			String[] strnr = straddr.split(" [0-9]");
 			appendOptional(sb, strnr[0]);
-			if(strnr.length>1) {
+			if (strnr.length > 1) {
 				appendOptional(sb, strnr[1]);
-			}else {
+			} else {
 				sb.append(StringConstants.CRLF);
-			}				
+			}
 		}
 		appendOptional(sb, k.get(Kontakt.FLD_ZIP));
 		appendOptional(sb, k.get(Kontakt.FLD_PLACE));
-		String cntry=k.get(Kontakt.FLD_COUNTRY);
-		if(StringTool.isNothing(cntry)) {
-			cntry="CH";
+		String cntry = k.get(Kontakt.FLD_COUNTRY);
+		if (StringTool.isNothing(cntry)) {
+			cntry = "CH";
 		}
 		appendOptional(sb, cntry);
 		
 	}
 	
-	private void appendOptional(StringBuilder sb, String val) {
-		if(!StringTool.isNothing(val)) {
+	/*
+	 * Even if we don't set a field, we must put a CRLF since there's no way to identify fields otherwise.
+	 */
+	private void appendOptional(StringBuilder sb, String val){
+		if (!StringTool.isNothing(val)) {
 			sb.append(val);
 		}
 		sb.append(StringConstants.CRLF);
 	}
+	
+	/*
+	 * create an SVG image from a QR Code to insert into the template. 
+	 * @param qr the QRCode to embed
+	 * @return a String describing an SVG image.
+	 */
 	private String toSvgString(QrCode qr){
 		StringBuilder sb = new StringBuilder();
-
-		//sb.append("<svg width=\"200\" height=\"200\">");
-		sb.append(String.format(
-			"<svg width=\"80mm\" height=\"80mm\" viewBox=\"0 0 %1$d %1$d\">\n",
+		sb.append(String.format("<svg width=\"80mm\" height=\"80mm\" viewBox=\"0 0 %1$d %1$d\">\n",
 			size + border * 2));
 		sb.append("<rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\"/>\n");
 		sb.append("<path d=\"");
