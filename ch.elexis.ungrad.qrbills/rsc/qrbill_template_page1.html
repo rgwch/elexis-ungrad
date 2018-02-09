@@ -4,17 +4,17 @@
 <head>
   <meta charset="utf-8" />
   <style>
-    @page{
+    @page {
       size: A4 portrait;
-      margin-top: 10mm;
     }
+
     #container {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 210mm;
-      height: 297mm;
       font-size: 10pt;
+      left:0;
+      top:0;
+      width: 100%;
+      height: 100%
     }
 
     #header {
@@ -23,19 +23,22 @@
       padding-bottom: 0;
       padding-top: 0;
     }
-    
-    h1{
+
+    h1 {
       font-size: 12pt;
       margin-bottom: 0;
       padding-bottom: 0;
     }
 
-    table,tr,td{
-      padding-bottom:0;
-      padding-top:0;
-      margin-bottom:0;
-      margin-top:0;
+    table,
+    tr,
+    td {
+      padding-bottom: 0;
+      padding-top: 0;
+      margin-bottom: 0;
+      margin-top: 0;
     }
+
     #datum {
       position: absolute;
       right: 20mm;
@@ -61,19 +64,85 @@
       background-color: gainsboro;
       left: 10mm;
       top: 70mm;
-      padding:5px;
+      padding: 5px;
     }
 
-    #maintext{
+    #maintext {
       position: absolute;
       left: 10mm;
       top: 100mm;
     }
-    #qrzone {
+
+    #payment_slip {
       position: absolute;
-      left: 100mm;
-      top: 200mm;
+      width: 148mm;
+      height: 105mm;
+      right: 0;
+      bottom: 0;
+      border-style: solid;
+      border-color: black;
+      border-width: 1px;
+      font-family: Arial, Helvetica, sans-serif;
     }
+
+    #payment_slip_title {
+      position: absolute;
+      font-size: 11pt;
+      top: 0;
+      left: 6mm;
+      height: 10mm;
+    }
+
+    #payment_slip_mode {
+      position: absolute;
+      font-size: 11pt;
+      top: 10mm;
+      left: 6mm;
+      height: 15mm;
+    }
+
+    #payment_slip_qrzone {
+      position: absolute;
+      left: 6mm;
+      top: 30mm;
+      width: 50mm;
+      height: 50mm;
+    }
+
+    #payment_slip_amount {
+      position: absolute;
+      left: 6mm;
+      top: 85mm;
+      height: 15mm;
+    }
+
+    #payment_slip_details {
+      position: absolute;
+      left: 65mm;
+      top: 6mm;
+    }
+
+    .payment_slip_heading {
+      font-size: 9pt;
+      font-weight: bold;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    .payment_slip_default {
+      font-size: 11pt;
+      padding-top: 0;
+      margin-top: 0;
+    }
+    .rectangle{
+            position:absolute; 
+            left:20mm; 
+            top:20mm; 
+            width:100mm; 
+            height:100mm; 
+            border-style:solid;
+            border-width:1px;
+        }
   </style>
 </head>
 
@@ -102,44 +171,79 @@
     </div>
 
     <div id="rn_ident">
-        <table>
-          <tr>
-            <td>
-              Für: [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Rechnungs-Nummer:
-            </td>
-            <td>
-              [Rechnung.RnNummer]
-            </td>
-          </tr>
-          <tr>
-            <td>Rechnungs-Datum:</td>
-            <td>[Rechnung.RnDatum]</td>
-          </tr>
-          <tr>
-            <td>Behandlungen von:</td>
-            <td>[Rechnung.RnDatumVon]</td>
-          </tr>
-          <tr>
-            <td>Behandlungen bis:</td>
-            <td>[Rechnung.RnDatumBis]</td>
-          </tr>
-  
-        </table>
-      </div>
-  
-      <div id="maintext">
+      <table>
+        <tr>
+          <td>
+            Für: [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Rechnungs-Nummer:
+          </td>
+          <td>
+            [Rechnung.RnNummer]
+          </td>
+        </tr>
+        <tr>
+          <td>Rechnungs-Datum:</td>
+          <td>[Rechnung.RnDatum]</td>
+        </tr>
+        <tr>
+          <td>Behandlungen von:</td>
+          <td>[Rechnung.RnDatumVon]</td>
+        </tr>
+        <tr>
+          <td>Behandlungen bis:</td>
+          <td>[Rechnung.RnDatumBis]</td>
+        </tr>
+
+      </table>
+    </div>
+
+    <div id="maintext">
       <h1>Honorar-Rechnung</h1>
-      <p>Diese Seite ist für Ihre Unterlagen bestimmt. Bitte senden Sie den beiliegenden Rückerstattungs-Beleg an Ihre Krankenkasse. 
+      <p>Diese Seite ist für Ihre Unterlagen bestimmt. Bitte senden Sie den beiliegenden Rückerstattungs-Beleg an Ihre Krankenkasse.
         Bitte um Begleichung innert 30 Tagen.
       </p>
     </div>
-    
-      <div id="qrzone">QRCODE</div>
+    <div id="payment_slip">
+      <div id="payment_slip_title">
+        Zahlteil QR-Rechnung
+      </div>
+      <div id="payment_slip_mode">
+        <p class="payment_slip_heading">Unterstützt</p>
+        <span class="payment_slip_default">Überweisung</span>
+      </div>
+      <div id="payment_slip_qrzone">[QRCODE]</div>
+      <div id="payment_slip_amount">
+        <table>
+          <tr class="payment_slip_heading">
+            <td style="padding-right:5px;">Währung</td>
+            <td style="padding-left:5px;">Betrag</td>
+          </tr>
+          <tr class="payment_slip_default">
+            <td style="padding-right:5px;">[CURRENCY]</td>
+            <td style="padding-left:5px;">[AMOUNT]</td>
+          </tr>
+        </table>
+      </div>
+      <div id="payment_slip_details">
+        <p class="payment_slip_heading">Konto</p>
+        <p class="payment_slip_default">[IBAN]</p>
+        <p class="payment_slip_heading">Zahlungsempfänger</p>
+        <p class="payment_slip_default">[BILLER]</p>
+        <p class="payment_slip_heading">Zusätzliche Informationen</p>
+        <p class="payment_slip_default">Arztrechnung</p>
+        <p class="payment_slip_heading">Zahlungspflichtiger</p>
+        <p class="payment_slip_default">[ADDRESSEE]</p>
+        <p class="payment_slip_heading">Zahlbar bis</p>
+        <p class="payment_slip_default">[DUE]</p>
+      
+        
+      </div>
+    </div>
+    <div class="rectangle"></div>
   </div>
 </body>
 

@@ -105,15 +105,21 @@ public class QR_Outputter implements IRnOutputter {
 			
 			for (Rechnung rn : rnn) {
 				try {
-					Fall fall = rn.getFall();
-					Patient patient = fall.getPatient();
-					Kontakt biller = rn.getMandant().getRechnungssteller();
-					replacer.put("Adressat", rn.getFall().getPatient());
+					BillDetails bill=new BillDetails(rn);
+					replacer.put("Adressat", bill.adressat);
 					Resolver resolver = new Resolver(replacer, true);
 					
 					String cookedHTML = resolver.resolve(rawHTML);
-					String svg = qr.generate(rn);
-					String finished = cookedHTML.replaceAll("QRCODE", svg);
+					String svg = qr.generate(rn,bill);
+					String finished = cookedHTML.replace("[QRCODE]", svg)
+							.replace("[CURRENCY]", bill.currency)
+							.replace("[AMOUNT]", bill.amount.getAmountAsString())
+							.replace("[IBAN]", bill.IBAN)
+							.replace("[BILLER]", bill.biller_address)
+							.replace("[ADDRESSEE]", bill.addressee)
+							.replace("[DUE]", bill.dateDue);
+					
+							
 					FileTool.writeTextFile(new File(outputDir, rn.getRnId() + ".html"), finished);
 					res.add(new Result<Rechnung>(rn));
 				} catch (Exception ex) {

@@ -64,31 +64,21 @@ public class QR_Generator {
 	 * @param rn the bill to take the data from
 	 * @return an SVG Image with the QR Code.
 	 */
-	public String generate(Rechnung rn){
-		String iban = "CH130012234556661fake"; // todo, set and use real IBAN
-		Kontakt rnSteller = rn.getMandant().getRechnungssteller();
-		TarmedACL ta = TarmedACL.getInstance();
+	public String generate(Rechnung rn, BillDetails bill){
 		StringBuilder sb = new StringBuilder();
-		sb.append("SPC\r\n").append("0100\r\n").append("1\r\n").append(iban)
+		sb.append("SPC\r\n").append("0100\r\n").append("1\r\n").append(bill.IBAN)
 			.append(StringConstants.CRLF);
 		
-		String curr = (String) rnSteller.getExtInfoStoredObjectByKey(Messages.XMLExporter_Currency);
-		if (StringTool.isNothing(curr)) {
-			curr = "CHF"; //$NON-NLS-1$
-		}
-		Kontakt bank = Kontakt.load(rnSteller.getInfoString(ta.RNBANK));
-		addKontakt(bank, sb);
-		addKontakt(rnSteller, sb);
-		appendOptional(sb, rn.getBetrag().getAmountAsString());
-		appendOptional(sb, curr);
+		addKontakt(bill.bank, sb);
+		addKontakt(bill.biller, sb);
+		appendOptional(sb, bill.amount.getAmountAsString());
+		appendOptional(sb, bill.currency);
 		TimeTool now = new TimeTool();
 		now.addDays(30);
 		appendOptional(sb, now.toString(TimeTool.DATE_MYSQL));
-		addKontakt(rn.getFall().getPatient(), sb);
+		addKontakt(bill.patient, sb);
 		sb.append("QRR").append(StringConstants.CRLF);
-		String qriban =
-			StringTool.pad(StringTool.LEFT, '0', StringTool.addModulo10(rn.getNr()), 27);
-		sb.append(qriban).append(StringConstants.CRLF);
+		sb.append(bill.qrIBAN).append(StringConstants.CRLF);
 		sb.append("Memo");
 		QrCode result;
 		List<QrSegment> segments = QrSegment.makeSegments(sb.toString());
@@ -142,7 +132,7 @@ public class QR_Generator {
 	 */
 	private String toSvgString(QrCode qr){
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("<svg width=\"80mm\" height=\"80mm\" viewBox=\"0 0 %1$d %1$d\">\n",
+		sb.append(String.format("<svg width=\"57mm\" height=\"57mm\" viewBox=\"0 0 %1$d %1$d\">\n",
 			size + border * 2));
 		sb.append("<rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\"/>\n");
 		sb.append("<path d=\"");
