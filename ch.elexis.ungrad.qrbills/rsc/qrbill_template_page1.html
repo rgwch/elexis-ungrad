@@ -1,4 +1,19 @@
 <!DOCTYPE html>
+<!--
+  Template for ISO 20022 conformant bills (for swiss payments after 2018).
+  Note: The output when printed will differ from the screen display. Output must be:
+  * without borders
+  * Without any scaling (i.e. 100%)
+  * Withoud Printer-supplied  or OS supplied headers or footers
+
+  Only the lowermost part with the payment slip mut be exactly like this. The rest of the paper
+  is user-designable.
+
+  (c) 2018 by G. Weirich
+  You may use and modify this template freely, but there is no warranty of any kind that is is 
+  correct and that the output will be accepted by authorities. YMMV.
+-->
+
 <html lang="de">
 
 <head>
@@ -7,7 +22,8 @@
     @page {
       size: A4 portrait;
     }
-
+  
+    /* the outermost div */
     #container {
       position: absolute;
       font-size: 10pt;
@@ -17,6 +33,7 @@
       height: 100%
     }
 
+    /* The heading swith sender informations and practice logo*/ 
     #header {
       color: green;
       text-align: center;
@@ -30,6 +47,7 @@
       padding-bottom: 0;
     }
 
+  /* Make tables more compact */
     table,
     tr,
     td {
@@ -52,6 +70,7 @@
       margin-right: 20px;
     }
 
+    /* Modify the position to match your envelopes */
     #addressfield {
       position: absolute;
       right: 20mm;
@@ -59,6 +78,7 @@
       background-color: light-gray;
     }
 
+    /* The summary box for the details of the Bill */
     #rn_ident {
       position: absolute;
       background-color: gainsboro;
@@ -73,15 +93,19 @@
       top: 100mm;
     }
 
+    /* Do not modify or reposition these parts */
     #payment_slip {
       position: absolute;
       width: 148mm;
       height: 105mm;
       right: 0;
       bottom: 0;
-      border-style: solid;
-      border-color: black;
-      border-width: 1px;
+      border-left-color: black;
+      border-left-style:dashed;
+      border-top-style: dashed;
+      border-top-color: black;
+      border-top-width: 1px;
+      border-left-width: 1px;
       font-family: Arial, Helvetica, sans-serif;
     }
 

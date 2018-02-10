@@ -20,7 +20,7 @@ public class BillDetails {
 	Money amount;
 	Kontakt biller;
 	Kontakt adressat;
-	String IBAN = "FAKE";
+	String IBAN = "CH000NUR00ZUR00DEMO00";
 	String currency;
 	Kontakt bank;
 	String qrIBAN;
@@ -44,7 +44,7 @@ public class BillDetails {
 		biller = rn.getMandant().getRechnungssteller();
 		checkNull(biller, "Biller");
 		adressat = patient;
-		IBAN = (String) biller.getExtInfoStoredObjectByKey("IBAN");
+		// IBAN = (String) biller.getExtInfoStoredObjectByKey("IBAN");
 		checkNull(IBAN, "IBAN");
 		if (IBAN.length() != 21) {
 			throw new BadParameterException("IBAN is not 21 Chars", 3);
