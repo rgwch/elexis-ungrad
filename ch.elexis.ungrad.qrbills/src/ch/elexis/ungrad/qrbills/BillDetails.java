@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2018 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
 package ch.elexis.ungrad.qrbills;
 
 import ch.elexis.TarmedRechnung.Messages;
@@ -6,6 +19,7 @@ import ch.elexis.data.Fall;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Rechnung;
+import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.rgw.crypt.BadParameterException;
 import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
@@ -44,7 +58,7 @@ public class BillDetails {
 		biller = rn.getMandant().getRechnungssteller();
 		checkNull(biller, "Biller");
 		adressat = patient;
-		// IBAN = (String) biller.getExtInfoStoredObjectByKey("IBAN");
+		IBAN = (String) biller.getExtInfoStoredObjectByKey(PreferenceConstants.QRIBAN);
 		checkNull(IBAN, "IBAN");
 		if (IBAN.length() != 21) {
 			throw new BadParameterException("IBAN is not 21 Chars", 3);

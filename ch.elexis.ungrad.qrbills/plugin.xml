@@ -4,9 +4,24 @@
    <extension
          point="ch.elexis.core.data.RechnungsManager">
       <Rechnung
-            name="ch.elexis.ungrad.qrbills.Rechnung"
+            name="QR Code Rechnung"
             outputter="ch.elexis.ungrad.qrbills.QR_Outputter">
       </Rechnung>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="ch.elexis.ungrad.qrbills.preferences.QRCodePreferencePage"
+            id="ch.elexis.ungrad.qrbills.preferences.PreferencePage"
+            name="QR-Rechnung"
+            category="ch.elexis.Leistungscodes">	
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="ch.elexis.ungrad.qrbills.preferences.PreferenceInitializer">
+      </initializer>
    </extension>
 
 </plugin>

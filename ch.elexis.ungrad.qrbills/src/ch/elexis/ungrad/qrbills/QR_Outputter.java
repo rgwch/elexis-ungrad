@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2018 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
 package ch.elexis.ungrad.qrbills;
 
 import java.io.File;
@@ -27,6 +40,7 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Rechnung;
 import ch.elexis.ungrad.Resolver;
+import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Result;
