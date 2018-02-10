@@ -2,8 +2,6 @@ package ch.elexis.ungrad.qrbills;
 
 import java.util.List;
 
-import ch.elexis.TarmedRechnung.Messages;
-import ch.elexis.TarmedRechnung.TarmedACL;
 import ch.elexis.core.constants.StringConstants;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Rechnung;
