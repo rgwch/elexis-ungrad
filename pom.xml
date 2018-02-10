@@ -34,6 +34,8 @@
         <module>com.jsigle.noatext_jsl.feature</module>
         <module>ungrad-labenter</module>
         <module>ungrad-labenter-feature</module>
+        <module>ch.elexis.ungrad.qrbills</module>
+        <module>ch.elexis.ungrad.qrbills.feature</module>
         <!-- module>ch.berchtold.privatrechnung</module>
         <module>ch.berchtold.privatrechnung.feature</module -->
         <module>ungrad-p2site</module>
