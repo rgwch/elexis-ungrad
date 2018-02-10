@@ -17,4 +17,6 @@ Allerdings ist der Aufbau des QR-Zahlteils ein wenig knifflig, und deshalb sind 
 
  ## Konfiguration
 
- QrBills benötigt die IBAN Nummer Ihres Kontos.
+ QrBills benötigt die IBAN Nummer Ihres Kontos. Gehen Sie auf Datei-Einstellungen - Abrechnungssysteme - QR-Rechnung und geben Sie die entsprechenden Daten ein.
+ 
+ 
