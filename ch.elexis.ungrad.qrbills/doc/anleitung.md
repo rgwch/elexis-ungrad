@@ -31,4 +31,14 @@ Allerdings ist der Aufbau des QR-Zahlteils ein wenig knifflig, und deshalb sind 
 
  ## Nutzung
  
+ Wählen Sie bei der Rechnungsausgabe das Ziel "Rechnung mit QR-Code". Im Feld darunter tragen Sie das Verzeichnis ein, in das die Rechnungen
+ geschrieben werden sollen. 
+ 
+ ![output.jpg](./output.jpg)
+ 
+ Die Rechnungen werden als id.html geschrieben, wobei für ID eine Kombination aus Patientennummer und Rechnungsnummer eingesetzt wird. In den meisten Fällen werden Sie die Rechnung aber nicht als HTML haben wollen, sondern entweder als PDF, um sie dem patienten per Mail zu senden, oder Sie möchten sie auf den Drucker senden.
+ 
+Im Feld "Nachbearbeitung" können Sie irgendein beliebiges Programm angeben, das die Rechnungen weiterverarbeitet. (Hier im Beispiel werden HTML zu PDF Rechnungen umgewandelt).
+
+
  

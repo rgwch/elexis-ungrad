@@ -15,8 +15,13 @@ package ch.elexis.ungrad.qrbills.preferences;
 
 public class PreferenceConstants {
 	static final String BASE="ch.elexis.ungrad/rbills";
-	public static final String RNN_DIR=BASE+"/rnndir"; 
 	
+	// Settings entries
+	public static final String RNN_DIR=BASE+"/rnndir"; 
+	public static final String POSTPROCESS="/postprocess";
+	
+	
+	// Extinfo entries
 	public static final String QRBANK=BASE+"/bank";
 	public static final String QRIBAN=BASE+"/iban";
 

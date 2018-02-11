@@ -14,6 +14,7 @@
 package ch.elexis.ungrad.qrbills;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +58,8 @@ import ch.rgw.tools.Result.SEVERITY;
 public class QR_Outputter implements IRnOutputter {
 	String outputDir;
 	Map<String, IPersistentObject> replacer = new HashMap<>();
+	Text txPostProcess;
+	String postProcessCommand = "";
 
 	public QR_Outputter() {
 	}
@@ -85,7 +88,7 @@ public class QR_Outputter implements IRnOutputter {
 		l.setText(Messages.XMLExporter_PleaseEnterOutputDirectoryForBills);
 		l.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		final Text text = new Text(ret, SWT.READ_ONLY | SWT.BORDER);
-		text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
+		text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		Button b = new Button(ret, SWT.PUSH);
 		b.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -98,13 +101,19 @@ public class QR_Outputter implements IRnOutputter {
 		b.setText(Messages.XMLExporter_Change);
 		outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR, CorePreferenceInitializer.getDefaultDBPath());
 		text.setText(outputDir);
+		Label lbPostProcess = new Label(ret, SWT.NONE);
+		lbPostProcess.setText("Nachbearbeitung (%s for Quelldatei, %t für Zieldatei einsetzen)");
+		lbPostProcess.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		txPostProcess = new Text(ret, SWT.BORDER);
+		txPostProcess.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
+		txPostProcess.setText(CoreHub.localCfg.get(PreferenceConstants.POSTPROCESS, ""));
 		return ret;
 	}
 
 	@Override
 	public void saveComposite() {
-		// TODO Auto-generated method stub
-
+		postProcessCommand = txPostProcess.getText();
+		CoreHub.localCfg.set(PreferenceConstants.POSTPROCESS, postProcessCommand);
 	}
 
 	@Override
@@ -127,12 +136,12 @@ public class QR_Outputter implements IRnOutputter {
 					String svg = qr.generate(rn, bill);
 					String finished = cookedHTML.replace("[QRCODE]", svg).replace("[CURRENCY]", bill.currency)
 							.replace("[AMOUNT]", bill.amount.getAmountAsString()).replace("[IBAN]", bill.IBAN)
-							.replace("[BILLER]", bill.biller_address)
-							.replace("[ESRLINE]", bill.ESRNr)
+							.replace("[BILLER]", bill.biller_address).replace("[ESRLINE]", bill.ESRNr)
 							.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
 							.replace("[ADDRESSEE]", bill.addressee).replace("[DUE]", bill.dateDue);
 
 					FileTool.writeTextFile(new File(outputDir, rn.getRnId() + ".html"), finished);
+					doPostProcess(rn.getRnId());
 					res.add(new Result<Rechnung>(rn));
 				} catch (Exception ex) {
 					ExHandler.handle(ex);
@@ -144,13 +153,21 @@ public class QR_Outputter implements IRnOutputter {
 			res.add(new Result<Rechnung>(SEVERITY.ERROR, 1, "Could  not find templateFile " + template, null, true));
 		}
 		if (res.isOK()) {
-			SWTHelper.showInfo("Ausgabe beendet",
-				rnn.size()+" QR-Rechnung(en) wurde(n) ausgegeben");
+			SWTHelper.showInfo("Ausgabe beendet", rnn.size() + " QR-Rechnung(en) wurde(n) ausgegeben");
 		} else {
 			SWTHelper.showError("QR-Outout", "Fehler bei der Rechnungsausgabe", res.toString());
-			
+
 		}
 		return res;
+	}
+
+	private void doPostProcess(String id) throws IOException {
+		if (!postProcessCommand.isEmpty()) {
+			String cmd = postProcessCommand.replace("%s", outputDir + File.separator + id + ".html").replace("%t",
+					outputDir + File.separator + id);
+			String[] params = cmd.split(" +");
+			Runtime.getRuntime().exec(params);
+		}
 	}
 
 }
