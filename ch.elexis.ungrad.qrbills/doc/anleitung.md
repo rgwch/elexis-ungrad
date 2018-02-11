@@ -36,9 +36,16 @@ Allerdings ist der Aufbau des QR-Zahlteils ein wenig knifflig, und deshalb sind 
  
  ![output.jpg](./output.jpg)
  
- Die Rechnungen werden als id.html geschrieben, wobei für ID eine Kombination aus Patientennummer und Rechnungsnummer eingesetzt wird. In den meisten Fällen werden Sie die Rechnung aber nicht als HTML haben wollen, sondern entweder als PDF, um sie dem patienten per Mail zu senden, oder Sie möchten sie auf den Drucker senden.
+ Die Rechnungen werden als id.html geschrieben, wobei für ID eine Kombination aus Patientennummer und Rechnungsnummer eingesetzt wird. In den meisten Fällen werden Sie die Rechnung aber nicht als HTML haben wollen, sondern entweder als PDF, um sie dem Patienten per Mail zu senden, oder Sie möchten sie zum Drucker schicken.
  
 Im Feld "Nachbearbeitung" können Sie irgendein beliebiges Programm angeben, das die Rechnungen weiterverarbeitet. (Hier im Beispiel werden HTML zu PDF Rechnungen umgewandelt).
 
 
+ ## Mögliche Probleme
  
+ Die Übersetzung einer HTML Datei zum Drucker oder zu einer PDF-Datei ist nicht immer perfekt. Häufig spielen Uns "intelligente" Optimierungen einen Streich. So versuchen manche Druckertreiber, die Seite zu verkleinern, damit sie in den Druckbereich (Seite ohne Ränder) des Druckers passt. Dies darf im Fall der QR-Rechnung aber nicht passieren, da die Grösse und Position aller Elemente innerhalb enger Grenuzen vorgeschrieben ist. Kontrollieren Sie das, indem Sie nach enem Probeausdruck nachmessen, ob der "Zahlteil" wirklich Format A6 ist (148x105mm), und ob er wirklich in der rechten unteren Ecke der Seite (nicht des Druckbereichs!) platziert ist.
+ 
+Wenn die Positionierung und Grösse nicht stimmt, damm kommen automatische Verarbeitungssysteme damit nicht zurecht, was für Sie zu erhöhten Verarbeitungskosten führen kann.
+
+Lesen Sie dann den QR Code mit irgendeiner QR-Applikation auf Ihrem Smartphone ein und prüfen Sie, ob die Rechnungsdaten korrekt eingelesen werden. Die ersten drei Zeilen müssen SPC, 0100 und 1 sein, darunter folgen die IBAN und die weiteren Rechnungsdetails, hier ein Beispiel:
+
