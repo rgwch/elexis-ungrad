@@ -21,6 +21,10 @@
   <style>
     @page {
       size: A4 portrait;
+      margin-top:5mm;
+      margin-left:5mm;
+      margin-bottom:2mm;
+      margin-right: 2mm;
     }
   
     /* the outermost div */
@@ -87,13 +91,19 @@
       padding: 5px;
     }
 
+    /* The Text for the Bill */
     #maintext {
       position: absolute;
       left: 10mm;
       top: 100mm;
     }
 
-    /* Do not modify or reposition these parts */
+    /***** Do not modify or reposition the parts between here and /style   ******/
+
+    /* The payment slip must be A6 and located in the lower right edge of the page 
+        It must be separated with lines or perforations from the rest of the document. 
+        Only sans-serif fonts between 9 and 11pt are acceptable.             */
+        
     #payment_slip {
       position: absolute;
       width: 148mm;
@@ -109,6 +119,7 @@
       font-family: Arial, Helvetica, sans-serif;
     }
 
+    /* The Text "Zahlteil QR-Rechnung" */
     #payment_slip_title {
       position: absolute;
       font-size: 11pt;
@@ -117,6 +128,7 @@
       height: 10mm;
     }
 
+    /* The Text "Unterstützt: Überweisung */
     #payment_slip_mode {
       position: absolute;
       font-size: 11pt;
@@ -125,6 +137,7 @@
       height: 15mm;
     }
 
+    /* The QR Code. Must have a free zone of at least 5mm around and should be at least 47x47mm */
     #payment_slip_qrzone {
       position: absolute;
       left: 6mm;
@@ -133,19 +146,22 @@
       height: 50mm;
     }
 
+    /** Currency and amount */
     #payment_slip_amount {
       position: absolute;
       left: 6mm;
-      top: 85mm;
+      top: 88mm;
       height: 15mm;
     }
 
+    /* Right side of the payment slip */
     #payment_slip_details {
       position: absolute;
       left: 65mm;
       top: 6mm;
     }
 
+    /* Font for headings in the payment slip */
     .payment_slip_heading {
       font-size: 9pt;
       font-weight: bold;
@@ -153,11 +169,14 @@
       margin-bottom: 0;
     }
 
+    /* Font for Text in the payment slip */
     .payment_slip_default {
       font-size: 11pt;
       padding-top: 0;
       margin-top: 0;
     }
+
+    /* Test purposes: Print the page and measure, if the rectagle ist exactly 10x10 cm */
     .rectangle{
             position:absolute; 
             left:20mm; 
@@ -231,6 +250,9 @@
         Bitte um Begleichung innert 30 Tagen.
       </p>
     </div>
+
+    <!-- Do not reposition the payment slip and any elements therein -->
+
     <div id="payment_slip">
       <div id="payment_slip_title">
         Zahlteil QR-Rechnung
@@ -257,8 +279,8 @@
         <p class="payment_slip_default">[IBAN]</p>
         <p class="payment_slip_heading">Zahlungsempfänger</p>
         <p class="payment_slip_default">[BILLER]</p>
-        <p class="payment_slip_heading">Zusätzliche Informationen</p>
-        <p class="payment_slip_default">[INFO]</p>
+        <p class="payment_slip_heading">Referenznummer</p>
+        <p class="payment_slip_default">[ESRLINE]</p>
         <p class="payment_slip_heading">Zahlungspflichtiger</p>
         <p class="payment_slip_default">[ADDRESSEE]</p>
         <p class="payment_slip_heading">Zahlbar bis</p>

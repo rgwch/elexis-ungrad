@@ -15,6 +15,8 @@ package ch.elexis.ungrad.qrbills;
 
 import ch.elexis.TarmedRechnung.Messages;
 import ch.elexis.TarmedRechnung.TarmedACL;
+import ch.elexis.base.ch.ebanking.esr.ESR;
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
@@ -35,6 +37,7 @@ public class BillDetails {
 	Kontakt biller;
 	Kontakt adressat;
 	String IBAN = "CH000NUR00ZUR00DEMO00";
+	String ESRNr = "";
 	String currency;
 	Kontakt bank;
 	String qrIBAN;
@@ -89,6 +92,9 @@ public class BillDetails {
 		firstDate = new TimeTool(rn.getDatumVon()).toString(TimeTool.DATE_GER);
 		numCons = rn.getKonsultationen().size();
 		lastDate = new TimeTool(rn.getDatumBis()).toString(TimeTool.DATE_GER);
+		ESR esr = new ESR((String) biller.getExtInfoStoredObjectByKey(ta.ESRNUMBER),
+				(String) biller.getExtInfoStoredObjectByKey(ta.ESRSUB), rn.getRnId(), 27);
+		ESRNr = esr.makeRefNr(true);
 	}
 
 	void checkNull(Object o, String msg) throws BadParameterException {

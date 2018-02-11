@@ -128,6 +128,7 @@ public class QR_Outputter implements IRnOutputter {
 					String finished = cookedHTML.replace("[QRCODE]", svg).replace("[CURRENCY]", bill.currency)
 							.replace("[AMOUNT]", bill.amount.getAmountAsString()).replace("[IBAN]", bill.IBAN)
 							.replace("[BILLER]", bill.biller_address)
+							.replace("[ESRLINE]", bill.ESRNr)
 							.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
 							.replace("[ADDRESSEE]", bill.addressee).replace("[DUE]", bill.dateDue);
 
@@ -142,8 +143,12 @@ public class QR_Outputter implements IRnOutputter {
 			ExHandler.handle(ex);
 			res.add(new Result<Rechnung>(SEVERITY.ERROR, 1, "Could  not find templateFile " + template, null, true));
 		}
-		if(!res.isOK()) {
+		if (res.isOK()) {
+			SWTHelper.showInfo("Ausgabe beendet",
+				rnn.size()+" QR-Rechnung(en) wurde(n) ausgegeben");
+		} else {
 			SWTHelper.showError("QR-Outout", "Fehler bei der Rechnungsausgabe", res.toString());
+			
 		}
 		return res;
 	}

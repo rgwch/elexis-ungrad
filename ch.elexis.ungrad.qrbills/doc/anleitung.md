@@ -14,9 +14,21 @@ Allerdings ist der Aufbau des QR-Zahlteils ein wenig knifflig, und deshalb sind 
  ## Installation
 
  Sie können ch.elexis.ungrad.qrbills über die Software-Installation in Elexis Ungrad 2018 oder Elexis 3.4 installieren.
+ Ausserdem muss das feature "Elexis Swiss OpenSource Feature" aus der Gruppe "Basispakete" installiert sein.
 
  ## Konfiguration
 
  QrBills benötigt die IBAN Nummer Ihres Kontos. Gehen Sie auf Datei-Einstellungen - Abrechnungssysteme - QR-Rechnung und geben Sie die entsprechenden Daten ein.
+ 
+ ![settings.jpg](./settings.jpg)
+
+ Beachten Sie, dass die derzeitige Spezifikation QR-Rechnung von ISO 20022 nur IBAN-Nummern mit CH und LI Präfix zulässt.
+ 
+ Sie können dieses Plugin zur Rechnungsausgabe für jedes andere Abrechnungssystem verwenden:
+ 
+ ![settings2.jpg](./settings2.jpg)
+ 
+
+ ## Nutzung
  
  
