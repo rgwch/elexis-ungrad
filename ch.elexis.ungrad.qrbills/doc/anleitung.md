@@ -43,7 +43,7 @@ Im Feld "Nachbearbeitung" können Sie irgendein beliebiges Programm angeben, das
 
  ## Mögliche Probleme
  
- Die Übersetzung einer HTML Datei zum Drucker oder zu einer PDF-Datei ist nicht immer perfekt. Häufig spielen uns "intelligente" Optimierungen einen Streich. So versuchen manche Druckertreiber, die Seite zu verkleinern, damit sie in den Druckbereich (Seite ohne Ränder) des Druckers passt. Dies darf im Fall der QR-Rechnung aber nicht passieren, da die Grösse und Position aller Elemente innerhalb enger Grenuzen vorgeschrieben ist. Kontrollieren Sie das, indem Sie nach enem Probeausdruck nachmessen, ob der "Zahlteil" wirklich Format A6 ist (148x105mm), und ob er wirklich in der rechten unteren Ecke der Seite (nicht des Druckbereichs!) platziert ist.
+ Die Übersetzung einer HTML Datei zum Drucker oder zu einer PDF-Datei ist nicht immer perfekt. Häufig spielen uns "intelligente" Optimierungen einen Streich. So versuchen manche Druckertreiber, die Seite zu verkleinern, damit sie in den Druckbereich (Seite ohne Ränder) des Druckers passt. Dies darf im Fall der QR-Rechnung aber nicht passieren, da die Grösse und Position aller Elemente innerhalb enger Grenzen vorgeschrieben ist. Kontrollieren Sie das, indem Sie nach enem Probeausdruck nachmessen, ob der "Zahlteil" wirklich Format A6 ist (148x105mm), und ob er wirklich in der rechten unteren Ecke der Seite (nicht des Druckbereichs!) platziert ist.
  
 Wenn die Positionierung und Grösse nicht stimmt, damm kommen automatische Verarbeitungssysteme damit nicht zurecht, was für Sie zu erhöhten Verarbeitungskosten führen kann.
 
@@ -80,4 +80,6 @@ QRR
 000000000000000000000415591
 3 Konsultationen von 07.07.2014 bis 01.10.2014
 ```
+
+(Die Papierversion dieser Rechnung sehen Sie unter [example.pdf](./example.pdf) )
 
