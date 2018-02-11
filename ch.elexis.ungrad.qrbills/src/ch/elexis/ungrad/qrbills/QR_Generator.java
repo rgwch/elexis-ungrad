@@ -112,7 +112,8 @@ public class QR_Generator {
 				sb.append(StringConstants.CRLF);
 			}
 		} else {
-			sb.append(checkSize(k.getLabel(),70)).append(StringConstants.CRLF);
+			String name=k.get("Bezeichnung1")+" "+k.get("Bezeichnung2");
+			sb.append(checkSize(name,70)).append(StringConstants.CRLF);
 			String straddr = k.get(Kontakt.FLD_STREET);
 			if (StringTool.isNothing(straddr)) {
 				sb.append(StringConstants.CRLF);
@@ -121,6 +122,8 @@ public class QR_Generator {
 				String[] strnr = straddr.split(" [0-9]");
 				appendOptional(sb, checkSize(strnr[0],70));
 				if (strnr.length > 1) {
+					char tr=straddr.charAt(strnr[0].length()+1);
+					strnr[1]=tr+strnr[1];
 					appendOptional(sb, checkSize(strnr[1],16));
 				} else {
 					sb.append(StringConstants.CRLF);
