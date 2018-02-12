@@ -18,6 +18,9 @@
    <feature url="features/ch.elexis.ungrad.labenter.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.labenter.feature" version="1.0.0.qualifier">
       <category name="ch.elexis.ungrad.findings"/>
    </feature>
+   <feature url="features/ch.elexis.ungrad.qrbills.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.qrbills.feature" version="1.0.0.qualifier">
+      <category name="ch.elexis.ungrad.financial"/>
+   </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>
