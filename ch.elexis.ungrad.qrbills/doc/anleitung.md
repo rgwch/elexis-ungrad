@@ -53,32 +53,31 @@ Lesen Sie dann den QR Code mit irgendeiner QR-Applikation auf Ihrem Smartphone e
 SPC
 0100
 1
-CH1111111111111111111
+CH8281479000001545305
 Weirich Gerry
 Rietstrasse
 30
 8200
-Schaffhausen 
-CH 
+Schaffhausen
+CH
 
 
 
 
 
 
-850.40 
-CHF 
-2018-03-13 
-Testperson 
-Armeswesen 
-Hintergasse 
-17 
-9999 
-Elexikon 
-CH 
-QRR 
-000000000000000000000415591
-3 Konsultationen von 07.07.2014 bis 01.10.2014
+155.15
+CHF
+2018-03-15
+Testperson Armeswesen
+Hintergasse
+17
+9999
+Elexikon
+CH
+QRR
+000000000000000000000456007
+3 Konsultationen von 07.05.2016 bis 03.01.2017
 ```
 
 (Die Papierversion dieser Rechnung sehen Sie unter [example.pdf](./example.pdf) )
