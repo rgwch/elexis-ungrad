@@ -31,8 +31,8 @@ public class QR_Generator {
 	/* See https://www.paymentstandards.ch/dam/downloads/ig-qr-bill-de.pdf */
 	private static final QrCode.Ecc ecc = Ecc.MEDIUM;
 	private static final int VERSION = 25;
-	private static final int size = 117; // total size must be 46x46 mm
-	private static final double module_size = 0.4; // module size at least 0.4 mm
+	// private static final int size = 117; // total size must be 46x46 mm
+	// private static final double module_size = 0.4; // module size at least 0.4 mm
 	private static final int quiet_zone = 5; // quiet zone around QR 5mm.
 	private static final int border = 10;
 	private static final int logo_size = 7; // swiss symbol 7x7 mm.
@@ -98,7 +98,8 @@ public class QR_Generator {
 		sb.append(bill.qrIBAN).append(StringConstants.CRLF);
 		sb.append(checkSize(Integer.toString(bill.numCons)+" Konsultationen von "+bill.firstDate+" bis "+bill.lastDate,140));
 		List<QrSegment> segments = QrSegment.makeSegments(sb.toString());
-		QrCode result = QrCode.encodeSegments(segments, ecc, VERSION, VERSION, -1, false);
+		//QrCode result = QrCode.encodeSegments(segments, ecc, 20, VERSION, -1, false);
+		QrCode result= QrCode.encodeBinary(sb.toString().getBytes(), ecc);
 		return toSvgString(result);
 	}
 	
@@ -162,13 +163,18 @@ public class QR_Generator {
 	 */
 	private String toSvgString(QrCode qr){
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("<svg width=\"57mm\" height=\"57mm\" viewBox=\"0 0 %1$d %1$d\">\n",
-			size + border * 2));
+		int dim=qr.size+border*2;
+		double center=dim/2.0;
+		double module_size=46.0/qr.size;
+		double ratio=7/module_size;
+		double cross=center-ratio/2;
+		sb.append(String.format("<svg width=\"66mm\" height=\"66mm\" viewBox=\"0 0 %1$d %1$d\">\n",
+			dim));
 		sb.append("<rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\"/>\n");
 		sb.append("<path d=\"");
 		boolean head = true;
-		for (int y = -border; y < size + border; y++) {
-			for (int x = -border; x < size + border; x++) {
+		for (int y = -border; y < qr.size + border; y++) {
+			for (int x = -border; x < qr.size + border; x++) {
 				if (qr.getModule(x, y)) {
 					if (head)
 						head = false;
@@ -179,8 +185,36 @@ public class QR_Generator {
 			}
 		}
 		sb.append("\" fill=\"#000000\"/>\n");
-		sb.append("</svg>\n");
+		sb.append("<g transform=\"translate("+cross+","+cross+")\">");
+		sb.append(createCross(module_size));
+		sb.append("</g></svg>\n");
 		return sb.toString();
 	}
 	
+	
+	/*
+	 * Swiss cross: 
+	 * Field size Must be 7x7 mm == 17.5 modules
+	 * Cross must be 2/3 of field == 11.67 modules
+	 * length of crossbars must be Width+1/6 Width
+	 * -> Each crossbar is 11.7 * 3.5 modules
+	 * 
+	 * */
+	private String createCross(double ms){
+		double quadrat=7/ms;
+		double bar_length=quadrat*2/3;
+		double offset1=(quadrat-bar_length)/2;
+		double bar_width=(3.0*bar_length)/10.0;
+		double offset2=(quadrat-bar_width)/2;
+		StringBuilder ret=new StringBuilder();
+		// black field
+		ret.append("<rect width=\""+quadrat+"\" height=\""+quadrat+"\" fill=\"black\" />");
+		// white border
+		ret.append("<rect width=\""+quadrat+"\" height=\""+quadrat+"\" fill=\"none\" stroke=\"white\" stroke-width=\"0.8\" />");
+		//crossbars
+		ret.append("<rect x=\""+offset2+"\" y= \""+offset1+"\" width=\""+bar_width+"\" height=\""+bar_length+"\" fill=\"white\"/>");
+		ret.append("<rect x=\""+offset1+"\" y=\""+offset2+"\" width=\""+bar_length+"\" height=\""+bar_width+"\" fill=\"white\" />");
+		return  ret.toString();
+	}
+	 
 }
