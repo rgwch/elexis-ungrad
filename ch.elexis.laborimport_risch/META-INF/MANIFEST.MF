@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Laborimport_risch
+Bundle-SymbolicName: ch.elexis.laborimport_risch;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: weirich@elexis.ch
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.ui.forms,
+ ch.rgw.utility,
+ ch.elexis.core.ui,
+ ch.elexis.core.ui.importer.div;bundle-version="3.1.0",
+ ch.elexis.core.data
+Bundle-ClassPath: .
+

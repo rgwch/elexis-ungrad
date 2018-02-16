@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="ch.elexis.laborimport.sftp.feature"
+      label="Laborimport via SFTP"
+      version="3.0.0.qualifier"
+      provider-name="ch.elexis">
+
+   <description url="http://www.elexis.ch/ungrad">
+      Laborimport via SFTP
+   </description>
+
+   <copyright>
+      G. Weirich
+   </copyright>
+
+   <license url="">
+      EPL v1.0
+   </license>
+
+   <plugin
+         id="ch.elexis.laborimport.sftp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

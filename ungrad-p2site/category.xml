@@ -21,6 +21,12 @@
    <feature url="features/ch.elexis.ungrad.qrbills.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.qrbills.feature" version="1.0.0.qualifier">
       <category name="ch.elexis.ungrad.financial"/>
    </feature>
+   <feature url="features/ch.elexis.laborimport_risch.feature_1.0.0.qualifier.jar" id="ch.elexis.laborimport_risch.feature" version="1.0.0.qualifier">
+      <category name="ch.elexis.ungrad.findings"/>
+   </feature>
+   <feature url="features/ch.elexis.laborimport.sftp.feature_3.0.0.qualifier.jar" id="ch.elexis.laborimport.sftp.feature" version="3.0.0.qualifier">
+      <category name="ch.elexis.ungrad.findings"/>
+   </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>

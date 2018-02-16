@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Laborimport via FTP
+Bundle-SymbolicName: ch.elexis.laborimport.sftp;singleton:=true
+Bundle-Version: 3.0.0.qualifier
+Bundle-Vendor: ch.elexis/ungrad
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ ch.rgw.utility,
+ ch.elexis.core.data,
+ ch.elexis.core.ui,
+ ch.elexis.core.ui.importer.div
+Bundle-ClassPath: .,
+ lib/jsch-0.1.53.jar

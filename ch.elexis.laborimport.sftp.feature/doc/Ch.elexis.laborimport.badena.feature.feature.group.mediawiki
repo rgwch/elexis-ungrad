@@ -1,0 +1,54 @@
+[[Category:Laboranbindung]]
+<table style="width:100%; border: 1px solid; padding: 10px">
+	
+	<tr>
+		<td>Version:</td>
+		<td>3.0.0.a20140325-1130</td>
+	</tr>
+	<tr>
+		<td style="width:150px;">Kategorie:</td>
+		<td>Laboranbindung</td>
+	</tr>
+	<tr>
+		<td>Beschreibung:</td>
+		<td>Import Laborwerte vom Ärztelabor Badena</td>
+	</tr>
+	<tr>
+		<td>Author:</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Letzte Bearbeitung:</td>
+		<td>17. Juni 2014</td>
+	</tr>
+	<tr>
+		<td>Voraussetzungen:</td>
+		<td>Elexis 3.0</td>
+	</tr>
+	<tr>
+		<td>Betriebssystem:</td>
+		<td>Windows, Mac, Linux</td>
+	</tr>
+	<tr>
+		<td>Lizenz:</td>
+		<td>Proprietär</td>
+	</tr>
+</table>
+== Einführung ==
+Dieses Plugin dient dazu, Laborwerte vom Ärztelabor Badena in Baden nach Elexis zu importieren. Das Ärztelabor Badena stellt hierfür einen secure ftp (sftp) Server zur Verfügung, von dem Elexis die Daten selbständig herunterladen und in die KG importieren kann.
+== Konfiguration ==
+Vom Ärztelabor müssen Sie folgende Parameter erhalten haben:
+* Die IP-Adresse des Servers. Etwas wie 20.345.21.334
+* Den Port auf dem Server (meist 22)
+* Ihren Benutzernamen für den Zugriff auf den Server
+* Ihr Passwort für den Zugriff auf den Server.
+[[File:badena-fig1.png|Abbildung 1|frame|none]] 
+Wenn Sie das Plugin korrekt installiert haben, dann erscheint unter Datei-Einstellungen-Datenaustausch eine Seite ‘Badena’, wo Sie diese vier Parameter eingeben können (Vgl. Abb. [fig:lab1]). Markieren Sie ausserdem ‘Nach Download löschen’, um die Heruntergeladenen Dateien nach erfolgreichem Import jeweils vom Server zu löschen. Wenn Sie dieses Feld nicht markieren, wird Elexis die heruntergeladenen Dateien nicht vom Server löschen, so dass sie beim nächsten Importvorgang erneut heruntergeladen werden. (Dies ist selbstverständlich nur für ganz spezielle Situationen wie Tests oder Import in verschiedenen Datenbanken sinnvoll).
+== Anwendung ==
+[[File:badena-fig2.png|Abbildung 2|frame|none]] 
+ 
+Im Laborblatt finden Sie im View-Menu den Punkt ‘Import…’. Anwahl dieses Punktes öffnet eine Dialogbox wie in Abb. [fig:lab2]. Sie können entweder eine (mit einem anderen Programm oder von einem anderen Labor) heruntergeladene HL7-Datei einlesen, oder Sie können mittels ‘direkt herunterladen’ alle vorhandenen Dateien auf einmal automatisch abholen und einlesen.
+In manchen Fällen kann die Zuordnung des im Laborbefund genannten Patienten nicht automatisch erfolgen. Beispielsweise kann die Schreibweise anders sein (Müller René kann im Labor als MUELLER-MEIER RENE erfasst sein). In einem solchen Fall öffnet sich eine Dialogbox wie in Abb. [fig:lab3]. Suchen Sie dort den Patienten auf, der dem genannten Patienten entspricht, oder klicken Sie ‘Cancel’, wenn Sie nicht wissen, welchem Patienten der genannte Name entspricht (in diesem Fall wird der Import übersprungen).
+[[File:fig3.png|Abbildung 1|frame|none]] 
+ 
+Nach dem Import werden alle heruntergeladenen Dateien in einem Unterordner ‘archive’ des Download-Verzeichnisses aufbewahrt, wo Sie sie nach einiger Zeit von Hand löschen können.

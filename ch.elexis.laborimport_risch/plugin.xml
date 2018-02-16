@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="ch.elexis.core.ui.LaborDatenImport">
+      <Importer
+            Class="ch.elexis.laborimport.risch.Importer"
+            name="Labor Risch">
+      </Importer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="ch.elexis.preferences.transporters"
+            class="ch.elexis.laborimport.risch.PreferencePage"
+            id="ch.elexis.laborimport_risch.prefs"
+            name="Labor Risch">
+      </page>
+   </extension>
+
+</plugin>
