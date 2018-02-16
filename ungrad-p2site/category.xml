@@ -27,8 +27,12 @@
    <feature url="features/ch.elexis.laborimport.sftp.feature_3.0.0.qualifier.jar" id="ch.elexis.laborimport.sftp.feature" version="3.0.0.qualifier">
       <category name="ch.elexis.ungrad.findings"/>
    </feature>
+   <feature url="features/ch.elexis.ungrad.artikelstamm.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.artikelstamm.feature" version="1.0.0.qualifier">
+      <category name="ch.elexis.ungrad.articles"/>
+   </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>
    <category-def name="ch.elexis.ungrad.financial" label="Finanzen"/>
+   <category-def name="ch.elexis.ungrad.articles" label="Artikel"/>
 </site>
