@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="at.medevit.ch.artikelstamm.elexis.common.ui.preferences.ArtikelstammPreferencePage"
+            id="at.medevit.ch.artikelstamm.elexis.common.ui.preferences.ArtikelstammPreferencePage"
+            name="Artikelstamm">
+      </page>
+   </extension>
+
+ <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            class="at.medevit.ch.artikelstamm.elexis.common.ui.ArtikelstammDecorator"
+            id="at.medevit.ch.artikelstamm.ui.ArtikelstammDecorator"
+            label="ArtikelstammDecorator"
+            lightweight="true"
+            objectClass="at.medevit.ch.artikelstamm.ui.IArtikelstammItem"
+            state="true">
+      </decorator>
+   </extension>
+ <extension
+       point="ch.elexis.core.data.PersistentReference">
+    <Factory
+          Class="at.medevit.ch.artikelstamm.elexis.common.ArtikelstammPOFactory">
+    </Factory>
+ </extension>
+ <extension
+       point="org.eclipse.ui.handlers">
+    <handler
+          class="at.medevit.ch.artikelstamm.elexis.common.ui.OpenArticelDetailDialogHandler"
+          commandId="ch.elexis.core.ui.medication.OpenArticelDetailDialog">
+       <activeWhen>
+          <not>
+             <test
+                   property="ch.elexis.core.ui.medication.property.isDefaultArticle">
+             </test>
+          </not>
+       </activeWhen>
+    </handler>
+ </extension>
+ <extension
+       point="ch.elexis.core.ui.Verrechnungscode">
+    <Artikel
+          CodeDetailDisplay="at.medevit.ch.artikelstamm.elexis.common.ui.DetailDisplay"
+          CodeSelectorFactory="at.medevit.ch.artikelstamm.elexis.common.ui.cv.ArtikelstammCodeSelectorFactory"
+          ElementFactory="at.medevit.ch.artikelstamm.elexis.common.ArtikelstammPOFactory"
+          ImporterClass="at.medevit.ch.artikelstamm.elexis.common.ArtikelstammImporterPage"
+          name="ch.elexis.ungrad.artikelstamm.Artikel">
+    </Artikel>
+ </extension>
+</plugin>
