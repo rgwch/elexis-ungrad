@@ -8,7 +8,7 @@
  * Contributors:
  *     MEDEVIT <office@medevit.at> - initial API and implementation
  ******************************************************************************/
-package at.medevit.ch.artikelstamm.elexis.common;
+package ch.artikelstamm.elexis.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

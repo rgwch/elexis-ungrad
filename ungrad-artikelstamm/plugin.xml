@@ -17,14 +17,14 @@
             id="at.medevit.ch.artikelstamm.ui.ArtikelstammDecorator"
             label="ArtikelstammDecorator"
             lightweight="true"
-            objectClass="at.medevit.ch.artikelstamm.ui.IArtikelstammItem"
+            objectClass="at.medevit.ch.artikelstamm.IArtikelstammItem"
             state="true">
       </decorator>
    </extension>
  <extension
        point="ch.elexis.core.data.PersistentReference">
     <Factory
-          Class="at.medevit.ch.artikelstamm.elexis.common.ArtikelstammPOFactory">
+          Class="ch.artikelstamm.elexis.common.ArtikelstammPOFactory">
     </Factory>
  </extension>
  <extension
@@ -46,7 +46,7 @@
     <Artikel
           CodeDetailDisplay="at.medevit.ch.artikelstamm.elexis.common.ui.DetailDisplay"
           CodeSelectorFactory="at.medevit.ch.artikelstamm.elexis.common.ui.cv.ArtikelstammCodeSelectorFactory"
-          ElementFactory="at.medevit.ch.artikelstamm.elexis.common.ArtikelstammPOFactory"
+          ElementFactory="ch.artikelstamm.elexis.common.ArtikelstammPOFactory"
           ImporterClass="at.medevit.ch.artikelstamm.elexis.common.ArtikelstammImporterPage"
           name="ch.elexis.ungrad.artikelstamm.Artikel">
     </Artikel>

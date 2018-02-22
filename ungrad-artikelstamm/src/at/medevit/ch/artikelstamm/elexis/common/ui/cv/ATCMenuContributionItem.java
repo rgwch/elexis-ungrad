@@ -24,8 +24,8 @@ import at.medevit.atc_codes.ATCCode;
 import at.medevit.atc_codes.ATCCodeLanguageConstants;
 import at.medevit.atc_codes.ATCCodeService;
 import at.medevit.ch.artikelstamm.elexis.common.ATCCodeServiceConsumer;
-import at.medevit.ch.artikelstamm.elexis.common.ArtikelstammItem;
 import at.medevit.ch.artikelstamm.elexis.common.ui.preferences.PreferenceConstants;
+import ch.artikelstamm.elexis.common.ArtikelstammItem;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.viewers.CommonViewer;
 
@@ -39,9 +39,8 @@ public class ATCMenuContributionItem extends ContributionItem {
 		this.cov = cov;
 		this.fdl = fdl;
 		
-		prefAtcLanguage =
-			CoreHub.globalCfg.get(PreferenceConstants.PREF_ATC_CODE_LANGUAGE,
-				ATCCodeLanguageConstants.ATC_LANGUAGE_VAL_GERMAN);
+		prefAtcLanguage = CoreHub.globalCfg.get(PreferenceConstants.PREF_ATC_CODE_LANGUAGE,
+			ATCCodeLanguageConstants.ATC_LANGUAGE_VAL_GERMAN);
 	}
 	
 	@Override

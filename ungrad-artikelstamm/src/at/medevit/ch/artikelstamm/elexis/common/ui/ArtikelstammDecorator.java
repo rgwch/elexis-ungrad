@@ -8,7 +8,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.wb.swt.ResourceManager;
 
-import at.medevit.ch.artikelstamm.elexis.common.ArtikelstammItem;
+import ch.artikelstamm.elexis.common.ArtikelstammItem;
 import ch.elexis.core.ui.UiDesk;
 
 public class ArtikelstammDecorator implements ILightweightLabelDecorator {

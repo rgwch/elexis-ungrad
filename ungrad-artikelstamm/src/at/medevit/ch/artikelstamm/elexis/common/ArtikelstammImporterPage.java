@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.medevit.ch.artikelstamm.ArtikelstammHelper;
+import ch.artikelstamm.elexis.common.ArtikelstammItem;
 import ch.elexis.core.ui.util.ImporterPage;
 import ch.elexis.core.ui.util.SWTHelper;
 
@@ -38,13 +39,14 @@ public class ArtikelstammImporterPage extends ImporterPage {
 	@Override
 	public IStatus doImport(IProgressMonitor monitor) throws Exception{
 		log.info("ArtikelstammImporterPage.doImport " + results[0]);
-		return ArtikelstammImporter.performImport(monitor, new FileInputStream(results[0]), bPharma, bNonPharma, null);
+		return ArtikelstammImporter.performImport(monitor, new FileInputStream(results[0]), bPharma,
+			bNonPharma, null);
 	}
 	
 	@Override
-	public void collect() {
-		bPharma=cbPharma.getSelection();
-		bNonPharma=cbNonPharma.getSelection();
+	public void collect(){
+		bPharma = cbPharma.getSelection();
+		bNonPharma = cbNonPharma.getSelection();
 	}
 	
 	@Override

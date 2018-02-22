@@ -18,7 +18,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import at.medevit.ch.artikelstamm.elexis.common.ArtikelstammItem;
+import ch.artikelstamm.elexis.common.ArtikelstammItem;
 import ch.elexis.core.data.interfaces.IVerrechenbar.VatInfo;
 import ch.elexis.core.ui.util.viewers.CommonViewer;
 

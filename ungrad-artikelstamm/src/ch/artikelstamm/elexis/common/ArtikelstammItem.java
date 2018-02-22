@@ -8,7 +8,7 @@
  * Contributors:
  *     MEDEVIT <office@medevit.at> - initial API and implementation
  ******************************************************************************/
-package at.medevit.ch.artikelstamm.elexis.common;
+package ch.artikelstamm.elexis.common;
 
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -20,11 +20,11 @@ import java.util.List;
 
 import at.medevit.ch.artikelstamm.ArtikelstammConstants;
 import at.medevit.ch.artikelstamm.ArtikelstammConstants.TYPE;
-import at.medevit.ch.artikelstamm.elexis.common.ui.preferences.MargePreference;
 import at.medevit.ch.artikelstamm.ArtikelstammHelper;
 import at.medevit.ch.artikelstamm.BlackBoxReason;
 import at.medevit.ch.artikelstamm.DATASOURCEType;
 import at.medevit.ch.artikelstamm.IArtikelstammItem;
+import at.medevit.ch.artikelstamm.elexis.common.ui.preferences.MargePreference;
 import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.data.interfaces.IFall;
 import ch.elexis.core.data.interfaces.IOptifier;
@@ -45,6 +45,9 @@ import ch.rgw.tools.VersionInfo;
  * {@link ArtikelstammItem} persistent object implementation. This class conforms both to the
  * requirements of an {@link Artikel} as required by Elexis v2.1 and to the requirements given by
  * the common base in form of {@link IArtikelstammItem}
+ * 
+ * Note: Fully qualified package/class name is used in dependent classes (such as stock_item. So
+ * don't move.)
  */
 public class ArtikelstammItem extends Artikel implements IArtikelstammItem {
 	private static DateFormat df = new SimpleDateFormat("ddMMyy HH:mm");
@@ -772,6 +775,10 @@ public class ArtikelstammItem extends Artikel implements IArtikelstammItem {
 		return get(FLD_LIMITATION_TEXT);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see at.medevit.ch.artikelstamm.IArtikelstammItem#isInLPPV()
+	 */
 	@Override
 	public boolean isInLPPV(){
 		return (get(FLD_LPPV).equals(StringConstants.ONE)) ? true : false;

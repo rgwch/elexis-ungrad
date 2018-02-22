@@ -8,9 +8,9 @@ import org.eclipse.swt.graphics.Image;
 
 import at.medevit.atc_codes.ATCCode;
 import at.medevit.ch.artikelstamm.elexis.common.ATCCodeCache;
-import at.medevit.ch.artikelstamm.elexis.common.ArtikelstammItem;
 import at.medevit.ch.artikelstamm.elexis.common.ui.preferences.PreferenceConstants;
 import at.medevit.ch.artikelstamm.ui.ATCLabelProvider;
+import ch.artikelstamm.elexis.common.ArtikelstammItem;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IVerrechenbar.VatInfo;
 import ch.rgw.tools.StringTool;

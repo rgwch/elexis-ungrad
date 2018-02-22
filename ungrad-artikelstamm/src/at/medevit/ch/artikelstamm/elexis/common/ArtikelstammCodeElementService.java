@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.osgi.service.component.annotations.Component;
 
 import at.medevit.ch.artikelstamm.ArtikelstammConstants;
+import ch.artikelstamm.elexis.common.ArtikelstammItem;
 import ch.elexis.core.model.ICodeElement;
 import ch.elexis.core.services.ICodeElementServiceContribution;
 

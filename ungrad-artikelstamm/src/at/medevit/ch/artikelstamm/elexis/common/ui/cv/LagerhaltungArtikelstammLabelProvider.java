@@ -16,8 +16,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.wb.swt.ResourceManager;
 
-import at.medevit.ch.artikelstamm.elexis.common.ArtikelstammItem;
 import at.medevit.ch.artikelstamm.ui.ArtikelstammLabelProvider;
+import ch.artikelstamm.elexis.common.ArtikelstammItem;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.services.IStockService.Availability;
 import ch.elexis.core.ui.UiDesk;

@@ -33,9 +33,9 @@ import org.eclipse.ui.PlatformUI;
 import at.medevit.atc_codes.ATCCodeLanguageConstants;
 import at.medevit.ch.artikelstamm.ArtikelstammConstants;
 import at.medevit.ch.artikelstamm.IArtikelstammItem;
-import at.medevit.ch.artikelstamm.elexis.common.ArtikelstammItem;
 import at.medevit.ch.artikelstamm.elexis.common.ui.ArtikelstammDetailDialog;
 import at.medevit.ch.artikelstamm.elexis.common.ui.preferences.PreferenceConstants;
+import ch.artikelstamm.elexis.common.ArtikelstammItem;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.UiDesk;
@@ -58,37 +58,39 @@ import ch.elexis.data.PersistentObject;
 import ch.elexis.data.Query;
 
 public class ArtikelstammCodeSelectorFactory extends CodeSelectorFactory {
-
+	
 	private SelectorPanelProvider slp;
 	private int eventType = SWT.KeyDown;
 	private ToggleVerrechenbarFavoriteAction tvfa = new ToggleVerrechenbarFavoriteAction();
-
+	
 	private static final String DISP_PRODNAME = "Artikel";
 	private static final String DISP_SUBSTANCE = "Substanz";
-
+	
 	private ISelectionChangedListener selChange = new ISelectionChangedListener() {
 		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
+		public void selectionChanged(SelectionChangedEvent event){
 			TableViewer tv = (TableViewer) event.getSource();
 			StructuredSelection ss = (StructuredSelection) tv.getSelection();
 			tvfa.updateSelection(ss.isEmpty() ? null : ss.getFirstElement());
 		}
 	};
-
+	
 	@Override
-	public ViewerConfigurer createViewerConfigurer(CommonViewer cv) {
+	public ViewerConfigurer createViewerConfigurer(CommonViewer cv){
 		final CommonViewer cov = cv;
 		cov.setSelectionChangedListener(selChange);
-
+		
 		FieldDescriptor<?>[] fields = {
-				new FieldDescriptor<ArtikelstammItem>(DISP_PRODNAME, ArtikelstammItem.FLD_DSCR, Typ.STRING, null),
-				new FieldDescriptor<ArtikelstammItem>(DISP_SUBSTANCE, ArtikelstammItem.FLD_SUBSTANCE, Typ.STRING,
-						null) };
-
+			new FieldDescriptor<ArtikelstammItem>(DISP_PRODNAME, ArtikelstammItem.FLD_DSCR,
+				Typ.STRING, null),
+			new FieldDescriptor<ArtikelstammItem>(DISP_SUBSTANCE, ArtikelstammItem.FLD_SUBSTANCE,
+				Typ.STRING, null)
+		};
+		
 		// add keyListener to search field
 		Listener keyListener = new Listener() {
 			@Override
-			public void handleEvent(Event event) {
+			public void handleEvent(Event event){
 				if (event.type == eventType) {
 					if (event.keyCode == SWT.CR || event.keyCode == SWT.KEYPAD_CR) {
 						slp.fireChangedEvent();
@@ -101,66 +103,74 @@ public class ArtikelstammCodeSelectorFactory extends CodeSelectorFactory {
 		}
 		slp = new SelectorPanelProvider(fields, true);
 		slp.addChangeListener(new AControlFieldListener(slp));
-
+		
 		Query<ArtikelstammItem> qbe = new Query<ArtikelstammItem>(ArtikelstammItem.class);
 		ArtikelstammFlatDataLoader fdl = new ArtikelstammFlatDataLoader(cv, qbe, slp);
-
+		
 		PreferedProviderSorterAction mppsa = new PreferedProviderSorterAction(fdl);
-		mppsa.setChecked(CoreHub.globalCfg.get(PreferedProviderSorterAction.CFG_PREFER_PROVIDER, false));
+		mppsa.setChecked(
+			CoreHub.globalCfg.get(PreferedProviderSorterAction.CFG_PREFER_PROVIDER, false));
 		SupportedATCFilteringAction safa = new SupportedATCFilteringAction(fdl);
 		FilterBlackboxAction fiblabo = new FilterBlackboxAction(fdl);
-
+		
 		List<IAction> actionList = new ArrayList<>();
 		actionList.add(mppsa);
 		actionList.add(safa);
 		actionList.add(fiblabo);
-
+		
 		populateSelectorPanel(slp, fdl, actionList);
 		slp.addActions(actionList.toArray(new IAction[actionList.size()]));
-
-		SimpleWidgetProvider swp = new SimpleWidgetProvider(SimpleWidgetProvider.TYPE_LAZYLIST, SWT.NONE, null);
-
-		ILabelDecorator decorator = PlatformUI.getWorkbench().getDecoratorManager().getLabelDecorator();
-
+		
+		SimpleWidgetProvider swp =
+			new SimpleWidgetProvider(SimpleWidgetProvider.TYPE_LAZYLIST, SWT.NONE, null);
+		
+		ILabelDecorator decorator =
+			PlatformUI.getWorkbench().getDecoratorManager().getLabelDecorator();
+		// ILabelDecorator decorator=(ILabelDecorator) new ArtikelstammDecorator();
+		
 		String atcLang = CoreHub.globalCfg.get(PreferenceConstants.PREF_ATC_CODE_LANGUAGE,
-				ATCCodeLanguageConstants.ATC_LANGUAGE_VAL_GERMAN);
+			ATCCodeLanguageConstants.ATC_LANGUAGE_VAL_GERMAN);
 		ATCArtikelstammDecoratingLabelProvider adlp = new ATCArtikelstammDecoratingLabelProvider(
-				new LagerhaltungArtikelstammLabelProvider(), decorator, atcLang);
-
+			new LagerhaltungArtikelstammLabelProvider(), decorator, atcLang);
+		
 		ViewerConfigurer vc = new ViewerConfigurer(fdl, adlp,
-				// new MedINDEXArticleControlFieldProvider(cv),
-				slp, new ViewerConfigurer.DefaultButtonProvider(), swp, fdl);
-
+			// new MedINDEXArticleControlFieldProvider(cv),
+			slp, new ViewerConfigurer.DefaultButtonProvider(), swp, fdl);
+		
 		// the dropdown menu on the viewer
 		MenuManager menu = new MenuManager();
-		menu.add(new Action(ch.elexis.core.ui.views.artikel.Messages.ArtikelContextMenu_propertiesAction) {
+		menu.add(new Action(
+			ch.elexis.core.ui.views.artikel.Messages.ArtikelContextMenu_propertiesAction) {
 			{
 				setImageDescriptor(Images.IMG_EDIT.getImageDescriptor());
-				setToolTipText(ch.elexis.core.ui.views.artikel.Messages.ArtikelContextMenu_propertiesTooltip);
+				setToolTipText(
+					ch.elexis.core.ui.views.artikel.Messages.ArtikelContextMenu_propertiesTooltip);
 			}
-
+			
 			@Override
-			public void run() {
-				StructuredSelection structuredSelection = new StructuredSelection(cov.getSelection());
+			public void run(){
+				StructuredSelection structuredSelection =
+					new StructuredSelection(cov.getSelection());
 				Object element = structuredSelection.getFirstElement();
-				ArtikelstammDetailDialog dd = new ArtikelstammDetailDialog(UiDesk.getTopShell(),
-						(IArtikelstammItem) element);
+				ArtikelstammDetailDialog dd =
+					new ArtikelstammDetailDialog(UiDesk.getTopShell(), (IArtikelstammItem) element);
 				dd.open();
 			}
 		});
-
+		
 		// menu.add(new AddVerrechenbarContributionItem(cov));
-
-		MenuManager subMenu = new MenuManager("ATC Gruppen-Selektion", Images.IMG_CATEGORY_GROUP.getImageDescriptor(),
-				null) {
+		
+		MenuManager subMenu = new MenuManager("ATC Gruppen-Selektion",
+			Images.IMG_CATEGORY_GROUP.getImageDescriptor(), null) {
 			@Override
-			public boolean isDynamic() {
+			public boolean isDynamic(){
 				return true;
 			}
-
+			
 			@Override
-			public boolean isVisible() {
-				StructuredSelection structuredSelection = new StructuredSelection(cov.getSelection());
+			public boolean isVisible(){
+				StructuredSelection structuredSelection =
+					new StructuredSelection(cov.getSelection());
 				Object element = structuredSelection.getFirstElement();
 				if (element instanceof ArtikelstammItem) {
 					ArtikelstammItem ai = (ArtikelstammItem) element;
@@ -171,30 +181,30 @@ public class ArtikelstammCodeSelectorFactory extends CodeSelectorFactory {
 		};
 		subMenu.add(new ATCMenuContributionItem(cov, fdl));
 		menu.add(subMenu);
-
+		
 		menu.add(tvfa);
 		menu.add(new Separator());
 		menu.add(new VATMenuContributionItem(cov));
 		cv.setContextMenu(menu);
-
+		
 		return vc;
 	}
-
+	
 	@Override
-	public Class<? extends PersistentObject> getElementClass() {
+	public Class<? extends PersistentObject> getElementClass(){
 		return ArtikelstammItem.class;
 	}
-
+	
 	@Override
-	public void dispose() {
+	public void dispose(){
 		// TODO Auto-generated method stub
 	}
-
+	
 	@Override
-	public String getCodeSystemName() {
+	public String getCodeSystemName(){
 		return ArtikelstammConstants.CODESYSTEM_NAME;
 	}
-
+	
 	/**
 	 * Overwrite to add actions to the selector panel
 	 * 
@@ -202,25 +212,26 @@ public class ArtikelstammCodeSelectorFactory extends CodeSelectorFactory {
 	 * 
 	 * @param slp2
 	 */
-	public void populateSelectorPanel(SelectorPanelProvider slp, FlatDataLoader fdl, List<IAction> actionList) {
-	}
-
+	public void populateSelectorPanel(SelectorPanelProvider slp, FlatDataLoader fdl,
+		List<IAction> actionList){}
+	
 	private class AControlFieldListener implements ControlFieldListener {
 		private SelectorPanelProvider slp;
-
-		public AControlFieldListener(SelectorPanelProvider slp) {
+		
+		public AControlFieldListener(SelectorPanelProvider slp){
 			this.slp = slp;
 		}
-
+		
 		@Override
-		public void changed(HashMap<String, String> values) {
+		public void changed(HashMap<String, String> values){
 			String val = values.get(DISP_PRODNAME);
 			if (val != null && val.length() == 13 && StringUtils.isNumeric(val)) {
 				List<ArtikelstammItem> result = new Query<ArtikelstammItem>(ArtikelstammItem.class,
-						ArtikelstammItem.FLD_GTIN, val).execute();
+					ArtikelstammItem.FLD_GTIN, val).execute();
 				if (result != null && result.size() == 1) {
 					KonsDetailView detailView = getKonsDetailView();
-					Konsultation kons = (Konsultation) ElexisEventDispatcher.getSelected(Konsultation.class);
+					Konsultation kons =
+						(Konsultation) ElexisEventDispatcher.getSelected(Konsultation.class);
 					if (detailView != null && kons != null) {
 						detailView.addToVerechnung(result.get(0));
 						slp.clearValues();
@@ -230,10 +241,10 @@ public class ArtikelstammCodeSelectorFactory extends CodeSelectorFactory {
 				}
 			}
 		}
-
-		private KonsDetailView getKonsDetailView() {
-			IViewReference[] viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-					.getViewReferences();
+		
+		private KonsDetailView getKonsDetailView(){
+			IViewReference[] viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getActivePage().getViewReferences();
 			for (IViewReference viewRef : viewReferences) {
 				if (KonsDetailView.ID.equals(viewRef.getId())) {
 					return (KonsDetailView) viewRef.getPart(false);
@@ -241,14 +252,12 @@ public class ArtikelstammCodeSelectorFactory extends CodeSelectorFactory {
 			}
 			return null;
 		}
-
+		
 		@Override
-		public void reorder(String field) {
-		}
-
+		public void reorder(String field){}
+		
 		@Override
-		public void selected() {
-		}
+		public void selected(){}
 	}
-
+	
 }

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import at.medevit.atc_codes.ATCCode;
 import at.medevit.atc_codes.ATCCodeService;
+import ch.artikelstamm.elexis.common.ArtikelstammItem;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.data.NamedBlob2;
 import ch.elexis.data.PersistentObject;
@@ -59,8 +60,8 @@ public class ATCCodeCache {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static void deserializeFromDatabase(String id) throws IOException,
-		ClassNotFoundException{
+	private static void deserializeFromDatabase(String id)
+		throws IOException, ClassNotFoundException{
 		
 		NamedBlob2 cacheStorage = NamedBlob2.load(id);
 		if (cacheStorage != null) {
@@ -76,8 +77,8 @@ public class ATCCodeCache {
 				pmd.run(false, false, new IRunnableWithProgress() {
 					
 					@Override
-					public void run(IProgressMonitor monitor) throws InvocationTargetException,
-						InterruptedException{
+					public void run(IProgressMonitor monitor)
+						throws InvocationTargetException, InterruptedException{
 						rebuildCache(monitor);
 					}
 				});
@@ -104,7 +105,7 @@ public class ATCCodeCache {
 		}
 		
 		Integer value = cache.get(element.atcCode);
-		return (value!=null) ? value : 0;
+		return (value != null) ? value : 0;
 	}
 	
 	public static void rebuildCache(IProgressMonitor monitor){
@@ -114,10 +115,11 @@ public class ATCCodeCache {
 		List<ATCCode> allATCCodes = atcCodeService.getAllATCCodes();
 		int numberOfATCCodes = allATCCodes.size();
 		
-		monitor.beginTask("Rebuilding index of available articles per ATC Code", numberOfATCCodes+1);
+		monitor.beginTask("Rebuilding index of available articles per ATC Code",
+			numberOfATCCodes + 1);
 		
 		cache = new HashMap<String, Integer>(numberOfATCCodes);
-	
+		
 		TreeMap<String, Integer> tm = new TreeMap<String, Integer>();
 		String query = "SELECT " + ArtikelstammItem.FLD_ATC + " FROM " + ArtikelstammItem.TABLENAME;
 		Stm stm = PersistentObject.getConnection().getStatement();
@@ -125,7 +127,8 @@ public class ATCCodeCache {
 		try {
 			while (rs.next()) {
 				String atc = rs.getString(1);
-				if(atc==null) continue;
+				if (atc == null)
+					continue;
 				if (!tm.containsKey(atc)) {
 					tm.put(atc, 0);
 				}
@@ -139,15 +142,15 @@ public class ATCCodeCache {
 		
 		for (ATCCode atcCode : allATCCodes) {
 			int foundElements = 0;
-		
+			
 			ATCCode next = atcCodeService.getNextInHierarchy(atcCode);
 			SortedMap<String, Integer> subMap;
-			if(next!=null) {
+			if (next != null) {
 				subMap = tm.subMap(atcCode.atcCode, next.atcCode);
 			} else {
 				subMap = tm.tailMap(atcCode.atcCode);
 			}
-
+			
 			for (Iterator<String> a = subMap.keySet().iterator(); a.hasNext();) {
 				String val = a.next();
 				foundElements += tm.get(val);
