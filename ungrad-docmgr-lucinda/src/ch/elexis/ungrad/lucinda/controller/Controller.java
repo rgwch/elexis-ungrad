@@ -54,6 +54,7 @@ import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.TimeTool;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import ch.elexis.omnivore.data.DocHandle;;
 
 /**
  * Controlle for the Lucinda View
@@ -251,7 +252,7 @@ public class Controller implements IProgressController {
 						MessageFormat.format(Messages.Controller_cons_not_found_text, doc.getString("title"))); // $NON-NLS-2$
 			}
 		} else if (doctype.equalsIgnoreCase(Preferences.OMNIVORE_NAME)) {
-			ch.elexis.omnivore.data.DocHandle dh = ch.elexis.omnivore.data.DocHandle.load(doc.getString(Preferences.FLD_ID));
+			DocHandle dh = DocHandle.load(doc.getString(Preferences.FLD_ID));
 			if (dh.exists()) {
 				dh.execute();
 			} else {
