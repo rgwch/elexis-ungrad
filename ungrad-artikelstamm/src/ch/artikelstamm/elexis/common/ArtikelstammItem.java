@@ -452,6 +452,7 @@ public class ArtikelstammItem extends Artikel implements IArtikelstammItem {
 		return super.getExt(name);
 	}
 	
+	
 	private VatInfo getOriginalVatInfo(){
 		switch (getType()) {
 		case P:

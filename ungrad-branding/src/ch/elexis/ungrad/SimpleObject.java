@@ -8,6 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.elexis.core.jdt.NonNull;
 import ch.rgw.tools.StringTool;
 
 public abstract class SimpleObject {
@@ -16,7 +17,7 @@ public abstract class SimpleObject {
 	protected Map<String, String> props = new HashMap<>();
 	protected Logger log = LoggerFactory.getLogger(getClass().getName());
 	
-	protected void load(ResultSet res){
+	protected void load( ResultSet res){
 		Util.require(res != null, "ResultSet must not be null");
 		for (String field : getFields()) {
 			try {
