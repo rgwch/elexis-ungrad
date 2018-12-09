@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2018 by G. Weirich
  * 
  * 
  * All rights reserved. This program and the accompanying materials
@@ -29,7 +29,7 @@ import io.vertx.core.json.JsonObject;
  * Client library for Lucinda Created by gerry on 10.05.16.
  */
 public class Client {
-	private String api = "/api/1.0/";
+	private String api = "/lucinda/2.0/";
 	private Vertx vertx;
 	private Logger log = Logger.getLogger("Lucinda Client");
 	private HttpClient http;
@@ -54,7 +54,7 @@ public class Client {
 		http = vertx.createHttpClient(hop);
 		HttpClientRequest htr = http.request(HttpMethod.GET, api + "ping", response -> {
 			response.bodyHandler(buffer -> {
-				if (buffer.toString().equals("pong")) {
+				if (buffer.toString().contains("Lucinda")) {
 					handler.signal(make("status:connected"));
 					log.info("Rest API ok");
 				}
