@@ -169,7 +169,7 @@ public class ArtikelstammItem extends Artikel implements IArtikelstammItem {
 			FLD_LIMITATION, FLD_LIMITATION_PTS, FLD_LIMITATION_TEXT, FLD_GENERIC_TYPE,
 			FLD_HAS_GENERIC, FLD_LPPV, FLD_DEDUCTIBLE, FLD_NARCOTIC, FLD_NARCOTIC_CAS, FLD_VACCINE,
 			VERKAUFSEINHEIT, FLD_PRODNO, FLD_SUBSTANCE, PersistentObject.FLD_EXTINFO);
-		ArtikelstammItem version = load(VERSION_ENTRY_ID);
+			ArtikelstammItem version = load(VERSION_ENTRY_ID);
 		if (!version.exists()) {
 			createOrModifyTable(createDB);
 		} else {
