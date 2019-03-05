@@ -41,6 +41,9 @@ public class Lucinda {
 		}
 	}
 
+	public void rescan(Handler ha) {
+		client.rescan(ha);
+	}
 	public void query(String q, Handler ha) {
 		client.query(q, ha);
 	}

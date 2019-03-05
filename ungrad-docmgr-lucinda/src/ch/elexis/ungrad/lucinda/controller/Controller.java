@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2018 by G. Weirich
+ * Copyright (c) 2016-2019 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -168,6 +168,9 @@ public class Controller implements IProgressController {
 		runQuery(view.getSearchField().getText());
 	}
 
+	public void doRescan() {
+		lucinda.rescan(result->{});
+	}
 	/**
 	 * Send a query to the lucinda server.
 	 * 

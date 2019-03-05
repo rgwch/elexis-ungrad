@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2019 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -47,7 +47,7 @@ import ch.rgw.tools.StringTool;
 public class GlobalView extends ViewPart implements IActivationListener {
 
 	private Controller controller;
-	private Action doubleClickAction, filterCurrentPatAction, showInboxAction, aquireAction;
+	private Action doubleClickAction, filterCurrentPatAction, showInboxAction, aquireAction, rescanAction;
 
 	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
 			ElexisEvent.EVENT_SELECTED) {
@@ -118,10 +118,22 @@ public class GlobalView extends ViewPart implements IActivationListener {
 		}
 		toolbar.add(new Separator());
 		toolbar.add(aquireAction);
+		menu.add(rescanAction);
 
 	}
 
 	private void makeActions() {
+		rescanAction = new Action("Rescan") {
+			{
+				setToolTipText("Lucinda Dokumente neu einlesen");
+				setImageDescriptor(Images.IMG_REFRESH.getImageDescriptor());
+			}
+			@Override
+			public void run() {
+				controller.doRescan();
+			}
+			
+		};
 
 		filterCurrentPatAction = new Action(Messages.GlobalView_actPatient_name, Action.AS_CHECK_BOX) {
 			{
