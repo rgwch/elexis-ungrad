@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="Elexis Ungrad" uid="ch.elexis.ungrad.product" id="org.eclipse.equinox.p2.director.app.product" application="ch.elexis.core.application.ElexisApp" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
+
+   <aboutInfo>
+      <image path="rsc/logo_about250.png"/>
+      <text>
+         Copyright (c) 2005-2019 by G. Weirich, elexis.info and others
+      </text>
+   </aboutInfo>
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
+      </vmArgsMac>
+   </launcherArgs>
+
+   <windowImages i16="rsc/elexis16.png" i32="rsc/elexis32.png" i48="rsc/elexis48.png"/>
+
+   <splash
+      location="ch.elexis.ungrad.branding" />
+   <launcher>
+      <linux icon="/ungrad-product/rsc/icon.xpm"/>
+      <macosx icon="/ungrad-product/rsc/elexis-mac.icns"/>
+      <win useIco="true">
+         <ico path="/ungrad-product/rsc/elexis.ico"/>
+         <bmp/>
+      </win>
+   </launcher>
+
+
+   <vm>
+   </vm>
+
+
+   <plugins>
+      <plugin id="at.medevit.elexis.tarmed.model"/>
+      <plugin id="at.medevit.elexis.tarmed.model.tests" fragment="true"/>
+      <plugin id="bouncycastle.bcprov-jdk14"/>
+      <plugin id="ca.odell.glazedlists"/>
+      <plugin id="ca.uhn.hapi.osgi-base"/>
+      <plugin id="ch.elexis.base.ch.arzttarife"/>
+      <plugin id="ch.elexis.base.ch.arzttarife.test" fragment="true"/>
+      <plugin id="ch.elexis.base.ch.diagnosecodes"/>
+      <plugin id="ch.elexis.base.ch.ebanking"/>
+      <plugin id="ch.elexis.base.ch.ebanking.test" fragment="true"/>
+      <plugin id="ch.elexis.base.ch.labortarif_2009"/>
+      <plugin id="ch.elexis.base.ch.ticode"/>
+      <plugin id="ch.elexis.core"/>
+      <plugin id="ch.elexis.core.application"/>
+      <plugin id="ch.elexis.core.data"/>
+      <plugin id="ch.elexis.core.data.tests" fragment="true"/>
+      <plugin id="ch.elexis.core.findings"/>
+      <plugin id="ch.elexis.core.findings.templates"/>
+      <plugin id="ch.elexis.core.findings.ui"/>
+      <plugin id="ch.elexis.core.findings.util"/>
+      <plugin id="ch.elexis.core.findings.util.test" fragment="true"/>
+      <plugin id="ch.elexis.core.hl7.v2x"/>
+      <plugin id="ch.elexis.core.hl7.v2x.tests" fragment="true"/>
+      <plugin id="ch.elexis.core.importer.div"/>
+      <plugin id="ch.elexis.core.l10n"/>
+      <plugin id="ch.elexis.core.logging.default_configuration" fragment="true"/>
+      <plugin id="ch.elexis.core.ui"/>
+      <plugin id="ch.elexis.core.ui.contacts"/>
+      <plugin id="ch.elexis.core.ui.dbcheck"/>
+      <plugin id="ch.elexis.core.ui.icons"/>
+      <plugin id="ch.elexis.core.ui.importer.div"/>
+      <plugin id="ch.elexis.core.ui.importer.div.tests" fragment="true"/>
+      <plugin id="ch.elexis.core.ui.laboratory"/>
+      <plugin id="ch.elexis.core.ui.medication"/>
+      <plugin id="ch.elexis.core.ui.medication.os" fragment="true"/>
+      <plugin id="ch.elexis.core.ui.tests" fragment="true"/>
+      <plugin id="ch.elexis.ebanking"/>
+      <plugin id="ch.elexis.ebanking.tests" fragment="true"/>
+      <plugin id="ch.elexis.ungrad.branding"/>
+      <plugin id="ch.qos.logback.classic"/>
+      <plugin id="ch.qos.logback.core"/>
+      <plugin id="ch.qos.logback.slf4j" fragment="true"/>
+      <plugin id="ch.rgw.utility"/>
+      <plugin id="ch.rgw.utility.tests" fragment="true"/>
+      <plugin id="com.eclipsesource.jaxrs.consumer"/>
+      <plugin id="com.eclipsesource.jaxrs.jersey-all-nojavax"/>
+      <plugin id="com.google.code.gson"/>
+      <plugin id="com.google.guava"/>
+      <plugin id="com.google.zxing.core"/>
+      <plugin id="com.healthmarketscience.jackcess"/>
+      <plugin id="com.ibm.icu"/>
+      <plugin id="com.mysql.cj"/>
+      <plugin id="com.phloc.commons"/>
+      <plugin id="com.phloc.schematron"/>
+      <plugin id="findbugsAnnotations"/>
+      <plugin id="info.elexis.server.hapi.fhir"/>
+      <plugin id="javassist"/>
+      <plugin id="javax.activation"/>
+      <plugin id="javax.annotation"/>
+      <plugin id="javax.inject"/>
+      <plugin id="javax.servlet"/>
+      <plugin id="javax.xml"/>
+      <plugin id="javax.xml.stream.stax-api"/>
+      <plugin id="net.sf.opencsv"/>
+      <plugin id="net.sf.saxon.Saxon-HE"/>
+      <plugin id="org.apache.batik.css"/>
+      <plugin id="org.apache.batik.util"/>
+      <plugin id="org.apache.commons.codec"/>
+      <plugin id="org.apache.commons.dbcp"/>
+      <plugin id="org.apache.commons.io"/>
+      <plugin id="org.apache.commons.jexl"/>
+      <plugin id="org.apache.commons.jxpath"/>
+      <plugin id="org.apache.commons.lang"/>
+      <plugin id="org.apache.commons.lang3"/>
+      <plugin id="org.apache.commons.logging"/>
+      <plugin id="org.apache.commons.pool"/>
+      <plugin id="org.apache.felix.scr"/>
+      <plugin id="org.apache.httpcomponents.httpclient"/>
+      <plugin id="org.apache.httpcomponents.httpcore"/>
+      <plugin id="org.apache.poi"/>
+      <plugin id="org.apache.poi.ooxml"/>
+      <plugin id="org.apache.poi.ooxml.schemas"/>
+      <plugin id="org.apache.xmlbeans"/>
+      <plugin id="org.dom4j"/>
+      <plugin id="org.eclipse.core.commands"/>
+      <plugin id="org.eclipse.core.contenttype"/>
+      <plugin id="org.eclipse.core.databinding"/>
+      <plugin id="org.eclipse.core.databinding.beans"/>
+      <plugin id="org.eclipse.core.databinding.observable"/>
+      <plugin id="org.eclipse.core.databinding.property"/>
+      <plugin id="org.eclipse.core.expressions"/>
+      <plugin id="org.eclipse.core.jobs"/>
+      <plugin id="org.eclipse.core.runtime"/>
+      <plugin id="org.eclipse.e4.core.commands"/>
+      <plugin id="org.eclipse.e4.core.contexts"/>
+      <plugin id="org.eclipse.e4.core.di"/>
+      <plugin id="org.eclipse.e4.core.di.annotations"/>
+      <plugin id="org.eclipse.e4.core.di.extensions"/>
+      <plugin id="org.eclipse.e4.core.di.extensions.supplier"/>
+      <plugin id="org.eclipse.e4.core.services"/>
+      <plugin id="org.eclipse.e4.emf.xpath"/>
+      <plugin id="org.eclipse.e4.ui.bindings"/>
+      <plugin id="org.eclipse.e4.ui.css.core"/>
+      <plugin id="org.eclipse.e4.ui.css.swt"/>
+      <plugin id="org.eclipse.e4.ui.css.swt.theme"/>
+      <plugin id="org.eclipse.e4.ui.di"/>
+      <plugin id="org.eclipse.e4.ui.model.workbench"/>
+      <plugin id="org.eclipse.e4.ui.services"/>
+      <plugin id="org.eclipse.e4.ui.swt.gtk" fragment="true"/>
+      <plugin id="org.eclipse.e4.ui.widgets"/>
+      <plugin id="org.eclipse.e4.ui.workbench"/>
+      <plugin id="org.eclipse.e4.ui.workbench.addons.swt"/>
+      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt"/>
+      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt.nl_de" fragment="true"/>
+      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt.nl_fr" fragment="true"/>
+      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt.nl_it" fragment="true"/>
+      <plugin id="org.eclipse.e4.ui.workbench.swt"/>
+      <plugin id="org.eclipse.e4.ui.workbench3"/>
+      <plugin id="org.eclipse.emf.common"/>
+      <plugin id="org.eclipse.emf.ecore"/>
+      <plugin id="org.eclipse.emf.ecore.change"/>
+      <plugin id="org.eclipse.emf.ecore.xmi"/>
+      <plugin id="org.eclipse.equinox.app"/>
+      <plugin id="org.eclipse.equinox.common"/>
+      <plugin id="org.eclipse.equinox.ds"/>
+      <plugin id="org.eclipse.equinox.event"/>
+      <plugin id="org.eclipse.equinox.preferences"/>
+      <plugin id="org.eclipse.equinox.registry"/>
+      <plugin id="org.eclipse.help"/>
+      <plugin id="org.eclipse.jface"/>
+      <plugin id="org.eclipse.jface.databinding"/>
+      <plugin id="org.eclipse.jface.nl_de" fragment="true"/>
+      <plugin id="org.eclipse.jface.nl_fr" fragment="true"/>
+      <plugin id="org.eclipse.jface.nl_it" fragment="true"/>
+      <plugin id="org.eclipse.nebula.cwt"/>
+      <plugin id="org.eclipse.nebula.widgets.cdatetime"/>
+      <plugin id="org.eclipse.nebula.widgets.nattable.core"/>
+      <plugin id="org.eclipse.nebula.widgets.nattable.extension.glazedlists"/>
+      <plugin id="org.eclipse.nebula.widgets.tablecombo"/>
+      <plugin id="org.eclipse.osgi"/>
+      <plugin id="org.eclipse.osgi.compatibility.state" fragment="true"/>
+      <plugin id="org.eclipse.osgi.services"/>
+      <plugin id="org.eclipse.osgi.util"/>
+      <plugin id="org.eclipse.swt"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.swt.nl_de" fragment="true"/>
+      <plugin id="org.eclipse.swt.nl_fr" fragment="true"/>
+      <plugin id="org.eclipse.swt.nl_it" fragment="true"/>
+      <plugin id="org.eclipse.ui"/>
+      <plugin id="org.eclipse.ui.forms"/>
+      <plugin id="org.eclipse.ui.views"/>
+      <plugin id="org.eclipse.ui.views.nl_de" fragment="true"/>
+      <plugin id="org.eclipse.ui.views.nl_fr" fragment="true"/>
+      <plugin id="org.eclipse.ui.views.nl_it" fragment="true"/>
+      <plugin id="org.eclipse.ui.views.properties.tabbed"/>
+      <plugin id="org.eclipse.ui.workbench"/>
+      <plugin id="org.eclipse.ui.workbench.nl_de" fragment="true"/>
+      <plugin id="org.eclipse.ui.workbench.nl_fr" fragment="true"/>
+      <plugin id="org.eclipse.ui.workbench.nl_it" fragment="true"/>
+      <plugin id="org.h2"/>
+      <plugin id="org.hamcrest.core"/>
+      <plugin id="org.hamcrest.library"/>
+      <plugin id="org.iatrix.help.wiki"/>
+      <plugin id="org.jboss.aerogear.otp-java"/>
+      <plugin id="org.jdom"/>
+      <plugin id="org.junit"/>
+      <plugin id="org.postgresql"/>
+      <plugin id="org.slf4j.api"/>
+      <plugin id="org.slf4j.nop" fragment="true"/>
+      <plugin id="org.springframework.spring-web"/>
+      <plugin id="org.w3c.css.sac"/>
+      <plugin id="stax2-api"/>
+      <plugin id="woodstox-core-asl"/>
+   </plugins>
+
+
+   <preferencesInfo>
+      <targetfile overwrite="false"/>
+   </preferencesInfo>
+
+   <cssInfo>
+   </cssInfo>
+
+</product>
