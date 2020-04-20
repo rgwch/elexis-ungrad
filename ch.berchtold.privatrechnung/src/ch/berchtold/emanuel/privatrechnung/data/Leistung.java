@@ -14,6 +14,7 @@ package ch.berchtold.emanuel.privatrechnung.data;
 
 import java.util.List;
 
+import ch.elexis.core.data.interfaces.IFall;
 import ch.elexis.data.Fall;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.data.VerrechenbarAdapter;
@@ -234,6 +235,18 @@ public class Leistung extends VerrechenbarAdapter {
 	public List<Object> getActions(Object context){
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int getTP(TimeTool date, IFall fall) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getFactor(TimeTool date, IFall fall) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 }
