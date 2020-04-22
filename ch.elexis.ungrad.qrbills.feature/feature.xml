@@ -2,7 +2,7 @@
 <feature
       id="ch.elexis.ungrad.qrbills.feature"
       label="ISO 20022 conformant bills"
-      version="1.0.0.qualifier"
+      version="1.0.1.qualifier"
       provider-name="weirich@elexis.ch">
 
    <description url="http://www.example.com/description">

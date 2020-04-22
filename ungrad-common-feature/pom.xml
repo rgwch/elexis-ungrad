@@ -6,8 +6,8 @@
     <artifactId>elexis-ungrad-aggregator
 </artifactId>
   </parent>
-  <artifactId>ch.elexis.ungrad.branding.feature</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <artifactId>ch.elexis.ungrad.common.feature</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
 
   <groupId>ch.rgw</groupId>

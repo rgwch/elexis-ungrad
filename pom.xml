@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>ch.rgw
 
@@ -24,6 +24,8 @@
     <modules>
         <module>ungrad-kassenbuch</module>
         <module>ungrad-kassenbuch-feature</module>
+        <module>ungrad.common</module>
+        <module>ungrad-common-feature</module>
         <module>ungrad-docmgr-lucinda</module>
         <module>ungrad-docmgr-lucinda-feature</module>
         <module>ungrad-docmgr-lucinda-omnivore</module>
@@ -60,20 +62,20 @@
             <layout>p2</layout>
         </repository -->
         <repository>
-          <id>elexis-ungrad</id>
-          <url>http://www.elexis.ch/ungrad2018/p2/dependencies/latest</url>
-          <layout>p2</layout>
+            <id>elexis-ungrad</id>
+            <url>http://www.elexis.ch/ungrad2018/p2/dependencies/latest</url>
+            <layout>p2</layout>
         </repository>
         <repository>
-          <id>elexis-base-local</id>
-          <url>file:../elexis-3-base/ch.elexis.base.p2site/target/repository</url>
-          <layout>p2</layout>
+            <id>elexis-base-local</id>
+            <url>file:../elexis-3-base/ch.elexis.base.p2site/target/repository</url>
+            <layout>p2</layout>
         </repository>
         <repository>
-          <id>elexis-core-local</id>
-          <url>file:../elexis-3-core/ch.elexis.core.p2site/target/repository</url>
-          <layout>p2</layout>
-          
+            <id>elexis-core-local</id>
+            <url>file:../elexis-3-core/ch.elexis.core.p2site/target/repository</url>
+            <layout>p2</layout>
+
         </repository>
     </repositories>
     <build>

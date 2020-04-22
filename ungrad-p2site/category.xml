@@ -6,7 +6,7 @@
    <feature url="features/ch.elexis.ungrad.labview.feature_1.0.1.qualifier.jar" id="ch.elexis.ungrad.labview.feature" version="1.0.1.qualifier">
       <category name="ch.elexis.ungrad.findings"/>
    </feature>
-   <feature url="features/ch.elexis.ungrad.branding.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.branding.feature" version="1.0.0.qualifier">
+   <feature url="features/ch.elexis.ungrad.branding.feature_1.0.1.qualifier.jar" id="ch.elexis.ungrad.branding.feature" version="1.0.1.qualifier">
       <category name="ch.elexis.ungrad.common"/>
    </feature>
    <feature url="features/com.jsigle.noatext_jsl.feature_3.1.0.qualifier.jar" id="com.jsigle.noatext_jsl.feature" version="3.1.0.qualifier">
@@ -18,9 +18,6 @@
    <feature url="features/ch.elexis.ungrad.labenter.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.labenter.feature" version="1.0.0.qualifier">
       <category name="ch.elexis.ungrad.findings"/>
    </feature>
-   <feature url="features/ch.elexis.ungrad.qrbills.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.qrbills.feature" version="1.0.0.qualifier">
-      <category name="ch.elexis.ungrad.financial"/>
-   </feature>
    <feature url="features/ch.elexis.laborimport_risch.feature_1.0.0.qualifier.jar" id="ch.elexis.laborimport_risch.feature" version="1.0.0.qualifier">
       <category name="ch.elexis.ungrad.findings"/>
    </feature>
@@ -29,6 +26,12 @@
    </feature>
    <feature url="features/ch.elexis.ungrad.artikelstamm.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.artikelstamm.feature" version="1.0.0.qualifier">
       <category name="ch.elexis.ungrad.articles"/>
+   </feature>
+   <feature id="ch.elexis.ungrad.qrbills.feature">
+      <category name="ch.elexis.ungrad.financial"/>
+   </feature>
+   <feature id="ch.elexis.ungrad.common.feature">
+      <category name="ch.elexis.ungrad.common"/>
    </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
