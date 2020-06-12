@@ -1,13 +1,14 @@
 package ch.elexis.ungrad.lucinda.controller;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 import ch.elexis.ungrad.lucinda.Preferences;
-import io.vertx.core.json.JsonObject;
+
 
 public class DocumentFilter extends ViewerFilter {
 	private Set<String> doctypes = new HashSet<>();
@@ -22,8 +23,8 @@ public class DocumentFilter extends ViewerFilter {
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		JsonObject doc = (JsonObject) element;
-		return doctypes.contains(doc.getString(Preferences.FLD_LUCINDA_DOCTYPE)); // $NON-NLS-1$
+		Map doc = (Map)element;
+		return doctypes.contains(doc.get(Preferences.FLD_LUCINDA_DOCTYPE)); // $NON-NLS-1$
 	}
 
 }

@@ -15,9 +15,9 @@
 package ch.elexis.ungrad.lucinda.model;
 
 import java.util.List;
+import java.util.Map;
 
 import ch.elexis.data.PersistentObject;
-import ch.elexis.ungrad.lucinda.JsonObject;
 
 public interface Customer {
 	/**
@@ -30,7 +30,7 @@ public interface Customer {
 	 *         Recommended are: "lastname", "firstname", "birthdate" of the Patient this Document
 	 *         belongs to.
 	 */
-	public JsonObject specify(PersistentObject po);
+	public Map specify(PersistentObject po);
 	
 	/**
 	 * Signal the Customer that a document was indexed successfully
@@ -45,5 +45,5 @@ public interface Customer {
 	 * @param messages
 	 *            All messages received from Lucinda while transmitting
 	 */
-	public void finished(List<JsonObject> messages);
+	public void finished(List<Map<String,String>> messages);
 }

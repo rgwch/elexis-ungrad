@@ -14,6 +14,7 @@
 
 package ch.elexis.ungrad.lucinda.view;
 
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
@@ -30,7 +31,6 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.rgw.tools.StringTool;
-import io.vertx.core.json.JsonObject;
 
 /**
  * The Detail-Subview shows metadata of the document selected in the
@@ -76,8 +76,8 @@ public class Detail extends Composite {
 			@SuppressWarnings("unchecked")
 			@Override
 			public Object[] getElements(Object inputElement) {
-				JsonObject el = (JsonObject) inputElement;
-				Stream<Entry<String, Object>> filtered = el.getMap().entrySet().stream().filter(e -> isNotExcluded(e));
+				Map<String,Object> el = (Map) inputElement;
+				Stream<Entry<String, Object>> filtered = el.entrySet().stream().filter(e -> isNotExcluded(e));
 				return filtered.toArray();
 			}
 		});

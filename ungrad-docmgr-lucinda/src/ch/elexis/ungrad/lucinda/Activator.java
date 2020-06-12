@@ -17,6 +17,7 @@ package ch.elexis.ungrad.lucinda;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -35,7 +36,7 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	private List<Handler> handlers = new ArrayList<>();
-	private List<JsonObject> messages = new LinkedList<>();
+	private List<Map<String, String>> messages = new LinkedList<>();
 	private List<IDocumentHandler> addons;
 	
 	
@@ -81,15 +82,15 @@ public class Activator extends AbstractUIPlugin {
 		super.stop(context);
 	}
 
-	public void addMessage(JsonObject message) {
+	public void addMessage(Map<String,String> message) {
 		messages.add(message);
 	}
 
-	public void addMessages(List<JsonObject> messages) {
+	public void addMessages(List<Map<String,String>> messages) {
 		this.messages.addAll(messages);
 	}
 
-	public List<JsonObject> getMessages() {
+	public List<Map<String,String>> getMessages() {
 		return messages;
 	}
 

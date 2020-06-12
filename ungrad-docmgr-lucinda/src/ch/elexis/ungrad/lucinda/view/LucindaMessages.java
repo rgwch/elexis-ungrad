@@ -1,5 +1,6 @@
 package ch.elexis.ungrad.lucinda.view;
 
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -14,7 +15,6 @@ import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Handler;
-import ch.elexis.ungrad.lucinda.JsonObject;
 
 public class LucindaMessages extends ViewPart implements Handler {
 	private TreeViewer tv;
@@ -39,7 +39,7 @@ public class LucindaMessages extends ViewPart implements Handler {
 
 			@Override
 			public boolean hasChildren(Object element) {
-				if (element instanceof JsonObject) {
+				if (element instanceof Map) {
 					return true;
 				} else {
 					return false;
@@ -58,8 +58,8 @@ public class LucindaMessages extends ViewPart implements Handler {
 
 			@Override
 			public Object[] getChildren(Object parentElement) {
-				JsonObject doc = (JsonObject) parentElement;
-				Set<Entry<String, Object>> entries = doc.getMap().entrySet();
+				Map doc = (Map) parentElement;
+				Set<Entry<String, Object>> entries = doc.entrySet();
 				return entries.toArray();
 			}
 		});
@@ -68,8 +68,8 @@ public class LucindaMessages extends ViewPart implements Handler {
 
 			@Override
 			public String getText(Object element) {
-				if (element instanceof JsonObject) {
-					return ((JsonObject) element).getString("status"); //$NON-NLS-1$
+				if (element instanceof Map) {
+					return (String)((Map) element).get("status"); //$NON-NLS-1$
 				} else if (element instanceof Entry) {
 					Entry e = (Entry) element;
 					return e.getKey() + ": " + e.getValue(); //$NON-NLS-1$
@@ -92,7 +92,7 @@ public class LucindaMessages extends ViewPart implements Handler {
 	}
 
 	@Override
-	public void signal(JsonObject msg) {
+	public void signal(Map msg) {
 		Display.getDefault().asyncExec(new Runnable() {
 
 			@Override

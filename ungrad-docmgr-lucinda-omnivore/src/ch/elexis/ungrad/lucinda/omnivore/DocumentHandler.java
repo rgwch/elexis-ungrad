@@ -17,6 +17,8 @@ package ch.elexis.ungrad.lucinda.omnivore;
 import static ch.elexis.ungrad.lucinda.Preferences.INCLUDE_OMNI;
 import static ch.elexis.ungrad.lucinda.Preferences.SHOW_OMNIVORE;
 
+import java.io.IOException;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;

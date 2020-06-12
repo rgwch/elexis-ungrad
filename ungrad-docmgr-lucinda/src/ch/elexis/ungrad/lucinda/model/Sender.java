@@ -17,6 +17,7 @@ package ch.elexis.ungrad.lucinda.model;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,6 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Handler;
-import ch.elexis.ungrad.lucinda.JsonObject;
 import ch.elexis.ungrad.lucinda.Lucinda;
 
 /**
@@ -39,7 +39,7 @@ import ch.elexis.ungrad.lucinda.Lucinda;
 public class Sender implements Handler {
 	private List<? extends PersistentObject> toDo;
 	private Customer customer;
-	private List<JsonObject> answers = new ArrayList<>();
+	private List<Map> answers = new ArrayList<>();
 	private List<String> onTheWay = new ArrayList<>();
 	private Lucinda lucinda;
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -62,11 +62,11 @@ public class Sender implements Handler {
 		this.bCopy = bCopy;
 		lucinda = new Lucinda();
 		lucinda.connect(result -> {
-			if (result.getString("status").equalsIgnoreCase("connected")) {
+			if (((String)result.get("status")).equalsIgnoreCase("connected")) {
 				sendNext();
 			} else {
-				SWTHelper.showError("Lucinda", "unexpected answer " + result.getString("status")
-					+ ", " + result.getString("message"));
+				SWTHelper.showError("Lucinda", "unexpected answer " + result.get("status")
+					+ ", " + result.get("message"));
 			}
 		});
 	}
@@ -77,16 +77,16 @@ public class Sender implements Handler {
 	 * are on the way, then we tell our customer, that we finished the job.
 	 */
 	@Override
-	public void signal(JsonObject message){
-		String id = message.getString("_id"); //$NON-NLS-1$
-		if (!message.getString("status").equals("ok")) {
+	public void signal(Map message){
+		String id = (String)message.get("_id"); //$NON-NLS-1$
+		if (!message.get("status").equals("ok")) {
 			/*
 			 * SWTHelper.showError("Lucinda Sender " +
 			 * message.getString("status"), message.getString("message") + "; "
 			 * + message.getString("title"));
 			 */
-			log.error("*** Lucinda Sender " + message.getString("status")
-				+ message.getString("message") + "; " + message.getString("title"));
+			log.error("*** Lucinda Sender " + message.get("status")
+				+ message.get("message") + "; " + message.get("title"));
 			Activator.getDefault().addMessage(message);
 		} else {
 			customer.success(id);
@@ -109,21 +109,21 @@ public class Sender implements Handler {
 		if (!toDo.isEmpty()) {
 			PersistentObject po = toDo.remove(0);
 			if (po.exists()) {
-				JsonObject order = customer.specify(po);
+				Map order = customer.specify(po);
 				if (order == null) {
 					toDo.clear();
 				} else {
-					byte[] contents = order.getBinary("payload"); //$NON-NLS-1$
+					byte[] contents = (byte[])order.get("payload"); //$NON-NLS-1$
 					if (contents != null) { // skip empty files - no point in
 												// indexing null
-						String title = order.getString("title");
-						String type = order.getString("type");
+						String title = (String)order.get("title");
+						String type = (String)order.get("type");
 						log.debug(title);
 						onTheWay.add(po.getId());
 						lucinda.addToIndex(po.getId(), title == null ? "?" : title, //$NON-NLS-1$
 							type == null ? "" : type, order, contents, this, bCopy); //$NON-NLS-1$
 					} else { // Skipped empty file -> Advance to next
-						log.warn("Skipping empty Document " + order.getString("title"));
+						log.warn("Skipping empty Document " + order.get("title"));
 						sendNext();
 					}
 				}

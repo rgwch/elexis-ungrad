@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,21 +60,21 @@ public class Client3 {
 		
 	}
 	
-	public void addToIndex(final String id, final String title, final String doctype, JsonObject metadata,
+	public void addToIndex(final String id, final String title, final String doctype, Map metadata,
 			final byte[] contents, final Handler handler) {
 		
 	}
 	
 	public void addFile(final String uid, final String filename, final String concern, final String doctype,
-			JsonObject metadata, final byte[] contents, final Handler handler) {
+			Map<String,Object> metadata, final byte[] contents, final Handler handler) {
 		
 	}
 	public void shutDown() {}
 	
-	private JsonObject prepare(final String id, final String title, final String doctype, JsonObject metadata,
+	private Map<String, Object> prepare(final String id, final String title, final String doctype, Map metadata,
 			final byte[] contents) throws IOException {
 		if (metadata == null) {
-			metadata = new JsonObject();
+			metadata = new HashMap<String, Object>();
 		}
 		if (!id.isEmpty()) {
 			metadata.put("_id", id);
@@ -88,8 +90,8 @@ public class Client3 {
 	/*
 	 * syntactic sugar to create and initialize a JsonObject with a single call
 	 */
-	private JsonObject make(String... params) {
-		JsonObject ret = new JsonObject();
+	private Map make(String... params) {
+		Map ret = new HashMap();
 		for (String param : params) {
 			String[] p = param.split(":");
 			ret.put(p[0], p[1]);

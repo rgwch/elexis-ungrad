@@ -14,10 +14,11 @@
 
 package ch.elexis.ungrad.lucinda;
 
+import java.util.Map;
 
 /**
  * Created by gerry on 11.05.16.
  */
 public interface Handler {
-	public void signal(JsonObject detail);
+	public void signal(Map detail);
 }

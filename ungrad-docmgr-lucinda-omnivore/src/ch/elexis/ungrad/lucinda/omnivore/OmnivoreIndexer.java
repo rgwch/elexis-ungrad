@@ -14,9 +14,12 @@
 
 package ch.elexis.ungrad.lucinda.omnivore;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +35,6 @@ import ch.elexis.ungrad.lucinda.model.Customer;
 import ch.elexis.ungrad.lucinda.model.Sender;
 import ch.rgw.tools.JdbcLink;
 import ch.rgw.tools.TimeTool;
-import io.vertx.core.json.JsonObject;
 
 /**
  * A Lucinda Indexer Customer for Omnivore Documents
@@ -60,10 +62,11 @@ public class OmnivoreIndexer implements Customer {
 	 * database. A progress indicator and a Sender are initialized
 	 * We use the lastupdate field to check where we ware, which is probably not accurate with older
 	 * databases where that field didn't exist yet.
+	 * @throws IOException 
 	 * @See Sender
 	 */
 
-	public void start(IProgressController pc) {
+	public void start(IProgressController pc) throws IOException {
 		this.pc = pc;
 		try {
 			lastCheck = Long.parseLong(Preferences.get(Preferences.LASTSCAN_OMNI, "0")); //$NON-NLS-1$
@@ -118,10 +121,10 @@ public class OmnivoreIndexer implements Customer {
 	 */
 
 	@Override
-	public JsonObject specify(PersistentObject po) {
+	public Map specify(PersistentObject po) {
 		DocHandle dh = (DocHandle) po;
 		if (cont) {
-			JsonObject meta = new JsonObject();
+			Map<String,Object> meta = new HashMap<String, Object>();
 			Patient patient = dh.getPatient();
 			String bdRaw = get(patient, Patient.FLD_DOB);
 			String lastname = get(patient, Patient.FLD_NAME);
@@ -174,7 +177,7 @@ public class OmnivoreIndexer implements Customer {
 	 */
 
 	@Override
-	public void finished(List<JsonObject> messages) {
+	public void finished(List<Map<String,String>> messages) {
 		Activator.getDefault().addMessages(messages);
 		Preferences.cfg.flush();
 	}

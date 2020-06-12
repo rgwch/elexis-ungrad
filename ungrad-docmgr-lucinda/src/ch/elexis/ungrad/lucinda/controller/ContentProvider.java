@@ -14,10 +14,12 @@
 
 package ch.elexis.ungrad.lucinda.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import ch.elexis.ungrad.lucinda.JsonArray;
 
 public class ContentProvider implements IStructuredContentProvider {
 
@@ -35,10 +37,10 @@ public class ContentProvider implements IStructuredContentProvider {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		JsonArray values = (JsonArray) inputElement;
+		List<Map> values = (List) inputElement;
 		Object[] ret = new Object[values.size()];
 		for (int i = 0; i < ret.length; i++) {
-			ret[i] = values.getJsonObject(i);
+			ret[i] = values.get(i);
 		}
 		return ret;
 	}

@@ -14,10 +14,13 @@
 
 package ch.elexis.ungrad.docmgr.lucinda.kons;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +37,7 @@ import ch.elexis.ungrad.lucinda.model.Customer;
 import ch.elexis.ungrad.lucinda.model.Sender;
 import ch.rgw.tools.TimeTool;
 import ch.rgw.tools.VersionedResource;
-import io.vertx.core.json.JsonObject;
+
 
 public class ConsultationIndexer implements Customer {
 	Logger log = LoggerFactory.getLogger(ConsultationIndexer.class);
@@ -56,10 +59,11 @@ public class ConsultationIndexer implements Customer {
 	 * database. A progress indicator and a Sender are initialized. Note:
 	 * Possibly, there exist more than Integer.MAX_VALUE consultations. So the
 	 * List.size() call would not be correct.
+	 * @throws IOException 
 	 * 
 	 * @See Sender
 	 */
-	public void start(IProgressController pc) {
+	public void start(IProgressController pc) throws IOException {
 		this.pc = pc;
 		try {
 			lastCheck = Long.parseLong(Preferences.get(Preferences.LASTSCAN_KONS, "0")); //$NON-NLS-1$
@@ -105,12 +109,12 @@ public class ConsultationIndexer implements Customer {
 	 *          should finish and discard remaining objects.
 	 */
 	@Override
-	public JsonObject specify(PersistentObject po) {
+	public Map<String, Object> specify(PersistentObject po) {
 		Konsultation kons = (Konsultation) po;
 		long lastDisplayUüdate = System.currentTimeMillis();
 		int numOfUpdates = 0;
 		if (cont) {
-			JsonObject meta = new JsonObject();
+			Map<String,Object> meta = new HashMap<String, Object>();
 			Fall fall = kons.getFall();
 			Patient patient = fall.getPatient();
 			String bdRaw = get(patient, Patient.FLD_DOB);
@@ -181,7 +185,7 @@ public class ConsultationIndexer implements Customer {
 	 *            Lucinda messages sent while transferring.
 	 */
 	@Override
-	public void finished(List<JsonObject> messages) {
+	public void finished(List<Map<String,String>> messages) {
 		Activator.getDefault().addMessages(messages);
 		Preferences.cfg.flush();
 	}
