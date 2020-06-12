@@ -9,7 +9,6 @@ import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.vertx.core.json.JsonObject;
 
 public class Client3 {
 	private String api = "/lucinda/3.0";
@@ -46,6 +45,46 @@ public class Client3 {
 		}
 				
 	}
+	
+	public void query(final String phrase, final Handler handler) {
+		
+	}
+	
+	public void get(final String id, final Handler handler) {
+			
+	}
+	
+	public void rescan(final Handler handler) {
+		
+	}
+	
+	public void addToIndex(final String id, final String title, final String doctype, JsonObject metadata,
+			final byte[] contents, final Handler handler) {
+		
+	}
+	
+	public void addFile(final String uid, final String filename, final String concern, final String doctype,
+			JsonObject metadata, final byte[] contents, final Handler handler) {
+		
+	}
+	public void shutDown() {}
+	
+	private JsonObject prepare(final String id, final String title, final String doctype, JsonObject metadata,
+			final byte[] contents) throws IOException {
+		if (metadata == null) {
+			metadata = new JsonObject();
+		}
+		if (!id.isEmpty()) {
+			metadata.put("_id", id);
+		}
+		metadata.put("title", title);
+		metadata.put("lucinda_doctype", doctype);
+		metadata.put("filename", title);
+		metadata.put("payload", contents);
+		return metadata;
+	}
+
+	
 	/*
 	 * syntactic sugar to create and initialize a JsonObject with a single call
 	 */

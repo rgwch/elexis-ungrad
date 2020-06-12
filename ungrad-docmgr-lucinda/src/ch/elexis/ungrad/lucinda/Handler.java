@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2020 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -14,7 +14,6 @@
 
 package ch.elexis.ungrad.lucinda;
 
-import io.vertx.core.json.JsonObject;
 
 /**
  * Created by gerry on 11.05.16.

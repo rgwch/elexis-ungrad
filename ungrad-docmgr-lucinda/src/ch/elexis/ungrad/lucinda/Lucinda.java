@@ -13,18 +13,20 @@
  *********************************************************************************/
 package ch.elexis.ungrad.lucinda;
 
+import java.io.IOException;
+
 import ch.rgw.io.FileTool;
-import io.vertx.core.json.JsonObject;
+
 
 public class Lucinda {
-	private Client client;
+	private Client3 client;
 	private boolean connected = false;
 
 	public Lucinda() {
-		client = new Client();
+		client = new Client3();
 	}
 
-	public void connect(final Handler handler) {
+	public void connect(final Handler handler) throws IOException {
 		if (!connected) {
 			String server = Preferences.get(Preferences.SERVER_ADDR, "127.0.0.1"); //$NON-NLS-1$
 			int port = Integer.parseInt(Preferences.get(Preferences.SERVER_PORT, "2016")); //$NON-NLS-1$

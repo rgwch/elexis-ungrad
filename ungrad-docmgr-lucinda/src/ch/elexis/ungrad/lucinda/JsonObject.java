@@ -4,12 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JsonObject {
-	Map<String,String> cnt=new HashMap<>();
+	Map<String,Object> cnt=new HashMap<>();
 	
 	public void put(String key, String value) {
 		cnt.put(key, value);
 	}
-	public String get(String key) {
-		return cnt.get(key);
+	public String getString(String key) {
+		return (String)cnt.get(key);
+	}
+	public void put(String key, byte[] data) {
+		cnt.put(key, data);
 	}
 }
