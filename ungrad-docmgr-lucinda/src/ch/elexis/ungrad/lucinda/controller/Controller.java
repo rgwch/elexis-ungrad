@@ -15,6 +15,7 @@
 package ch.elexis.ungrad.lucinda.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,14 +85,19 @@ public class Controller implements IProgressController {
 		connect();
 	}
 
-	private void connect() {
-		lucinda.connect(result -> {
-			switch (result.getString("status")) {
-			case "connected":
-				view.setConnected(true);
-				break;
-			}
-		});
+	private void connect(){
+		try {
+			lucinda.connect(result -> {
+				switch (result.getString("status")) {
+				case "connected":
+					view.setConnected(true);
+					break;
+				}
+			});
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 

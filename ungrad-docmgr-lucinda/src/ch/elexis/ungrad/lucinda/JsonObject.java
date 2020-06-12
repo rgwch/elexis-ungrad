@@ -12,6 +12,9 @@ public class JsonObject {
 	public String getString(String key) {
 		return (String)cnt.get(key);
 	}
+	public byte[] getArray(String key) {
+		return (byte[])cnt.get(key);
+	}
 	public void put(String key, byte[] data) {
 		cnt.put(key, data);
 	}

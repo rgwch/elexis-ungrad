@@ -14,7 +14,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Handler;
-import io.vertx.core.json.JsonObject;
+import ch.elexis.ungrad.lucinda.JsonObject;
 
 public class LucindaMessages extends ViewPart implements Handler {
 	private TreeViewer tv;

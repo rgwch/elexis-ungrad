@@ -17,7 +17,7 @@ package ch.elexis.ungrad.lucinda.controller;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import io.vertx.core.json.JsonArray;
+import ch.elexis.ungrad.lucinda.JsonArray;
 
 public class ContentProvider implements IStructuredContentProvider {
 

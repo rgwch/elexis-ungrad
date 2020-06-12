@@ -17,7 +17,7 @@ package ch.elexis.ungrad.lucinda.model;
 import java.util.List;
 
 import ch.elexis.data.PersistentObject;
-import io.vertx.core.json.JsonObject;
+import ch.elexis.ungrad.lucinda.JsonObject;
 
 public interface Customer {
 	/**

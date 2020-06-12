@@ -22,7 +22,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import ch.elexis.core.data.util.Extensions;
-import io.vertx.core.json.JsonObject;
 
 
 /**

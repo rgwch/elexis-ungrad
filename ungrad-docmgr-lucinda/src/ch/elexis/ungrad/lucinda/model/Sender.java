@@ -14,6 +14,7 @@
 
 package ch.elexis.ungrad.lucinda.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +25,8 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Handler;
+import ch.elexis.ungrad.lucinda.JsonObject;
 import ch.elexis.ungrad.lucinda.Lucinda;
-import io.vertx.core.json.JsonObject;
 
 /**
  * The Sender takes a List of PersistentObjects from its creating customer and sends them
@@ -53,8 +54,9 @@ public class Sender implements Handler {
 	 *            List of PersistenObjects to send
 	 * @param bCopy
 	 *            if false, Documents are only indexed. If true, Documents are imported to Lucinda
+	 * @throws IOException 
 	 */
-	public Sender(Customer customer, List<? extends PersistentObject> list, boolean bCopy){
+	public Sender(Customer customer, List<? extends PersistentObject> list, boolean bCopy) throws IOException{
 		toDo = list;
 		this.customer = customer;
 		this.bCopy = bCopy;
