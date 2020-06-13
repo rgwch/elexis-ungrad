@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2020 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -45,5 +45,5 @@ public interface Customer {
 	 * @param messages
 	 *            All messages received from Lucinda while transmitting
 	 */
-	public void finished(List<Map<String,String>> messages);
+	public void finished(List<Map<String,Object>> messages);
 }

@@ -66,7 +66,7 @@ public class OmnivoreIndexer implements Customer {
 	 * @See Sender
 	 */
 
-	public void start(IProgressController pc) throws IOException {
+	public void start(IProgressController pc) {
 		this.pc = pc;
 		try {
 			lastCheck = Long.parseLong(Preferences.get(Preferences.LASTSCAN_OMNI, "0")); //$NON-NLS-1$
@@ -177,7 +177,7 @@ public class OmnivoreIndexer implements Customer {
 	 */
 
 	@Override
-	public void finished(List<Map<String,String>> messages) {
+	public void finished(List<Map<String,Object>> messages) {
 		Activator.getDefault().addMessages(messages);
 		Preferences.cfg.flush();
 	}

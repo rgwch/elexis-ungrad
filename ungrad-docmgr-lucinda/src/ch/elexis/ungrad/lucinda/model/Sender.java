@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2020 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -39,7 +39,7 @@ import ch.elexis.ungrad.lucinda.Lucinda;
 public class Sender implements Handler {
 	private List<? extends PersistentObject> toDo;
 	private Customer customer;
-	private List<Map> answers = new ArrayList<>();
+	private List<Map<String,Object>> answers = new ArrayList<>();
 	private List<String> onTheWay = new ArrayList<>();
 	private Lucinda lucinda;
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -56,28 +56,33 @@ public class Sender implements Handler {
 	 *            if false, Documents are only indexed. If true, Documents are imported to Lucinda
 	 * @throws IOException 
 	 */
-	public Sender(Customer customer, List<? extends PersistentObject> list, boolean bCopy) throws IOException{
+	public Sender(Customer customer, List<? extends PersistentObject> list, boolean bCopy){
 		toDo = list;
 		this.customer = customer;
 		this.bCopy = bCopy;
 		lucinda = new Lucinda();
-		lucinda.connect(result -> {
-			if (((String)result.get("status")).equalsIgnoreCase("connected")) {
-				sendNext();
-			} else {
-				SWTHelper.showError("Lucinda", "unexpected answer " + result.get("status")
-					+ ", " + result.get("message"));
-			}
-		});
+		try {
+			lucinda.connect(result -> {
+				if (((String)result.get("status")).equalsIgnoreCase("connected")) {
+					sendNext();
+				} else {
+					SWTHelper.showError("Lucinda", "unexpected answer " + result.get("status")
+						+ ", " + result.get("message"));
+				}
+			});
+		} catch (IOException e) {
+			SWTHelper.showError(("Lucinda"), "could not connect to Lucinda "+e.getMessage());
+			e.printStackTrace();
+		}
 	}
 	
 	/**
-	 * Lucinda will signal each transfer of a Document. We use these signals to keep track of how
+	 * Lucinda will signal each transfer of a Document. We use these signals to keep track of	 how
 	 * many Documents are still on the way. If no more Documents are waiting and no more Documents
 	 * are on the way, then we tell our customer, that we finished the job.
 	 */
 	@Override
-	public void signal(Map message){
+	public void signal(Map<String,Object> message){
 		String id = (String)message.get("_id"); //$NON-NLS-1$
 		if (!message.get("status").equals("ok")) {
 			/*

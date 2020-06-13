@@ -2,7 +2,7 @@
 <feature
       id="ch.elexis.ungrad.docmgr-lucinda.feature"
       label="Document Manager based on Lucinda"
-      version="1.0.0.qualifier"
+      version="2.0.0.qualifier"
       provider-name="G. Weirich"
       os="linux,macosx,win32"
       ws="cocoa,gtk,win32">

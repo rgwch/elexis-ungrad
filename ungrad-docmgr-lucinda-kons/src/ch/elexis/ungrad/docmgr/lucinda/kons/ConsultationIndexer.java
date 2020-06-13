@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2020 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -63,7 +63,7 @@ public class ConsultationIndexer implements Customer {
 	 * 
 	 * @See Sender
 	 */
-	public void start(IProgressController pc) throws IOException {
+	public void start(IProgressController pc) {
 		this.pc = pc;
 		try {
 			lastCheck = Long.parseLong(Preferences.get(Preferences.LASTSCAN_KONS, "0")); //$NON-NLS-1$
@@ -185,7 +185,7 @@ public class ConsultationIndexer implements Customer {
 	 *            Lucinda messages sent while transferring.
 	 */
 	@Override
-	public void finished(List<Map<String,String>> messages) {
+	public void finished(List<Map<String,Object>> messages) {
 		Activator.getDefault().addMessages(messages);
 		Preferences.cfg.flush();
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2019 by G. Weirich
+ * Copyright (c) 2016-2020 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -185,7 +186,7 @@ public class Controller implements IProgressController {
 	public void runQuery(String input) {
 		lucinda.query(buildQuery(input), result -> {
 			if (result.get("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
-				Set<Map> queryResult = (Set)result.get("result"); //$NON-NLS-1$
+				List<Map> queryResult = (List)result.get("result"); //$NON-NLS-1$
 
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override

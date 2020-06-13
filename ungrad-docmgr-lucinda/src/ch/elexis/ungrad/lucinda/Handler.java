@@ -20,5 +20,5 @@ import java.util.Map;
  * Created by gerry on 11.05.16.
  */
 public interface Handler {
-	public void signal(Map detail);
+	public void signal(Map<String,Object> detail);
 }

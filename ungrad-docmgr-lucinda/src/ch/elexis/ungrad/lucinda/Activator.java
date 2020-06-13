@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2020 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -36,7 +36,7 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	private List<Handler> handlers = new ArrayList<>();
-	private List<Map<String, String>> messages = new LinkedList<>();
+	private List<Map<String, Object>> messages = new LinkedList<>();
 	private List<IDocumentHandler> addons;
 	
 	
@@ -82,15 +82,15 @@ public class Activator extends AbstractUIPlugin {
 		super.stop(context);
 	}
 
-	public void addMessage(Map<String,String> message) {
+	public void addMessage(Map<String,Object> message) {
 		messages.add(message);
 	}
 
-	public void addMessages(List<Map<String,String>> messages) {
+	public void addMessages(List<Map<String,Object>> messages) {
 		this.messages.addAll(messages);
 	}
 
-	public List<Map<String,String>> getMessages() {
+	public List<Map<String,Object>> getMessages() {
 		return messages;
 	}
 

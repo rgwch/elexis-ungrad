@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2020 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -16,8 +16,6 @@ package ch.elexis.ungrad.lucinda.omnivore;
 
 import static ch.elexis.ungrad.lucinda.Preferences.INCLUDE_OMNI;
 import static ch.elexis.ungrad.lucinda.Preferences.SHOW_OMNIVORE;
-
-import java.io.IOException;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
