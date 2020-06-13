@@ -185,7 +185,9 @@ public class Controller implements IProgressController {
 	 */
 	public void runQuery(String input) {
 		lucinda.query(buildQuery(input), result -> {
-			if (result.get("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
+			String status=(String)result.get("status");
+					
+			if ("ok".equals(status)) { //$NON-NLS-1$ //$NON-NLS-2$
 				List<Map> queryResult = (List)result.get("result"); //$NON-NLS-1$
 
 				Display.getDefault().asyncExec(new Runnable() {

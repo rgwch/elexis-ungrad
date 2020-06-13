@@ -3,6 +3,8 @@ package ch.elexis.ungrad.lucinda;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -42,6 +44,31 @@ public class Client3 {
 			throw new IOException("could not read "+api_call+": Status was "+response);
 		}
 	}
+	private String doPost(final String api_call,final String body) throws IOException{
+		URL url=new URL(addr+api+api_call);	
+		conn=(HttpURLConnection)url.openConnection();
+		conn.setRequestMethod("POST");
+		// conn.setRequestProperty("method", "post");
+		conn.setRequestProperty("Content-Type", "application/json");
+		String json="{\"query\":\""+body+"\"}";
+		conn.setRequestProperty("Content-Length", String.valueOf(json.length()));
+		// conn.setConnectTimeout(5000);	
+		conn.setDoOutput(true);
+		
+		OutputStreamWriter os=new OutputStreamWriter(conn.getOutputStream());
+		os.write(json);	
+		os.flush();
+		BufferedReader in=new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		String line;
+		StringBuffer buffer=new StringBuffer();
+		while((line=in.readLine())!=null) {
+			buffer.append(line);
+		}
+		in.close();
+		conn.disconnect();
+		return buffer.toString();
+	}
+	
 	public void connect(final String server_ip, final int port, final Handler handler) {
 		addr="http://"+server_ip+":"+port;
 		try {
@@ -60,13 +87,22 @@ public class Client3 {
 	
 	public void query(final String phrase, final Handler handler) {
 		try {
-			String result=doSend("query/"+phrase);
-			Map<String,Object> json=readJson(result);
+			HashMap<String, Object> params=new HashMap<>();
+			HashMap<String, Object> query=new HashMap<>();
+			HashMap<String, Object> edismax=new HashMap<>();
+			edismax.put("query", phrase);
+			query.put("edismax", edismax);
+			params.put("query", query);
+			String result=doPost("/query",writeJson(params));
+			Map<String,Object> json=new HashMap<String,Object>();
+			json.put("result",readJson(result).get("docs"));
+			json.put("status", "ok");
 			handler.signal(json);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			handler.signal(make("status:error","message:"+e.getMessage()));
 		}
 	}
 	
@@ -125,7 +161,17 @@ public class Client3 {
 		}catch(Exception e) {
 			return null;
 		}
-
 	}
+	public String writeJson(Map<String,Object> source) {
+		ObjectMapper mapper=new ObjectMapper();
+		try {
+			return mapper.writeValueAsString(source);
+		}catch(Exception ex) {
+			ExHandler.handle(ex);
+			return null;
+		}
+	
+	}
+		
 		
 }
