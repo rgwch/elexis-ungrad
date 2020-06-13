@@ -30,7 +30,7 @@ public class Lucinda {
 	public void connect(final Handler handler) throws IOException {
 		if (!connected) {
 			String server = Preferences.get(Preferences.SERVER_ADDR, "127.0.0.1"); //$NON-NLS-1$
-			int port = Integer.parseInt(Preferences.get(Preferences.SERVER_PORT, "2016")); //$NON-NLS-1$
+			int port = Integer.parseInt(Preferences.get(Preferences.SERVER_PORT, "9997")); //$NON-NLS-1$
 			client.connect(server, port, handler);
 		}
 	}

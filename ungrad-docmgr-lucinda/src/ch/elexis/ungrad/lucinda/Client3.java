@@ -10,6 +10,11 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.*;
+
+import ch.rgw.tools.ExHandler;
 
 
 public class Client3 {
@@ -19,7 +24,7 @@ public class Client3 {
 	private String addr;
 	
 	private String doSend(final String api_call) throws IOException {
-		URL url=new URL(addr+api_call);	
+		URL url=new URL(addr+api+api_call);	
 		conn=(HttpURLConnection)url.openConnection();
 		conn.setRequestProperty("method", "get");
 		conn.setConnectTimeout(5000);
@@ -34,22 +39,35 @@ public class Client3 {
 			in.close();
 			return buffer.toString();
 		}else {
-			throw new IOException("could not read "+api_call);
+			throw new IOException("could not read "+api_call+": Status was "+response);
 		}
-		
-				
 	}
-	public void connect(final String server_ip, final int port, final Handler handler) throws IOException{
-		addr="http://"+server_ip+":"+port+"/";
+	public void connect(final String server_ip, final int port, final Handler handler) {
+		addr="http://"+server_ip+":"+port;
+		try {
 		String ans=doSend("");
 		if(ans.contains("Lucinda")) {
 			handler.signal(make("status:connected"));
+		}else {
+			handler.signal(make("status:failure"));
+		}
+		}catch(Exception ex) {
+			ExHandler.handle(ex);
+			handler.signal(make("status:failure","message:"+ex.getMessage()));
 		}
 				
 	}
 	
 	public void query(final String phrase, final Handler handler) {
-		
+		try {
+			String result=doSend("query/"+phrase);
+			Map<String,Object> json=readJson(result);
+			handler.signal(json);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void get(final String id, final Handler handler) {
@@ -99,5 +117,15 @@ public class Client3 {
 		return ret;
 	}
 
+	public Map<String,Object> readJson(String source){
+		ObjectMapper mapper=new ObjectMapper();
+		try {	
+			Map<String,Object> res=mapper.readValue(source, new TypeReference<Map<String,Object>>(){});
+			return res;
+		}catch(Exception e) {
+			return null;
+		}
+
+	}
 		
 }
