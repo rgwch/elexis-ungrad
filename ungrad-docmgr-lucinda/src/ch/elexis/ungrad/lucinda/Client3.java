@@ -50,13 +50,12 @@ public class Client3 {
 		conn.setRequestMethod("POST");
 		// conn.setRequestProperty("method", "post");
 		conn.setRequestProperty("Content-Type", "application/json");
-		String json="{\"query\":\""+body+"\"}";
-		conn.setRequestProperty("Content-Length", String.valueOf(json.length()));
+		conn.setRequestProperty("Content-Length", String.valueOf(body.length()));
 		// conn.setConnectTimeout(5000);	
 		conn.setDoOutput(true);
 		
 		OutputStreamWriter os=new OutputStreamWriter(conn.getOutputStream());
-		os.write(json);	
+		os.write(body);	
 		os.flush();
 		BufferedReader in=new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		String line;
