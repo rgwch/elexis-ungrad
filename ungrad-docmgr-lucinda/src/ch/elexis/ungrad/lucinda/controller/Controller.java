@@ -245,7 +245,7 @@ public class Controller implements IProgressController {
 				q.append(" +");
 			}
 			if(!input.contains(":")) {
-				input="contents:"+input;
+				input="contents:("+input+")";
 			}
 			q.append(input); // $NON-NLS-1$
 		}

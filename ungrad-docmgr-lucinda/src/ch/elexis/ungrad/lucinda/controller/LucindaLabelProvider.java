@@ -65,8 +65,8 @@ public class LucindaLabelProvider extends TableLabelProvider {
 	 * @param jo the Document metadata
 	 * @return
 	 */
-	private String[] possibleMeta = { "creation-date", "Creation-Date", "last-modified", "Last-Modified",
-			"meta:creation-date", "date", "Date", "last-save-date", "meta:save-date", "parseDate" };
+	private String[] possibleMeta = { "date", "creation-date", "Creation-Date", "last-modified", "Last-Modified",
+			"meta:creation-date", "Date", "last-save-date", "meta:save-date", "parseDate" };
 
 	public TimeTool getDate(Map<String, Object> jo) {
 		for (String meta : possibleMeta) {
