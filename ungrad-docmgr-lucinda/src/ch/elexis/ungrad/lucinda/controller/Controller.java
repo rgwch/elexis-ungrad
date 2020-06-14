@@ -126,8 +126,10 @@ public class Controller implements IProgressController {
 			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 				if (!sel.isEmpty()) {
-					Map doc = (Map) sel.getFirstElement();
-					if (doc.get(Preferences.FLD_LUCINDA_DOCTYPE).equals(Preferences.KONSULTATION_NAME)) {
+					@SuppressWarnings("unchecked")
+					Map<String,Object> doc = (Map<String,Object>) sel.getFirstElement();
+					String doctype=(String)doc.get(Preferences.FLD_LUCINDA_DOCTYPE);
+					if (Preferences.KONSULTATION_NAME.equals(doctype)) {
 						Konsultation kons = Konsultation.load((String)doc.get(Preferences.FLD_ID));
 						if (kons.exists()) {
 							ElexisEventDispatcher.fireSelectionEvent(kons);
@@ -241,7 +243,7 @@ public class Controller implements IProgressController {
 	public void loadDocument(final Map doc) {
 		String doctype = (String)doc.get(Preferences.FLD_LUCINDA_DOCTYPE);
 
-		if (doctype.equalsIgnoreCase(Preferences.INBOX_NAME)) {
+		if (Preferences.INBOX_NAME.equalsIgnoreCase(doctype)) {
 			lucinda.get((String)doc.get(Preferences.FLD_ID), result -> {
 				if (result.get("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
 					byte[] contents = (byte[]) result.get("result"); //$NON-NLS-1$

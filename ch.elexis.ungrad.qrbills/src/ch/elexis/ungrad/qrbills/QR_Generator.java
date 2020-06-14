@@ -39,6 +39,7 @@ public class QR_Generator {
 	private static final int logo_size = 7; // swiss symbol 7x7 mm.
 	private static final String ENC = "latin-1"; // Character encoding
 	
+	/*
 	private static final String[] QR_Elements = {
 		"QRType", // Always SPC, Mandatory
 		"Version", // Always 0100 this time, Mandatory
@@ -70,6 +71,7 @@ public class QR_Generator {
 		"Ustrd" // unstructured message, max 140 chars
 	
 	};
+	*/
 	
 	/**
 	 * Generate an iso 20022 conformant QR-Code (which is, in fact, an iso 18004 conformant QR-Code
@@ -96,7 +98,7 @@ public class QR_Generator {
 		sb.append(bill.qrIBAN).append(StringConstants.CRLF);
 		sb.append(checkSize(Integer.toString(bill.numCons) + " Konsultationen von " + bill.firstDate
 			+ " bis " + bill.lastDate, 140));
-		List<QrSegment> segments = QrSegment.makeSegments(sb.toString());
+		//List<QrSegment> segments = QrSegment.makeSegments(sb.toString());
 		//QrCode result = QrCode.encodeSegments(segments, ecc, 20, VERSION, -1, false);
 		QrCode result = QrCode.encodeBinary(sb.toString().getBytes(), ecc);
 		return toSvgString(result);
