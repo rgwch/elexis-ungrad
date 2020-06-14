@@ -102,6 +102,7 @@ public class Master extends Composite {
 		});
 		btnGo.setText(Messages.Master_searchButton_caption);
 
+/*
 		lblConnection = new Label(searchBox, SWT.NONE);
 		FormData fd_lblConnection = new FormData();
 		fd_lblConnection.height = 16;
@@ -116,6 +117,7 @@ public class Master extends Composite {
 			}
 
 		});
+*/		
 		Label lblClear = new Label(searchBox, SWT.NONE);
 		FormData fd_lblClear = new FormData();
 		fd_lblClear.height = 16;

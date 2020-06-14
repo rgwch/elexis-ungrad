@@ -76,7 +76,7 @@ public class Detail extends Composite {
 			@SuppressWarnings("unchecked")
 			@Override
 			public Object[] getElements(Object inputElement) {
-				Map<String,Object> el = (Map) inputElement;
+				Map<String,Object> el = (Map<String,Object>) inputElement;
 				Stream<Entry<String, Object>> filtered = el.entrySet().stream().filter(e -> isNotExcluded(e));
 				return filtered.toArray();
 			}

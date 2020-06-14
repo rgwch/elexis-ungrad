@@ -27,6 +27,7 @@ public class Lucinda {
 		client = new Client3();
 	}
 
+	/*
 	public void connect(final Handler handler) throws IOException {
 		if (!connected) {
 			String server = Preferences.get(Preferences.SERVER_ADDR, "127.0.0.1"); //$NON-NLS-1$
@@ -43,7 +44,7 @@ public class Lucinda {
 			}
 		}
 	}
-
+	 */
 	public void rescan(Handler ha) {
 		client.rescan(ha);
 	}

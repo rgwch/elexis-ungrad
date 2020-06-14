@@ -23,6 +23,8 @@ import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.model.DateParser;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
+
+import java.util.List;
 import java.util.Map;
 
 public class LucindaLabelProvider extends TableLabelProvider {
@@ -32,18 +34,22 @@ public class LucindaLabelProvider extends TableLabelProvider {
 		Map e = (Map) element;
 		switch (columnIndex) {
 		case 0:
-			return (String)e.get(Preferences.FLD_LUCINDA_DOCTYPE);
+			return (String) e.get(Preferences.FLD_LUCINDA_DOCTYPE);
 		case 1:
-			return (String)e.get("lastname"); //$NON-NLS-1$
+			return (String) e.get("lastname"); //$NON-NLS-1$
 		case 2:
 			return getDate(e).toString(TimeTool.DATE_GER);
 		case 3:
-			String cat = (String)e.get("category");//$NON-NLS-1$
+			String cat = (String) e.get("category");//$NON-NLS-1$
 			if (StringTool.isNothing(cat)) {
-				cat = (String)e.get("Kategorie");//$NON-NLS-1$
+				cat = (String) e.get("Kategorie");//$NON-NLS-1$
 			}
 			if (StringTool.isNothing(cat)) {
-				return (String)e.get("title"); //$NON-NLS-1$
+				String title = (String)e.get("title");
+				if (StringTool.isNothing(title)) {
+					title = "Ohne Titel";
+				}
+				return title; // $NON-NLS-1$
 			} else {
 				return cat + ": " + e.get("title"); //$NON-NLS-1$
 			}
@@ -53,40 +59,28 @@ public class LucindaLabelProvider extends TableLabelProvider {
 	}
 
 	/**
-	 * Try to read the document date from document's metadata. The Method tries several
-	 * fields
+	 * Try to read the document date from document's metadata. The Method tries
+	 * several fields
+	 * 
 	 * @param jo the Document metadata
 	 * @return
 	 */
-	public TimeTool getDate(Map jo) {
-		TimeTool tt = try_date(jo.get("last-modified")); //$NON-NLS-1$
-		if (tt == null) {
-			tt = try_date(jo.get("meta:creation-date")); //$NON-NLS-1$
+	private String[] possibleMeta = { "creation-date", "Creation-Date", "last-modified", "Last-Modified",
+			"meta:creation-date", "date", "Date", "last-save-date", "meta:save-date", "parseDate" };
+
+	public TimeTool getDate(Map<String, Object> jo) {
+		for (String meta : possibleMeta) {
+			TimeTool tt = try_date(jo.get(meta));
+			if (tt != null) {
+				return tt;
+			}
 		}
-		if (tt == null) {
-			tt = try_titledate(jo.get("title")); //$NON-NLS-1$
-		}
-		if(tt==null){
-			tt=try_date(jo.get("date"));
-		}
-		if (tt == null) {
-			tt = try_date(jo.get("meta:save-date")); //$NON-NLS-1$
-		}
-		if (tt == null) {
-			tt = try_date(jo.get("last-save-date")); //$NON-NLS-1$
-		}
-		if (tt == null) {
-			tt = try_date(jo.get("creation-date")); //$NON-NLS-1$
-		}
-		if (tt == null) {
-			tt = try_date(jo.get("parseDate")); //$NON-NLS-1$
-		}
-		
+		TimeTool tt = try_titledate(jo.get("title")); //$NON-NLS-1$
 		return tt == null ? new TimeTool() : tt;
 	}
 
 	private TimeTool try_titledate(Object ddo) {
-		String d = ((String)ddo).replaceAll("[_\\.]", "-"); //$NON-NLS-1$ //$NON-NLS-2$
+		String d = ((String) ddo).replaceAll("[_\\.]", "-"); //$NON-NLS-1$ //$NON-NLS-2$
 		final Pattern p1 = Pattern.compile("\\d{4}-\\d{1,2}-\\d{1,2}"); //$NON-NLS-1$
 		Matcher m1 = p1.matcher(d);
 		if (m1.find()) {
@@ -103,7 +97,17 @@ public class LucindaLabelProvider extends TableLabelProvider {
 	private TimeTool try_date(Object d) {
 		if (d != null) {
 			try {
-				return DateParser.parse((String)d);
+				if (d instanceof List) {
+					List<String> l = (List<String>) d;
+					for (String item : l) {
+						try {
+							return DateParser.parse(item);
+						} catch (ParseException ex) {
+						}
+					}
+				} else {
+					return DateParser.parse((String) d);
+				}
 
 			} catch (ParseException e) {
 				// never mind

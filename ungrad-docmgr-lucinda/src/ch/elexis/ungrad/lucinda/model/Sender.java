@@ -61,19 +61,6 @@ public class Sender implements Handler {
 		this.customer = customer;
 		this.bCopy = bCopy;
 		lucinda = new Lucinda();
-		try {
-			lucinda.connect(result -> {
-				if (((String)result.get("status")).equalsIgnoreCase("connected")) {
-					sendNext();
-				} else {
-					SWTHelper.showError("Lucinda", "unexpected answer " + result.get("status")
-						+ ", " + result.get("message"));
-				}
-			});
-		} catch (IOException e) {
-			SWTHelper.showError(("Lucinda"), "could not connect to Lucinda "+e.getMessage());
-			e.printStackTrace();
-		}
 	}
 	
 	/**
@@ -100,7 +87,6 @@ public class Sender implements Handler {
 		answers.add(message);
 		if (toDo.isEmpty() && onTheWay.isEmpty()) {
 			customer.finished(answers);
-			lucinda.disconnect();
 		}
 		sendNext();
 	}

@@ -81,9 +81,10 @@ public class Controller implements IProgressController {
 		bRestrictCurrentPatient = Boolean
 				.parseBoolean(Preferences.get(Preferences.RESTRICT_CURRENT, Boolean.toString(false)));
 		cnt = new ContentProvider();
-		connect();
+		// connect();
 	}
 
+	/*
 	private void connect() {
 		try {
 			lucinda.connect(result -> {
@@ -106,7 +107,7 @@ public class Controller implements IProgressController {
 		lucinda.disconnect();
 		connect();
 	}
-
+	 */
 	public Composite createView(Composite parent) {
 		if (Preferences.cfg.get(Preferences.SHOW_CONS, true)) {
 			allowed_doctypes.add(Preferences.KONSULTATION_NAME);
@@ -154,7 +155,7 @@ public class Controller implements IProgressController {
 	}
 
 	public void clear() {
-		viewer.setInput(new ArrayList<Map>());
+		viewer.setInput(new ArrayList<Map<String,Object>>());
 	}
 
 	int cPatWidth = 0;
@@ -329,7 +330,7 @@ public class Controller implements IProgressController {
 	}
 
 	/**
-	 * Launch a script to acquire a document from tze scanner
+	 * Launch a script to acquire a document from the scanner
 	 * 
 	 * @param shell
 	 */
@@ -438,9 +439,9 @@ public class Controller implements IProgressController {
 		if (bRestrictCurrentPatient) {
 			Text text = view.getSearchField();
 			String q = text.getText();
-			if (q.isEmpty()) {
-				text.setText("*:*"); //$NON-NLS-1$
-			}
+			/*if (q.isEmpty()) {
+				text.setText(""); //$NON-NLS-1$
+			}*/
 			runQuery(q);
 		}
 	}
