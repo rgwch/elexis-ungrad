@@ -1,6 +1,9 @@
 package ch.elexis.ungrad.lucinda;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -25,21 +28,20 @@ public class Client3 {
 	private HttpURLConnection conn;
 	private String addr;
 	
-	private String doSend(final String api_call) throws IOException {
+	private byte[] doGet(final String api_call) throws IOException {
 		URL url=new URL(addr+api+api_call);	
 		conn=(HttpURLConnection)url.openConnection();
 		conn.setRequestProperty("method", "get");
 		conn.setConnectTimeout(5000);
 		int response=conn.getResponseCode();
 		if(response==HttpURLConnection.HTTP_OK) {
-			BufferedReader in=new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			String line;
-			StringBuffer buffer=new StringBuffer();
-			while((line=in.readLine())!=null) {
-				buffer.append(line);
+			ByteArrayOutputStream baos=new ByteArrayOutputStream();
+			BufferedInputStream bin=new BufferedInputStream(conn.getInputStream());
+			int c;
+			while((c=bin.read())!=-1) {
+				baos.write(c);
 			}
-			in.close();
-			return buffer.toString();
+			return baos.toByteArray();
 		}else {
 			throw new IOException("could not read "+api_call+": Status was "+response);
 		}
@@ -71,7 +73,8 @@ public class Client3 {
 	public void connect(final String server_ip, final int port, final Handler handler) {
 		addr="http://"+server_ip+":"+port;
 		try {
-		String ans=doSend("");
+		byte[] ret=doGet("");
+		String ans=new String(ret,"utf-8");
 		if(ans.contains("Lucinda")) {
 			handler.signal(make("status:connected"));
 		}else {
@@ -106,7 +109,17 @@ public class Client3 {
 	}
 	
 	public void get(final String id, final Handler handler) {
-			
+		Map<String,Object> json=new HashMap<String, Object>();
+		try {
+			byte[] result=doGet("/get/"+id);
+			json.put("status", "ok");
+			json.put("result", result);
+		}catch(Exception e) {
+			ExHandler.handle(e);
+			json.put("status", "error");
+			json.put("message", e.getMessage());
+		}
+		handler.signal(json);
 	}
 	
 	public void rescan(final Handler handler) {
