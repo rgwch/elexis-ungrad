@@ -247,7 +247,7 @@ public class Controller implements IProgressController {
 			lucinda.get((String)doc.get(Preferences.FLD_ID), result -> {
 				if (result.get("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
 					byte[] contents = (byte[]) result.get("result"); //$NON-NLS-1$
-					String ext = FileTool.getExtension((String)doc.get("url")); //$NON-NLS-1$
+					String ext = FileTool.getExtension((String)doc.get("loc")); //$NON-NLS-1$
 					launchViewerForDocument(contents, ext);
 				}
 			});
