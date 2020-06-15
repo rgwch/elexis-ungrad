@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.model.IPatient;
 import ch.elexis.core.text.model.Samdas;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Konsultation;
@@ -214,7 +215,7 @@ public class Controller implements IProgressController {
 	 * 
 	 * @return the reined query
 	 */
-	private String buildQuery(String input) {
+	protected String buildQuery(String input) {
 		StringBuilder q = new StringBuilder();
 		if (bRestrictCurrentPatient) {
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
