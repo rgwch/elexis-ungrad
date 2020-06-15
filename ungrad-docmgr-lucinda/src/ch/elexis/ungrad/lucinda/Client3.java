@@ -12,6 +12,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.tools.Tool;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -28,7 +30,7 @@ public class Client3 {
 	private URL makeURL(final String call) throws MalformedURLException {
 		String server = Preferences.get(Preferences.SERVER_ADDR, "127.0.0.1"); //$NON-NLS-1$
 		int port = Integer.parseInt(Preferences.get(Preferences.SERVER_PORT, "9997")); //$NON-NLS-1$
-		return new URL("http://" + server + ":" + port + api+ call);
+		return new URL("http://" + server + ":" + port + api + call);
 
 	}
 
@@ -51,7 +53,7 @@ public class Client3 {
 		}
 	}
 
-	private String doPost(final String api_call, final String body) throws IOException {
+	private String doPost(final String api_call, final String body, final int expectedStatus) throws IOException {
 		URL url = makeURL(api_call);
 		conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("POST");
@@ -64,15 +66,21 @@ public class Client3 {
 		OutputStreamWriter os = new OutputStreamWriter(conn.getOutputStream());
 		os.write(body);
 		os.flush();
-		BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		String line;
-		StringBuffer buffer = new StringBuffer();
-		while ((line = in.readLine()) != null) {
-			buffer.append(line);
+		int response = conn.getResponseCode();
+		if (response == expectedStatus) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String line;
+			StringBuffer buffer = new StringBuffer();
+			while ((line = in.readLine()) != null) {
+				buffer.append(line);
+			}
+			in.close();
+			conn.disconnect();
+			return buffer.toString();
+		} else {
+			log.error("Bad answer for " + api_call + ": " + response);
+			return null;
 		}
-		in.close();
-		conn.disconnect();
-		return buffer.toString();
 	}
 
 	/*
@@ -94,7 +102,7 @@ public class Client3 {
 			query.put("edismax", edismax);
 			params.put("query", query);
 			params.put("limit", Preferences.get(Preferences.MAXIMUM_HITS, "100"));
-			String result = doPost("/query", writeJson(params));
+			String result = doPost("/query", writeJson(params), HttpURLConnection.HTTP_OK);
 			Map<String, Object> json = new HashMap<String, Object>();
 			json.put("result", readJson(result).get("docs"));
 			json.put("status", "ok");
@@ -125,21 +133,93 @@ public class Client3 {
 
 	}
 
+	/**
+	 * Add a document to the index. Note: The document itself will not be stored,
+	 * only parsed and added to the index. The caller must handle it by itself and
+	 * make sure, that it can retrieve the document with the given id
+	 *
+	 * @param id       unique id for the document. The caller should be able to
+	 *                 retrieve or reconstruct the document later with this id
+	 * @param title    A title for the document.
+	 * @param doctype  a random document type (this is not the mime-type but rather
+	 *                 some application dependent organizational attribute)
+	 * @param metadata application defined metadata. These are stored with the index
+	 *                 and can be queried for. Example: If there is an attribute
+	 *                 "author: john doe", a later query can search for "author:
+	 *                 john*"
+	 * @param contents The file contents parse. Many file types are supported and
+	 *                 recognized by content (not by file extension), such as .odt,
+	 *                 .doc, .pdf, tif. Image files are parsed through OCR and any
+	 *                 found text is indexed
+	 * @param handler  Handler to call after indexing
+	 */
 	public void addToIndex(final String id, final String title, final String doctype, Map metadata,
 			final byte[] contents, final Handler handler) {
+		Map<String, Object> params = prepare(id, title, doctype, metadata);
+		params.put("contents", contents);
+		try {
+			String ans = doPost("/addindex", writeJson(params), HttpURLConnection.HTTP_CREATED);
+			if (StringTool.isNothing(ans)) {
+				handler.signal(make("status:error"));
+			} else {
+				handler.signal(readJson(ans));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			handler.signal(make("status:error", "message:" + e.getMessage()));
+		}
 
 	}
 
+	/**
+	 * Add a file to the Lucinda store and index.
+	 *
+	 * @param filename Name for the file to write (no path, only filename)
+	 * @param concern  some grouping hint for the file (e.g. name of the group). The
+	 *                 file will be stored in a subdirectory of that name. if
+	 *                 concern is null, the base directory for imports is used.
+	 * @param doctype  a random document type (this is not the mime-type but rather
+	 *                 some application dependent organizational attribute)
+	 * @param metadata application defined metadata. These are stored with the index
+	 *                 and can be queried for. Example: If there is an attribute
+	 *                 "author: john doe", a later query can search for "author:
+	 *                 john*"
+	 * @param contents The file contents to parse. Many file types are supported and
+	 *                 recognized by content (not by file extension), such as .odt,
+	 *                 .doc, .pdf, tif. Image files are parsed through OCR and any
+	 *                 found text is indexed
+	 * @param handler  Handler to call after the import
+	 * @throws IOException
+	 */
 	public void addFile(final String uid, final String filename, final String concern, final String doctype,
 			Map<String, Object> metadata, final byte[] contents, final Handler handler) {
+		Map<String, Object> meta = prepare(uid, filename, doctype, metadata);
+		if (!StringTool.isNothing(concern)) {
+			meta.put("concern", concern);
+		}
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("metadata", meta);
+		params.put("payload", contents);
+		try {
+			String ans = doPost("/addindex", writeJson(params), HttpURLConnection.HTTP_ACCEPTED);
+			if (StringTool.isNothing(ans)) {
+				handler.signal(make("status:error"));
+			} else {
+				handler.signal(readJson(ans));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			handler.signal(make("status:error", "message:" + e.getMessage()));
+		}
 
 	}
 
-	public void shutDown() {
-	}
+	/*
+	 * public void shutDown() { }
+	 */
 
-	private Map<String, Object> prepare(final String id, final String title, final String doctype, Map metadata,
-			final byte[] contents) throws IOException {
+	private Map<String, Object> prepare(final String id, final String title, final String doctype,
+			Map<String, Object> metadata) {
 		if (metadata == null) {
 			metadata = new HashMap<String, Object>();
 		}
@@ -149,7 +229,6 @@ public class Client3 {
 		metadata.put("title", title);
 		metadata.put("lucinda_doctype", doctype);
 		metadata.put("filename", title);
-		metadata.put("payload", contents);
 		return metadata;
 	}
 
