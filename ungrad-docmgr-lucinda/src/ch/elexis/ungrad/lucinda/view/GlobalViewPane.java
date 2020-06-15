@@ -105,11 +105,11 @@ public class GlobalViewPane extends Composite {
 			detail.setInput(element);
 		}
 	}
-
+/*
 	public void setConnected(boolean bConnected) {
 		master.setConnected(bConnected);
 	}
-
+*/
 	public Text getSearchField() {
 		return master.getSearchField();
 	}

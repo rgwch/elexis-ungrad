@@ -45,7 +45,7 @@ public class Master extends Composite {
 	private Text text;
 	private Table table;
 	private TableViewer tableViewer;
-	private Label lblConnection;
+	//private Label lblConnection;
 	private Button btnGo;
 	public static int COLUMN_TYPE = 0;
 	public static int COLUMN_NAME = 1;
@@ -123,7 +123,7 @@ public class Master extends Composite {
 		fd_lblClear.height = 16;
 		fd_lblClear.width = 16;
 		fd_lblClear.top = new FormAttachment(text, 0, SWT.CENTER);
-		fd_lblClear.left = new FormAttachment(lblConnection, 0);
+		// fd_lblClear.left = new FormAttachment(lblConnection, 0);
 		lblClear.setLayoutData(fd_lblClear);
 		lblClear.addMouseListener(new org.eclipse.swt.events.MouseAdapter() {
 
@@ -174,7 +174,7 @@ public class Master extends Composite {
 			}
 		});
 
-		setConnected(false);
+		// setConnected(false);
 
 	}
 
@@ -203,6 +203,7 @@ public class Master extends Composite {
 		});
 	}
 
+	/*
 	public void setConnected(boolean bConnected) {
 		Display.getDefault().asyncExec(new Runnable() {
 
@@ -224,7 +225,7 @@ public class Master extends Composite {
 
 		});
 	}
-
+*/
 	public Text getSearchField() {
 		return text;
 	}

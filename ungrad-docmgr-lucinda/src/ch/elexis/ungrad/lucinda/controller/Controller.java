@@ -55,6 +55,7 @@ import ch.elexis.ungrad.lucinda.view.GlobalViewPane;
 import ch.elexis.ungrad.lucinda.view.Master;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
+import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 import ch.elexis.omnivore.data.DocHandle;;
 
@@ -241,15 +242,14 @@ public class Controller implements IProgressController {
 			}
 			q.append(")");//$NON-NLS-1$
 		}
-		if (input.length() > 0 && !input.equals("*") && !input.equals("*:*")) {
-			if (!input.trim().startsWith("+")) {
-				q.append(" +");
-			}
-			if(!input.contains(":")) {
-				input="contents:("+input+")";
-			}
-			q.append(input); // $NON-NLS-1$
+		if(StringTool.isNothing(input) || input.equals("*")||input.equals("*:*")) {
+			q.append(" contents:*");
+		}else if(input.contains(":")){
+			q.append("+").append(input);
+		}else {
+			q.append("+").append("contents:(").append(input).append(")");
 		}
+		log.info(q.toString());
 		return q.toString();
 	}
 

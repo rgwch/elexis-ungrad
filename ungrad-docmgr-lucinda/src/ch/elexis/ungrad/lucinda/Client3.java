@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,16 +24,16 @@ public class Client3 {
 	private String api = "/lucinda/3.0";
 	private Logger log = LoggerFactory.getLogger("Lucinda v3 client");
 	private HttpURLConnection conn;
-	private String addr;
 
-	public Client3() {
+	private URL makeURL(final String call) throws MalformedURLException {
 		String server = Preferences.get(Preferences.SERVER_ADDR, "127.0.0.1"); //$NON-NLS-1$
 		int port = Integer.parseInt(Preferences.get(Preferences.SERVER_PORT, "9997")); //$NON-NLS-1$
-		addr = "http://" + server + ":" + port;
+		return new URL("http://" + server + ":" + port + api+ call);
+
 	}
 
 	private byte[] doGet(final String api_call) throws IOException {
-		URL url = new URL(addr + api + api_call);
+		URL url = makeURL(api_call);
 		conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestProperty("method", "get");
 		conn.setConnectTimeout(5000);
@@ -51,7 +52,7 @@ public class Client3 {
 	}
 
 	private String doPost(final String api_call, final String body) throws IOException {
-		URL url = new URL(addr + api + api_call);
+		URL url = makeURL(api_call);
 		conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("POST");
 		// conn.setRequestProperty("method", "post");
