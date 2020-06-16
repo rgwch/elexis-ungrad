@@ -33,6 +33,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
@@ -45,7 +47,6 @@ public class Master extends Composite {
 	private Text text;
 	private Table table;
 	private TableViewer tableViewer;
-	//private Label lblConnection;
 	private Button btnGo;
 	public static int COLUMN_TYPE = 0;
 	public static int COLUMN_NAME = 1;
@@ -102,22 +103,6 @@ public class Master extends Composite {
 		});
 		btnGo.setText(Messages.Master_searchButton_caption);
 
-/*
-		lblConnection = new Label(searchBox, SWT.NONE);
-		FormData fd_lblConnection = new FormData();
-		fd_lblConnection.height = 16;
-		fd_lblConnection.width = 16;
-		fd_lblConnection.top = new FormAttachment(text, 0, SWT.CENTER);
-		lblConnection.setLayoutData(fd_lblConnection);
-		lblConnection.addMouseListener(new org.eclipse.swt.events.MouseAdapter() {
-
-			@Override
-			public void mouseUp(org.eclipse.swt.events.MouseEvent e) {
-				gvp.controller.reconnect();
-			}
-
-		});
-*/		
 		Label lblClear = new Label(searchBox, SWT.NONE);
 		FormData fd_lblClear = new FormData();
 		fd_lblClear.height = 16;
@@ -173,6 +158,10 @@ public class Master extends Composite {
 
 			}
 		});
+		Menu menu=new Menu(tableViewer.getTable());
+		MenuItem mEdit=new MenuItem(menu,SWT.NONE);
+		mEdit.setText("Edit");
+		tableViewer.getTable().setMenu(menu);
 
 		// setConnected(false);
 
@@ -203,29 +192,6 @@ public class Master extends Composite {
 		});
 	}
 
-	/*
-	public void setConnected(boolean bConnected) {
-		Display.getDefault().asyncExec(new Runnable() {
-
-			@Override
-			public void run() {
-				if (bConnected) {
-					StringBuilder sb = new StringBuilder(Messages.Master_connected_tooltip);
-					sb.append(Messages.Master_connected_tooltip2);
-					lblConnection.setImage(Images.IMG_BULLET_GREEN.getImage());
-					lblConnection.setToolTipText(sb.toString());
-				} else {
-					lblConnection.setImage(Images.IMG_BULLET_RED.getImage());
-					lblConnection.setToolTipText(Messages.Master_disconnected_tooltip);
-				}
-				text.setEnabled(bConnected);
-				btnGo.setEnabled(bConnected);
-
-			}
-
-		});
-	}
-*/
 	public Text getSearchField() {
 		return text;
 	}

@@ -288,7 +288,7 @@ public class Controller implements IProgressController {
 
 	private void loadFile(String docbase, Map<String, Object> doc) {
 		final String loc = (String) doc.get(Preferences.FLD_LOCATION);
-		if (loc.contains(":/") || StringTool.isNothing(loc)) {
+		if (loc.contains(":/") || StringTool.isNothing(docbase)) {
 			lucinda.get((String) doc.get(Preferences.FLD_ID), result -> {
 				try {
 					if (result.get("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$

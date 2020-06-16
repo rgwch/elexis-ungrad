@@ -21,20 +21,31 @@ import static ch.elexis.ungrad.lucinda.Preferences.SHOW_INBOX;
 import static ch.elexis.ungrad.lucinda.Preferences.SHOW_OMNIVORE;
 
 import java.io.File;
+import java.util.List;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
+import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.data.Patient;
@@ -61,6 +72,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 
 	public GlobalView() {
 		controller = new Controller();
+
 	}
 
 	@Override
@@ -121,7 +133,38 @@ public class GlobalView extends ViewPart implements IActivationListener {
 		menu.add(rescanAction);
 
 	}
+	
+	public void createViewerContextMenu(StructuredViewer viewer,
+			final List<IContributionItem> contributionItems){
+			MenuManager menuMgr = new MenuManager();
+			menuMgr.setRemoveAllWhenShown(true);
+			menuMgr.addMenuListener(new IMenuListener() {
+				public void menuAboutToShow(IMenuManager manager){
+					fillContextMenu(manager, contributionItems);
+				}
+			});
+			Menu menu = menuMgr.createContextMenu(viewer.getControl());
+			viewer.getControl().setMenu(menu);
+			
+			getViewSite().registerContextMenu(menuMgr, viewer);
+		}
 
+	private void fillContextMenu(IMenuManager manager, List<IContributionItem> contributionItems){
+		manager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+		for (IContributionItem contributionItem : contributionItems) {
+			if (contributionItem == null) {
+				manager.add(new Separator());
+				continue;
+			} else if (contributionItem instanceof ActionContributionItem) {
+				ActionContributionItem ac = (ActionContributionItem) contributionItem;
+				if (ac.getAction() instanceof RestrictedAction) {
+					((RestrictedAction) ac.getAction()).reflectRight();
+				}
+			}
+			contributionItem.update();
+			manager.add(contributionItem);
+		}
+	}
 	private void makeActions() {
 		rescanAction = new Action("Rescan") {
 			{
