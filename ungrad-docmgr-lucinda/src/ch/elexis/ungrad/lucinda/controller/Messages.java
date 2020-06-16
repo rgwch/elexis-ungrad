@@ -11,6 +11,7 @@ public class Messages extends NLS {
 	public static String Controller_omnivore_not_found_text;
 	public static String Controller_unknown_type_caption;
 	public static String Controller_unknown_type_text;
+	public static String Controller_could_not_load_file;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

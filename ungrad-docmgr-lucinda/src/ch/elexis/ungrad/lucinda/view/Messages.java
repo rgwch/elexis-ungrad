@@ -35,6 +35,7 @@ public class Messages extends NLS {
 	public static String LucindaPrefs_netmask;
 	public static String LucindaPrefs_serverAddress;
 	public static String LucindaPrefs_serverPort;
+	public static String LucindaPrefs_documentStore;
 	public static String Master_clearButton_tooltip;
 	public static String Master_col_caption_date;
 	public static String Master_col_caption_doc;

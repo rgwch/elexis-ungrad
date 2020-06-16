@@ -46,6 +46,7 @@ import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.text.model.Samdas;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.data.Fall;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.lucinda.Activator;
@@ -87,28 +88,15 @@ public class Controller implements IProgressController {
 	}
 
 	/*
-	private void connect() {
-		try {
-			lucinda.connect(result -> {
-				switch ((String) result.get("status")) {
-				case "connected":
-					view.setConnected(true);
-					break;
-				}
-			});
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	public void reconnect() {
-		clear();
-		view.setConnected(false);
-		lucinda.disconnect();
-		connect();
-	}
+	 * private void connect() { try { lucinda.connect(result -> { switch ((String)
+	 * result.get("status")) { case "connected": view.setConnected(true); break; }
+	 * }); } catch (IOException e) { // TODO Auto-generated catch block
+	 * e.printStackTrace(); }
+	 * 
+	 * }
+	 * 
+	 * public void reconnect() { clear(); view.setConnected(false);
+	 * lucinda.disconnect(); connect(); }
 	 */
 	public Composite createView(Composite parent) {
 		if (Preferences.cfg.get(Preferences.SHOW_CONS, true)) {
@@ -157,7 +145,7 @@ public class Controller implements IProgressController {
 	}
 
 	public void clear() {
-		viewer.setInput(new ArrayList<Map<String,Object>>());
+		viewer.setInput(new ArrayList<Map<String, Object>>());
 	}
 
 	int cPatWidth = 0;
@@ -221,15 +209,15 @@ public class Controller implements IProgressController {
 		if (bRestrictCurrentPatient) {
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
 			if (pat != null) {
-				q.append("+concern:")
-					.append(pat.getName().replaceAll(" ", "_")).append("_")
-					.append(pat.getVorname().replaceAll(" ", "_")).append("_")
-					.append(new TimeTool(pat.getGeburtsdatum()).toString((TimeTool.DATE_GER)));
+				q.append("+concern:").append(pat.getName().replaceAll(" ", "_")).append("_")
+						.append(pat.getVorname().replaceAll(" ", "_")).append("_")
+						.append(new TimeTool(pat.getGeburtsdatum()).toString((TimeTool.DATE_GER)));
 				/*
-				q.append("+lastname:").append(pat.getName()).append(" +firstname:") //$NON-NLS-1$//$NON-NLS-2$
-						.append(pat.getVorname()).append(" +birthdate:") //$NON-NLS-1$
-						.append(new TimeTool(pat.getGeburtsdatum()).toString(TimeTool.DATE_COMPACT));
-						*/
+				 * q.append("+lastname:").append(pat.getName()).append(" +firstname:")
+				 * //$NON-NLS-1$//$NON-NLS-2$ .append(pat.getVorname()).append(" +birthdate:")
+				 * //$NON-NLS-1$ .append(new
+				 * TimeTool(pat.getGeburtsdatum()).toString(TimeTool.DATE_COMPACT));
+				 */
 			}
 		}
 
@@ -242,28 +230,30 @@ public class Controller implements IProgressController {
 			}
 			q.append(")");//$NON-NLS-1$
 		}
-		if(StringTool.isNothing(input) || input.equals("*")||input.equals("*:*")) {
+		if (StringTool.isNothing(input) || input.equals("*") || input.equals("*:*")) {
 			q.append(" contents:*");
-		}else if(input.contains(":")){
+		} else if (input.contains(":")) {
 			q.append("+").append(input);
-		}else {
+		} else {
 			q.append("+").append("contents:(").append(input).append(")");
 		}
 		log.info(q.toString());
 		return q.toString();
 	}
 
+	/**
+	 * fetch the contents of a document and launch an associated application if it's
+	 * a file from the Lucinda inbox, launch it from there.
+	 * 
+	 * @param doc
+	 */
 	public void loadDocument(final Map doc) {
 		String doctype = (String) doc.get(Preferences.FLD_LUCINDA_DOCTYPE);
 
 		if (Preferences.INBOX_NAME.equalsIgnoreCase(doctype)) {
-			lucinda.get((String) doc.get(Preferences.FLD_ID), result -> {
-				if (result.get("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
-					byte[] contents = (byte[]) result.get("result"); //$NON-NLS-1$
-					String ext = FileTool.getExtension((String) doc.get("loc")); //$NON-NLS-1$
-					launchViewerForDocument(contents, ext);
-				}
-			});
+			String docbase = Preferences.cfg.get(Preferences.DOCUMENT_STORE, "");
+			loadFile(docbase, doc);
+
 		} else if (doctype.equalsIgnoreCase(Preferences.KONSULTATION_NAME)) {
 			Konsultation kons = Konsultation.load((String) doc.get(Preferences.FLD_ID));
 			if (kons.exists()) {
@@ -272,7 +262,10 @@ public class Controller implements IProgressController {
 					Samdas samdas = new Samdas(entry);
 					entry = samdas.getRecordText();
 				}
-				launchViewerForDocument(entry.getBytes(), "txt"); //$NON-NLS-1$
+				//launchViewerForDocument(entry.getBytes(), "txt"); //$NON-NLS-1$
+				Fall fall=kons.getFall();
+				Patient pat=fall.getPatient();
+				ElexisEventDispatcher.fireSelectionEvents(pat,fall,kons);
 			} else {
 				SWTHelper.showError(Messages.Controller_cons_not_found_caption,
 						MessageFormat.format(Messages.Controller_cons_not_found_text, doc.get("title"))); // $NON-NLS-2$
@@ -293,30 +286,53 @@ public class Controller implements IProgressController {
 
 	}
 
-	/*
-	 * @Override public void signal(Map<String, Object> message) { switch ((String)
-	 * message.get("status")) { //$NON-NLS-1$ case "connected": //$NON-NLS-1$
-	 * view.setConnected(true, lucinda.isBusAPI(), lucinda.isRestAPI()); break; case
-	 * "disconnected": //$NON-NLS-1$ view.setConnected(false, false, false); break;
-	 * } }
-	 */
+	private void loadFile(String docbase, Map<String, Object> doc) {
+		final String loc = (String) doc.get(Preferences.FLD_LOCATION);
+		if (loc.contains(":/") || StringTool.isNothing(loc)) {
+			lucinda.get((String) doc.get(Preferences.FLD_ID), result -> {
+				try {
+					if (result.get("status").equals("ok")) { //$NON-NLS-1$ //$NON-NLS-2$
+						byte[] contents = (byte[]) result.get("result"); //$NON-NLS-1$
+						String ext = FileTool.getExtension(loc); // $NON-NLS-1$
+						File temp = File.createTempFile("lucinda_", "." + ext); //$NON-NLS-1$ //$NON-NLS-2$
+						temp.deleteOnExit();
+						FileTool.writeFile(temp, contents);
+						asyncRunViewer(temp.getAbsolutePath());
+					} else {
+						throw (new Exception("Could not fetch file contents " + result.get("message")));
+					}
+				} catch (Exception ex) {
+					ExHandler.handle(ex);
+					SWTHelper.showError(Messages.Controller_could_not_launch_file, ex.getMessage());
 
-	public void launchViewerForDocument(byte[] cnt, String ext) {
+				}
+			});
+		} else {
+			if (!loc.startsWith("/") && !loc.contains(":\\")) {
+				if (!docbase.endsWith(File.separator)) {
+					docbase += File.separator;
+				}
+				asyncRunViewer(docbase + loc);
+			} else {
+				asyncRunViewer(loc);
+			}
+		}
+	}
+
+	private void asyncRunViewer(String filepath) {
 		Display.getDefault().asyncExec(new Runnable() {
 
 			@Override
 			public void run() {
 				try {
+					String ext = FileTool.getExtension(filepath); // $NON-NLS-1$
 
-					File temp = File.createTempFile("lucinda_", "." + ext); //$NON-NLS-1$ //$NON-NLS-2$
-					temp.deleteOnExit();
-					FileTool.writeFile(temp, cnt);
 					Program proggie = Program.findProgram(ext);
 					if (proggie != null) {
-						proggie.execute(temp.getAbsolutePath());
+						proggie.execute(filepath);
 					} else {
-						if (Program.launch(temp.getAbsolutePath()) == false) {
-							Runtime.getRuntime().exec(temp.getAbsolutePath());
+						if (Program.launch(filepath) == false) {
+							Runtime.getRuntime().exec(filepath);
 						}
 					}
 
@@ -330,6 +346,7 @@ public class Controller implements IProgressController {
 
 	}
 
+	
 	/**
 	 * Launch a script to acquire a document from the scanner
 	 * 
@@ -440,9 +457,9 @@ public class Controller implements IProgressController {
 		if (bRestrictCurrentPatient) {
 			Text text = view.getSearchField();
 			String q = text.getText();
-			/*if (q.isEmpty()) {
-				text.setText(""); //$NON-NLS-1$
-			}*/
+			/*
+			 * if (q.isEmpty()) { text.setText(""); //$NON-NLS-1$ }
+			 */
 			runQuery(q);
 		}
 	}
