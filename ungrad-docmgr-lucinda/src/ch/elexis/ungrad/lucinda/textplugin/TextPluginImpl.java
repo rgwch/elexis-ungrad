@@ -6,25 +6,23 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 
 import ch.elexis.core.data.interfaces.text.ReplaceCallback;
 import ch.elexis.core.ui.text.ITextPlugin;
 
+
 public class TextPluginImpl implements ITextPlugin {
 
 	private Composite comp;
 	private Label filename_label;
-
+	private List openFiles;
+	private boolean bSaveOnFocusLost=false;
+	private PageFormat format;
+	
 
 	@Override
 	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2) throws CoreException {
@@ -34,14 +32,12 @@ public class TextPluginImpl implements ITextPlugin {
 
 	@Override
 	public PageFormat getFormat() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.format;
 	}
 
 	@Override
 	public void setFormat(PageFormat f) {
-		// TODO Auto-generated method stub
-
+		this.format=f;
 	}
 
 	@Override
@@ -60,7 +56,7 @@ public class TextPluginImpl implements ITextPlugin {
 			layout.fill = false;
 			layout.justify = false;
 			comp.setLayout(layout);
-			
+			openFiles=new List(comp, SWT.SINGLE);
 			/*
 			RowData data = new RowData();
 			filename_label = new Label(comp, SWT.PUSH);
@@ -114,13 +110,13 @@ public class TextPluginImpl implements ITextPlugin {
 
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
+		this.comp.setFocus();
 
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
+		this.comp.dispose();
 
 	}
 
