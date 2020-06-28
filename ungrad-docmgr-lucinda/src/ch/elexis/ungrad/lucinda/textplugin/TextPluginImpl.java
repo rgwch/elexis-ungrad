@@ -32,7 +32,7 @@ import ch.elexis.data.Patient;
 
 public class TextPluginImpl implements ITextPlugin {
 
-	private static final String pluginID = "ch.elexis.ungrad.docmgr-lucinda";
+	public static final String pluginID = "ch.elexis.ungrad.docmgr-lucinda";
 	private Composite comp;
 	private Label filename_label;
 	private File file;
@@ -41,7 +41,7 @@ public class TextPluginImpl implements ITextPlugin {
 	private PageFormat format;
 	
 	private static Logger logger = LoggerFactory.getLogger(pluginID);
-	private Process editor_process;
+	
 	private OdtHandler odt=new OdtHandler(this);
 	
 	@Override
@@ -151,16 +151,7 @@ public class TextPluginImpl implements ITextPlugin {
 		return loadFromStream(stream, asTemplate);
 	}
 
-	private boolean editorRunning(){
-		if (editor_process == null)
-			return false;
-		try {
-			int exitValue = editor_process.exitValue();
-			return false;
-		} catch (IllegalThreadStateException e) {
-			return true;
-		}
-	}
+		
 
 	/**
 	 * Sicherstellen dass kein Editor geoeffnet ist. Falls einer geoeffnet ist, wird eine
@@ -175,7 +166,7 @@ public class TextPluginImpl implements ITextPlugin {
 				+ actPatient.getName().toString());
 		}
 		
-		while (editorRunning()) {
+		while (odt.editorRunning()) {
 			logger.info("Editor already opened file " + file.getAbsolutePath());
 			SWTHelper
 				.showError(
@@ -195,6 +186,7 @@ public class TextPluginImpl implements ITextPlugin {
 	
 	@Override
 	public boolean loadFromStream(InputStream is, boolean asTemplate) {
+		/*
 		logger.info("loadFromStream: " + (file != null));
 		if (!ensureClosed()) {
 			return false;
@@ -218,8 +210,8 @@ public class TextPluginImpl implements ITextPlugin {
 			logger.info("loadFromStream: loading document failed ");
 			return false;
 		}
-		
-		return true;
+		*/
+		return false;
 	}
 
 	@Override
@@ -260,6 +252,7 @@ public class TextPluginImpl implements ITextPlugin {
 
 	@Override
 	public Object insertText(String marke, String text, int adjust) {
+		/*
 		if (!ensureClosed() || file == null) {
 			return null;
 		}
@@ -287,10 +280,13 @@ public class TextPluginImpl implements ITextPlugin {
 			e.printStackTrace();
 			return null;
 		}
+		*/
+		return null;
 	}
 
 	@Override
 	public Object insertText(Object pos, String text, int adjust) {
+		/*
 		if (!ensureClosed() || file == null || pos == null) {
 			return null;
 		}
@@ -324,6 +320,8 @@ public class TextPluginImpl implements ITextPlugin {
 			e.printStackTrace();
 			return null;
 		}
+		*/
+		return null;
 	}
 
 	@Override
