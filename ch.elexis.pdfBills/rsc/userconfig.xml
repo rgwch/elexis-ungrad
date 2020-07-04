@@ -1,0 +1,18 @@
+<fop version="1.0">
+  <base>!PATH!</base>	
+  <renderers>
+    <renderer mime="application/pdf">
+      <fonts>
+        <font  metrics-url="!PATH!ocrb.xml"  
+               kerning="yes" 
+               embed-url="!PATH!ocrb.pfb">
+          <font-triplet name="OCRB10PitchBT-Regular" style="normal" weight="normal"/>
+        </font>
+        <!-- 
+        <directory>rsc</directory>
+        -->
+      </fonts>
+      
+	</renderer>
+  </renderers>	
+</fop>  
