@@ -78,7 +78,8 @@ public class BillDetails {
 			throw new BadParameterException("Bank was not valid", 2);
 		}
 		checkNull(rn.getNr(), "Bill Number");
-		qrIBAN = StringTool.pad(StringTool.LEFT, '0', StringTool.addModulo10(rn.getNr()), 27);
+		qrIBAN = StringTool.pad(StringTool.LEFT, '0', rn.getNr(), 26);
+		qrIBAN = StringTool.addModulo10(qrIBAN);
 		checkNull(biller.getPostAnschrift(), "Postanschrift");
 		biller_address = biller.getPostAnschrift(true).trim().replaceAll("\\r", "").replaceAll("\\n+", "<br />");
 		checkNull(adressat.getPostAnschrift(), "Postanschrift");
