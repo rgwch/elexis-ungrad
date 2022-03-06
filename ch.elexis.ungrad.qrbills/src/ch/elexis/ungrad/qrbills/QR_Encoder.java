@@ -37,7 +37,7 @@ public class QR_Encoder {
 		*/
 		final PaymentPartReceipt ppr=QrInvoicePaymentPartReceiptCreator.create()
 				.qrInvoice(qr)
-				.outputFormat(OutputFormat.PNG)
+				.outputFormat(OutputFormat.PDF)
 				.fontFamily(FontFamily.LIBERATION_SANS)
 				.locale(Locale.GERMAN)
 				.createPaymentPartReceipt();
