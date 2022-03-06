@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 by G. Weirich
+ * Copyright (c) 2018-2022 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -155,7 +155,7 @@ public class QR_Outputter implements IRnOutputter {
 		if (res.isOK()) {
 			SWTHelper.showInfo("Ausgabe beendet", rnn.size() + " QR-Rechnung(en) wurde(n) ausgegeben");
 		} else {
-			SWTHelper.showError("QR-Outout", "Fehler bei der Rechnungsausgabe", res.toString());
+			SWTHelper.showError("QR-Output", "Fehler bei der Rechnungsausgabe", res.toString());
 
 		}
 		return res;
