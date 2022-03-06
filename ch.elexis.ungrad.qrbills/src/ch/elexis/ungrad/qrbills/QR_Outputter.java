@@ -119,7 +119,8 @@ public class QR_Outputter implements IRnOutputter {
 	@Override
 	public Result<Rechnung> doOutput(TYPE type, Collection<Rechnung> rnn, Properties props) {
 		Result<Rechnung> res = new Result<Rechnung>();
-		QR_Generator qr = new QR_Generator();
+		// QR_Generator qr = new QR_Generator();
+		QR_Encoder qr=new QR_Encoder();
 		String template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 				+ File.separator + "qrbill_template_page1.html";
 		File templateFile = new File(template);
@@ -130,6 +131,9 @@ public class QR_Outputter implements IRnOutputter {
 				try {
 					BillDetails bill = new BillDetails(rn);
 					replacer.put("Adressat", bill.adressat);
+					replacer.put("Mandant",bill.biller);
+					replacer.put("Patient",bill.patient);
+					replacer.put("Rechnung",rn);
 					Resolver resolver = new Resolver(replacer, true);
 
 					String cookedHTML = resolver.resolve(rawHTML);
