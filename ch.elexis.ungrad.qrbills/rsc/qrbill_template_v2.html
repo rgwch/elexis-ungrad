@@ -52,7 +52,7 @@
             background-color: lightgray;
         }
 
-        /* The Text "Zahlteil QR-Rechnung" */
+        /* The Text "Zahlteil" */
         #payment_slip_title {
             position: absolute;
             font-size: 11pt;
@@ -68,7 +68,6 @@
             top: 20mm;
             width: 47mm;
             height: 47mm;
-            border: solid red 2px;
         }
 
         /** Currency and amount */
@@ -84,6 +83,21 @@
             position: absolute;
             left: 57mm;
             top: 5mm;
+        }
+
+        /* Font for headings in the payment slip */
+        .payment_slip_heading {
+            font-size: 8pt;
+            font-weight: bold;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        /* Font for Text in the payment slip */
+        .payment_slip_default {
+            font-size: 10pt;
+            padding-top: 0;
+            margin-top: 0;
         }
 
 
@@ -154,12 +168,12 @@
             </div>
 
             <div id="payment_slip_details">
-                <p class="payment_slip_heading">Konto / zahlbar an</p>
+                <p class="payment_slip_heading">Konto / Zahlbar an</p>
                 <p class="payment_slip_default">[IBAN]</p>
                 <p class="payment_slip_default">[BILLER]</p>
                 <p class="payment_slip_heading">Referenz</p>
                 <p class="payment_slip_default">[ESRLINE]</p>
-                <p class="payment_slip_heading">Zahlungspflichtiger</p>
+                <p class="payment_slip_heading">Zahlbar durch</p>
                 <p class="payment_slip_default">[ADDRESSEE]</p>
                 <p class="payment_slip_heading">Zahlbar bis</p>
                 <p class="payment_slip_default">[DUE]</p>
