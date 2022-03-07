@@ -27,14 +27,14 @@ public class QR_Encoder {
 						.addressLine2(bill.biller.get(Kontakt.FLD_ZIP) + " " + bill.biller.get(Kontakt.FLD_PLACE))
 						.country("CH"))
 				.paymentReference(r -> r.qrReference(bill.qrIBAN)).build();
-		/*
+		
 		final QrCode qrCode = QrInvoiceCodeCreator.create()
 				.qrInvoice(qr)
 				.outputFormat(OutputFormat.SVG)
 				.desiredQrCodeSize(500)
 				.createQrCode();
 		final byte[] image = qrCode.getData();
-		*/
+		/*
 		final PaymentPartReceipt ppr=QrInvoicePaymentPartReceiptCreator.create()
 				.qrInvoice(qr)
 				.outputFormat(OutputFormat.PDF)
@@ -43,6 +43,7 @@ public class QR_Encoder {
 				.createPaymentPartReceipt();
 		//return new String(image,"utf-8");
 		final byte[] image=ppr.getData();
+		*/
 		return new String(image,"utf-8");
 	}
 }
