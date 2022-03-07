@@ -9,7 +9,7 @@
   Only the lowermost part with the payment slip must be exactly like this. The rest of the paper
   is user-designable.
 
-  (c) 2018-2020 by G. Weirich
+  (c) 2018-2022 by G. Weirich
   You may use and modify this template freely, but there is no warranty of any kind that is is 
   correct and that the output will be accepted by authorities. YMMV.
 -->
@@ -21,10 +21,10 @@
   <style>
     @page {
       size: A4 portrait;
-      margin-top:5mm;
-      margin-left:5mm;
-      margin-bottom:2mm;
-      margin-right: 2mm;
+      margin-top:0mm;
+      margin-left:0mm;
+      margin-bottom:0mm;
+      margin-right: 0mm;
     }
   
     /* the outermost div */
@@ -41,6 +41,7 @@
     #header {
       color: green;
       text-align: center;
+      margin-top: 5mm;
       padding-bottom: 0;
       padding-top: 0;
     }
@@ -176,7 +177,7 @@
       margin-top: 0;
     }
 
-    /* Test purposes: Print the page and measure, if the rectagle ist exactly 10x10 cm */
+    /* Test purposes: Print the page and measure, if the rectangle is exactly 10x10 cm */
     .rectangle{
             position:absolute; 
             left:20mm; 
@@ -289,7 +290,7 @@
         
       </div>
     </div>
-    <!-- div class="rectangle"></div -->
+    <div class="rectangle"></div>
   </div>
 </body>
 
