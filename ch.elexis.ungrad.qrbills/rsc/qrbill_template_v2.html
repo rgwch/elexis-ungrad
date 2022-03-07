@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin-top: 0;
+            margin-left: 0;
+            margin-bottom: 0;
+            margin-right: 0;
+        }
+
+        #container {
+            box-sizing: border-box;
+            position: absolute;
+            font-size: 10pt;
+            left: 0;
+            top: 0;
+            width: 210mm;
+            height: 297mm;
+        }
+
+        .rectangle {
+            position: absolute;
+            border-color: black;
+            border-style: solid;
+            border-width: 2px;
+            width: 100mm;
+            height: 100mm;
+            top: 20mm;
+            left: 40mm;
+        }
+
+        #payment_slip {
+            position: absolute;
+            width: 148mm;
+            height: 105mm;
+            left: 62mm;
+            bottom: 0;
+            border-left-color: black;
+            border-left-style: dashed;
+            border-top-style: dashed;
+            border-top-color: black;
+            border-top-width: 1px;
+            border-left-width: 1px;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: lightgray;
+        }
+
+        /* The Text "Zahlteil QR-Rechnung" */
+        #payment_slip_title {
+            position: absolute;
+            font-size: 11pt;
+            font-weight: bold;
+            top: 5mm;
+            left: 5mm;
+            height: 10mm;
+        }
+
+        #payment_slip_qrzone {
+            position: absolute;
+            left: 5mm;
+            top: 20mm;
+            width: 47mm;
+            height: 47mm;
+            border: solid red 2px;
+        }
+
+        /** Currency and amount */
+        #payment_slip_amount {
+            position: absolute;
+            left: 5mm;
+            top: 72mm;
+            height: 15mm;
+        }
+
+        /* Right side of the payment slip */
+        #payment_slip_details {
+            position: absolute;
+            left: 57mm;
+            top: 5mm;
+        }
+
+
+        #receive_slip {
+            position: absolute;
+            width: 62mm;
+            height: 105mm;
+            left: 0mm;
+            bottom: 0;
+            border-top: black dashed 1px;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: gray;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="receive_slip"></div>
+        <div id="payment_slip">
+            <div id="payment_slip_title">
+                Zahlteil
+            </div>
+            <div id="payment_slip_qrzone">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 49 49" stroke="none">
+                    <style type="text/css">
+                        .black {
+                            fill: #000000;
+                        }
+
+                        .white {
+                            fill: #FFFFFF;
+                        }
+
+                        .whitestroke {
+                            fill: none;
+                            stroke: #FFFFFF;
+                            stroke-width: 1.4357;
+                            stroke-miterlimit: 10;
+                        }
+                    </style>
+                    <defs>
+                        <g id="swisscross" class="swisscrossbox" transform="scale(0.35353535353535354)">
+                            <polygon
+                                points="18.3,0.7 1.6,0.7 0.7,0.7 0.7,1.6 0.7,18.3 0.7,19.1 1.6,19.1 18.3,19.1 19.1,19.1 19.1,18.3 19.1,1.6 19.1,0.7 " />
+                            <rect x="8.3" y="4" class="white" width="3.3" height="11" />
+                            <rect x="4.4" y="7.9" class="white" width="11" height="3.3" />
+                            <polygon class="whitestroke"
+                                points="0.7,1.6 0.7,18.3 0.7,19.1 1.6,19.1 18.3,19.1 19.1,19.1 19.1,18.3 19.1,1.6 19.1,0.7 18.3,0.7 1.6,0.7 0.7,0.7 " />
+                        </g>
+                    </defs>
+                    <path class="black"
+                        d=" M0,0h1v1h-1z M1,0h1v1h-1z M2,0h1v1h-1z M3,0h1v1h-1z M4,0h1v1h-1z M5,0h1v1h-1z M6,0h1v1h-1z M10,0h1v1h-1z M13,0h1v1h-1z M16,0h1v1h-1z M17,0h1v1h-1z M19,0h1v1h-1z M20,0h1v1h-1z M22,0h1v1h-1z M23,0h1v1h-1z M27,0h1v1h-1z M30,0h1v1h-1z M31,0h1v1h-1z M34,0h1v1h-1z M35,0h1v1h-1z M40,0h1v1h-1z M42,0h1v1h-1z M43,0h1v1h-1z M44,0h1v1h-1z M45,0h1v1h-1z M46,0h1v1h-1z M47,0h1v1h-1z M48,0h1v1h-1z M0,1h1v1h-1z M6,1h1v1h-1z M10,1h1v1h-1z M11,1h1v1h-1z M16,1h1v1h-1z M17,1h1v1h-1z M18,1h1v1h-1z M20,1h1v1h-1z M21,1h1v1h-1z M22,1h1v1h-1z M23,1h1v1h-1z M27,1h1v1h-1z M28,1h1v1h-1z M29,1h1v1h-1z M33,1h1v1h-1z M34,1h1v1h-1z M35,1h1v1h-1z M38,1h1v1h-1z M39,1h1v1h-1z M40,1h1v1h-1z M42,1h1v1h-1z M48,1h1v1h-1z M0,2h1v1h-1z M2,2h1v1h-1z M3,2h1v1h-1z M4,2h1v1h-1z M6,2h1v1h-1z M9,2h1v1h-1z M10,2h1v1h-1z M13,2h1v1h-1z M17,2h1v1h-1z M18,2h1v1h-1z M20,2h1v1h-1z M22,2h1v1h-1z M24,2h1v1h-1z M28,2h1v1h-1z M29,2h1v1h-1z M30,2h1v1h-1z M31,2h1v1h-1z M34,2h1v1h-1z M35,2h1v1h-1z M37,2h1v1h-1z M39,2h1v1h-1z M40,2h1v1h-1z M42,2h1v1h-1z M44,2h1v1h-1z M45,2h1v1h-1z M46,2h1v1h-1z M48,2h1v1h-1z M0,3h1v1h-1z M2,3h1v1h-1z M3,3h1v1h-1z M4,3h1v1h-1z M6,3h1v1h-1z M11,3h1v1h-1z M12,3h1v1h-1z M15,3h1v1h-1z M17,3h1v1h-1z M21,3h1v1h-1z M22,3h1v1h-1z M26,3h1v1h-1z M27,3h1v1h-1z M28,3h1v1h-1z M30,3h1v1h-1z M34,3h1v1h-1z M35,3h1v1h-1z M36,3h1v1h-1z M37,3h1v1h-1z M39,3h1v1h-1z M42,3h1v1h-1z M44,3h1v1h-1z M45,3h1v1h-1z M46,3h1v1h-1z M48,3h1v1h-1z M0,4h1v1h-1z M2,4h1v1h-1z M3,4h1v1h-1z M4,4h1v1h-1z M6,4h1v1h-1z M10,4h1v1h-1z M11,4h1v1h-1z M13,4h1v1h-1z M16,4h1v1h-1z M18,4h1v1h-1z M19,4h1v1h-1z M20,4h1v1h-1z M22,4h1v1h-1z M23,4h1v1h-1z M24,4h1v1h-1z M25,4h1v1h-1z M26,4h1v1h-1z M30,4h1v1h-1z M36,4h1v1h-1z M42,4h1v1h-1z M44,4h1v1h-1z M45,4h1v1h-1z M46,4h1v1h-1z M48,4h1v1h-1z M0,5h1v1h-1z M6,5h1v1h-1z M8,5h1v1h-1z M10,5h1v1h-1z M13,5h1v1h-1z M14,5h1v1h-1z M17,5h1v1h-1z M18,5h1v1h-1z M20,5h1v1h-1z M21,5h1v1h-1z M22,5h1v1h-1z M26,5h1v1h-1z M31,5h1v1h-1z M32,5h1v1h-1z M34,5h1v1h-1z M37,5h1v1h-1z M38,5h1v1h-1z M42,5h1v1h-1z M48,5h1v1h-1z M0,6h1v1h-1z M1,6h1v1h-1z M2,6h1v1h-1z M3,6h1v1h-1z M4,6h1v1h-1z M5,6h1v1h-1z M6,6h1v1h-1z M8,6h1v1h-1z M10,6h1v1h-1z M12,6h1v1h-1z M14,6h1v1h-1z M16,6h1v1h-1z M18,6h1v1h-1z M20,6h1v1h-1z M22,6h1v1h-1z M24,6h1v1h-1z M26,6h1v1h-1z M28,6h1v1h-1z M30,6h1v1h-1z M32,6h1v1h-1z M34,6h1v1h-1z M36,6h1v1h-1z M38,6h1v1h-1z M40,6h1v1h-1z M42,6h1v1h-1z M43,6h1v1h-1z M44,6h1v1h-1z M45,6h1v1h-1z M46,6h1v1h-1z M47,6h1v1h-1z M48,6h1v1h-1z M9,7h1v1h-1z M12,7h1v1h-1z M14,7h1v1h-1z M16,7h1v1h-1z M17,7h1v1h-1z M21,7h1v1h-1z M22,7h1v1h-1z M26,7h1v1h-1z M27,7h1v1h-1z M31,7h1v1h-1z M32,7h1v1h-1z M34,7h1v1h-1z M37,7h1v1h-1z M39,7h1v1h-1z M40,7h1v1h-1z M0,8h1v1h-1z M3,8h1v1h-1z M5,8h1v1h-1z M6,8h1v1h-1z M8,8h1v1h-1z M10,8h1v1h-1z M15,8h1v1h-1z M16,8h1v1h-1z M18,8h1v1h-1z M19,8h1v1h-1z M22,8h1v1h-1z M23,8h1v1h-1z M24,8h1v1h-1z M25,8h1v1h-1z M26,8h1v1h-1z M33,8h1v1h-1z M36,8h1v1h-1z M37,8h1v1h-1z M38,8h1v1h-1z M40,8h1v1h-1z M41,8h1v1h-1z M43,8h1v1h-1z M0,9h1v1h-1z M2,9h1v1h-1z M5,9h1v1h-1z M7,9h1v1h-1z M11,9h1v1h-1z M12,9h1v1h-1z M19,9h1v1h-1z M21,9h1v1h-1z M23,9h1v1h-1z M25,9h1v1h-1z M27,9h1v1h-1z M29,9h1v1h-1z M32,9h1v1h-1z M35,9h1v1h-1z M36,9h1v1h-1z M37,9h1v1h-1z M39,9h1v1h-1z M41,9h1v1h-1z M44,9h1v1h-1z M2,10h1v1h-1z M5,10h1v1h-1z M6,10h1v1h-1z M8,10h1v1h-1z M11,10h1v1h-1z M14,10h1v1h-1z M16,10h1v1h-1z M17,10h1v1h-1z M18,10h1v1h-1z M20,10h1v1h-1z M23,10h1v1h-1z M24,10h1v1h-1z M25,10h1v1h-1z M26,10h1v1h-1z M29,10h1v1h-1z M32,10h1v1h-1z M35,10h1v1h-1z M36,10h1v1h-1z M37,10h1v1h-1z M39,10h1v1h-1z M40,10h1v1h-1z M42,10h1v1h-1z M43,10h1v1h-1z M44,10h1v1h-1z M46,10h1v1h-1z M0,11h1v1h-1z M1,11h1v1h-1z M5,11h1v1h-1z M7,11h1v1h-1z M9,11h1v1h-1z M13,11h1v1h-1z M14,11h1v1h-1z M15,11h1v1h-1z M20,11h1v1h-1z M21,11h1v1h-1z M22,11h1v1h-1z M24,11h1v1h-1z M25,11h1v1h-1z M26,11h1v1h-1z M27,11h1v1h-1z M31,11h1v1h-1z M32,11h1v1h-1z M33,11h1v1h-1z M36,11h1v1h-1z M38,11h1v1h-1z M39,11h1v1h-1z M44,11h1v1h-1z M45,11h1v1h-1z M46,11h1v1h-1z M48,11h1v1h-1z M2,12h1v1h-1z M4,12h1v1h-1z M5,12h1v1h-1z M6,12h1v1h-1z M8,12h1v1h-1z M9,12h1v1h-1z M14,12h1v1h-1z M17,12h1v1h-1z M18,12h1v1h-1z M20,12h1v1h-1z M25,12h1v1h-1z M28,12h1v1h-1z M34,12h1v1h-1z M35,12h1v1h-1z M36,12h1v1h-1z M38,12h1v1h-1z M41,12h1v1h-1z M43,12h1v1h-1z M44,12h1v1h-1z M46,12h1v1h-1z M47,12h1v1h-1z M48,12h1v1h-1z M0,13h1v1h-1z M1,13h1v1h-1z M2,13h1v1h-1z M3,13h1v1h-1z M5,13h1v1h-1z M7,13h1v1h-1z M8,13h1v1h-1z M9,13h1v1h-1z M10,13h1v1h-1z M11,13h1v1h-1z M14,13h1v1h-1z M17,13h1v1h-1z M18,13h1v1h-1z M19,13h1v1h-1z M20,13h1v1h-1z M22,13h1v1h-1z M23,13h1v1h-1z M26,13h1v1h-1z M30,13h1v1h-1z M31,13h1v1h-1z M32,13h1v1h-1z M33,13h1v1h-1z M36,13h1v1h-1z M39,13h1v1h-1z M41,13h1v1h-1z M44,13h1v1h-1z M45,13h1v1h-1z M46,13h1v1h-1z M47,13h1v1h-1z M3,14h1v1h-1z M5,14h1v1h-1z M6,14h1v1h-1z M7,14h1v1h-1z M8,14h1v1h-1z M9,14h1v1h-1z M11,14h1v1h-1z M12,14h1v1h-1z M14,14h1v1h-1z M15,14h1v1h-1z M16,14h1v1h-1z M20,14h1v1h-1z M21,14h1v1h-1z M22,14h1v1h-1z M23,14h1v1h-1z M24,14h1v1h-1z M28,14h1v1h-1z M29,14h1v1h-1z M35,14h1v1h-1z M36,14h1v1h-1z M37,14h1v1h-1z M38,14h1v1h-1z M40,14h1v1h-1z M41,14h1v1h-1z M42,14h1v1h-1z M43,14h1v1h-1z M46,14h1v1h-1z M48,14h1v1h-1z M1,15h1v1h-1z M2,15h1v1h-1z M5,15h1v1h-1z M9,15h1v1h-1z M10,15h1v1h-1z M11,15h1v1h-1z M12,15h1v1h-1z M13,15h1v1h-1z M14,15h1v1h-1z M17,15h1v1h-1z M18,15h1v1h-1z M20,15h1v1h-1z M21,15h1v1h-1z M23,15h1v1h-1z M28,15h1v1h-1z M29,15h1v1h-1z M31,15h1v1h-1z M33,15h1v1h-1z M35,15h1v1h-1z M37,15h1v1h-1z M39,15h1v1h-1z M41,15h1v1h-1z M43,15h1v1h-1z M45,15h1v1h-1z M46,15h1v1h-1z M1,16h1v1h-1z M2,16h1v1h-1z M5,16h1v1h-1z M6,16h1v1h-1z M7,16h1v1h-1z M8,16h1v1h-1z M9,16h1v1h-1z M10,16h1v1h-1z M11,16h1v1h-1z M12,16h1v1h-1z M13,16h1v1h-1z M15,16h1v1h-1z M16,16h1v1h-1z M17,16h1v1h-1z M18,16h1v1h-1z M19,16h1v1h-1z M24,16h1v1h-1z M25,16h1v1h-1z M26,16h1v1h-1z M27,16h1v1h-1z M29,16h1v1h-1z M31,16h1v1h-1z M32,16h1v1h-1z M33,16h1v1h-1z M34,16h1v1h-1z M36,16h1v1h-1z M40,16h1v1h-1z M43,16h1v1h-1z M46,16h1v1h-1z M0,17h1v1h-1z M1,17h1v1h-1z M2,17h1v1h-1z M4,17h1v1h-1z M9,17h1v1h-1z M11,17h1v1h-1z M14,17h1v1h-1z M17,17h1v1h-1z M19,17h1v1h-1z M21,17h1v1h-1z M23,17h1v1h-1z M24,17h1v1h-1z M26,17h1v1h-1z M28,17h1v1h-1z M33,17h1v1h-1z M35,17h1v1h-1z M36,17h1v1h-1z M37,17h1v1h-1z M38,17h1v1h-1z M39,17h1v1h-1z M43,17h1v1h-1z M48,17h1v1h-1z M1,18h1v1h-1z M2,18h1v1h-1z M3,18h1v1h-1z M4,18h1v1h-1z M6,18h1v1h-1z M9,18h1v1h-1z M11,18h1v1h-1z M15,18h1v1h-1z M18,18h1v1h-1z M20,18h1v1h-1z M21,18h1v1h-1z M24,18h1v1h-1z M28,18h1v1h-1z M30,18h1v1h-1z M32,18h1v1h-1z M34,18h1v1h-1z M36,18h1v1h-1z M38,18h1v1h-1z M39,18h1v1h-1z M42,18h1v1h-1z M43,18h1v1h-1z M44,18h1v1h-1z M45,18h1v1h-1z M46,18h1v1h-1z M48,18h1v1h-1z M0,19h1v1h-1z M2,19h1v1h-1z M3,19h1v1h-1z M7,19h1v1h-1z M9,19h1v1h-1z M13,19h1v1h-1z M14,19h1v1h-1z M17,19h1v1h-1z M21,19h1v1h-1z M22,19h1v1h-1z M24,19h1v1h-1z M29,19h1v1h-1z M31,19h1v1h-1z M33,19h1v1h-1z M34,19h1v1h-1z M35,19h1v1h-1z M36,19h1v1h-1z M40,19h1v1h-1z M44,19h1v1h-1z M45,19h1v1h-1z M46,19h1v1h-1z M0,20h1v1h-1z M3,20h1v1h-1z M4,20h1v1h-1z M5,20h1v1h-1z M6,20h1v1h-1z M7,20h1v1h-1z M10,20h1v1h-1z M12,20h1v1h-1z M14,20h1v1h-1z M16,20h1v1h-1z M17,20h1v1h-1z M19,20h1v1h-1z M21,20h1v1h-1z M22,20h1v1h-1z M24,20h1v1h-1z M25,20h1v1h-1z M26,20h1v1h-1z M28,20h1v1h-1z M32,20h1v1h-1z M33,20h1v1h-1z M35,20h1v1h-1z M37,20h1v1h-1z M38,20h1v1h-1z M40,20h1v1h-1z M41,20h1v1h-1z M44,20h1v1h-1z M45,20h1v1h-1z M48,20h1v1h-1z M2,21h1v1h-1z M3,21h1v1h-1z M4,21h1v1h-1z M7,21h1v1h-1z M11,21h1v1h-1z M12,21h1v1h-1z M13,21h1v1h-1z M18,21h1v1h-1z M19,21h1v1h-1z M24,21h1v1h-1z M25,21h1v1h-1z M27,21h1v1h-1z M29,21h1v1h-1z M32,21h1v1h-1z M33,21h1v1h-1z M35,21h1v1h-1z M37,21h1v1h-1z M39,21h1v1h-1z M42,21h1v1h-1z M43,21h1v1h-1z M47,21h1v1h-1z M48,21h1v1h-1z M1,22h1v1h-1z M3,22h1v1h-1z M4,22h1v1h-1z M5,22h1v1h-1z M6,22h1v1h-1z M7,22h1v1h-1z M8,22h1v1h-1z M11,22h1v1h-1z M13,22h1v1h-1z M15,22h1v1h-1z M16,22h1v1h-1z M19,22h1v1h-1z M22,22h1v1h-1z M23,22h1v1h-1z M24,22h1v1h-1z M25,22h1v1h-1z M26,22h1v1h-1z M27,22h1v1h-1z M30,22h1v1h-1z M31,22h1v1h-1z M32,22h1v1h-1z M33,22h1v1h-1z M34,22h1v1h-1z M36,22h1v1h-1z M38,22h1v1h-1z M39,22h1v1h-1z M40,22h1v1h-1z M41,22h1v1h-1z M42,22h1v1h-1z M43,22h1v1h-1z M44,22h1v1h-1z M45,22h1v1h-1z M46,22h1v1h-1z M47,22h1v1h-1z M48,22h1v1h-1z M1,23h1v1h-1z M4,23h1v1h-1z M8,23h1v1h-1z M9,23h1v1h-1z M11,23h1v1h-1z M15,23h1v1h-1z M16,23h1v1h-1z M18,23h1v1h-1z M20,23h1v1h-1z M22,23h1v1h-1z M26,23h1v1h-1z M27,23h1v1h-1z M29,23h1v1h-1z M32,23h1v1h-1z M35,23h1v1h-1z M38,23h1v1h-1z M40,23h1v1h-1z M44,23h1v1h-1z M45,23h1v1h-1z M48,23h1v1h-1z M1,24h1v1h-1z M2,24h1v1h-1z M4,24h1v1h-1z M6,24h1v1h-1z M8,24h1v1h-1z M9,24h1v1h-1z M11,24h1v1h-1z M12,24h1v1h-1z M14,24h1v1h-1z M15,24h1v1h-1z M16,24h1v1h-1z M18,24h1v1h-1z M22,24h1v1h-1z M24,24h1v1h-1z M26,24h1v1h-1z M28,24h1v1h-1z M32,24h1v1h-1z M33,24h1v1h-1z M37,24h1v1h-1z M40,24h1v1h-1z M42,24h1v1h-1z M44,24h1v1h-1z M47,24h1v1h-1z M48,24h1v1h-1z M0,25h1v1h-1z M2,25h1v1h-1z M3,25h1v1h-1z M4,25h1v1h-1z M8,25h1v1h-1z M10,25h1v1h-1z M11,25h1v1h-1z M12,25h1v1h-1z M15,25h1v1h-1z M18,25h1v1h-1z M20,25h1v1h-1z M21,25h1v1h-1z M22,25h1v1h-1z M26,25h1v1h-1z M32,25h1v1h-1z M33,25h1v1h-1z M34,25h1v1h-1z M35,25h1v1h-1z M36,25h1v1h-1z M38,25h1v1h-1z M39,25h1v1h-1z M40,25h1v1h-1z M44,25h1v1h-1z M46,25h1v1h-1z M4,26h1v1h-1z M5,26h1v1h-1z M6,26h1v1h-1z M7,26h1v1h-1z M8,26h1v1h-1z M11,26h1v1h-1z M12,26h1v1h-1z M14,26h1v1h-1z M15,26h1v1h-1z M17,26h1v1h-1z M21,26h1v1h-1z M22,26h1v1h-1z M23,26h1v1h-1z M24,26h1v1h-1z M25,26h1v1h-1z M26,26h1v1h-1z M28,26h1v1h-1z M30,26h1v1h-1z M31,26h1v1h-1z M33,26h1v1h-1z M36,26h1v1h-1z M37,26h1v1h-1z M40,26h1v1h-1z M41,26h1v1h-1z M42,26h1v1h-1z M43,26h1v1h-1z M44,26h1v1h-1z M48,26h1v1h-1z M0,27h1v1h-1z M1,27h1v1h-1z M2,27h1v1h-1z M3,27h1v1h-1z M7,27h1v1h-1z M8,27h1v1h-1z M9,27h1v1h-1z M10,27h1v1h-1z M11,27h1v1h-1z M14,27h1v1h-1z M15,27h1v1h-1z M18,27h1v1h-1z M19,27h1v1h-1z M21,27h1v1h-1z M22,27h1v1h-1z M23,27h1v1h-1z M27,27h1v1h-1z M29,27h1v1h-1z M31,27h1v1h-1z M33,27h1v1h-1z M35,27h1v1h-1z M39,27h1v1h-1z M41,27h1v1h-1z M42,27h1v1h-1z M43,27h1v1h-1z M45,27h1v1h-1z M47,27h1v1h-1z M48,27h1v1h-1z M0,28h1v1h-1z M3,28h1v1h-1z M4,28h1v1h-1z M6,28h1v1h-1z M7,28h1v1h-1z M14,28h1v1h-1z M15,28h1v1h-1z M17,28h1v1h-1z M18,28h1v1h-1z M19,28h1v1h-1z M20,28h1v1h-1z M25,28h1v1h-1z M26,28h1v1h-1z M27,28h1v1h-1z M29,28h1v1h-1z M31,28h1v1h-1z M32,28h1v1h-1z M37,28h1v1h-1z M38,28h1v1h-1z M40,28h1v1h-1z M42,28h1v1h-1z M43,28h1v1h-1z M44,28h1v1h-1z M45,28h1v1h-1z M47,28h1v1h-1z M48,28h1v1h-1z M0,29h1v1h-1z M5,29h1v1h-1z M7,29h1v1h-1z M8,29h1v1h-1z M9,29h1v1h-1z M10,29h1v1h-1z M11,29h1v1h-1z M14,29h1v1h-1z M15,29h1v1h-1z M16,29h1v1h-1z M17,29h1v1h-1z M18,29h1v1h-1z M19,29h1v1h-1z M20,29h1v1h-1z M24,29h1v1h-1z M28,29h1v1h-1z M33,29h1v1h-1z M34,29h1v1h-1z M37,29h1v1h-1z M41,29h1v1h-1z M42,29h1v1h-1z M43,29h1v1h-1z M44,29h1v1h-1z M45,29h1v1h-1z M0,30h1v1h-1z M1,30h1v1h-1z M2,30h1v1h-1z M3,30h1v1h-1z M4,30h1v1h-1z M6,30h1v1h-1z M8,30h1v1h-1z M11,30h1v1h-1z M15,30h1v1h-1z M17,30h1v1h-1z M18,30h1v1h-1z M20,30h1v1h-1z M21,30h1v1h-1z M22,30h1v1h-1z M24,30h1v1h-1z M28,30h1v1h-1z M29,30h1v1h-1z M32,30h1v1h-1z M35,30h1v1h-1z M36,30h1v1h-1z M38,30h1v1h-1z M40,30h1v1h-1z M42,30h1v1h-1z M43,30h1v1h-1z M45,30h1v1h-1z M47,30h1v1h-1z M48,30h1v1h-1z M1,31h1v1h-1z M3,31h1v1h-1z M4,31h1v1h-1z M5,31h1v1h-1z M7,31h1v1h-1z M9,31h1v1h-1z M11,31h1v1h-1z M13,31h1v1h-1z M17,31h1v1h-1z M18,31h1v1h-1z M21,31h1v1h-1z M22,31h1v1h-1z M23,31h1v1h-1z M28,31h1v1h-1z M29,31h1v1h-1z M33,31h1v1h-1z M34,31h1v1h-1z M35,31h1v1h-1z M40,31h1v1h-1z M41,31h1v1h-1z M45,31h1v1h-1z M46,31h1v1h-1z M47,31h1v1h-1z M48,31h1v1h-1z M0,32h1v1h-1z M1,32h1v1h-1z M3,32h1v1h-1z M5,32h1v1h-1z M6,32h1v1h-1z M10,32h1v1h-1z M13,32h1v1h-1z M14,32h1v1h-1z M15,32h1v1h-1z M16,32h1v1h-1z M20,32h1v1h-1z M23,32h1v1h-1z M27,32h1v1h-1z M28,32h1v1h-1z M33,32h1v1h-1z M35,32h1v1h-1z M36,32h1v1h-1z M37,32h1v1h-1z M38,32h1v1h-1z M39,32h1v1h-1z M40,32h1v1h-1z M41,32h1v1h-1z M42,32h1v1h-1z M43,32h1v1h-1z M44,32h1v1h-1z M46,32h1v1h-1z M47,32h1v1h-1z M0,33h1v1h-1z M1,33h1v1h-1z M2,33h1v1h-1z M3,33h1v1h-1z M4,33h1v1h-1z M7,33h1v1h-1z M8,33h1v1h-1z M9,33h1v1h-1z M10,33h1v1h-1z M12,33h1v1h-1z M15,33h1v1h-1z M18,33h1v1h-1z M19,33h1v1h-1z M20,33h1v1h-1z M21,33h1v1h-1z M23,33h1v1h-1z M24,33h1v1h-1z M26,33h1v1h-1z M28,33h1v1h-1z M32,33h1v1h-1z M33,33h1v1h-1z M36,33h1v1h-1z M37,33h1v1h-1z M39,33h1v1h-1z M42,33h1v1h-1z M43,33h1v1h-1z M47,33h1v1h-1z M48,33h1v1h-1z M3,34h1v1h-1z M6,34h1v1h-1z M10,34h1v1h-1z M19,34h1v1h-1z M20,34h1v1h-1z M22,34h1v1h-1z M24,34h1v1h-1z M25,34h1v1h-1z M26,34h1v1h-1z M29,34h1v1h-1z M30,34h1v1h-1z M31,34h1v1h-1z M32,34h1v1h-1z M36,34h1v1h-1z M37,34h1v1h-1z M38,34h1v1h-1z M40,34h1v1h-1z M42,34h1v1h-1z M45,34h1v1h-1z M48,34h1v1h-1z M0,35h1v1h-1z M3,35h1v1h-1z M8,35h1v1h-1z M11,35h1v1h-1z M12,35h1v1h-1z M13,35h1v1h-1z M14,35h1v1h-1z M19,35h1v1h-1z M20,35h1v1h-1z M21,35h1v1h-1z M25,35h1v1h-1z M27,35h1v1h-1z M28,35h1v1h-1z M31,35h1v1h-1z M33,35h1v1h-1z M36,35h1v1h-1z M37,35h1v1h-1z M38,35h1v1h-1z M39,35h1v1h-1z M40,35h1v1h-1z M42,35h1v1h-1z M44,35h1v1h-1z M45,35h1v1h-1z M47,35h1v1h-1z M2,36h1v1h-1z M3,36h1v1h-1z M6,36h1v1h-1z M8,36h1v1h-1z M9,36h1v1h-1z M10,36h1v1h-1z M11,36h1v1h-1z M16,36h1v1h-1z M18,36h1v1h-1z M20,36h1v1h-1z M22,36h1v1h-1z M24,36h1v1h-1z M26,36h1v1h-1z M29,36h1v1h-1z M33,36h1v1h-1z M38,36h1v1h-1z M40,36h1v1h-1z M41,36h1v1h-1z M42,36h1v1h-1z M43,36h1v1h-1z M46,36h1v1h-1z M47,36h1v1h-1z M48,36h1v1h-1z M1,37h1v1h-1z M2,37h1v1h-1z M3,37h1v1h-1z M8,37h1v1h-1z M10,37h1v1h-1z M11,37h1v1h-1z M12,37h1v1h-1z M13,37h1v1h-1z M14,37h1v1h-1z M16,37h1v1h-1z M18,37h1v1h-1z M20,37h1v1h-1z M22,37h1v1h-1z M23,37h1v1h-1z M27,37h1v1h-1z M28,37h1v1h-1z M33,37h1v1h-1z M34,37h1v1h-1z M35,37h1v1h-1z M38,37h1v1h-1z M41,37h1v1h-1z M46,37h1v1h-1z M47,37h1v1h-1z M48,37h1v1h-1z M1,38h1v1h-1z M5,38h1v1h-1z M6,38h1v1h-1z M7,38h1v1h-1z M9,38h1v1h-1z M11,38h1v1h-1z M12,38h1v1h-1z M14,38h1v1h-1z M15,38h1v1h-1z M18,38h1v1h-1z M20,38h1v1h-1z M21,38h1v1h-1z M22,38h1v1h-1z M26,38h1v1h-1z M28,38h1v1h-1z M29,38h1v1h-1z M30,38h1v1h-1z M34,38h1v1h-1z M35,38h1v1h-1z M36,38h1v1h-1z M38,38h1v1h-1z M40,38h1v1h-1z M42,38h1v1h-1z M44,38h1v1h-1z M48,38h1v1h-1z M1,39h1v1h-1z M2,39h1v1h-1z M3,39h1v1h-1z M9,39h1v1h-1z M12,39h1v1h-1z M14,39h1v1h-1z M16,39h1v1h-1z M21,39h1v1h-1z M23,39h1v1h-1z M25,39h1v1h-1z M26,39h1v1h-1z M28,39h1v1h-1z M29,39h1v1h-1z M31,39h1v1h-1z M32,39h1v1h-1z M35,39h1v1h-1z M36,39h1v1h-1z M37,39h1v1h-1z M39,39h1v1h-1z M42,39h1v1h-1z M45,39h1v1h-1z M46,39h1v1h-1z M47,39h1v1h-1z M48,39h1v1h-1z M0,40h1v1h-1z M1,40h1v1h-1z M2,40h1v1h-1z M6,40h1v1h-1z M7,40h1v1h-1z M8,40h1v1h-1z M9,40h1v1h-1z M10,40h1v1h-1z M11,40h1v1h-1z M13,40h1v1h-1z M15,40h1v1h-1z M18,40h1v1h-1z M21,40h1v1h-1z M22,40h1v1h-1z M23,40h1v1h-1z M24,40h1v1h-1z M25,40h1v1h-1z M26,40h1v1h-1z M31,40h1v1h-1z M32,40h1v1h-1z M33,40h1v1h-1z M34,40h1v1h-1z M36,40h1v1h-1z M37,40h1v1h-1z M38,40h1v1h-1z M40,40h1v1h-1z M41,40h1v1h-1z M42,40h1v1h-1z M43,40h1v1h-1z M44,40h1v1h-1z M45,40h1v1h-1z M47,40h1v1h-1z M48,40h1v1h-1z M8,41h1v1h-1z M14,41h1v1h-1z M17,41h1v1h-1z M18,41h1v1h-1z M19,41h1v1h-1z M22,41h1v1h-1z M26,41h1v1h-1z M28,41h1v1h-1z M35,41h1v1h-1z M37,41h1v1h-1z M40,41h1v1h-1z M44,41h1v1h-1z M47,41h1v1h-1z M48,41h1v1h-1z M0,42h1v1h-1z M1,42h1v1h-1z M2,42h1v1h-1z M3,42h1v1h-1z M4,42h1v1h-1z M5,42h1v1h-1z M6,42h1v1h-1z M9,42h1v1h-1z M11,42h1v1h-1z M13,42h1v1h-1z M17,42h1v1h-1z M20,42h1v1h-1z M22,42h1v1h-1z M24,42h1v1h-1z M26,42h1v1h-1z M28,42h1v1h-1z M30,42h1v1h-1z M31,42h1v1h-1z M32,42h1v1h-1z M34,42h1v1h-1z M35,42h1v1h-1z M36,42h1v1h-1z M39,42h1v1h-1z M40,42h1v1h-1z M42,42h1v1h-1z M44,42h1v1h-1z M45,42h1v1h-1z M47,42h1v1h-1z M48,42h1v1h-1z M0,43h1v1h-1z M6,43h1v1h-1z M8,43h1v1h-1z M13,43h1v1h-1z M14,43h1v1h-1z M19,43h1v1h-1z M21,43h1v1h-1z M22,43h1v1h-1z M26,43h1v1h-1z M28,43h1v1h-1z M29,43h1v1h-1z M33,43h1v1h-1z M34,43h1v1h-1z M36,43h1v1h-1z M39,43h1v1h-1z M40,43h1v1h-1z M44,43h1v1h-1z M46,43h1v1h-1z M0,44h1v1h-1z M2,44h1v1h-1z M3,44h1v1h-1z M4,44h1v1h-1z M6,44h1v1h-1z M9,44h1v1h-1z M11,44h1v1h-1z M12,44h1v1h-1z M13,44h1v1h-1z M17,44h1v1h-1z M20,44h1v1h-1z M22,44h1v1h-1z M23,44h1v1h-1z M24,44h1v1h-1z M25,44h1v1h-1z M26,44h1v1h-1z M28,44h1v1h-1z M32,44h1v1h-1z M34,44h1v1h-1z M35,44h1v1h-1z M36,44h1v1h-1z M40,44h1v1h-1z M41,44h1v1h-1z M42,44h1v1h-1z M43,44h1v1h-1z M44,44h1v1h-1z M45,44h1v1h-1z M46,44h1v1h-1z M48,44h1v1h-1z M0,45h1v1h-1z M2,45h1v1h-1z M3,45h1v1h-1z M4,45h1v1h-1z M6,45h1v1h-1z M8,45h1v1h-1z M9,45h1v1h-1z M14,45h1v1h-1z M15,45h1v1h-1z M19,45h1v1h-1z M20,45h1v1h-1z M22,45h1v1h-1z M23,45h1v1h-1z M25,45h1v1h-1z M28,45h1v1h-1z M29,45h1v1h-1z M32,45h1v1h-1z M33,45h1v1h-1z M34,45h1v1h-1z M35,45h1v1h-1z M37,45h1v1h-1z M38,45h1v1h-1z M39,45h1v1h-1z M41,45h1v1h-1z M44,45h1v1h-1z M45,45h1v1h-1z M0,46h1v1h-1z M2,46h1v1h-1z M3,46h1v1h-1z M4,46h1v1h-1z M6,46h1v1h-1z M9,46h1v1h-1z M13,46h1v1h-1z M14,46h1v1h-1z M16,46h1v1h-1z M19,46h1v1h-1z M20,46h1v1h-1z M23,46h1v1h-1z M24,46h1v1h-1z M25,46h1v1h-1z M26,46h1v1h-1z M30,46h1v1h-1z M31,46h1v1h-1z M32,46h1v1h-1z M34,46h1v1h-1z M35,46h1v1h-1z M36,46h1v1h-1z M37,46h1v1h-1z M42,46h1v1h-1z M43,46h1v1h-1z M44,46h1v1h-1z M45,46h1v1h-1z M46,46h1v1h-1z M48,46h1v1h-1z M0,47h1v1h-1z M6,47h1v1h-1z M10,47h1v1h-1z M12,47h1v1h-1z M14,47h1v1h-1z M17,47h1v1h-1z M19,47h1v1h-1z M20,47h1v1h-1z M21,47h1v1h-1z M23,47h1v1h-1z M24,47h1v1h-1z M25,47h1v1h-1z M28,47h1v1h-1z M31,47h1v1h-1z M32,47h1v1h-1z M33,47h1v1h-1z M37,47h1v1h-1z M38,47h1v1h-1z M40,47h1v1h-1z M42,47h1v1h-1z M43,47h1v1h-1z M44,47h1v1h-1z M45,47h1v1h-1z M47,47h1v1h-1z M48,47h1v1h-1z M0,48h1v1h-1z M1,48h1v1h-1z M2,48h1v1h-1z M3,48h1v1h-1z M4,48h1v1h-1z M5,48h1v1h-1z M6,48h1v1h-1z M8,48h1v1h-1z M9,48h1v1h-1z M10,48h1v1h-1z M11,48h1v1h-1z M14,48h1v1h-1z M16,48h1v1h-1z M17,48h1v1h-1z M18,48h1v1h-1z M24,48h1v1h-1z M28,48h1v1h-1z M29,48h1v1h-1z M32,48h1v1h-1z M33,48h1v1h-1z M36,48h1v1h-1z M37,48h1v1h-1z M40,48h1v1h-1z M43,48h1v1h-1z M44,48h1v1h-1z M46,48h1v1h-1z M47,48h1v1h-1z M48,48h1v1h-1z" />
+                    <use href="#swisscross" transform="translate(21,21)" />
+                </svg>
+            </div>
+            <div id="payment_slip_amount">
+                <table>
+                    <tr class="payment_slip_heading">
+                        <td style="padding-right:5px;">Währung</td>
+                        <td style="padding-left:5px;">Betrag</td>
+                    </tr>
+                    <tr class="payment_slip_default">
+                        <td style="padding-right:5px;">[CURRENCY]</td>
+                        <td style="padding-left:5px;">[AMOUNT]</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="payment_slip_details">
+                <p class="payment_slip_heading">Konto / zahlbar an</p>
+                <p class="payment_slip_default">[IBAN]</p>
+                <p class="payment_slip_default">[BILLER]</p>
+                <p class="payment_slip_heading">Referenz</p>
+                <p class="payment_slip_default">[ESRLINE]</p>
+                <p class="payment_slip_heading">Zahlungspflichtiger</p>
+                <p class="payment_slip_default">[ADDRESSEE]</p>
+                <p class="payment_slip_heading">Zahlbar bis</p>
+                <p class="payment_slip_default">[DUE]</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -21,23 +21,24 @@
   <style>
     @page {
       size: A4 portrait;
-      margin-top:5mm;
-      margin-left:5mm;
-      margin-bottom:2mm;
+      margin-top: 5mm;
+      margin-left: 5mm;
+      margin-bottom: 2mm;
       margin-right: 2mm;
     }
-  
+
     /* the outermost div */
     #container {
+      box-sizing: content-box;
       position: absolute;
       font-size: 10pt;
-      left:0;
-      top:0;
+      left: 0;
+      top: 0;
       width: 210mm;
       height: 297mm;
     }
 
-    /* The heading with sender informations and practice logo*/ 
+    /* The heading with sender informations and practice logo*/
     #header {
       color: green;
       text-align: center;
@@ -51,7 +52,7 @@
       padding-bottom: 0;
     }
 
-  /* Make tables more compact */
+    /* Make tables more compact */
     table,
     tr,
     td {
@@ -103,7 +104,7 @@
     /* The payment slip must be A6 and located in the lower right edge of the page 
         It must be separated with lines or perforations from the rest of the document. 
         Only sans-serif fonts between 9 and 11pt are acceptable.             */
-        
+
     #payment_slip {
       position: absolute;
       width: 148mm;
@@ -111,7 +112,7 @@
       right: 0;
       bottom: 0;
       border-left-color: black;
-      border-left-style:dashed;
+      border-left-style: dashed;
       border-top-style: dashed;
       border-top-color: black;
       border-top-width: 1px;
@@ -163,7 +164,7 @@
 
     /* Font for headings in the payment slip */
     .payment_slip_heading {
-      font-size: 9pt;
+      font-size: 8pt;
       font-weight: bold;
       padding-bottom: 0;
       margin-bottom: 0;
@@ -171,21 +172,21 @@
 
     /* Font for Text in the payment slip */
     .payment_slip_default {
-      font-size: 11pt;
+      font-size: 10pt;
       padding-top: 0;
       margin-top: 0;
     }
 
     /* Test purposes: Print the page and measure, if the rectagle ist exactly 10x10 cm */
-    .rectangle{
-            position:absolute; 
-            left:20mm; 
-            top:20mm; 
-            width:100mm; 
-            height:100mm; 
-            border-style:solid;
-            border-width:1px;
-        }
+    .rectangle {
+      position: absolute;
+      left: 20mm;
+      top: 20mm;
+      width: 100mm;
+      height: 100mm;
+      border-style: solid;
+      border-width: 1px;
+    }
   </style>
 </head>
 
@@ -246,7 +247,8 @@
 
     <div id="maintext">
       <h1>Honorar-Rechnung</h1>
-      <p>Diese Seite ist für Ihre Unterlagen bestimmt. Bitte senden Sie den beiliegenden Rückerstattungs-Beleg an Ihre Krankenkasse.
+      <p>Diese Seite ist für Ihre Unterlagen bestimmt. Bitte senden Sie den beiliegenden Rückerstattungs-Beleg an Ihre
+        Krankenkasse.
         Bitte um Begleichung innert 30 Tagen.
       </p>
     </div>
@@ -285,11 +287,11 @@
         <p class="payment_slip_default">[ADDRESSEE]</p>
         <p class="payment_slip_heading">Zahlbar bis</p>
         <p class="payment_slip_default">[DUE]</p>
-      
-        
+
+
       </div>
     </div>
-    <!-- div class="rectangle"></div -->
+    <div class="rectangle"></div>
   </div>
 </body>
 
