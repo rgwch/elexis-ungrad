@@ -122,7 +122,7 @@ public class QR_Outputter implements IRnOutputter {
 		// QR_Generator qr = new QR_Generator();
 		QR_Encoder qr=new QR_Encoder();
 		String template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
-				+ File.separator + "qrbill_template_page1.html";
+				+ File.separator + "qrbill_template_v2.html";
 		File templateFile = new File(template);
 		try {
 			String rawHTML = FileTool.readTextFile(templateFile);

@@ -26,24 +26,23 @@ public class QR_Encoder {
 						.addressLine1(bill.biller.get(Kontakt.FLD_STREET))
 						.addressLine2(bill.biller.get(Kontakt.FLD_ZIP) + " " + bill.biller.get(Kontakt.FLD_PLACE))
 						.country("CH"))
+				.ultimateDebtor(d -> d.combinedAddress()
+						.name(bill.patient.get(Kontakt.FLD_NAME1) + " " + bill.patient.get(Kontakt.FLD_NAME2))
+						.addressLine1(bill.patient.get(Kontakt.FLD_STREET))
+						.addressLine2(bill.patient.get(Kontakt.FLD_ZIP) + " " + bill.patient.get(Kontakt.FLD_PLACE))
+						.country("CH"))
 				.paymentReference(r -> r.qrReference(bill.qrIBAN)).build();
-		
-		final QrCode qrCode = QrInvoiceCodeCreator.create()
-				.qrInvoice(qr)
-				.outputFormat(OutputFormat.SVG)
-				.desiredQrCodeSize(500)
-				.createQrCode();
+
+		final QrCode qrCode = QrInvoiceCodeCreator.create().qrInvoice(qr).outputFormat(OutputFormat.SVG)
+				.desiredQrCodeSize(500).createQrCode();
 		final byte[] image = qrCode.getData();
 		/*
-		final PaymentPartReceipt ppr=QrInvoicePaymentPartReceiptCreator.create()
-				.qrInvoice(qr)
-				.outputFormat(OutputFormat.PDF)
-				.fontFamily(FontFamily.LIBERATION_SANS)
-				.locale(Locale.GERMAN)
-				.createPaymentPartReceipt();
-		//return new String(image,"utf-8");
-		final byte[] image=ppr.getData();
-		*/
-		return new String(image,"utf-8");
+		 * final PaymentPartReceipt ppr=QrInvoicePaymentPartReceiptCreator.create()
+		 * .qrInvoice(qr) .outputFormat(OutputFormat.PDF)
+		 * .fontFamily(FontFamily.LIBERATION_SANS) .locale(Locale.GERMAN)
+		 * .createPaymentPartReceipt(); //return new String(image,"utf-8"); final byte[]
+		 * image=ppr.getData();
+		 */
+		return new String(image, "utf-8");
 	}
 }
