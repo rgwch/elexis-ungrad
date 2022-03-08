@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: QRInvoice-lib
 Bundle-SymbolicName: QRInvoice-lib
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: slf4j-api-1.7.33.jar,
  qrinvoice-openpdf-1.13.jar,
  qrinvoice-core-1.13.jar,
