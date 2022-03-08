@@ -15,5 +15,10 @@ Require-Bundle: ch.elexis.core.data;bundle-version="3.4.0",
  org.eclipse.ui.forms;bundle-version="3.7.1",
  ch.elexis.base.ch.ebanking;bundle-version="3.2.0",
  ch.elexis.ungrad.common;bundle-version="1.0.0",
- org.slf4j.log4j;bundle-version="1.7.2",
- QRInvoice-lib;bundle-version="1.0.0"
+ org.slf4j.log4j;bundle-version="1.7.2"
+Bundle-ClassPath: lib/core-3.4.1.jar,
+ lib/javase-3.4.1.jar,
+ lib/qrinvoice-core-1.13.jar,
+ lib/qrinvoice-openpdf-1.13.jar,
+ lib/slf4j-api-1.7.33.jar,
+ .
