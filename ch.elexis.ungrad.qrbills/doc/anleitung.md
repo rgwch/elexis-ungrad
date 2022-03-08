@@ -18,7 +18,7 @@ Allerdings ist der Aufbau des QR-Zahlteils ein wenig knifflig, und deshalb sind 
 
  ## Konfiguration
 
- QrBills benötigt die IBAN Nummer Ihres Kontos. Gehen Sie auf Datei-Einstellungen - Abrechnungssysteme - QR-Rechnung und geben Sie die entsprechenden Daten ein.
+ QrBills benötigt die qrIBAN Nummer Ihres Kontos (Das ist nicht dieselbe, wie die "alte" IBAN!). Gehen Sie auf Datei-Einstellungen - Abrechnungssysteme - QR-Rechnung und geben Sie die entsprechenden Daten ein.
  
  ![settings.jpg](./settings.jpg)
 
@@ -47,11 +47,11 @@ Im Feld "Nachbearbeitung" können Sie irgendein beliebiges Programm angeben, das
  
 Wenn die Positionierung und Grösse nicht stimmt, damm kommen automatische Verarbeitungssysteme damit nicht zurecht, was für Sie zu erhöhten Verarbeitungskosten führen kann.
 
-Lesen Sie dann den QR Code mit irgendeiner QR-Applikation auf Ihrem Smartphone ein und prüfen Sie, ob die Rechnungsdaten korrekt eingelesen werden. Die ersten drei Zeilen müssen SPC, 0100 und 1 sein, darunter folgen die IBAN und die weiteren Rechnungsdetails, hier ein Beispiel:
+Lesen Sie dann den QR Code mit irgendeiner QR-Applikation auf Ihrem Smartphone ein und prüfen Sie, ob die Rechnungsdaten korrekt eingelesen werden. Die ersten drei Zeilen müssen SPC, 0200 und 1 sein, darunter folgen die IBAN und die weiteren Rechnungsdetails, hier ein Beispiel:
 
 ```
 SPC
-0100
+0200
 1
 CH8281479000001545305
 Weirich Gerry
