@@ -22,6 +22,32 @@
   top: 24mm;
 }
 
+/* The heading with sender informations and practice logo*/
+#header {
+  color: green;
+  text-align: center;
+  margin-top: 5mm;
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
+h1 {
+  font-size: 12pt;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Make tables more compact */
+table,
+tr,
+td {
+  padding-bottom: 0;
+  padding-top: 0;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+
 #sender {
   position: absolute;
   left: 10mm;
@@ -38,6 +64,22 @@
   background-color: light-gray;
 }
 
+/* The summary box for the details of the Bill */
+#bill_summary {
+  position: absolute;
+  background-color: gainsboro;
+  left: 10mm;
+  top: 70mm;
+  padding: 5px;
+}
+
+/* The Text for the Bill */
+#maintext {
+  position: absolute;
+  left: 10mm;
+  top: 100mm;
+}
+
 
 .rectangle {
   position: absolute;
@@ -50,6 +92,12 @@
   left: 40mm;
 }
 
+.scissors{
+  position: absolute;
+  width: 7mm;
+  top: 189mm;
+  left: 70mm;
+}
 /***** Do not modify or reposition the parts between here and /style   ******/
 
 /* The payment slip must be A6 and located in the lower right edge of the page 
@@ -121,7 +169,7 @@ Only sans-serif fonts between 9 and 11pt are acceptable.             */
 }
 
 
-#receive_slip {
+#receipt_slip {
   position: absolute;
   width: 62mm;
   height: 105mm;
