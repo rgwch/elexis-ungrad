@@ -14,6 +14,7 @@
 package ch.elexis.ungrad.qrbills;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,6 +31,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
 import ch.elexis.TarmedRechnung.Messages;
 import ch.elexis.core.data.activator.CoreHub;
@@ -120,7 +123,7 @@ public class QR_Outputter implements IRnOutputter {
 	public Result<Rechnung> doOutput(TYPE type, Collection<Rechnung> rnn, Properties props) {
 		Result<Rechnung> res = new Result<Rechnung>();
 		// QR_Generator qr = new QR_Generator();
-		QR_Encoder qr=new QR_Encoder();
+		QR_Encoder qr = new QR_Encoder();
 		String template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 				+ File.separator + "qrbill_template_v2.html";
 		File templateFile = new File(template);
@@ -131,9 +134,9 @@ public class QR_Outputter implements IRnOutputter {
 				try {
 					BillDetails bill = new BillDetails(rn);
 					replacer.put("Adressat", bill.adressat);
-					replacer.put("Mandant",bill.biller);
-					replacer.put("Patient",bill.patient);
-					replacer.put("Rechnung",rn);
+					replacer.put("Mandant", bill.biller);
+					replacer.put("Patient", bill.patient);
+					replacer.put("Rechnung", rn);
 					Resolver resolver = new Resolver(replacer, true);
 
 					String cookedHTML = resolver.resolve(rawHTML);
@@ -144,7 +147,15 @@ public class QR_Outputter implements IRnOutputter {
 							.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
 							.replace("[ADDRESSEE]", bill.addressee).replace("[DUE]", bill.dateDue);
 
-					FileTool.writeTextFile(new File(outputDir, rn.getRnId() + ".html"), finished);
+					File file = new File(outputDir, rn.getRnId() + ".html");
+					FileTool.writeTextFile(file, finished);
+					FileOutputStream fout = new FileOutputStream(new File(outputDir, rn.getId() + ".pdf"));
+
+					PdfRendererBuilder builder = new PdfRendererBuilder();
+					builder.useFastMode();
+					builder.withFile(file);
+					builder.toStream(fout);
+					builder.run();
 					doPostProcess(rn.getRnId());
 					res.add(new Result<Rechnung>(rn));
 				} catch (Exception ex) {
