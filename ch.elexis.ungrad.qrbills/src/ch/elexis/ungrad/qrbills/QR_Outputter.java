@@ -140,7 +140,7 @@ public class QR_Outputter implements IRnOutputter {
 					String svg = qr.generate(rn, bill);
 					String finished = cookedHTML.replace("[QRCODE]", svg).replace("[CURRENCY]", bill.currency)
 							.replace("[AMOUNT]", bill.amount.getAmountAsString()).replace("[IBAN]", bill.IBAN)
-							.replace("[BILLER]", bill.biller_address).replace("[ESRLINE]", bill.ESRNr)
+							.replace("[BILLER]", bill.biller_address).replace("[ESRLINE]", bill.qrIBAN)
 							.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
 							.replace("[ADDRESSEE]", bill.addressee).replace("[DUE]", bill.dateDue);
 

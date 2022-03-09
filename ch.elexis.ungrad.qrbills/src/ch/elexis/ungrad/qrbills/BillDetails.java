@@ -49,18 +49,15 @@ public class BillDetails {
 	int numCons;;
 
 	public BillDetails(Rechnung rn) throws BadParameterException {
-		checkNull(rn, "Rechnung");
-		this.rn = rn;
-		fall = rn.getFall();
-		checkNull(fall, "Fall");
-		patient = fall.getPatient();
-		checkNull(patient, "Patient");
-		amount = rn.getBetrag();
-		checkNull(amount, "Amount");
+		this.rn = (Rechnung) checkNull(rn, "Rechnung");
+		fall = (Fall) checkNull(rn.getFall(), "Fall");
+		patient = (Patient) checkNull(fall.getPatient(), "Patient");
+		amount = (Money) checkNull(rn.getBetrag(), "Betrag");
 		checkNull(rn.getMandant(), "Mandant");
 		biller = rn.getMandant().getRechnungssteller();
 		checkNull(biller, "Biller");
 		adressat = patient;
+		String patnr = (String) checkNull(patient.getPatCode(), "PatientNr.");
 		IBAN = (String) biller.getExtInfoStoredObjectByKey(PreferenceConstants.QRIBAN);
 		checkNull(IBAN, "IBAN");
 		if (IBAN.length() != 21) {
@@ -78,8 +75,8 @@ public class BillDetails {
 			throw new BadParameterException("Bank was not valid", 2);
 		}
 		checkNull(rn.getNr(), "Bill Number");
-		qrIBAN = StringTool.pad(StringTool.LEFT, '0', StringTool.addModulo10(rn.getNr()), 27);
-		checkNull(biller.getPostAnschrift(), "Postanschrift");
+		qrIBAN = StringTool.pad(StringTool.LEFT, '0', StringTool.addModulo10(patnr+"0"+rn.getNr()), 27);
+		checkNull(biller.getPostAnschrift(), "Postanschrift");	
 		biller_address = biller.getPostAnschrift(true).trim().replaceAll("\\r", "").replaceAll("\\n+", "<br />");
 		checkNull(adressat.getPostAnschrift(), "Postanschrift");
 		addressee = adressat.getPostAnschrift(true).trim().replaceAll("\\r", "").replaceAll("\\n+", "<br />");
@@ -97,9 +94,10 @@ public class BillDetails {
 		ESRNr = esr.makeRefNr(true);
 	}
 
-	void checkNull(Object o, String msg) throws BadParameterException {
+	Object checkNull(Object o, String msg) throws BadParameterException {
 		if (o == null) {
 			throw new BadParameterException(msg + " was null", 1);
 		}
+		return o;
 	}
 }
