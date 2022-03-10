@@ -13,13 +13,11 @@
  *********************************************************************************/
 package ch.elexis.ungrad.qrbills;
 
-import java.awt.FontFormatException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -33,16 +31,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.w3c.dom.Element;
 
-import com.openhtmltopdf.css.sheet.FontFaceRule;
-import com.openhtmltopdf.css.style.CssContext;
-import com.openhtmltopdf.extend.SVGDrawer;
-import com.openhtmltopdf.extend.SVGDrawer.SVGImage;
-import com.openhtmltopdf.layout.SharedContext;
-import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.FontStyle;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import com.openhtmltopdf.render.Box;
 
 import ch.elexis.TarmedRechnung.Messages;
 import ch.elexis.core.data.activator.CoreHub;
@@ -156,10 +146,11 @@ public class QR_Outputter implements IRnOutputter {
 
 					String finished = cookedHTML.replace("[QRIMG]", rn.getRnId() + ".png")
 							.replace("[CURRENCY]", bill.currency).replace("[AMOUNT]", bill.amount.getAmountAsString())
-							.replace("[IBAN]", bill.IBAN).replace("[BILLER]", bill.biller_address)
-							.replace("[ESRLINE]", bill.qrIBAN)
+							.replace("[IBAN]", bill.formattedIban)
+							.replace("[BILLER]", bill.combinedAddress(bill.biller))
+							.replace("[ESRLINE]", bill.formattedReference)
 							.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
-							.replace("[ADDRESSEE]", bill.addressee).replace("[DUE]", bill.dateDue);
+							.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);
 
 					File file = new File(outputDir, rn.getRnId() + ".html");
 					FileTool.writeTextFile(file, finished);

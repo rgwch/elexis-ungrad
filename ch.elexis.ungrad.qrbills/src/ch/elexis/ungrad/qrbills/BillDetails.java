@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 by G. Weirich
+ * Copyright (c) 2018-2022 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -16,7 +16,6 @@ package ch.elexis.ungrad.qrbills;
 import ch.elexis.TarmedRechnung.Messages;
 import ch.elexis.TarmedRechnung.TarmedACL;
 import ch.elexis.base.ch.ebanking.esr.ESR;
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
@@ -37,16 +36,26 @@ public class BillDetails {
 	Kontakt biller;
 	Kontakt adressat;
 	String IBAN = "CH000NUR00ZUR00DEMO00";
+	String formattedIban;
 	String ESRNr = "";
 	String currency;
 	Kontakt bank;
 	String qrIBAN;
+	String formattedReference;
 	String biller_address;
 	String addressee;
 	String dateDue;
 	String firstDate;
 	String lastDate;
-	int numCons;;
+	int numCons;
+
+	public String combinedAddress(Kontakt k) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(k.get(Kontakt.FLD_NAME1) + " " + k.get(Kontakt.FLD_NAME2)).append("<br />")
+				.append(k.get(Kontakt.FLD_STREET)).append("<br />")
+				.append(k.get(Kontakt.FLD_ZIP) + " " + k.get(Kontakt.FLD_PLACE));
+		return sb.toString();
+	}
 
 	public BillDetails(Rechnung rn) throws BadParameterException {
 		this.rn = (Rechnung) checkNull(rn, "Rechnung");
@@ -75,8 +84,8 @@ public class BillDetails {
 			throw new BadParameterException("Bank was not valid", 2);
 		}
 		checkNull(rn.getNr(), "Bill Number");
-		qrIBAN = StringTool.pad(StringTool.LEFT, '0', StringTool.addModulo10(patnr+"0"+rn.getNr()), 27);
-		checkNull(biller.getPostAnschrift(), "Postanschrift");	
+		qrIBAN = StringTool.pad(StringTool.LEFT, '0', StringTool.addModulo10(patnr + "0" + rn.getNr()), 27);
+		checkNull(biller.getPostAnschrift(), "Postanschrift");
 		biller_address = biller.getPostAnschrift(true).trim().replaceAll("\\r", "").replaceAll("\\n+", "<br />");
 		checkNull(adressat.getPostAnschrift(), "Postanschrift");
 		addressee = adressat.getPostAnschrift(true).trim().replaceAll("\\r", "").replaceAll("\\n+", "<br />");
@@ -92,6 +101,17 @@ public class BillDetails {
 		ESR esr = new ESR((String) biller.getExtInfoStoredObjectByKey(ta.ESRNUMBER),
 				(String) biller.getExtInfoStoredObjectByKey(ta.ESRSUB), rn.getRnId(), 27);
 		ESRNr = esr.makeRefNr(true);
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < 20; i += 4) {
+			sb.append(IBAN.substring(i, i + 4)).append(" ");
+		}
+		formattedIban = sb.append(IBAN.substring(19)).toString();
+		sb.setLength(0);
+		sb.append(qrIBAN.substring(0, 2));
+		for (int i = 0; i < 25; i += 5) {
+			sb.append(qrIBAN.substring(i, i + 5)).append(" ");
+		}
+		formattedReference = sb.toString().trim();
 	}
 
 	Object checkNull(Object o, String msg) throws BadParameterException {

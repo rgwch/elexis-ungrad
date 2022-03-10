@@ -235,6 +235,19 @@ Only sans-serif fonts between 9 and 11pt are acceptable.             */
       top: 82mm;
       height: 18mm;
     }
+
+    .receipt_slip_heading {
+      font-size: 6pt;
+      font-weight: bold;
+      padding-bottom: 0;
+      margin-bottom: 0;
+
+    }
+
+    .receipt_slip_default {
+      font-size: 8pt;
+      font-weight: normal;
+    }
   </style>
 </head>
 
@@ -308,22 +321,22 @@ Only sans-serif fonts between 9 and 11pt are acceptable.             */
         Empfangsschein
       </div>
       <div id="receipt_slip_details">
-        <p class="payment_slip_heading">Konto / Zahlbar an</p>
-        <p class="payment_slip_default">[IBAN]<br />[BILLER]</p>
-        <p class="payment_slip_heading">Referenz</p>
-        <p class="payment_slip_default">[ESRLINE]</p>
-        <p class="payment_slip_heading">Zahlbar durch</p>
-        <p class="payment_slip_default">[ADDRESSEE]</p>
+        <p class="receipt_slip_heading">Konto / Zahlbar an</p>
+        <p class="receipt_slip_default">[IBAN]<br />[BILLER]</p>
+        <p class="receipt_slip_heading">Referenz</p>
+        <p class="receipt_slip_default">[ESRLINE]</p>
+        <p class="receipt_slip_heading">Zahlbar durch</p>
+        <p class="receipt_slip_default">[ADDRESSEE]</p>
         <!-- p class="payment_slip_heading">Zahlbar bis</p>
         <p class="payment_slip_default">[DUE]</p -->
       </div>
       <div id="receipt_slip_amount">
         <table>
-          <tr class="payment_slip_heading">
+          <tr class="receipt_slip_heading">
             <td style="padding-right:5px;">Währung</td>
             <td style="padding-left:5px;">Betrag</td>
           </tr>
-          <tr class="payment_slip_default">
+          <tr class="receipt_slip_default">
             <td style="padding-right:5px;">[CURRENCY]</td>
             <td style="padding-left:5px;">[AMOUNT]</td>
           </tr>
