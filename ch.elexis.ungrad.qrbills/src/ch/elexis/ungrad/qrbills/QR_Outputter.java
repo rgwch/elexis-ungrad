@@ -13,11 +13,13 @@
  *********************************************************************************/
 package ch.elexis.ungrad.qrbills;
 
+import java.awt.FontFormatException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -31,8 +33,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.w3c.dom.Element;
 
+import com.openhtmltopdf.css.sheet.FontFaceRule;
+import com.openhtmltopdf.css.style.CssContext;
+import com.openhtmltopdf.extend.SVGDrawer;
+import com.openhtmltopdf.extend.SVGDrawer.SVGImage;
+import com.openhtmltopdf.layout.SharedContext;
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.FontStyle;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import com.openhtmltopdf.render.Box;
 
 import ch.elexis.TarmedRechnung.Messages;
 import ch.elexis.core.data.activator.CoreHub;
@@ -125,7 +135,7 @@ public class QR_Outputter implements IRnOutputter {
 		// QR_Generator qr = new QR_Generator();
 		QR_Encoder qr = new QR_Encoder();
 		String template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
-				+ File.separator + "qrbill_template_v2.html";
+				+ File.separator + "qrbill_template_v3.html";
 		File templateFile = new File(template);
 		try {
 			String rawHTML = FileTool.readTextFile(templateFile);
@@ -140,17 +150,20 @@ public class QR_Outputter implements IRnOutputter {
 					Resolver resolver = new Resolver(replacer, true);
 
 					String cookedHTML = resolver.resolve(rawHTML);
-					String svg = qr.generate(rn, bill);
-					String finished = cookedHTML.replace("[QRCODE]", svg).replace("[CURRENCY]", bill.currency)
-							.replace("[AMOUNT]", bill.amount.getAmountAsString()).replace("[IBAN]", bill.IBAN)
-							.replace("[BILLER]", bill.biller_address).replace("[ESRLINE]", bill.qrIBAN)
+					byte[] png = qr.generate(rn, bill);
+					File imgFile = new File(outputDir, rn.getRnId() + ".png");
+					FileTool.writeFile(imgFile, png);
+
+					String finished = cookedHTML.replace("[QRIMG]", rn.getRnId() + ".png")
+							.replace("[CURRENCY]", bill.currency).replace("[AMOUNT]", bill.amount.getAmountAsString())
+							.replace("[IBAN]", bill.IBAN).replace("[BILLER]", bill.biller_address)
+							.replace("[ESRLINE]", bill.qrIBAN)
 							.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
 							.replace("[ADDRESSEE]", bill.addressee).replace("[DUE]", bill.dateDue);
 
 					File file = new File(outputDir, rn.getRnId() + ".html");
-					// FileTool.writeTextFile(file, finished);
+					FileTool.writeTextFile(file, finished);
 					FileOutputStream fout = new FileOutputStream(new File(outputDir, rn.getId() + ".pdf"));
-
 					PdfRendererBuilder builder = new PdfRendererBuilder();
 					builder.useFastMode();
 					builder.withFile(file);
