@@ -25,10 +25,10 @@
   <style>
     @page {
       size: A4 portrait;
-      margin-top: 0;
-      margin-left: 0;
-      margin-bottom: 0;
-      margin-right: 0;
+      margin-top: 5mm;
+      margin-left: 5mm;
+      margin-bottom: 5mm;
+      margin-right: 5mm;
     }
 
     #container {
@@ -120,7 +120,7 @@
     .scissors {
       position: absolute;
       width: 7mm;
-      max.width: 7mm;
+      max-width: 7mm;
       top: 189mm;
       left: 70mm;
     }
@@ -153,25 +153,23 @@ Only sans-serif fonts between 9 and 11pt are acceptable.             */
       font-weight: bold;
       top: 5mm;
       left: 5mm;
-      height: 10mm;
+      height: 7mm;
     }
 
     #payment_slip_qrzone {
       position: absolute;
       left: 5mm;
-      top: 20mm;
-      width: 47mm;
-      height: 47mm;
-      max-width: 47mm;
-      max-height: 47mm;
+      top: 18mm;
+      width: 46mm;
+      height: 46mm;
     }
 
     /** Currency and amount */
     #payment_slip_amount {
       position: absolute;
       left: 5mm;
-      top: 72mm;
-      height: 15mm;
+      top: 69mm;
+      height: 22mm;
     }
 
     /* Right side of the payment slip */
@@ -205,6 +203,37 @@ Only sans-serif fonts between 9 and 11pt are acceptable.             */
       bottom: 0;
       border-top: black dashed 1px;
       font-family: Arial, Helvetica, sans-serif;
+    }
+
+    #receipt_slip_title {
+      position: absolute;
+      font-size: 11pt;
+      font-weight: bold;
+      left: 5mm;
+      top: 5mm;
+      height: 7mm;
+    }
+
+    #receipt_slip_details {
+      position: absolute;
+      left: 5mm;
+      top: 12mm;
+      height: 56mm;
+    }
+
+    /** Currency and amount */
+    #receipt_slip_amount {
+      position: absolute;
+      left: 5mm;
+      top: 68mm;
+      height: 14mm;
+    }
+
+    #receipt_slip_intermediate {
+      position: absolute;
+      right: 2mm;
+      top: 82mm;
+      height: 18mm;
     }
   </style>
 </head>
@@ -274,13 +303,43 @@ Only sans-serif fonts between 9 and 11pt are acceptable.             */
     <!-- Do not reposition the payment slip and any elements therein -->
 
 
-    <div id="receipt_slip">Quittung</div>
+    <div id="receipt_slip">
+      <div id="receipt_slip_title">
+        Empfangsschein
+      </div>
+      <div id="receipt_slip_details">
+        <p class="payment_slip_heading">Konto / Zahlbar an</p>
+        <p class="payment_slip_default">[IBAN]<br />[BILLER]</p>
+        <p class="payment_slip_heading">Referenz</p>
+        <p class="payment_slip_default">[ESRLINE]</p>
+        <p class="payment_slip_heading">Zahlbar durch</p>
+        <p class="payment_slip_default">[ADDRESSEE]</p>
+        <!-- p class="payment_slip_heading">Zahlbar bis</p>
+        <p class="payment_slip_default">[DUE]</p -->
+      </div>
+      <div id="receipt_slip_amount">
+        <table>
+          <tr class="payment_slip_heading">
+            <td style="padding-right:5px;">Währung</td>
+            <td style="padding-left:5px;">Betrag</td>
+          </tr>
+          <tr class="payment_slip_default">
+            <td style="padding-right:5px;">[CURRENCY]</td>
+            <td style="padding-left:5px;">[AMOUNT]</td>
+          </tr>
+        </table>
+      </div>
+      <div id="receipt_slip_intermediate" class="payment_slip_heading">
+        Annahmestelle
+      </div>
+    </div>
+
     <div id="payment_slip">
       <div id="payment_slip_title">
         Zahlteil
       </div>
       <div id="payment_slip_qrzone">
-      <img src="[QRIMG]" width="47mm"></img>
+        <img src="[QRIMG]" width="47mm"></img>
       </div>
       <div id="payment_slip_amount">
         <table>
@@ -303,11 +362,11 @@ Only sans-serif fonts between 9 and 11pt are acceptable.             */
         <p class="payment_slip_default">[ESRLINE]</p>
         <p class="payment_slip_heading">Zahlbar durch</p>
         <p class="payment_slip_default">[ADDRESSEE]</p>
-        <p class="payment_slip_heading">Zahlbar bis</p>
-        <p class="payment_slip_default">[DUE]</p>
+        <!-- p class="payment_slip_heading">Zahlbar bis</p>
+        <p class="payment_slip_default">[DUE]</p -->
       </div>
     </div>
-    
+
   </div>
 </body>
 
