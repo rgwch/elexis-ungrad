@@ -20,9 +20,8 @@ Bundle-ClassPath: lib/core-3.4.1.jar,
  lib/qrinvoice-core-1.13.jar,
  lib/qrinvoice-openpdf-1.13.jar,
  .,
- lib/openhtmltopdf-core-1.0.11-SNAPSHOT.jar,
- lib/openhtmltopdf-pdfbox-1.0.11-SNAPSHOT.jar,
- lib/openhtmltopdf-svg-support-1.0.11-SNAPSHOT.jar,
  lib/slf4j-api-1.7.33.jar,
- lib/pdfbox-2.0.25.jar,
- lib/xmpbox-2.0.25.jar
+ lib/xmpbox-2.0.25.jar,
+ lib/openhtmltopdf-core-1.0.11-SNAPSHOT-jar-with-dependencies.jar,
+ lib/openhtmltopdf-pdfbox-1.0.11-SNAPSHOT-jar-with-dependencies.jar,
+ lib/openhtmltopdf-svg-support-1.0.11-SNAPSHOT-jar-with-dependencies.jar

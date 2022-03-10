@@ -148,7 +148,7 @@ public class QR_Outputter implements IRnOutputter {
 							.replace("[ADDRESSEE]", bill.addressee).replace("[DUE]", bill.dateDue);
 
 					File file = new File(outputDir, rn.getRnId() + ".html");
-					FileTool.writeTextFile(file, finished);
+					// FileTool.writeTextFile(file, finished);
 					FileOutputStream fout = new FileOutputStream(new File(outputDir, rn.getId() + ".pdf"));
 
 					PdfRendererBuilder builder = new PdfRendererBuilder();
