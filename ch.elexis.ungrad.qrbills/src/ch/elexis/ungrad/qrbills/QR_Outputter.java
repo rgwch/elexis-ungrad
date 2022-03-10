@@ -163,7 +163,7 @@ public class QR_Outputter implements IRnOutputter {
 
 					File file = new File(outputDir, rn.getRnId() + ".html");
 					FileTool.writeTextFile(file, finished);
-					FileOutputStream fout = new FileOutputStream(new File(outputDir, rn.getId() + ".pdf"));
+					FileOutputStream fout = new FileOutputStream(new File(outputDir, rn.getRnId() + ".pdf"));
 					PdfRendererBuilder builder = new PdfRendererBuilder();
 					builder.useFastMode();
 					builder.withFile(file);
@@ -171,6 +171,8 @@ public class QR_Outputter implements IRnOutputter {
 					builder.run();
 					doPostProcess(rn.getRnId());
 					res.add(new Result<Rechnung>(rn));
+					imgFile.delete();
+					file.delete();
 				} catch (Exception ex) {
 					ExHandler.handle(ex);
 					res.add(new Result<Rechnung>(SEVERITY.ERROR, 2, ex.getMessage(), rn, true));
