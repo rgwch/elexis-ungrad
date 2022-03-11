@@ -47,6 +47,7 @@
       position: absolute;
       right: 20mm;
       top: 24mm;
+      width: 50mm;
     }
 
     /* The heading with sender informations and practice logo*/
@@ -80,6 +81,7 @@
       left: 10mm;
       top: 24mm;
       margin-right: 20px;
+      width: 70mm;
     }
 
 
@@ -133,7 +135,10 @@
 
     /* The payment slip must be A6 and located in the lower right edge of the page 
 It must be separated with lines or perforations from the rest of the document. 
-Only sans-serif fonts between 9 and 11pt are acceptable.             */
+
+Must conform to the following paper:
+https://www.paymentstandards.ch/dam/downloads/style-guide-de.pdf 
+        */
 
     #payment_slip {
       position: absolute;
@@ -348,7 +353,7 @@ Only sans-serif fonts between 9 and 11pt are acceptable.             */
           </tr>
         </table>
       </div>
-      <div id="receipt_slip_intermediate" class="payment_slip_heading">
+      <div id="receipt_slip_intermediate" class="receipt_slip_heading">
         Annahmestelle
       </div>
     </div>
