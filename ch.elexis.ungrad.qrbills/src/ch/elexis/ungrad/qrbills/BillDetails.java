@@ -105,10 +105,10 @@ public class BillDetails {
 		for (int i = 0; i < 20; i += 4) {
 			sb.append(IBAN.substring(i, i + 4)).append(" ");
 		}
-		formattedIban = sb.append(IBAN.substring(19)).toString();
+		formattedIban = sb.append(IBAN.substring(20)).toString();
 		sb.setLength(0);
-		sb.append(qrIBAN.substring(0, 2));
-		for (int i = 0; i < 25; i += 5) {
+		sb.append(qrIBAN.substring(0, 2)).append(" ");
+		for (int i = 2; i < 25; i += 5) {
 			sb.append(qrIBAN.substring(i, i + 5)).append(" ");
 		}
 		formattedReference = sb.toString().trim();

@@ -30,6 +30,7 @@ public class QR_Generator {
 	/* ISO 20022 Defaults */
 	/* See https://www.paymentstandards.ch/dam/downloads/ig-qr-bill-de.pdf */
 	/* https://www.paymentstandards.ch/de/shared/communication-grid.html */
+	/* https://www.paymentstandards.ch/dam/downloads/style-guide-de.pdf */
 	private static final QrCode.Ecc ecc = Ecc.MEDIUM;
 	private static final int VERSION = 25;
 	// private static final int size = 117; // total size must be 46x46 mm

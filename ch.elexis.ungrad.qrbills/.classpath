@@ -3,18 +3,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/core-3.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javase-3.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/qrinvoice-core-1.13.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/qrinvoice-openpdf-1.13.jar"/>
-	<classpathentry kind="lib" path="lib/xmpbox-2.0.25.jar"/>
-	<classpathentry kind="lib" path="lib/openhtmltopdf-core-1.0.11-SNAPSHOT-jar-with-dependencies.jar" sourcepath="/home/gerry/git/ungrad2020/openhtmltopdf/openhtmltopdf-core/target/openhtmltopdf-core-1.0.11-SNAPSHOT-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/home/gerry/git/ungrad2020/openhtmltopdf/openhtmltopdf-core/target/openhtmltopdf-core-1.0.11-SNAPSHOT-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/openhtmltopdf-pdfbox-1.0.11-SNAPSHOT-jar-with-dependencies.jar" sourcepath="/home/gerry/git/elexis/openhtmltopdf/openhtmltopdf-pdfbox/target/openhtmltopdf-pdfbox-1.0.11-SNAPSHOT-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/home/gerry/git/ungrad2020/openhtmltopdf/openhtmltopdf-pdfbox/target/openhtmltopdf-pdfbox-1.0.11-SNAPSHOT-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="lib/openhtmltopdf-core-1.0.11-SNAPSHOT-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="lib/openhtmltopdf-pdfbox-1.0.11-SNAPSHOT-jar-with-dependencies.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>

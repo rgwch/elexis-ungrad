@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Template for ISO 20022 conformant bills (for swiss payments after 2018).
+  https://www.paymentstandards.ch/dam/downloads/style-guide-de.pdf
+  
   Note: The output when printed will differ from the screen display. Output must be:
   * without borders
   * Without any scaling (i.e. 100%)
@@ -25,10 +27,10 @@
   <style>
     @page {
       size: A4 portrait;
-      margin-top: 5mm;
-      margin-left: 5mm;
-      margin-bottom: 5mm;
-      margin-right: 5mm;
+      margin-top: 0mm;
+      margin-left: 0mm;
+      margin-bottom: 0mm;
+      margin-right: 0mm;
     }
 
     #container {
@@ -86,6 +88,7 @@
       position: absolute;
       right: 20mm;
       top: 45mm;
+      width: 60mm;
       background-color: light-gray;
     }
 
@@ -95,6 +98,7 @@
       background-color: gainsboro;
       left: 10mm;
       top: 70mm;
+      width: 80mm;
       padding: 5px;
     }
 
@@ -102,7 +106,7 @@
     #maintext {
       position: absolute;
       left: 10mm;
-      top: 100mm;
+      top: 110mm;
     }
 
 
@@ -233,7 +237,7 @@ Only sans-serif fonts between 9 and 11pt are acceptable.             */
       position: absolute;
       right: 2mm;
       top: 82mm;
-      height: 18mm;
+
     }
 
     .receipt_slip_heading {
@@ -247,6 +251,8 @@ Only sans-serif fonts between 9 and 11pt are acceptable.             */
     .receipt_slip_default {
       font-size: 8pt;
       font-weight: normal;
+      padding-top: 0;
+      margin-top: 0;
     }
   </style>
 </head>
@@ -277,12 +283,12 @@ Only sans-serif fonts between 9 and 11pt are acceptable.             */
     <div id="bill_summary">
       <table>
         <tr>
-          <td>
+          <td colspan="2">
             Für: [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
-          </td>
+          </td>	
         </tr>
         <tr>
-          <td>
+          <td width="100%">
             Rechnungs-Nummer:
           </td>
           <td>
