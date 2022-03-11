@@ -40,9 +40,11 @@ import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.data.preferences.CorePreferenceInitializer;
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.core.model.IPersistentObject;
+import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Rechnung;
+import ch.elexis.data.RnStatus;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.rgw.io.FileTool;
@@ -119,19 +121,48 @@ public class QR_Outputter implements IRnOutputter {
 		CoreHub.localCfg.set(PreferenceConstants.POSTPROCESS, postProcessCommand);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public Result<Rechnung> doOutput(TYPE type, Collection<Rechnung> rnn, Properties props) {
 		Result<Rechnung> res = new Result<Rechnung>();
 		// QR_Generator qr = new QR_Generator();
 		QR_Encoder qr = new QR_Encoder();
-		String template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
+
+		String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 				+ File.separator + "qrbill_template_v3.html";
-		File templateFile = new File(template);
+
 		try {
-			String rawHTML = FileTool.readTextFile(templateFile);
 
 			for (Rechnung rn : rnn) {
+
 				try {
+					String fname = "";
+					switch (rn.getStatus()) {
+					case RnStatus.OFFEN:
+					case RnStatus.OFFEN_UND_GEDRUCKT:
+						fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL, "");
+						break;
+					case RnStatus.MAHNUNG_1:
+					case RnStatus.MAHNUNG_1_GEDRUCKT:
+						fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1, "");
+						break;
+					case RnStatus.MAHNUNG_2:
+					case RnStatus.MAHNUNG_2_GEDRUCKT:
+						fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2, "");
+						break;
+					case RnStatus.MAHNUNG_3:
+					case RnStatus.MAHNUNG_3_GEDRUCKT:
+						fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3, "");
+						break;
+					default:
+						fname = default_template;
+					}
+					File template = new File(fname);
+					if(!template.exists()) {
+						template=new File(default_template);
+					}
+					String rawHTML = FileTool.readTextFile(template);	
+
 					BillDetails bill = new BillDetails(rn);
 					replacer.put("Adressat", bill.adressat);
 					replacer.put("Mandant", bill.biller);
@@ -171,7 +202,7 @@ public class QR_Outputter implements IRnOutputter {
 			}
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
-			res.add(new Result<Rechnung>(SEVERITY.ERROR, 1, "Could  not find templateFile " + template, null, true));
+			res.add(new Result<Rechnung>(SEVERITY.ERROR, 1, "Could  not find templateFile ", null, true));
 		}
 		if (res.isOK()) {
 			SWTHelper.showInfo("Ausgabe beendet", rnn.size() + " QR-Rechnung(en) wurde(n) ausgegeben");

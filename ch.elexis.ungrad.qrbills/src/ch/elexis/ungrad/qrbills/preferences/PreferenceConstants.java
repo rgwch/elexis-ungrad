@@ -19,7 +19,10 @@ public class PreferenceConstants {
 	// Settings entries
 	public static final String RNN_DIR=BASE+"/rnndir"; 
 	public static final String POSTPROCESS="/postprocess";
-	
+	public static final String TEMPLATE_BILL="/template_bill";
+	public static final String TEMPLATE_REMINDER1="/template_reminder1";
+	public static final String TEMPLATE_REMINDER2="/template_reminder2";
+	public static final String TEMPLATE_REMINDER3="/template_reminder3";
 	
 	// Extinfo entries
 	public static final String QRBANK=BASE+"/bank";

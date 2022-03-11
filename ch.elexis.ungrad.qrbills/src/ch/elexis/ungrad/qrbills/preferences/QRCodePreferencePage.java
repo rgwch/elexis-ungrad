@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -39,6 +41,7 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 	private Text txBank;
 	private Label lbIban;
 	private Text txIban;
+	private FileFieldEditor ffe1,ffe2,ffe3,ffe4;
 	private Mandant currentMandator;
 	private static final String ERRMSG_BAD_IBAN = "Eine zulässige IBAN muss genau 21 Zeichen lang sein und mit CH oder LI beginnen.";
 	private static final String ERRMSG_BAD_BANK = "Die gewählte Bank ist nicht gültig.";
@@ -76,20 +79,20 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 	protected Control createContents(Composite parent) {
 		Color blau = UiDesk.getColor(UiDesk.COL_BLUE);
 		Composite ret = new Composite(parent, SWT.NONE);
-		ret.setLayout(new GridLayout(2, false));
+		ret.setLayout(new GridLayout(3, false));
 		cbMandanten = new Combo(ret, SWT.READ_ONLY);
-		cbMandanten.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		cbMandanten.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
 		hlBank = new Hyperlink(ret, SWT.NONE);
 		hlBank.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		hlBank.setText("Bank");
 		hlBank.setForeground(blau);
 		txBank = new Text(ret, SWT.READ_ONLY);
-		txBank.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		txBank.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		lbIban = new Label(ret, SWT.NONE);
 		lbIban.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		lbIban.setText("IBAN");
 		txIban = new Text(ret, SWT.NONE);
-		txIban.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		txIban.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		HashMap<String, Mandant> hMandanten = new HashMap<>();
 		cbMandanten.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -129,14 +132,22 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 		txIban.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				applyIban();
+				applyFields();
 			}
 		});
-
+		ffe1=new FileFieldEditor(PreferenceConstants.TEMPLATE_BILL, "Vorlage für Rechnung", ret);
+		ffe2=new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER1, "Vorlage für Mahnung 1", ret);
+		ffe3=new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER2, "Vorlage für Mahnung 2", ret);
+		ffe4=new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER3, "Vorlage für Mahnung 3", ret);
+		ffe1.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL,""));
+		ffe2.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1,""));
+		ffe3.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2,""));
+		ffe4.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3,""));
+		
 		return ret;
 	}
 
-	private boolean applyIban() {
+	private boolean applyFields() {
 		String iban = txIban.getText().toUpperCase();
 		if (iban.length() != 21 || (!iban.startsWith("CH") && !iban.startsWith("LI"))) {
 			SWTHelper.showError("IBAN", ERRMSG_BAD_IBAN);
@@ -149,7 +160,11 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 
 	@Override
 	public boolean performOk() {
-		return applyIban() && super.performOk();
+		CoreHub.globalCfg.set(PreferenceConstants.TEMPLATE_BILL, ffe1.getStringValue());
+		CoreHub.globalCfg.set(PreferenceConstants.TEMPLATE_REMINDER1, ffe2.getStringValue());
+		CoreHub.globalCfg.set(PreferenceConstants.TEMPLATE_REMINDER2, ffe3.getStringValue());
+		CoreHub.globalCfg.set(PreferenceConstants.TEMPLATE_REMINDER3, ffe4.getStringValue());
+		return applyFields() && super.performOk();
 	}
 
 }
