@@ -27,7 +27,7 @@ public class QR_SettingsControl extends Composite {
 	String outputDir;
 	Combo cbPrinters;
 	PrintService[] printers;
-	Button cbDoPrint, cbDoDelete;
+	Button cbDoPrint, cbDirectPrint, cbDoDelete;
 
 	public QR_SettingsControl(Composite parent) {
 		super(parent, SWT.NONE);
@@ -51,11 +51,14 @@ public class QR_SettingsControl extends Composite {
 		b.setText("Ändern");
 		outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR, CorePreferenceInitializer.getDefaultDBPath());
 		text.setText(outputDir);
-
-		cbDoPrint = new Button(this, SWT.CHECK);
-		cbDoPrint.setText("Direkt ausdrucken auf:");
-		cbDoPrint.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		cbDoPrint.setSelection(CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false));
+		cbDoPrint=new Button(this,SWT.CHECK);
+		cbDoPrint.setText("Rechnung ausdrucken");
+		cbDoPrint.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		cbDoPrint.setSelection(CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false));
+		cbDirectPrint = new Button(this, SWT.CHECK);
+		cbDirectPrint.setText("Direkt ausdrucken auf:");
+		cbDirectPrint.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		cbDirectPrint.setSelection(CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false));
 		cbPrinters = new Combo(this, SWT.READ_ONLY);
 		cbPrinters.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		printers = PrintServiceLookup.lookupPrintServices(null, null);
@@ -74,7 +77,8 @@ public class QR_SettingsControl extends Composite {
 	}
 
 	public void doSave() {
-		CoreHub.localCfg.set(PreferenceConstants.DIRECT_PRINT, cbDoPrint.getSelection());
+		CoreHub.localCfg.set(PreferenceConstants.DO_PRINT, cbDoPrint.getSelection());
+		CoreHub.localCfg.set(PreferenceConstants.DIRECT_PRINT, cbDirectPrint.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DELETE_AFTER_PRINT, cbDoDelete.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
 		PrintService printService = printers[cbPrinters.getSelectionIndex()];

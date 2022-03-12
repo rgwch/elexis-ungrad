@@ -155,18 +155,20 @@ public class QR_Outputter implements IRnOutputter {
 					builder.withFile(file);
 					builder.toStream(fout);
 					builder.run();
-					String defaultPrinter = null;
-					if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
-						defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
-					}
-					if (printer.print(pdfFile, defaultPrinter)) {
-						if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
-							pdfFile.delete();
+					if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
+						String defaultPrinter = null;
+						if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
+							defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
+						}
+						if (printer.print(pdfFile, defaultPrinter)) {
+							if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
+								pdfFile.delete();
+							}
 						}
 					}
 					imgFile.delete();
 					file.delete();
-					Tarmedprinter tp=new Tarmedprinter();
+					Tarmedprinter tp = new Tarmedprinter();
 					tp.print(rn);
 					res.add(new Result<Rechnung>(rn));
 				} catch (Exception ex) {

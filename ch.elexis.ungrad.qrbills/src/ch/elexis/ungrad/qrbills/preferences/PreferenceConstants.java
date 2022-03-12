@@ -23,6 +23,7 @@ public class PreferenceConstants {
 	public static final String TEMPLATE_REMINDER2 = BASE + "/template_reminder2";
 	public static final String TEMPLATE_REMINDER3 = BASE + "/template_reminder3";
 	public static final String DEFAULT_PRINTER = BASE + "/printer";
+	public static final String DO_PRINT = BASE + "/do_print";
 	public static final String DIRECT_PRINT = BASE + "/direct_print";
 	public static final String DELETE_AFTER_PRINT = BASE + "/delete_after_print";
 
