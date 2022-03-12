@@ -7,13 +7,15 @@ Für uns einfache Leute am wichtigsten sind erstens die Zahlungseingangs-Dateien
 auf ein XML-basiertes Format umgestellt wurden.
 Elexis kann in der Version 3.4/Ungrad2018  solche Dateien bereits verarbeiten. Achtung: Mit früheren Elexis Versionen können Sie Zahlungen nur noch so lange automatisch verbuchen, bis Ihre Bank auf Iso 20022 umgestellt hat.
 
-In einem zweiten Schritt, der auf Mitte/Ende 2018 angekündigt ist, sollen auch die Einzahlungsscheine geändert werden. Anstelle des Roten/rosa ESR-Teils soll ein auf beliebiges Papier druckbarer QR-Code kommen. Das ist zunächst mal eine Verbesserung: Es erspart uns, Drucker mit zwei Schächten anzuschaffen und zwei Sorten Papier vorzuhalten.
+In einem zweiten Schritt, der auf Mitte/Ende 2018 angekündigt ist, sollen auch die Einzahlungsscheine geändert werden. Anstelle des Roten/rosa ESR-Teils soll ein auf beliebiges Papier druckbarer QR-Code kommen. Das scheint auf den ersten Blick zunächst mal eine Verbesserung: Es erspart uns, Drucker mit zwei Schächten anzuschaffen und zwei Sorten Papier vorzuhalten.
 
-Allerdings ist der Aufbau des QR-Zahlteils ein wenig knifflig, und deshalb sind zum Zeitpunkt dieses Schreibens nur wenige Firmen und nur wenige Software-Lösungen bereits darauf eingerichtet.
+Allerdings schreibt der Standard vor, dass der Zahlteil mit einer Perforation vom oberen Teil abzutrennen ist. Wir brauchen also doch verschiedene Papiertypen. Nur wenn die Rechnung als PDF versandt wird, gilt auch eine gestrichelte Linie und ein Hinweis in Form eines Scherensymbols oder des Texts "Vor dem Einzahlen abzutrennen" als zulässig.
+
+*Achtung*: Das Datenformat wurde geändert. Die mit Elexis Ungrad 2018 erstellbaren QR-Codes sind nicht mehr gültig. Aktuell gilt das Format 2.0. Sie müssen also zumindest das QR-Plugin auf Ungrad2020 updaten, falls Sie schon eine frühere Version verwendet haben. 
  
  ## Installation
 
- Sie können ch.elexis.ungrad.qrbills über die Software-Installation in Elexis Ungrad 2018 oder Elexis 3.4 installieren.
+ Sie können ch.elexis.ungrad.qrbills über die Software-Installation in Elexis Ungrad 2018, 2020 oder Elexis 3.7 installieren.
  Ausserdem muss das feature "Elexis Swiss OpenSource Feature" aus der Gruppe "Basispakete" installiert sein.
 
  ## Konfiguration

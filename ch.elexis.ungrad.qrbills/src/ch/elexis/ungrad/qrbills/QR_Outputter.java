@@ -127,6 +127,7 @@ public class QR_Outputter implements IRnOutputter {
 		Result<Rechnung> res = new Result<Rechnung>();
 		// QR_Generator qr = new QR_Generator();
 		QR_Encoder qr = new QR_Encoder();
+		QR_Printer printer = new QR_Printer();
 
 		String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 				+ File.separator + "qrbill_template_v3.html";
@@ -158,10 +159,10 @@ public class QR_Outputter implements IRnOutputter {
 						fname = default_template;
 					}
 					File template = new File(fname);
-					if(!template.exists()) {
-						template=new File(default_template);
+					if (!template.exists()) {
+						template = new File(default_template);
 					}
-					String rawHTML = FileTool.readTextFile(template);	
+					String rawHTML = FileTool.readTextFile(template);
 
 					BillDetails bill = new BillDetails(rn);
 					replacer.put("Adressat", bill.adressat);
@@ -184,17 +185,21 @@ public class QR_Outputter implements IRnOutputter {
 							.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);
 
 					File file = new File(outputDir, rn.getRnId() + ".html");
+					File pdfFile = new File(outputDir, rn.getRnId() + ".pdf");
 					FileTool.writeTextFile(file, finished);
-					FileOutputStream fout = new FileOutputStream(new File(outputDir, rn.getRnId() + ".pdf"));
+					FileOutputStream fout = new FileOutputStream(pdfFile);
 					PdfRendererBuilder builder = new PdfRendererBuilder();
 					builder.useFastMode();
 					builder.withFile(file);
 					builder.toStream(fout);
 					builder.run();
 					doPostProcess(rn.getRnId());
-					res.add(new Result<Rechnung>(rn));
+					if (printer.print(pdfFile, null)) {
+						pdfFile.delete();
+					}
 					imgFile.delete();
 					file.delete();
+					res.add(new Result<Rechnung>(rn));
 				} catch (Exception ex) {
 					ExHandler.handle(ex);
 					res.add(new Result<Rechnung>(SEVERITY.ERROR, 2, ex.getMessage(), rn, true));
