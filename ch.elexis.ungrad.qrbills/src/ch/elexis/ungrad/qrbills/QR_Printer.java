@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
+import javax.print.attribute.PrintServiceAttributeSet;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPrintable;
@@ -29,6 +30,7 @@ public class QR_Printer {
 		PDDocument pdoc = PDDocument.load(pdfFile);
 		PDFPrintable printable = new PDFPrintable(pdoc);
 		PrinterJob job = PrinterJob.getPrinterJob();
+		PrintServiceAttributeSet attributes;
 		job.setPrintable(printable);
 		boolean printed = false;
 		if (!StringTool.isNothing(printer)) {
@@ -38,6 +40,7 @@ public class QR_Printer {
 			for (int i = 0; i < services.length; i++) {
 				if (services[i].getName().toUpperCase().contains(printer)) {
 					selectedService = i;
+					attributes=services[i].getAttributes();
 					break;
 				}
 			}

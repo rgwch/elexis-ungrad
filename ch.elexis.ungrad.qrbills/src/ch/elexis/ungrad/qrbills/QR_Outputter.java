@@ -37,7 +37,6 @@ import org.eclipse.swt.widgets.Text;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
-import ch.elexis.TarmedRechnung.Messages;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.data.preferences.CorePreferenceInitializer;
@@ -64,10 +63,8 @@ import ch.rgw.tools.StringTool;
  *
  */
 public class QR_Outputter implements IRnOutputter {
-	String outputDir;
 	Map<String, IPersistentObject> replacer = new HashMap<>();
-	PrintService[] printers;
-	Combo cbPrinters;
+	QR_SettingsControl qrs;
 
 	public QR_Outputter() {
 	}
@@ -89,42 +86,13 @@ public class QR_Outputter implements IRnOutputter {
 
 	@Override
 	public Control createSettingsControl(final Object parent) {
-		final Composite parentInc = (Composite) parent;
-		Composite ret = new Composite(parentInc, SWT.NONE);
-		ret.setLayout(new GridLayout(2, false));
-		Label l = new Label(ret, SWT.NONE);
-		l.setText(Messages.XMLExporter_PleaseEnterOutputDirectoryForBills);
-		l.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		final Text text = new Text(ret, SWT.READ_ONLY | SWT.BORDER);
-		text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		Button b = new Button(ret, SWT.PUSH);
-		b.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				outputDir = new DirectoryDialog(parentInc.getShell(), SWT.OPEN).open();
-				CoreHub.localCfg.set(PreferenceConstants.RNN_DIR, outputDir);
-				text.setText(outputDir);
-			}
-		});
-		b.setText(Messages.XMLExporter_Change);
-		outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR, CorePreferenceInitializer.getDefaultDBPath());
-		text.setText(outputDir);
-		cbPrinters = new Combo(ret, SWT.READ_ONLY);
-		cbPrinters.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		printers = PrintServiceLookup.lookupPrintServices(null, null);
-		for (PrintService ps : printers) {
-			cbPrinters.add(ps.getName());
-		}
-		String currentPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
-		if (!StringTool.isNothing(currentPrinter)) {
-			cbPrinters.setText(currentPrinter);
-		}
-		return ret;
+		qrs = new QR_SettingsControl((Composite) parent);
+		return qrs;
 	}
 
 	@Override
 	public void saveComposite() {
-		CoreHub.localCfg.set(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
+		qrs.doSave();
 	}
 
 	@SuppressWarnings("deprecation")
@@ -144,6 +112,8 @@ public class QR_Outputter implements IRnOutputter {
 
 				try {
 					String fname = "";
+					String outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR,
+							CoreHub.getTempDir().getAbsolutePath());
 					switch (rn.getStatus()) {
 					case RnStatus.OFFEN:
 					case RnStatus.OFFEN_UND_GEDRUCKT:
@@ -199,7 +169,7 @@ public class QR_Outputter implements IRnOutputter {
 					builder.withFile(file);
 					builder.toStream(fout);
 					builder.run();
-						if (printer.print(pdfFile, null)) {
+					if (printer.print(pdfFile, null)) {
 						pdfFile.delete();
 					}
 					imgFile.delete();
