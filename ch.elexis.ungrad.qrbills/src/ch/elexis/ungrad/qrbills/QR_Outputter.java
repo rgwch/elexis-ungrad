@@ -166,6 +166,8 @@ public class QR_Outputter implements IRnOutputter {
 					}
 					imgFile.delete();
 					file.delete();
+					Tarmedprinter tp=new Tarmedprinter();
+					tp.print(rn);
 					res.add(new Result<Rechnung>(rn));
 				} catch (Exception ex) {
 					ExHandler.handle(ex);
