@@ -16,7 +16,7 @@ Allerdings schreibt der Standard vor, dass der Zahlteil mit einer Perforation vo
  ## Installation
 
  Sie können ch.elexis.ungrad.qrbills über die Software-Installation in Elexis Ungrad 2018, 2020 oder Elexis 3.7 installieren.
- Ausserdem muss das feature "Elexis Swiss OpenSource Feature" aus der Gruppe "Basispakete" installiert sein.
+ Ausserdem muss das Feature "Elexis Swiss OpenSource Feature" aus der Gruppe "Basispakete" installiert sein.
 
  ## Konfiguration
 
