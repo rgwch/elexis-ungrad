@@ -7,7 +7,10 @@ import java.io.IOException;
 
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttribute;
 import javax.print.attribute.PrintServiceAttributeSet;
+import javax.print.attribute.standard.MediaSizeName;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPrintable;
@@ -45,7 +48,9 @@ public class QR_Printer {
 				}
 			}
 			job.setPrintService(services[selectedService]);
-			job.print();
+			HashPrintRequestAttributeSet attrs=new HashPrintRequestAttributeSet();
+			attrs.add(MediaSizeName.ISO_A4);
+			job.print(attrs);
 			printed = true;
 
 		} else {
