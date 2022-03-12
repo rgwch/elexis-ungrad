@@ -1,5 +1,7 @@
 package ch.elexis.ungrad.qrbills;
 
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.IOException;
 
@@ -10,8 +12,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPrintable;
 
 import ch.rgw.tools.StringTool;
-
-import java.awt.print.*;
 
 public class QR_Printer {
 
@@ -30,6 +30,7 @@ public class QR_Printer {
 		PDFPrintable printable = new PDFPrintable(pdoc);
 		PrinterJob job = PrinterJob.getPrinterJob();
 		job.setPrintable(printable);
+		boolean printed = false;
 		if (!StringTool.isNothing(printer)) {
 			PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
 			int selectedService = 0;
@@ -42,14 +43,16 @@ public class QR_Printer {
 			}
 			job.setPrintService(services[selectedService]);
 			job.print();
-			return true;
+			printed = true;
 
 		} else {
 			if (job.printDialog()) {
 				job.print();
-				return true;
+				printed = true;
 			}
-			return false;
+
 		}
+		pdoc.close();
+		return printed;
 	}
 }

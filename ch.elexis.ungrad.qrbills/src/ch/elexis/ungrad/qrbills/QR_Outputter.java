@@ -15,17 +15,20 @@ package ch.elexis.ungrad.qrbills;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -40,7 +43,6 @@ import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.data.preferences.CorePreferenceInitializer;
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.core.model.IPersistentObject;
-import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Rechnung;
@@ -51,6 +53,7 @@ import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
+import ch.rgw.tools.StringTool;
 
 /**
  * An Elexis-IRnOutputter for ISO 20022 conformant bills. Embeds a QR Code in a
@@ -63,8 +66,8 @@ import ch.rgw.tools.Result.SEVERITY;
 public class QR_Outputter implements IRnOutputter {
 	String outputDir;
 	Map<String, IPersistentObject> replacer = new HashMap<>();
-	Text txPostProcess;
-	String postProcessCommand = "";
+	PrintService[] printers;
+	Combo cbPrinters;
 
 	public QR_Outputter() {
 	}
@@ -106,19 +109,22 @@ public class QR_Outputter implements IRnOutputter {
 		b.setText(Messages.XMLExporter_Change);
 		outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR, CorePreferenceInitializer.getDefaultDBPath());
 		text.setText(outputDir);
-		Label lbPostProcess = new Label(ret, SWT.NONE);
-		lbPostProcess.setText("Nachbearbeitung (%s for Quelldatei, %t für Zieldatei einsetzen)");
-		lbPostProcess.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		txPostProcess = new Text(ret, SWT.BORDER);
-		txPostProcess.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
-		txPostProcess.setText(CoreHub.localCfg.get(PreferenceConstants.POSTPROCESS, ""));
+		cbPrinters = new Combo(ret, SWT.READ_ONLY);
+		cbPrinters.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		printers = PrintServiceLookup.lookupPrintServices(null, null);
+		for (PrintService ps : printers) {
+			cbPrinters.add(ps.getName());
+		}
+		String currentPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
+		if (!StringTool.isNothing(currentPrinter)) {
+			cbPrinters.setText(currentPrinter);
+		}
 		return ret;
 	}
 
 	@Override
 	public void saveComposite() {
-		postProcessCommand = txPostProcess.getText();
-		CoreHub.localCfg.set(PreferenceConstants.POSTPROCESS, postProcessCommand);
+		CoreHub.localCfg.set(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
 	}
 
 	@SuppressWarnings("deprecation")
@@ -193,8 +199,7 @@ public class QR_Outputter implements IRnOutputter {
 					builder.withFile(file);
 					builder.toStream(fout);
 					builder.run();
-					doPostProcess(rn.getRnId());
-					if (printer.print(pdfFile, null)) {
+						if (printer.print(pdfFile, null)) {
 						pdfFile.delete();
 					}
 					imgFile.delete();
@@ -216,15 +221,6 @@ public class QR_Outputter implements IRnOutputter {
 
 		}
 		return res;
-	}
-
-	private void doPostProcess(String id) throws IOException {
-		if (!postProcessCommand.isEmpty()) {
-			String cmd = postProcessCommand.replace("%s", outputDir + File.separator + id + ".html").replace("%t",
-					outputDir + File.separator + id);
-			String[] params = cmd.split(" +");
-			Runtime.getRuntime().exec(params);
-		}
 	}
 
 }
