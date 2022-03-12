@@ -41,14 +41,14 @@ public class QR_Printer {
 			int selectedService = 0;
 			/* Scan found services to see if anyone suits our needs */
 			for (int i = 0; i < services.length; i++) {
-				if (services[i].getName().toUpperCase().contains(printer)) {
+				if (services[i].getName().toLowerCase().contains(printer.toLowerCase())) {
 					selectedService = i;
-					attributes=services[i].getAttributes();
+					attributes = services[i].getAttributes();
 					break;
 				}
 			}
 			job.setPrintService(services[selectedService]);
-			HashPrintRequestAttributeSet attrs=new HashPrintRequestAttributeSet();
+			HashPrintRequestAttributeSet attrs = new HashPrintRequestAttributeSet();
 			attrs.add(MediaSizeName.ISO_A4);
 			job.print(attrs);
 			printed = true;
