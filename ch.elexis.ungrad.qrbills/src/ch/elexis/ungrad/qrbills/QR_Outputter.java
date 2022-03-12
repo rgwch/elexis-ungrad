@@ -20,26 +20,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter;
-import ch.elexis.core.data.preferences.CorePreferenceInitializer;
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.core.model.IPersistentObject;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -52,7 +39,6 @@ import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
-import ch.rgw.tools.StringTool;
 
 /**
  * An Elexis-IRnOutputter for ISO 20022 conformant bills. Embeds a QR Code in a
@@ -169,8 +155,14 @@ public class QR_Outputter implements IRnOutputter {
 					builder.withFile(file);
 					builder.toStream(fout);
 					builder.run();
-					if (printer.print(pdfFile, null)) {
-						pdfFile.delete();
+					String defaultPrinter = null;
+					if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
+						defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
+					}
+					if (printer.print(pdfFile, defaultPrinter)) {
+						if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
+							pdfFile.delete();
+						}
 					}
 					imgFile.delete();
 					file.delete();

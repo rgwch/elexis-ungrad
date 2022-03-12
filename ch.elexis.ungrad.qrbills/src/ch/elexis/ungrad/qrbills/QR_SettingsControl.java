@@ -79,6 +79,7 @@ public class QR_SettingsControl extends Composite {
 		CoreHub.localCfg.set(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
 		PrintService printService = printers[cbPrinters.getSelectionIndex()];
 		Class[] attributes = printService.getSupportedAttributeCategories();
+		// printService.getSupportedAttributeValues(arg0, arg1, arg2)
 		// Attribute[] aatr=attributes.toArray();
 		System.out.print(attributes.length);
 	}
