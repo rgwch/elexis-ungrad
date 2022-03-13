@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html lang="de">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<title>Tarmedrechnung</title>
+	<style>
+		@page {
+			size: A4 portrait;
+			margin-top: 0mm;
+			margin-left: 5mm;
+			margin-bottom: 0mm;
+			margin-right: 5mm;
+		}
+
+		#container {
+			box-sizing: border-box;
+			position: absolute;
+			font-size: 10pt;
+			left: 5mm;
+			top: 0;
+			width: 200mm;
+			height: 297mm;
+			background-color: aquamarine;
+		}
+
+		#rn_type {
+			position: absolute;
+			top: 20mm;
+			left: 0;
+			height: 6mm;
+			width: 60mm;
+			font-size: 12pt;
+			font-weight: bold;
+		}
+
+		#frame1 {
+			position: absolute;
+			top: 28mm;
+			left: 0;
+			height: 18mm;
+			width: 200mm;
+			border: black 1px solid;
+		}
+
+		#frame2 {
+			position: absolute;
+			top: 46mm;
+			left: 0;
+			width: 200mm;
+			height: 70mm;
+			border-left: black 1px solid;
+		}
+
+		#frame3 {
+			position: absolute;
+			top: 116mm;
+			width: 200mm;
+			height: 4mm;
+			border: black 0.5px solid;
+		}
+
+		#frame4 {
+			position: absolute;
+			top: 120mm;
+			width: 200mm;
+			height: 4mm;
+			border: black 0.5px solid;
+		}
+
+		#frame5 {
+			position: absolute;
+			top: 124mm;
+			width: 200mm;
+			height: 4mm;
+			border: black 0.5px solid;
+		}
+
+		#release {
+			position: absolute;
+			top: 25mm;
+			left: 180mm;
+		}
+
+		.heading {
+			font-size: 8px;
+			font-weight: bold;
+		}
+
+		.normal {
+			font-size: 9px;
+			font-weight: normal;
+		}
+
+		table,
+		tr,
+		td {
+			padding: 0;
+		}
+
+
+
+		table .col0 {
+			width: 16mm;
+		}
+
+		table .col1 {
+			width: 22mm;
+		}
+
+		table .col2 {
+			width: 22mm;
+		}
+
+		table .col3 {
+			width: 100mm;
+		}
+
+		table .col4 {
+			width: 30mm;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="container">
+		<div id="rn_type">[TP]</div>
+		<div id="release" class="normal">Release 4.4G/de</div>
+		<div id="frame1">
+			<table>
+				<tr>
+					<td class="col0 heading">Dokument</td>
+					<td class="col1 normal">Identifikation</td>
+					<td class="col3 normal" colspan="2">[DocID]</td>
+					<td class="col4 normal">Seite 1</td>
+				</tr>
+				<tr>
+					<td class="col0 heading">Rechnungs-</td>
+					<td class="col1 normal"> GLN-Nr (B)</td>
+					<td class="col2 normal">[Biller.EAN]</td>
+					<td class="col3 normal">[Biller.Bezeichnung1] [Biller.Bezeichnung2</td>
+					<td class="col4 normal">Tel. [Biller.Telefon1]</td>
+				</tr>
+				<tr>
+					<td class="col0 heading">steller</td>
+					<td class="col1 normal">ZSR-Nr (B)</td>
+					<td class="col2 normal">[Biller.ZSR]</td>
+					<td class="col3 normal">[Biller.Strasse] [Biller.plz] [Biller.Ort]</td>
+					<td class="col4 normal">Tel. [Biller.Fax]</td>
+				</tr>
+				<tr>
+					<td class="col0 heading">Leistungs-</td>
+					<td class="col1 normal"> GLN-Nr (P)</td>
+					<td class="col2 normal">[Provider.EAN]</td>
+					<td class="col3 normal">[Provider.Bezeichnung1] [Provider.Bezeichnung2</td>
+					<td class="col4 normal">Tel. [Provider.Telefon1]</td>
+				</tr>
+				<td class="col0 heading">erbringer-</td>
+				<td class="col1 normal"> GLN-Nr (P)</td>
+				<td class="col2 normal">[Provider.ZSR]</td>
+				<td class="col3 normal">[Provider.Strasse] [Provider.plz] [Provider.Ort]</td>
+				<td class="col4 normal">Tel. [Provider.Fax]</td>
+			</table>
+		</div>
+		<div id="frame2">
+			frame2
+		</div>
+		<div id="frame3">
+			frame3
+		</div>
+		<div id="frame4">
+			frame4
+		</div>
+		<iv id="frame5">
+			frame5
+		</iv>
+	</div>
+</body>
+
+</html>

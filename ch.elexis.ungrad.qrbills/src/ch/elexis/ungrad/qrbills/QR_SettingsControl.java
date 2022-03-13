@@ -28,6 +28,7 @@ public class QR_SettingsControl extends Composite {
 	Combo cbPrinters;
 	PrintService[] printers;
 	Button cbDoPrint, cbDirectPrint, cbDoDelete;
+	Text tOutdir;
 
 	public QR_SettingsControl(Composite parent) {
 		super(parent, SWT.NONE);
@@ -37,20 +38,20 @@ public class QR_SettingsControl extends Composite {
 		Label l = new Label(this, SWT.NONE);
 		l.setText("Zielverzeichnis für PDFs");
 		l.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		final Text text = new Text(this, SWT.READ_ONLY | SWT.BORDER);
-		text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		tOutdir = new Text(this, SWT.READ_ONLY | SWT.BORDER);
+		tOutdir.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		Button b = new Button(this, SWT.PUSH);
 		b.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				outputDir = new DirectoryDialog(parent.getShell(), SWT.OPEN).open();
 				CoreHub.localCfg.set(PreferenceConstants.RNN_DIR, outputDir);
-				text.setText(outputDir);
+				tOutdir.setText(outputDir);
 			}
 		});
 		b.setText("Ändern");
 		outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR, CorePreferenceInitializer.getDefaultDBPath());
-		text.setText(outputDir);
+		tOutdir.setText(outputDir);
 		cbDoPrint=new Button(this,SWT.CHECK);
 		cbDoPrint.setText("Rechnung ausdrucken");
 		cbDoPrint.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
@@ -77,6 +78,7 @@ public class QR_SettingsControl extends Composite {
 	}
 
 	public void doSave() {
+		CoreHub.localCfg.set(PreferenceConstants.RNN_DIR, tOutdir.getText());
 		CoreHub.localCfg.set(PreferenceConstants.DO_PRINT, cbDoPrint.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DIRECT_PRINT, cbDirectPrint.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DELETE_AFTER_PRINT, cbDoDelete.getSelection());
