@@ -90,7 +90,7 @@ public class QR_Outputter implements IRnOutputter {
 		QR_Printer printer = new QR_Printer();
 
 		String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
-				+ File.separator + "qrbill_template_v3.html";
+				+ File.separator + "qrbill_template_v4.html";
 
 		try {
 
