@@ -19,386 +19,360 @@
 <html lang="de">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
-  <!-- link rel="stylesheet" href="qrbill_styles.css" / -->
-  <style>
-    @page {
-      size: A4 portrait;
-      margin-top: 5mm;
-      margin-left: 5mm;
-      margin-bottom: 5mm;
-      margin-right: 0mm;
-    }
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Document</title>
+<!-- link rel="stylesheet" href="qrbill_styles.css" / -->
+<style>
+@page {
+	size: A4 portrait;
+	margin-top: 5mm;
+	margin-left: 5mm;
+	margin-bottom: 5mm;
+	margin-right: 5mm;
+}
 
-    #container {
-      box-sizing: border-box;
-      position: absolute;
-      font-size: 10pt;
-      left: 5;
-      top: 0;
-      width: 200mm;
-      height: 292mm;
-    }
+#container {
+	box-sizing: border-box;
+	position: absolute;
+	font-size: 10pt;
+	left: 5;
+	top: 0;
+	width: 200mm;
+	height: 287mm;
+}
 
-    #date {
-      position: absolute;
-      right: 20mm;
-      top: 24mm;
-      width: 50mm;
-    }
+#date {
+	position: absolute;
+	right: 20mm;
+	top: 24mm;
+	width: 50mm;
+}
 
-    /* The heading with sender informations and practice logo*/
-    #header {
-      color: green;
-      text-align: center;
-      margin-top: 5mm;
-      padding-bottom: 0;
-      padding-top: 0;
-    }
+/* The heading with sender informations and practice logo*/
+#header {
+	color: green;
+	text-align: center;
+	margin-top: 0mm;
+	padding-bottom: 0;
+	padding-top: 0;
+}
 
-    h1 {
-      font-size: 12pt;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
+h1 {
+	font-size: 12pt;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
 
-    /* Make tables more compact */
-    table,
-    tr,
-    td {
-      padding-bottom: 0;
-      padding-top: 0;
-      margin-bottom: 0;
-      margin-top: 0;
-    }
+/* Make tables more compact */
+table, tr, td {
+	padding-bottom: 0;
+	padding-top: 0;
+	margin-bottom: 0;
+	margin-top: 0;
+}
 
+#sender {
+	position: absolute;
+	left: 10mm;
+	top: 24mm;
+	margin-right: 20px;
+	width: 70mm;
+}
 
-    #sender {
-      position: absolute;
-      left: 10mm;
-      top: 24mm;
-      margin-right: 20px;
-      width: 70mm;
-    }
+/* Modify the position to match your envelopes */
+#address {
+	position: absolute;
+	right: 20mm;
+	top: 45mm;
+	width: 60mm;
+	background-color: light-gray;
+}
 
+/* The summary box for the details of the Bill */
+#bill_summary {
+	position: absolute;
+	background-color: gainsboro;
+	left: 10mm;
+	top: 70mm;
+	width: 80mm;
+	padding: 5px;
+}
 
-    /* Modify the position to match your envelopes */
-    #address {
-      position: absolute;
-      right: 20mm;
-      top: 45mm;
-      width: 60mm;
-      background-color: light-gray;
-    }
+/* The Text for the Bill */
+#maintext {
+	position: absolute;
+	left: 10mm;
+	top: 110mm;
+}
 
-    /* The summary box for the details of the Bill */
-    #bill_summary {
-      position: absolute;
-      background-color: gainsboro;
-      left: 10mm;
-      top: 70mm;
-      width: 80mm;
-      padding: 5px;
-    }
+.rectangle {
+	position: absolute;
+	border-color: black;
+	border-style: solid;
+	border-width: 2px;
+	width: 100mm;
+	height: 100mm;
+	top: 20mm;
+	left: 40mm;
+}
 
-    /* The Text for the Bill */
-    #maintext {
-      position: absolute;
-      left: 10mm;
-      top: 110mm;
-    }
+.scissors {
+	position: absolute;
+	width: 7mm;
+	max-width: 7mm;
+	top: 189mm;
+	left: 70mm;
+}
 
+/***** Do not modify or reposition the parts between here and /style   ******/
 
-    .rectangle {
-      position: absolute;
-      border-color: black;
-      border-style: solid;
-      border-width: 2px;
-      width: 100mm;
-      height: 100mm;
-      top: 20mm;
-      left: 40mm;
-    }
-
-    .scissors {
-      position: absolute;
-      width: 7mm;
-      max-width: 7mm;
-      top: 189mm;
-      left: 70mm;
-    }
-
-    /***** Do not modify or reposition the parts between here and /style   ******/
-
-    /* The payment slip must be A6 and located in the lower right edge of the page 
+/* The payment slip must be A6 and located in the lower right edge of the page 
 It must be separated with lines or perforations from the rest of the document. 
 
 Must conform to the following paper:
 https://www.paymentstandards.ch/dam/downloads/style-guide-de.pdf 
         */
+#payment_part {
+	position: absolute;
+	left: 0mm;
+	width: 200mm;
+	top: 190mm;
+	border-top: black 0.5px dashed;
+	font-family: Arial, Helvetica, sans-serif;
+}
 
-    #payment_slip {
-      position: absolute;
-      width: 143mm;
-      height: 105mm;
-      left: 57mm;
-      bottom: 0;
-      border-left-color: black;
-      border-left-style: dashed;
-      border-top-style: dashed;
-      border-top-color: black;
-      border-top-width: 1px;
-      border-left-width: 1px;
-      font-family: Arial, Helvetica, sans-serif;
-    }
+#payment_slip {
+	position: absolute;
+	width: 143mm;
+	left: 57mm;
+	height: 95mm;
+	border-left: black 0.5px dashed;
+}
 
-    /* The Text "Zahlteil" */
-    #payment_slip_title {
-      position: absolute;
-      font-size: 11pt;
-      font-weight: bold;
-      top: 5mm;
-      left: 5mm;
-      height: 7mm;
-    }
+/* The Text "Zahlteil" */
+#payment_slip_title {
+	position: absolute;
+	font-size: 11pt;
+	font-weight: bold;
+	top: 5mm;
+	left: 5mm;
+	height: 7mm;
+}
 
-    #payment_slip_qrzone {
-      position: absolute;
-      left: 5mm;
-      top: 18mm;
-      width: 46mm;
-      height: 46mm;
-    }
+#payment_slip_qrzone {
+	position: absolute;
+	left: 5mm;
+	top: 18mm;
+	width: 47mm;
+	height: 47mm;
+}
 
-    /** Currency and amount */
-    #payment_slip_amount {
-      position: absolute;
-      left: 5mm;
-      top: 69mm;
-      height: 22mm;
-    }
+/** Currency and amount */
+#payment_slip_amount {
+	position: absolute;
+	left: 5mm;
+	top: 69mm;
+	height: 22mm;
+}
 
-    /* Right side of the payment slip */
-    #payment_slip_details {
-      position: absolute;
-      left: 57mm;
-      top: 5mm;
-    }
+/* Right side of the payment slip */
+#payment_slip_details {
+	position: absolute;
+	left: 57mm;
+	top: 5mm;
+}
 
-    /* Font for headings in the payment slip */
-    .payment_slip_heading {
-      font-size: 8pt;
-      font-weight: bold;
-      padding-bottom: 0;
-      margin-bottom: 0;
-    }
+/* Font for headings in the payment slip */
+.payment_slip_heading {
+	font-size: 8pt;
+	font-weight: bold;
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
 
-    /* Font for Text in the payment slip */
-    .payment_slip_default {
-      font-size: 10pt;
-      padding-top: 0;
-      margin-top: 0;
-    }
+/* Font for Text in the payment slip */
+.payment_slip_default {
+	font-size: 10pt;
+	padding-top: 0;
+	margin-top: 0;
+}
 
+#receipt_slip {
+	position: absolute;
+	width: 57mm;
+	left: 0mm;
+}
 
-    #receipt_slip {
-      position: absolute;
-      width: 57mm;
-      height: 105mm;
-      left: 0mm;
-      bottom: 0;
-      border-top: black dashed 1px;
-      font-family: Arial, Helvetica, sans-serif;
-    }
+#receipt_slip_title {
+	position: absolute;
+	font-size: 11pt;
+	font-weight: bold;
+	left: 0mm;
+	top: 5mm;
+	height: 7mm;
+}
 
-    #receipt_slip_title {
-      position: absolute;
-      font-size: 11pt;
-      font-weight: bold;
-      left: 0mm;
-      top: 5mm;
-      height: 7mm;
-    }
+#receipt_slip_details {
+	position: absolute;
+	left: 0mm;
+	top: 12mm;
+	height: 56mm;
+}
 
-    #receipt_slip_details {
-      position: absolute;
-      left: 0mm;
-      top: 12mm;
-      height: 56mm;
-    }
+/** Currency and amount */
+#receipt_slip_amount {
+	position: absolute;
+	left: 0mm;
+	top: 68mm;
+	height: 14mm;
+}
 
-    /** Currency and amount */
-    #receipt_slip_amount {
-      position: absolute;
-      left: 0mm;
-      top: 68mm;
-      height: 14mm;
-    }
+#receipt_slip_intermediate {
+	position: absolute;
+	right: 2mm;
+	top: 82mm;
+}
 
-    #receipt_slip_intermediate {
-      position: absolute;
-      right: 2mm;
-      top: 82mm;
+.receipt_slip_heading {
+	font-size: 6pt;
+	font-weight: bold;
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
 
-    }
-
-    .receipt_slip_heading {
-      font-size: 6pt;
-      font-weight: bold;
-      padding-bottom: 0;
-      margin-bottom: 0;
-
-    }
-
-    .receipt_slip_default {
-      font-size: 8pt;
-      font-weight: normal;
-      padding-top: 0;
-      margin-top: 0;
-    }
-  </style>
+.receipt_slip_default {
+	font-size: 8pt;
+	font-weight: normal;
+	padding-top: 0;
+	margin-top: 0;
+}
+</style>
 </head>
 
 <body>
-  <div id="container">
-    <!-- *******************************************************************************************************
+	<div id="container">
+		<!-- *******************************************************************************************************
       User-modifiable part starts here 
       ********************************************************************************************************* -->
-    <div id="header">
-      <h1>Praxis [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</h1>
-      <span>[Mandant.Strasse] [Mandant.Plz] [Mandant.Ort] Tel.: [Mandant.Telefon1] e-mail: [Mandant.E-Mail]</span>
-      <hr />
+		<div id="header">
+			<h1>Praxis [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</h1>
+			<span>[Mandant.Strasse] [Mandant.Plz] [Mandant.Ort] Tel.:
+				[Mandant.Telefon1] e-mail: [Mandant.E-Mail]</span>
+			<hr />
 
-    </div>
-    <div id="date">
-      [Mandant.Ort], [Datum.heute]
-    </div>
+		</div>
+		<div id="date">[Mandant.Ort], [Datum.heute]</div>
 
-    <div id="sender">
-      [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]
-      <br /> Facharzt für [Mandant.TarmedSpezialität]
-      <br /> ZSR-Nr. [Mandant.KSK]
-    </div>
+		<div id="sender">
+			[Mandant.Titel] [Mandant.Vorname] [Mandant.Name] <br /> Facharzt für
+			[Mandant.TarmedSpezialität] <br /> ZSR-Nr. [Mandant.KSK]
+		</div>
 
-    <div id="address">
-      [Adressat.Anschrift]
-      <br />
-    </div>
+		<div id="address">
+			[Adressat.Anschrift] <br />
+		</div>
 
-    <div id="bill_summary">
-      <table>
-        <tr>
-          <td colspan="2">
-            Für: [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
-          </td>
-        </tr>
-        <tr>
-          <td width="100%">
-            Rechnungs-Nummer:
-          </td>
-          <td>
-            [Rechnung.RnNummer]
-          </td>
-        </tr>
-        <tr>
-          <td>Rechnungs-Datum:</td>
-          <td>[Rechnung.RnDatum]</td>
-        </tr>
-        <tr>
-          <td>Behandlungen von:</td>
-          <td>[Rechnung.RnDatumVon]</td>
-        </tr>
-        <tr>
-          <td>Behandlungen bis:</td>
-          <td>[Rechnung.RnDatumBis]</td>
-        </tr>
+		<div id="bill_summary">
+			<table>
+				<tr>
+					<td colspan="2">Für: [Patient.Name] [Patient.Vorname],
+						[Patient.Geburtsdatum]</td>
+				</tr>
+				<tr>
+					<td width="100%">Rechnungs-Nummer:</td>
+					<td>[Rechnung.RnNummer]</td>
+				</tr>
+				<tr>
+					<td>Rechnungs-Datum:</td>
+					<td>[Rechnung.RnDatum]</td>
+				</tr>
+				<tr>
+					<td>Behandlungen von:</td>
+					<td>[Rechnung.RnDatumVon]</td>
+				</tr>
+				<tr>
+					<td>Behandlungen bis:</td>
+					<td>[Rechnung.RnDatumBis]</td>
+				</tr>
 
-      </table>
-    </div>
-    <div id="maintext">
-      <h1>Honorar-Rechnung</h1>
-      <p>Diese Seite ist für Ihre Unterlagen bestimmt. Bitte senden Sie den beiliegenden Rückerstattungs-Beleg an
-        Ihre
-        Krankenkasse.
-        Bitte um Begleichung innert 30 Tagen.
-      </p>
-    </div>
+			</table>
+		</div>
+		<div id="maintext">
+			<h1>Honorar-Rechnung</h1>
+			<p>Diese Seite ist für Ihre Unterlagen bestimmt. Bitte senden Sie
+				den beiliegenden Rückerstattungs-Beleg an Ihre Krankenkasse. Bitte
+				um Begleichung innert 30 Tagen.</p>
+		</div>
 
-    <!-- ***************************************************************************************** 
+		<!-- ***************************************************************************************** 
       User-modifiable part ends here 
      ********************************************************************************************* -->
 
-    <!-- Do not reposition the payment slip and any elements therein -->
+		<!-- Do not reposition the payment slip and any elements therein -->
 
+		<div id="payment_part">
+			<div id="receipt_slip">
+				<div id="receipt_slip_title">Empfangsschein</div>
+				<div id="receipt_slip_details">
+					<p class="receipt_slip_heading">Konto / Zahlbar an</p>
+					<p class="receipt_slip_default">
+						[IBAN]<br />[BILLER]
+					</p>
+					<p class="receipt_slip_heading">Referenz</p>
+					<p class="receipt_slip_default">[ESRLINE]</p>
+					<p class="receipt_slip_heading">Zahlbar durch</p>
+					<p class="receipt_slip_default">[ADDRESSEE]</p>
+				</div>
+				<div id="receipt_slip_amount">
+					<table>
+						<tr class="receipt_slip_heading">
+							<td style="padding-right: 5px;">Währung</td>
+							<td style="padding-left: 5px;">Betrag</td>
+						</tr>
+						<tr class="receipt_slip_default">
+							<td style="padding-right: 5px;">[CURRENCY]</td>
+							<td style="padding-left: 5px;">[AMOUNT]</td>
+						</tr>
+					</table>
+				</div>
+				<div id="receipt_slip_intermediate" class="receipt_slip_heading">
+					Annahmestelle</div>
+			</div>
 
-    <div id="receipt_slip">
-      <div id="receipt_slip_title">
-        Empfangsschein
-      </div>
-      <div id="receipt_slip_details">
-        <p class="receipt_slip_heading">Konto / Zahlbar an</p>
-        <p class="receipt_slip_default">[IBAN]<br />[BILLER]</p>
-        <p class="receipt_slip_heading">Referenz</p>
-        <p class="receipt_slip_default">[ESRLINE]</p>
-        <p class="receipt_slip_heading">Zahlbar durch</p>
-        <p class="receipt_slip_default">[ADDRESSEE]</p>
-        <!-- p class="payment_slip_heading">Zahlbar bis</p>
+			<div id="payment_slip">
+				<div id="payment_slip_title">Zahlteil</div>
+				<div id="payment_slip_qrzone">
+					<img src="[QRIMG]" width="47mm"></img>
+				</div>
+				<div id="payment_slip_amount">
+					<table>
+						<tr class="payment_slip_heading">
+							<td style="padding-right: 5px;">Währung</td>
+							<td style="padding-left: 5px;">Betrag</td>
+						</tr>
+						<tr class="payment_slip_default">
+							<td style="padding-right: 5px;">[CURRENCY]</td>
+							<td style="padding-left: 5px;">[AMOUNT]</td>
+						</tr>
+					</table>
+				</div>
+
+				<div id="payment_slip_details">
+					<p class="payment_slip_heading">Konto / Zahlbar an</p>
+					<p class="payment_slip_default">[IBAN]</p>
+					<p class="payment_slip_default">[BILLER]</p>
+					<p class="payment_slip_heading">Referenz</p>
+					<p class="payment_slip_default">[ESRLINE]</p>
+					<p class="payment_slip_heading">Zahlbar durch</p>
+					<p class="payment_slip_default">[ADDRESSEE]</p>
+					<!-- p class="payment_slip_heading">Zahlbar bis</p>
         <p class="payment_slip_default">[DUE]</p -->
-      </div>
-      <div id="receipt_slip_amount">
-        <table>
-          <tr class="receipt_slip_heading">
-            <td style="padding-right:5px;">Währung</td>
-            <td style="padding-left:5px;">Betrag</td>
-          </tr>
-          <tr class="receipt_slip_default">
-            <td style="padding-right:5px;">[CURRENCY]</td>
-            <td style="padding-left:5px;">[AMOUNT]</td>
-          </tr>
-        </table>
-      </div>
-      <div id="receipt_slip_intermediate" class="receipt_slip_heading">
-        Annahmestelle
-      </div>
-    </div>
-
-    <div id="payment_slip">
-      <div id="payment_slip_title">
-        Zahlteil
-      </div>
-      <div id="payment_slip_qrzone">
-        <img src="[QRIMG]" width="47mm"></img>
-      </div>
-      <div id="payment_slip_amount">
-        <table>
-          <tr class="payment_slip_heading">
-            <td style="padding-right:5px;">Währung</td>
-            <td style="padding-left:5px;">Betrag</td>
-          </tr>
-          <tr class="payment_slip_default">
-            <td style="padding-right:5px;">[CURRENCY]</td>
-            <td style="padding-left:5px;">[AMOUNT]</td>
-          </tr>
-        </table>
-      </div>
-
-      <div id="payment_slip_details">
-        <p class="payment_slip_heading">Konto / Zahlbar an</p>
-        <p class="payment_slip_default">[IBAN]</p>
-        <p class="payment_slip_default">[BILLER]</p>
-        <p class="payment_slip_heading">Referenz</p>
-        <p class="payment_slip_default">[ESRLINE]</p>
-        <p class="payment_slip_heading">Zahlbar durch</p>
-        <p class="payment_slip_default">[ADDRESSEE]</p>
-        <!-- p class="payment_slip_heading">Zahlbar bis</p>
-        <p class="payment_slip_default">[DUE]</p -->
-      </div>
-    </div>
-
-  </div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 
 </html>

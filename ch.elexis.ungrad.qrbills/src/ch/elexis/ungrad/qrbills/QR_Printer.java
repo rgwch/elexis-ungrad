@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2022 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
 package ch.elexis.ungrad.qrbills;
 
 import java.awt.print.PrinterException;
@@ -15,6 +28,7 @@ import javax.print.attribute.standard.MediaSizeName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPrintable;
 
+import ch.elexis.ungrad.Resolver;
 import ch.rgw.tools.StringTool;
 
 public class QR_Printer {

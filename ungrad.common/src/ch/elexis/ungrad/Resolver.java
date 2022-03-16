@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-202 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -38,6 +38,8 @@ public class Resolver {
 	 * 
 	 * @param fld
 	 *            Map Variable Names to classes.
+	 *@param asHTML
+	 *			if true replace linefeeds (\n) with html linebreaks (<br />)
 	 */
 	public Resolver(Map<String, IPersistentObject> fld, boolean asHTML){
 		replmap = fld;
