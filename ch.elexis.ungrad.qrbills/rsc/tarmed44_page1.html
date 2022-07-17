@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Template for ISO 20022 conformant bills (for swiss payments after 2018).
+  https://www.paymentstandards.ch/dam/downloads/style-guide-de.pdf
+  
+  Note: The output when printed will differ from the screen display. Output must be:
+  * without borders
+  * Without any scaling (i.e. 100%)
+  * Without Printer-supplied  or OS supplied headers or footers
+
+  Only the lowermost part with the payment slip must be exactly like this. The rest of the paper
+  is user-designable.
+
+  (c) 2018-2022 by G. Weirich
+  You may use and modify this template freely, but there is no warranty of any kind that is is 
+  correct and that the output will be accepted by authorities. YMMV.
+-->
+
 <html lang="de">
 
 <head>
@@ -43,7 +60,7 @@
 			left: 0;
 			height: 18mm;
 			width: 200mm;
-			border: black 1px solid;
+			border: black 0.5px solid;
 		}
 
 		#frame2 {
@@ -52,11 +69,13 @@
 			left: 0;
 			width: 200mm;
 			height: 70mm;
-			border-left: black 1px solid;
+			border-left: black 0.5px solid;
 		}
 
 		#frame3 {
 			position: absolute;
+			padding-top: 2px;
+			padding-bottom: 2px;
 			top: 116mm;
 			width: 200mm;
 			height: 4mm;
@@ -65,20 +84,31 @@
 
 		#frame4 {
 			position: absolute;
+			padding-top: 4px;
 			top: 120mm;
 			width: 200mm;
 			height: 4mm;
-			border: black 0.5px solid;
+			border-bottom: black 0.5px solid;
+			border-left: black 0.5px solid
 		}
 
 		#frame5 {
 			position: absolute;
+			padding-top: 2px;
 			top: 124mm;
 			width: 200mm;
 			height: 4mm;
-			border: black 0.5px solid;
+			border-bottom: black 0.5px solid;
 		}
 
+		#frame6 {
+			position: absolute;
+			padding-top: 2px;
+			top: 124mm;
+			width: 200mm;
+			height: 4mm;
+			border-bottom: black 0.5px solid;
+		}
 		#release {
 			position: absolute;
 			top: 25mm;
@@ -169,14 +199,17 @@
 			frame2
 		</div>
 		<div id="frame3">
-			frame3
+			<span class="heading">Auftraggeber EAN-Nr./ZSR-Nr.</span>
 		</div>
 		<div id="frame4">
-			frame4
+			<span class="heading">Diagnose</span>
 		</div>
-		<iv id="frame5">
-			frame5
-		</iv>
+		<div id="frame5">
+			<span class="heading">EAN-Liste</span>
+		</div>
+		<div id="frame6">
+			<span class="heading">Bemerkung</span>
+		</div>
 	</div>
 </body>
 

@@ -1,26 +1,36 @@
+/*******************************************************************************
+ * Copyright (c) 2018-2022 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
 package ch.elexis.ungrad.qrbills;
 
 import java.io.File;
 
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
 import ch.elexis.TarmedRechnung.XMLExporter;
 import ch.elexis.core.data.interfaces.IRnOutputter;
-import ch.elexis.core.data.interfaces.IRnOutputter.TYPE;
 import ch.elexis.data.Rechnung;
+import ch.elexis.ungrad.Resolver;
 
 public class Tarmedprinter {
-	IWorkbenchPage rnPage;
+	private Resolver resolver;
 	public static final Namespace nsinvoice = Namespace.getNamespace("invoice",
 			"http://www.forum-datenaustausch.ch/invoice");
 
-	public Tarmedprinter() {
-		rnPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+	public Tarmedprinter(Resolver resolver) {
+		this.resolver = resolver;
 	}
 
 	public boolean print(Rechnung rn, File xmlPath, IRnOutputter.TYPE type) {
