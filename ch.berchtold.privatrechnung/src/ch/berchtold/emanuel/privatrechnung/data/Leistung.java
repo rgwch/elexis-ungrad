@@ -183,14 +183,16 @@ public class Leistung extends VerrechenbarAdapter {
 	 * that is in effect at the given date and that migh depend from the "Fall-Type" and the billing
 	 * type.
 	 */
-	public double getFactor(final TimeTool date, final Fall fall){
+	@Override
+	public double getFactor(final TimeTool date, final IFall fall){
 		return getVKMultiplikator(date, fall);
 	}
 	
 	/**
 	 * base price at a given date for this service
 	 */
-	public int getTP(final TimeTool date, final Fall fall){
+	@Override
+	public int getTP(final TimeTool date, final IFall fall){
 		return checkZero(get("Preis"));
 	}
 	
@@ -232,21 +234,10 @@ public class Leistung extends VerrechenbarAdapter {
 		return true;
 	}
 	
+	@Override
 	public List<Object> getActions(Object context){
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public int getTP(TimeTool date, IFall fall) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public double getFactor(TimeTool date, IFall fall) {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 	
 }
