@@ -14,7 +14,7 @@
 package ch.elexis.ungrad.qrbills.preferences;
 
 public class PreferenceConstants {
-	static final String BASE = "ch.elexis.ungrad/rbills";
+	static final String BASE = "ch.elexis.ungrad/qrbills";
 
 	// Settings entries
 	public static final String RNN_DIR = BASE + "/rnndir";
