@@ -23,5 +23,15 @@
             class="ch.elexis.ungrad.qrbills.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view category="ch.elexis.abrechnungKategorie"
+            class="ch.elexis.ungrad.qrbills.views.RnPrintViewQR"
+            id="ch.elexis.ungrad.qrbills.printviewqr"
+         name="QR Bill print View">
+      </view>
+ 
+
+   </extension>
 
 </plugin>

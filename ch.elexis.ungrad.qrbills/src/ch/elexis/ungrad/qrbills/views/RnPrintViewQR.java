@@ -47,9 +47,9 @@ public class RnPrintViewQR extends ViewPart {
 	}
 
 	public boolean doPrint(final Rechnung rn, final IRnOutputter.TYPE rnType, final String saveFile,
-			final boolean withESR, final boolean withForms, final boolean doVerify, final IProgressMonitor monitor) {
+			final IProgressMonitor monitor) {
 		XMLExporter xmlex = new XMLExporter();
-		Document xmlRn = xmlex.doExport(rn, saveFile, rnType, doVerify);
+		Document xmlRn = xmlex.doExport(rn, saveFile, rnType, true);
 		if (rn.getStatus() == RnStatus.FEHLERHAFT) {
 			return false;
 		}
@@ -57,7 +57,7 @@ public class RnPrintViewQR extends ViewPart {
 		// initializeRequiredTemplates();
 
 		XML44Printer xmlPrinter = new XML44Printer(text);
-		return xmlPrinter.doPrint(rn, xmlRn, rnType, saveFile, withESR, withForms, doVerify, monitor);
+		return xmlPrinter.doPrint(rn, xmlRn, rnType, saveFile, false, true, false, monitor);
 
 	}
 
