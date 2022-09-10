@@ -52,7 +52,7 @@ public class QR_SettingsControl extends Composite {
 		b.setText("Ändern");
 		outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR, CorePreferenceInitializer.getDefaultDBPath());
 		tOutdir.setText(outputDir);
-		cbDoPrint=new Button(this,SWT.CHECK);
+		cbDoPrint = new Button(this, SWT.CHECK);
 		cbDoPrint.setText("Rechnung ausdrucken");
 		cbDoPrint.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbDoPrint.setSelection(CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false));
@@ -83,10 +83,12 @@ public class QR_SettingsControl extends Composite {
 		CoreHub.localCfg.set(PreferenceConstants.DIRECT_PRINT, cbDirectPrint.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DELETE_AFTER_PRINT, cbDoDelete.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
-		PrintService printService = printers[cbPrinters.getSelectionIndex()];
-		Class[] attributes = printService.getSupportedAttributeCategories();
-		// printService.getSupportedAttributeValues(arg0, arg1, arg2)
-		// Attribute[] aatr=attributes.toArray();
-		System.out.print(attributes.length);
+		if (cbPrinters.getSelectionIndex() > -1) {
+			PrintService printService = printers[cbPrinters.getSelectionIndex()];
+			Class[] attributes = printService.getSupportedAttributeCategories();
+			// printService.getSupportedAttributeValues(arg0, arg1, arg2)
+			// Attribute[] aatr=attributes.toArray();
+			System.out.print(attributes.length);
+		}
 	}
 }
