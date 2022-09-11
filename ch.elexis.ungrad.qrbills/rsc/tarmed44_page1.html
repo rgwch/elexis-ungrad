@@ -109,6 +109,7 @@
 			height: 4mm;
 			border-bottom: black 0.5px solid;
 		}
+
 		#release {
 			position: absolute;
 			top: 25mm;
@@ -123,6 +124,15 @@
 		.normal {
 			font-size: 9px;
 			font-weight: normal;
+		}
+
+		.entry {
+			font-size: 9px;
+			margin: 2px;
+		}
+
+		.entrytitle {
+			font-weight: bolder;
 		}
 
 		table,
@@ -196,7 +206,81 @@
 			</table>
 		</div>
 		<div id="frame2">
-			frame2
+			<div class="entry">
+				<span class="entrytitle">Patient</span>
+				<div style="position:absolute; top:0; left:18mm;">
+					<table>
+						<tr>
+							<td class="col1 normal">Name</td>
+							<td class="col2 normal">[Patient.Name]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Vorname</td>
+							<td class="col2 normal">[Patient.Vorame]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Strasse</td>
+							<td class="col2 normal">[Patient.Strasse]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">PLZ</td>
+							<td class="col2 normal">[Patient.Plz]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Ort</td>
+							<td class="col2 normal">[Patient.Ort]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Geburtsdatum</td>
+							<td class="col2 normal">[Patient.Geburtsdatum]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Geschlecht</td>
+							<td class="col2 normal">[Patient.Geschlecht]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Unfalldatum</td>
+							<td class="col2 normal">[F58]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Unfallnummer</td>
+							<td class="col2 normal">[Fall.Unfallnummer]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">AHV-Nr</td>
+							<td class="col2 normal">[F60]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Veka-Nr</td>
+							<td class="col2 normal">[veka]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Versicherten-Nr</td>
+							<td class="col2 normal">[Fall.Versicherungsnummer]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Kanton</td>
+							<td class="col2 normal">[Mandant.Kanton]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Kopie</td>
+							<td class="col2 normal">[F5]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Vergütungsart</td>
+							<td class="col2 normal">[Fall.payment]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Gesetz</td>
+							<td class="col2 normal">[Fall.Gesetz]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Name</td>
+							<td class="col2 normal">[Patient.Name]</td>
+						</tr>
+					</table>
+				</div>
+			</div>
 		</div>
 		<div id="frame3">
 			<span class="heading">Auftraggeber EAN-Nr./ZSR-Nr.</span>
