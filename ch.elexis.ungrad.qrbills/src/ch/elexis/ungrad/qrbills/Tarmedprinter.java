@@ -1,7 +1,5 @@
 package ch.elexis.ungrad.qrbills;
 
-import static ch.elexis.tarmed.printer.TarmedTemplateRequirement.TT_TARMED_44_S1;
-import static ch.elexis.tarmed.printer.TarmedTemplateRequirement.TT_TARMED_44_S2;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -76,6 +74,7 @@ import ch.fd.invoice440.request.TreatmentType;
 import ch.fd.invoice440.request.VatRateType;
 import ch.fd.invoice440.request.VatType;
 import ch.rgw.io.FileTool;
+import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
@@ -140,7 +139,7 @@ public class Tarmedprinter {
 		return ret;
 	}
 
-	public boolean doPrint(Rechnung rn, Document xmlRn, TYPE rnType, String saveFile, boolean doVerify,
+	public boolean print(Rechnung rn, Document xmlRn, TYPE rnType, String saveFile, boolean doVerify,
 			IProgressMonitor monitor) {
 		String page1filename = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 				+ File.separator + "tarmed44_page1.html";
@@ -173,12 +172,17 @@ public class Tarmedprinter {
 				rnSteller.getInfoString(TarmedACL.getInstance().ESRSUB), rn.getRnId(), ESR.ESR27);
 
 		Kontakt adressat = getAddressat(ezData.paymentMode, fall);
-		File page1file = new File(page1filename);
-		if (!page1file.exists()) {
-			throw new Exception("Template Tarmed44 not found");
+		String page1;
+		try {
+			File page1file = new File(page1filename);
+			if (!page1file.exists()) {
+				throw new Exception("Template Tarmed44 not found");
+			}
+			page1 = FileTool.readTextFile(page1file);
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+			return false;
 		}
-		String page1 = FileTool.readTextFile(page1file);
-
 		if (request.getPayload().isCopy()) {
 			page1.replace("\\[F5\\]", Messages.RnPrintView_yes); //$NON-NLS-1$
 		} else {
@@ -186,10 +190,10 @@ public class Tarmedprinter {
 		}
 
 		addFallSpecificLines(page1);
-		addDiagnoses(page1,body.getTreatment());
-		addRemarks(page1,body.getRemark());
+		addDiagnoses(page1, body.getTreatment());
+		addRemarks(page1, body.getRemark());
 		// adds values to reminder fields or "" if it's no reminder
-		addReminderFields(page1,request.getPayload().getReminder(), rn.getNr());
+		addReminderFields(page1, request.getPayload().getReminder(), rn.getNr());
 
 		List<Object> serviceRecords = services.getRecordTarmedOrRecordDrgOrRecordLab();
 
@@ -203,54 +207,39 @@ public class Tarmedprinter {
 
 		replaceHeaderFields(page1, rn, xmlRn, ezData.paymentMode);
 		page1.replace("\\[F.+\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		Object cursor = text.getPlugin().insertText("[Rechnungszeilen]", "\n", SWT.LEFT); //$NON-NLS-1$ //$NON-NLS-2$
-		int page = 1;
-		sideTotal = 0.0;
-		cmAvail = cmFirstPage;
-		monitor.worked(2);
-		StringBuilder sb = new StringBuilder();
+		/*
+		 * Object cursor = text.getPlugin().insertText("[Rechnungszeilen]", "\n",
+		 * SWT.LEFT); //$NON-NLS-1$ //$NON-NLS-2$ int page = 1; sideTotal = 0.0; cmAvail
+		 * = cmFirstPage; monitor.worked(2); StringBuilder sb = new StringBuilder();
+		 * 
+		 * for (Object obj : serviceRecordsSorted) { tp.setFont("Helvetica", SWT.NORMAL,
+		 * 8); //$NON-NLS-1$ sb.setLength(0); String recText = ""; String name = "";
+		 * 
+		 * if (obj instanceof RecordServiceType) { RecordServiceType rec =
+		 * (RecordServiceType) obj; recText = getRecordServiceString(rec, sb, eanMap);
+		 * name = rec.getName(); } else if (obj instanceof RecordTarmedType) {
+		 * RecordTarmedType tarmed = (RecordTarmedType) obj; recText =
+		 * getTarmedRecordString(tarmed, sb, eanMap); name = tarmed.getName(); }
+		 * 
+		 * if (recText == null) { continue; } cursor = tp.insertText(cursor, recText,
+		 * SWT.LEFT); tp.setFont("Helvetica", SWT.BOLD, 7); //$NON-NLS-1$ cursor =
+		 * tp.insertText(cursor, "\t" + name + "\n", SWT.LEFT); //$NON-NLS-1$
+		 * //$NON-NLS-2$
+		 * 
+		 * cmAvail -= cmPerLine; if (cmAvail <= cmPerLine) { addSubTotalLine(cursor, tp,
+		 * balance, tcCode, esr); addESRCodeLine(balance, tcCode, esr); if
+		 * (needDeadLetterAvoidance(mSave)) { return false; }
+		 * 
+		 * XMLPrinterUtil.insertPage(TT_TARMED_44_S2, ++page, adressat, rn, xmlRn,
+		 * ezData.paymentMode, text); cursor =
+		 * text.getPlugin().insertText("[Rechnungszeilen]", "\n", SWT.LEFT);
+		 * //$NON-NLS-1$ //$NON-NLS-2$ cmAvail = cmMiddlePage; monitor.worked(2); }
+		 * 
+		 * }
+		 */
+		// addBalanceLines(cursor, tp, balance, ezData.paid);
+		// addESRCodeLine(balance, tcCode, esr);
 
-		for (Object obj : serviceRecordsSorted) {
-			tp.setFont("Helvetica", SWT.NORMAL, 8); //$NON-NLS-1$
-			sb.setLength(0);
-			String recText = "";
-			String name = "";
-
-			if (obj instanceof RecordServiceType) {
-				RecordServiceType rec = (RecordServiceType) obj;
-				recText = getRecordServiceString(rec, sb, eanMap);
-				name = rec.getName();
-			} else if (obj instanceof RecordTarmedType) {
-				RecordTarmedType tarmed = (RecordTarmedType) obj;
-				recText = getTarmedRecordString(tarmed, sb, eanMap);
-				name = tarmed.getName();
-			}
-
-			if (recText == null) {
-				continue;
-			}
-			cursor = tp.insertText(cursor, recText, SWT.LEFT);
-			tp.setFont("Helvetica", SWT.BOLD, 7); //$NON-NLS-1$
-			cursor = tp.insertText(cursor, "\t" + name + "\n", SWT.LEFT); //$NON-NLS-1$ //$NON-NLS-2$
-
-			cmAvail -= cmPerLine;
-			if (cmAvail <= cmPerLine) {
-				addSubTotalLine(cursor, tp, balance, tcCode, esr);
-				addESRCodeLine(balance, tcCode, esr);
-				if (needDeadLetterAvoidance(mSave)) {
-					return false;
-				}
-
-				XMLPrinterUtil.insertPage(TT_TARMED_44_S2, ++page, adressat, rn, xmlRn, ezData.paymentMode, text);
-				cursor = text.getPlugin().insertText("[Rechnungszeilen]", "\n", SWT.LEFT); //$NON-NLS-1$ //$NON-NLS-2$
-				cmAvail = cmMiddlePage;
-				monitor.worked(2);
-			}
-		}
-
-		addBalanceLines(cursor, tp, balance, ezData.paid);
-		addESRCodeLine(balance, tcCode, esr);
-		
 		monitor.worked(2);
 		Hub.setMandant(mSave);
 		try {
@@ -351,23 +340,22 @@ public class Tarmedprinter {
 		}
 	}
 
-	private void addSubTotalLine(Object cursor, ITextPlugin tp, BalanceType balance, String tcCode, ESR esr) {
-		StringBuilder footer = new StringBuilder();
-		int places = Double.toString(sideTotal).indexOf('.');
-		if (places > 6) {
-			footer.append("\t\t\t\t\t\t\t\t\t\t\t\t\tZwischentotal\t").append(df.format(sideTotal)); //$NON-NLS-1$
-		} else if (places > 3) {
-			footer.append("\t\t\t\t\t\t\t\t\t\t\t\t\t\tZwischentotal\t").append(df.format(sideTotal)); //$NON-NLS-1$
-		} else {
-			footer.append("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tZwischentotal\t").append(df.format(sideTotal)); //$NON-NLS-1$
-		}
-		tp.setFont("Helvetica", SWT.BOLD, 7); //$NON-NLS-1$
-		cursor = tp.insertText(cursor, footer.toString(), SWT.LEFT);
-		// needed to make sure ESRCodeLine gets inserted correctly
-		cursor = text.getPlugin().insertTextAt(0, 0, 0, 0, "", SWT.LEFT); //$NON-NLS-1$
-		sideTotal = 0.0;
-	}
-
+	/*
+	 * private void addSubTotalLine(Object cursor, ITextPlugin tp, BalanceType
+	 * balance, String tcCode, ESR esr) { StringBuilder footer = new
+	 * StringBuilder(); int places = Double.toString(sideTotal).indexOf('.'); if
+	 * (places > 6) {
+	 * footer.append("\t\t\t\t\t\t\t\t\t\t\t\t\tZwischentotal\t").append(df.format(
+	 * sideTotal)); //$NON-NLS-1$ } else if (places > 3) {
+	 * footer.append("\t\t\t\t\t\t\t\t\t\t\t\t\t\tZwischentotal\t").append(df.format
+	 * (sideTotal)); //$NON-NLS-1$ } else {
+	 * footer.append("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tZwischentotal\t").append(df.
+	 * format(sideTotal)); //$NON-NLS-1$ } tp.setFont("Helvetica", SWT.BOLD, 7);
+	 * //$NON-NLS-1$ cursor = tp.insertText(cursor, footer.toString(), SWT.LEFT); //
+	 * needed to make sure ESRCodeLine gets inserted correctly cursor =
+	 * text.getPlugin().insertTextAt(0, 0, 0, 0, "", SWT.LEFT); //$NON-NLS-1$
+	 * sideTotal = 0.0; }
+	 */
 	private void addFallSpecificLines(String page) {
 		BodyType body = request.getPayload().getBody();
 		if (body != null) {
@@ -438,19 +426,14 @@ public class Tarmedprinter {
 
 	private void addRemarks(String page, final String remark) {
 		if (remark != null && !remark.isEmpty()) {
-			text.getPlugin().findOrReplace(Messages.RnPrintView_remark, new ReplaceCallback() {
-				@Override
-				public String replace(final String in) {
-					return Messages.RnPrintView_remarksp + remark;
-				}
-			});
+			page.replace("[remark]", remark);
 		}
 	}
 
 	private void addESRCodeLine(BalanceType balance, String tcCode, ESR esr) {
 		String offenRp = new Money(balance.getAmountDue()).getCentsAsString();
 		if (tcCode != null) {
-			esr.printESRCodeLine(text.getPlugin(), offenRp, tcCode);
+			// esr.printESRCodeLine(text.getPlugin(), offenRp, tcCode);
 		}
 	}
 
@@ -636,53 +619,52 @@ public class Tarmedprinter {
 		return bd.doubleValue();
 	}
 
-	private void addBalanceLines(Object cursor, ITextPlugin tp, BalanceType balance, Money paid) {
-		cursor = text.getPlugin().insertTextAt(0, 255, 190, 45, " ", SWT.LEFT); //$NON-NLS-1$
-		String balanceHeaders = "Code\tSatz\tBetrag\tMWSt\tMWSt.-Nr.:\t"; //$NON-NLS-1$
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, true, balanceHeaders);
-
-		VatType vat = balance.getVat();
-		String vatNumber = vat.getVatNumber();
-		if (vatNumber == null || vatNumber.equals(" ")) {
-			vatNumber = "keine";
-		} else {
-			vatNumber = vatNumber + " MWST";
-		}
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, vatNumber + "\t"); //$NON-NLS-1$
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, true, "Anzahlung:\t"); //$NON-NLS-1$
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, df.format(paid) + "\t\t\t"); //$NON-NLS-1$
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true, "Gesamtbetrag:\t"); //$NON-NLS-1$
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, false, df.format(balance.getAmount()) + "\n"); //$NON-NLS-1$
-
-		// second line
-		String secondLine = "0\t" + df.format(getVatRate(0, vat)) + "\t" + df.format(getVatAmount(0, vat)) + "\t"
-				+ df.format(getVatVat(0, vat)) + "\t";
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, secondLine); // $NON-NLS-1$
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, true, "Währung:\t\t"); //$NON-NLS-1$
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, "CHF\t"); //$NON-NLS-1$
-		if (balance.getAmountReminder() > 0) {
-			cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, true, "Mahngebühr:\t"); //$NON-NLS-1$
-			cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false,
-					df.format(balance.getAmountReminder()) + "\t\t\t"); //$NON-NLS-1$
-		} else {
-			cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, "\t\t\t\t\t"); //$NON-NLS-1$
-		}
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true, "davon PFL:\t"); //$NON-NLS-1$
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, false,
-				df.format(balance.getAmountObligations()) + "\n"); //$NON-NLS-1$
-		// third line
-		String thirdLine = "1\t" + df.format(getVatRate(1, vat)) + "\t" + df.format(getVatAmount(1, vat)) + "\t" //$NON-NLS-1$
-				+ df.format(getVatVat(1, vat)) + "\n"; //$NON-NLS-1$
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, thirdLine); // $NON-NLS-1$
-
-		// forth line
-		String forthLine = "2\t" + df.format(getVatRate(2, vat)) + "\t" + df.format(getVatAmount(2, vat)) + "\t" //$NON-NLS-1$
-				+ df.format(vat.getVat()) + "\t\t\t\t\t\t\t\t\t";
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, forthLine);
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true, "Fälliger Betrag:\t"); //$NON-NLS-1$
-		cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true, df.format(balance.getAmountDue()) + "\n"); //$NON-NLS-1$
-	}
-
+	/*
+	 * private void addBalanceLines(Object cursor, ITextPlugin tp, BalanceType
+	 * balance, Money paid) { cursor = text.getPlugin().insertTextAt(0, 255, 190,
+	 * 45, " ", SWT.LEFT); //$NON-NLS-1$ String balanceHeaders =
+	 * "Code\tSatz\tBetrag\tMWSt\tMWSt.-Nr.:\t"; //$NON-NLS-1$ cursor =
+	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, true, balanceHeaders);
+	 * 
+	 * VatType vat = balance.getVat(); String vatNumber = vat.getVatNumber(); if
+	 * (vatNumber == null || vatNumber.equals(" ")) { vatNumber = "keine"; } else {
+	 * vatNumber = vatNumber + " MWST"; } cursor = XMLPrinterUtil.print(cursor, tp,
+	 * 7, SWT.LEFT, false, vatNumber + "\t"); //$NON-NLS-1$ cursor =
+	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, true, "Anzahlung:\t");
+	 * //$NON-NLS-1$ cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false,
+	 * df.format(paid) + "\t\t\t"); //$NON-NLS-1$ cursor =
+	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true, "Gesamtbetrag:\t");
+	 * //$NON-NLS-1$ cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, false,
+	 * df.format(balance.getAmount()) + "\n"); //$NON-NLS-1$
+	 * 
+	 * // second line String secondLine = "0\t" + df.format(getVatRate(0, vat)) +
+	 * "\t" + df.format(getVatAmount(0, vat)) + "\t" + df.format(getVatVat(0, vat))
+	 * + "\t"; cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false,
+	 * secondLine); // $NON-NLS-1$ cursor = XMLPrinterUtil.print(cursor, tp, 7,
+	 * SWT.LEFT, true, "Währung:\t\t"); //$NON-NLS-1$ cursor =
+	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, "CHF\t"); //$NON-NLS-1$
+	 * if (balance.getAmountReminder() > 0) { cursor = XMLPrinterUtil.print(cursor,
+	 * tp, 7, SWT.LEFT, true, "Mahngebühr:\t"); //$NON-NLS-1$ cursor =
+	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false,
+	 * df.format(balance.getAmountReminder()) + "\t\t\t"); //$NON-NLS-1$ } else {
+	 * cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, "\t\t\t\t\t");
+	 * //$NON-NLS-1$ } cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true,
+	 * "davon PFL:\t"); //$NON-NLS-1$ cursor = XMLPrinterUtil.print(cursor, tp, 7,
+	 * SWT.RIGHT, false, df.format(balance.getAmountObligations()) + "\n");
+	 * //$NON-NLS-1$ // third line String thirdLine = "1\t" +
+	 * df.format(getVatRate(1, vat)) + "\t" + df.format(getVatAmount(1, vat)) + "\t"
+	 * //$NON-NLS-1$ + df.format(getVatVat(1, vat)) + "\n"; //$NON-NLS-1$ cursor =
+	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, thirdLine); //
+	 * $NON-NLS-1$
+	 * 
+	 * // forth line String forthLine = "2\t" + df.format(getVatRate(2, vat)) + "\t"
+	 * + df.format(getVatAmount(2, vat)) + "\t" //$NON-NLS-1$ +
+	 * df.format(vat.getVat()) + "\t\t\t\t\t\t\t\t\t"; cursor =
+	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, forthLine); cursor =
+	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true, "Fälliger Betrag:\t");
+	 * //$NON-NLS-1$ cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true,
+	 * df.format(balance.getAmountDue()) + "\n"); //$NON-NLS-1$ }
+	 */
 	private void addDiagnoses(String page, TreatmentType treatment) {
 		if (treatment == null) {
 			logger.debug("no treatments defined");

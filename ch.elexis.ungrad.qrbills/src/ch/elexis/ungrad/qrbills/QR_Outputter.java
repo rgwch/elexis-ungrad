@@ -220,10 +220,10 @@ public class QR_Outputter implements IRnOutputter {
 			}
 			imgFile.delete();
 			file.delete();
-			/*
-			Tarmedprinter tp = new Tarmedprinter(resolver);
+			
+			Tarmedprinter tp = new Tarmedprinter();
 			tp.print(rn, new File(outputDir, rn.getRnId() + ".xml"), IRnOutputter.TYPE.ORIG);
-			*/
+			
 			monitor.worked(5);
 			rnp.doPrint(rn, type, rn.getRnId() + ".auto.xml", monitor);
 			res.add(new Result<Rechnung>(rn));

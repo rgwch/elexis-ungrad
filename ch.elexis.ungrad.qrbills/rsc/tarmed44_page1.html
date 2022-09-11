@@ -104,10 +104,19 @@
 		#frame6 {
 			position: absolute;
 			padding-top: 2px;
-			top: 124mm;
+			top: 128mm;
 			width: 200mm;
 			height: 4mm;
 			border-bottom: black 0.5px solid;
+		}
+
+		#details {
+			position: absolute;
+			position: absolute;
+			padding-top: 2px;
+			top: 132mm;
+			width: 200mm;
+
 		}
 
 		#release {
@@ -141,7 +150,10 @@
 			padding: 0;
 		}
 
-
+		th {
+			font-size: 8px;
+			font-weight: normal;
+		}
 
 		table .col0 {
 			width: 16mm;
@@ -161,6 +173,46 @@
 
 		table .col4 {
 			width: 30mm;
+		}
+
+		table .d1 {
+			width: 20mm;
+		}
+
+		table .d2 {
+			width: 7mm;
+		}
+
+		table .d3 {
+			width: 14mm;
+		}
+
+		table .d4 {
+			width: 15mm;
+		}
+
+		table .d5 {
+			width: 7mm;
+		}
+
+		table .d6 {
+			width: 16mm;
+		}
+
+		table .d7 {
+			width: 17mm;
+		}
+
+		table .d8 {
+			width: 12mm;
+		}
+
+		table .d9 {
+			width: 12mm;
+		}
+
+		table .d10 {
+			width: 10mm;
 		}
 	</style>
 </head>
@@ -207,7 +259,22 @@
 		</div>
 		<div id="frame2">
 			<div class="entry">
-				<span class="entrytitle">Patient</span>
+				<span class="heading">Patient</span>
+				<div style="position:absolute; top:20mm; left: 98mm">
+					[Addressat.Anschrift]
+				</div>
+				<div style="position:absolute; top:60mm; left:120mm">
+					<table>
+						<tr>
+							<td class="col1 normal">Rechnungsnr</td>
+							<td class="col2 normal">[Rechnung.RnNummer]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Rechnung/Mahndatum</td>
+							<td class="col2 normal">[Rechnung.RnDatum]</td>
+						</tr>
+					</table>
+				</div>
 				<div style="position:absolute; top:0; left:18mm;">
 					<table>
 						<tr>
@@ -275,26 +342,81 @@
 							<td class="col2 normal">[Fall.Gesetz]</td>
 						</tr>
 						<tr>
-							<td class="col1 normal">Name</td>
-							<td class="col2 normal">[Patient.Name]</td>
+							<td class="col1 normal">Behandlungsgrund</td>
+							<td class="col2 normal">[Fall.Grund]</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Behandlung</td>
+							<td class="col3 normal">[Rechnung.RnDatumVon]-[Rechnung.RnDatumBis</td>
+						</tr>
+						<tr>
+							<td class="col1 normal">Rolle/Ort</td>
+							<td class="col2 normal">Arzt/Ärztin Praxis</td>
 						</tr>
 					</table>
 				</div>
 			</div>
 		</div>
 		<div id="frame3">
-			<span class="heading">Auftraggeber EAN-Nr./ZSR-Nr.</span>
+			<span class="heading">Zuweiser</span>
+			<span class="normal" style="margin-left:5mm;">GLN/ZSR-Nr.</span>
+			<span class="normal" style="margin-left:10mm;">[F23]/F[37]</span>
+			<span class="normal">[F38] [F38a]</span>
 		</div>
 		<div id="frame4">
-			<span class="heading">Diagnose</span>
+			<table>
+				<tr>
+					<td class="col0 heading">Diagnose</td>
+					<td class="col1 normal">[F51] [F52] </td>
+					<td class="col2 normal">[F53]</td>
+				</tr>
+			</table>
+
 		</div>
 		<div id="frame5">
-			<span class="heading">EAN-Liste</span>
+			<table>
+				<tr>
+					<td class="col0 heading">GLN-Liste</td>
+					<td class="col1 normal"></td>
+					<td class="col2 normal">1/[Mandant.EAN]</td>
+				</tr>
+			</table>
 		</div>
 		<div id="frame6">
-			<span class="heading">Bemerkung</span>
+			<table>
+				<tr>
+					<td class="col0 heading">Bemerkung</td>
+					<td class="col3 normal">[remark]</td>
+				</tr>
+			</table>
+		</div>
+		<div id="details">
+			<table>
+				<thead>
+					<th class="d1">Datum</th>
+					<th class="d2">Tarif</th>
+					<th class="d3">Tarifziffer</th>
+					<th class="d4">Bezugsziffer</th>
+					<th class="d5">Si</th>
+					<th class="d5">St</th>
+					<th class="d6">Anzahl</th>
+					<th class="d7">TP AL/Preis</th>
+					<th class="d8">f AL</th>
+					<th class="d9">TPW AL</th>
+					<th class="d7">TP TL</th>
+					<th class="d8">f TL</th>
+					<th class="d9">TPW TL</th>
+					<th class="d5">A</th>
+					<th class="d5">V</th>
+					<th class="d5">P</th>
+					<th class="d6">M</th>
+					<th class="d10">Betrag</th>
+
+				</thead>
+			</table>
 		</div>
 	</div>
+
 </body>
 
 </html>
