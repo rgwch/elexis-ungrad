@@ -28,10 +28,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
+import org.jdom.Document;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
 import ch.elexis.TarmedRechnung.TarmedACL;
+import ch.elexis.TarmedRechnung.XMLExporter;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.data.util.PlatformHelper;
@@ -60,13 +62,14 @@ import ch.rgw.tools.Result.SEVERITY;
 public class QR_Outputter implements IRnOutputter {
 	Map<String, IPersistentObject> replacer = new HashMap<>();
 	QR_SettingsControl qrs;
-	IWorkbenchPage rnPage;
-	RnPrintViewQR rnp;
+	// IWorkbenchPage rnPage;
+	// RnPrintViewQR rnp;
+	XMLExporter xmlex;
 	TarmedACL ta = TarmedACL.getInstance();
 	QR_Encoder qr;
 	QR_Printer printer;
 	private boolean modifyInvoiceState;
-	
+
 	public QR_Outputter() {
 	}
 
@@ -102,35 +105,35 @@ public class QR_Outputter implements IRnOutputter {
 		Result<Rechnung> res = new Result<Rechnung>();
 		qr = new QR_Encoder();
 		printer = new QR_Printer();
-		modifyInvoiceState=true;
-		
-		rnPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		xmlex = new XMLExporter();
+		modifyInvoiceState = true;
+
+		// rnPage =
+		// PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 		try {
-			rnp = (RnPrintViewQR) rnPage.showView(RnPrintViewQR.ID);
-			
-			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(),
-					new IRunnableWithProgress() {
-	
-						@Override
-						public void run(final IProgressMonitor monitor) {
-							monitor.beginTask("Drucke Rechnungen", rnn.size()*10);
-							for (Rechnung rn : rnn) {
-								doPrint(rn, monitor, type, res);
-								if (modifyInvoiceState) {
-									int status_vorher = rn.getStatus();
-									if ((status_vorher == RnStatus.OFFEN) || (status_vorher == RnStatus.MAHNUNG_1)
-											|| (status_vorher == RnStatus.MAHNUNG_2)
-											|| (status_vorher == RnStatus.MAHNUNG_3)) {
-										rn.setStatus(status_vorher + 1);
-									}
-									rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
-											+ RnStatus.getStatusText(rn.getStatus()));
-								}
-							}
+			// rnp = (RnPrintViewQR) rnPage.showView(RnPrintViewQR.ID);
 
+			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {
+
+				@Override
+				public void run(final IProgressMonitor monitor) {
+					monitor.beginTask("Drucke Rechnungen", rnn.size() * 10);
+					for (Rechnung rn : rnn) {
+						doPrint(rn, monitor, type, res);
+						if (modifyInvoiceState) {
+							int status_vorher = rn.getStatus();
+							if ((status_vorher == RnStatus.OFFEN) || (status_vorher == RnStatus.MAHNUNG_1)
+									|| (status_vorher == RnStatus.MAHNUNG_2) || (status_vorher == RnStatus.MAHNUNG_3)) {
+								rn.setStatus(status_vorher + 1);
+							}
+							rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
+									+ RnStatus.getStatusText(rn.getStatus()));
 						}
-					}, null);
+					}
+
+				}
+			}, null);
 
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
@@ -220,12 +223,14 @@ public class QR_Outputter implements IRnOutputter {
 			}
 			imgFile.delete();
 			file.delete();
-			
+
 			Tarmedprinter tp = new Tarmedprinter();
-			tp.print(rn, new File(outputDir, rn.getRnId() + ".xml"), IRnOutputter.TYPE.ORIG);
-			
+			File xmlfile = new File(outputDir, rn.getRnId() + ".xml");
+			Document doc = xmlex.doExport(rn, xmlfile.getAbsolutePath(), type, true);
+			tp.print(rn, doc, type, rn.getRnId() + ".html", monitor);
+
 			monitor.worked(5);
-			rnp.doPrint(rn, type, rn.getRnId() + ".auto.xml", monitor);
+			// rnp.doPrint(rn, type, , monitor);
 			res.add(new Result<Rechnung>(rn));
 
 		} catch (Exception ex) {

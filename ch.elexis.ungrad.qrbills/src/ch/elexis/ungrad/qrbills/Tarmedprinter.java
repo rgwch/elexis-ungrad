@@ -1,6 +1,5 @@
 package ch.elexis.ungrad.qrbills;
 
-
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -37,9 +36,6 @@ import ch.elexis.core.data.interfaces.text.ReplaceCallback;
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.core.data.util.SortedList;
 import ch.elexis.core.ui.Hub;
-import ch.elexis.core.ui.text.ITextPlugin;
-import ch.elexis.core.ui.text.TextContainer;
-import ch.elexis.data.Brief;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Fall.Tiers;
 import ch.elexis.data.Kontakt;
@@ -139,8 +135,7 @@ public class Tarmedprinter {
 		return ret;
 	}
 
-	public boolean print(Rechnung rn, Document xmlRn, TYPE rnType, String saveFile, boolean doVerify,
-			IProgressMonitor monitor) {
+	public boolean print(Rechnung rn, Document xmlRn, TYPE rnType, String saveFile, IProgressMonitor monitor) throws Exception{
 		String page1filename = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 				+ File.separator + "tarmed44_page1.html";
 		String fname = "";
@@ -239,7 +234,8 @@ public class Tarmedprinter {
 		 */
 		// addBalanceLines(cursor, tp, balance, ezData.paid);
 		// addESRCodeLine(balance, tcCode, esr);
-
+		
+		FileTool.writeTextFile(new File(saveFile), page1);
 		monitor.worked(2);
 		Hub.setMandant(mSave);
 		try {
