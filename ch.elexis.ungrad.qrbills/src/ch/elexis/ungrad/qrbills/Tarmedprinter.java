@@ -135,7 +135,7 @@ public class Tarmedprinter {
 		return ret;
 	}
 
-	public boolean print(Rechnung rn, Document xmlRn, TYPE rnType, String saveFile, IProgressMonitor monitor) throws Exception{
+	public boolean print(Rechnung rn, Document xmlRn, TYPE rnType, IProgressMonitor monitor) throws Exception{
 		String page1filename = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 				+ File.separator + "tarmed44_page1.html";
 		String fname = "";
@@ -235,7 +235,7 @@ public class Tarmedprinter {
 		// addBalanceLines(cursor, tp, balance, ezData.paid);
 		// addESRCodeLine(balance, tcCode, esr);
 		
-		FileTool.writeTextFile(new File(saveFile), page1);
+		FileTool.writeTextFile(new File(outputDir,rn.getNr()+"_tr.pdf"), page1);
 		monitor.worked(2);
 		Hub.setMandant(mSave);
 		try {

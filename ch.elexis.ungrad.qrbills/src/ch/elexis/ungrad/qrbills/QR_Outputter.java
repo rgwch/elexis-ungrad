@@ -227,7 +227,7 @@ public class QR_Outputter implements IRnOutputter {
 			Tarmedprinter tp = new Tarmedprinter();
 			File xmlfile = new File(outputDir, rn.getRnId() + ".xml");
 			Document doc = xmlex.doExport(rn, xmlfile.getAbsolutePath(), type, true);
-			tp.print(rn, doc, type, rn.getRnId() + ".html", monitor);
+			tp.print(rn, doc, type, monitor);
 
 			monitor.worked(5);
 			// rnp.doPrint(rn, type, , monitor);
