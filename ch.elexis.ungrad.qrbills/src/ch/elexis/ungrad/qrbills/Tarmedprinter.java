@@ -179,9 +179,9 @@ public class Tarmedprinter {
 			return false;
 		}
 		if (request.getPayload().isCopy()) {
-			page1.replace("\\[F5\\]", Messages.RnPrintView_yes); //$NON-NLS-1$
+			page1=page1.replace("\\[F5\\]", Messages.RnPrintView_yes); //$NON-NLS-1$
 		} else {
-			page1.replace("\\[F5\\]", Messages.RnPrintView_no); //$NON-NLS-1$
+			page1=page1.replace("\\[F5\\]", Messages.RnPrintView_no); //$NON-NLS-1$
 		}
 
 		addFallSpecificLines(page1);
@@ -195,13 +195,13 @@ public class Tarmedprinter {
 		// lookup EAN numbers in services
 		String[] eanArray = initEanArray(serviceRecords);
 		HashMap<String, String> eanMap = XMLPrinterUtil.getEANHashMap(eanArray);
-		page1.replace("\\[F98\\]", XMLPrinterUtil.getEANList(eanArray));
+		page1=page1.replace("\\[F98\\]", XMLPrinterUtil.getEANList(eanArray));
 
 		// add the various record services
 		SortedList<Object> serviceRecordsSorted = new SortedList<Object>(serviceRecords, new Rn44Comparator());
 
 		replaceHeaderFields(page1, rn, xmlRn, ezData.paymentMode);
-		page1.replace("\\[F.+\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		page1=page1.replace("\\[F.+\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		/*
 		 * Object cursor = text.getPlugin().insertText("[Rechnungszeilen]", "\n",
 		 * SWT.LEFT); //$NON-NLS-1$ //$NON-NLS-2$ int page = 1; sideTotal = 0.0; cmAvail
@@ -259,11 +259,11 @@ public class Tarmedprinter {
 			GregorianCalendar cal = date.toGregorianCalendar();
 			reminderDate = df.format(cal.getTime());
 		}
-		page.replace("\\[F44.MDatum\\]", reminderDate);
-		page.replace("\\[F44.MNr\\]", reminderNr);
+		page=page.replace("\\[F44.MDatum\\]", reminderDate);
+		page=page.replace("\\[F44.MNr\\]", reminderNr);
 	}
 
-	public static void replaceHeaderFields(final String page, final Rechnung rn, final Document xmlRn,
+	public static void replaceHeaderFields(String page, final Rechnung rn, final Document xmlRn,
 			final String paymentMode) {
 		Fall fall = rn.getFall();
 		Mandant m = rn.getMandant();
@@ -277,10 +277,10 @@ public class Tarmedprinter {
 			String requestId = xmlInvoice.getAttributeValue(XMLExporter.ATTR_REQUEST_ID);
 			String requestDate = xmlInvoice.getAttributeValue(XMLExporter.ATTR_REQUEST_DATE);
 			TimeTool date = new TimeTool(requestDate);
-			page.replace("\\[F1\\]", //$NON-NLS-1$
+			page=page.replace("\\[F1\\]", //$NON-NLS-1$
 					requestId + " - " + date.toString(TimeTool.DATE_GER) + " " + date.toString(TimeTool.TIME_FULL));
 		} else {
-			page.replace("\\[F1\\]", rn.getRnId()); //$NON-NLS-1$
+			page=page.replace("\\[F1\\]", rn.getRnId()); //$NON-NLS-1$
 		}
 
 		if (paymentMode.equals(XMLExporter.TIERS_PAYANT)) { // $NON-NLS-1$
@@ -311,21 +311,21 @@ public class Tarmedprinter {
 			titelMahnung = ""; //$NON-NLS-1$
 		}
 
-		page.replace("\\[Titel\\]", titel); //$NON-NLS-1$
-		page.replace("\\[TitelMahnung\\]", titelMahnung); //$NON-NLS-1$
+		page=page.replace("\\[Titel\\]", titel); //$NON-NLS-1$
+		page=page.replace("\\[TitelMahnung\\]", titelMahnung); //$NON-NLS-1$
 
 		if (fall.getAbrechnungsSystem().equals("IV")) { //$NON-NLS-1$
-			page.replace("\\[NIF\\]", TarmedRequirements.getNIF(m)); //$NON-NLS-1$
+			page=page.replace("\\[NIF\\]", TarmedRequirements.getNIF(m)); //$NON-NLS-1$
 			String ahv = TarmedRequirements.getAHV(fall.getPatient());
 			if (StringTool.isNothing(ahv)) {
 				ahv = fall.getRequiredString("AHV-Nummer");
 			}
-			page.replace("\\[F60\\]", ahv); //$NON-NLS-1$
+			page=page.replace("\\[F60\\]", ahv); //$NON-NLS-1$
 		} else {
-			page.replace("\\[NIF\\]", TarmedRequirements.getKSK(m)); //$NON-NLS-1$
-			page.replace("\\[F60\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			page=page.replace("\\[NIF\\]", TarmedRequirements.getKSK(m)); //$NON-NLS-1$
+			page=page.replace("\\[F60\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		page.replace("\\?\\?\\??[a-zA-Z0-9 \\.]+\\?\\?\\??", "");
+		page=page.replace("\\?\\?\\??[a-zA-Z0-9 \\.]+\\?\\?\\??", "");
 	}
 
 	private void initPrinterSettings() {
@@ -369,14 +369,14 @@ public class Tarmedprinter {
 			}
 			String vekaNumber = StringTool.unNull((String) fall.getExtInfoStoredObjectByKey("VEKANr"));
 
-			page.replace("\\[F44.Datum\\]", gesetzDatum);
-			page.replace("\\[F44.Nummer\\]", gesetzNummer);
+			page=page.replace("\\[F44.Datum\\]", gesetzDatum);
+			page=page.replace("\\[F44.Nummer\\]", gesetzNummer);
 
-			page.replace("\\[F44.FDatum\\]", getFDatum(body, fall));
-			page.replace("\\[F44.FNummer\\]", getFNummer(body, fall));
+			page=page.replace("\\[F44.FDatum\\]", getFDatum(body, fall));
+			page=page.replace("\\[F44.FNummer\\]", getFNummer(body, fall));
 
-			page.replace("\\[F44.ZSRNIF\\]", gesetzZSRNIF);
-			page.replace("\\[F44.VEKANr\\]", vekaNumber);
+			page=page.replace("\\[F44.ZSRNIF\\]", gesetzZSRNIF);
+			page=page.replace("\\[F44.VEKANr\\]", vekaNumber);
 		}
 	}
 
@@ -422,7 +422,7 @@ public class Tarmedprinter {
 
 	private void addRemarks(String page, final String remark) {
 		if (remark != null && !remark.isEmpty()) {
-			page.replace("[remark]", remark);
+			page=page.replace("[remark]", remark);
 		}
 	}
 
@@ -702,9 +702,9 @@ public class Tarmedprinter {
 			type = "TI-Code"; //$NON-NLS-1$
 		}
 
-		page.replace("\\[F51\\]", type); //$NON-NLS-1$
-		page.replace("\\[F52\\]", dCodesBuilder.toString()); //$NON-NLS-1$
-		page.replace("\\[F53\\]", freetext); //$NON-NLS-1$
+		page=page.replace("\\[F51\\]", type); //$NON-NLS-1$
+		page=page.replace("\\[F52\\]", dCodesBuilder.toString()); //$NON-NLS-1$
+		page=page.replace("\\[F53\\]", freetext); //$NON-NLS-1$
 	}
 
 	private String getTarifType(RecordServiceType rec) {
