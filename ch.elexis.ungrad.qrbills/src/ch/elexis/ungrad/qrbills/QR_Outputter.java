@@ -201,8 +201,8 @@ public class QR_Outputter implements IRnOutputter {
 					.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
 					.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);
 
-			File file = new File(outputDir, rn.getRnId() + ".html");
-			File pdfFile = new File(outputDir, rn.getRnId() + ".pdf");
+			File file = new File(outputDir, rn.getNr() + ".html");
+			File pdfFile = new File(outputDir, rn.getNr() + ".pdf");
 			FileTool.writeTextFile(file, finished);
 			FileOutputStream fout = new FileOutputStream(pdfFile);
 			PdfRendererBuilder builder = new PdfRendererBuilder();
@@ -225,7 +225,7 @@ public class QR_Outputter implements IRnOutputter {
 			file.delete();
 
 			Tarmedprinter tp = new Tarmedprinter();
-			File xmlfile = new File(outputDir, rn.getRnId() + ".xml");
+			File xmlfile = new File(outputDir, rn.getNr() + ".xml");
 			Document doc = xmlex.doExport(rn, xmlfile.getAbsolutePath(), type, true);
 			tp.print(rn, doc, type, monitor);
 

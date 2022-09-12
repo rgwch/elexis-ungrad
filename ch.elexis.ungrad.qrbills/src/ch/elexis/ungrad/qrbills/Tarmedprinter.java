@@ -157,7 +157,7 @@ public class Tarmedprinter {
 			throw new Exception("Template Tarmed44 not found");
 		}
 		page1 = FileTool.readTextFile(page1file);
-		File outfile = new File(outputDir, rn.getNr() + "_tr.html");
+		File outfile = new File(outputDir, rn.getNr() + "_rf.html");
 
 		Mandant mSave = (Mandant) ElexisEventDispatcher.getSelected(Mandant.class);
 		monitor.subTask(rn.getLabel());
@@ -210,6 +210,9 @@ public class Tarmedprinter {
 		page1 = addReminderFields(page1, request.getPayload().getReminder(), rn.getNr());
 		Resolver resolver=new Resolver(replacer,true);
 		page1=resolver.resolve(page1);
+		// Remove all unreplaced fields
+		page1 = page1.replaceAll("\\[F.+\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
+
 		FileTool.writeTextFile(outfile, page1);
 		monitor.worked(2);
 		Hub.setMandant(mSave);
@@ -553,6 +556,8 @@ public class Tarmedprinter {
 	private String addRemarks(String page, final String remark) {
 		if (remark != null && !remark.isEmpty()) {
 			page = page.replace("[remark]", remark);
+		}else {
+			page=page.replace("[remark]", "");
 		}
 		return page;
 	}
