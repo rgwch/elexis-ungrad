@@ -13,6 +13,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -36,6 +37,7 @@ import ch.elexis.core.data.interfaces.IRnOutputter.TYPE;
 import ch.elexis.core.data.interfaces.text.ReplaceCallback;
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.core.data.util.SortedList;
+import ch.elexis.core.model.IPersistentObject;
 import ch.elexis.core.ui.Hub;
 import ch.elexis.core.ui.views.rechnung.RnMenuListener;
 import ch.elexis.data.Fall;
@@ -52,6 +54,7 @@ import ch.elexis.tarmed.printer.XMLPrinterUtil;
 import ch.elexis.tarmed.printer.EZPrinter.EZPrinterData;
 import ch.elexis.tarmed.printer.Rn44Comparator;
 import ch.elexis.tarmedprefs.TarmedRequirements;
+import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.fd.invoice440.request.BalanceType;
 import ch.fd.invoice440.request.BodyType;
@@ -105,6 +108,7 @@ public class Tarmedprinter {
 	private Kontakt rnGarant;
 	private String paymentMode;
 	private String documentId;
+	private Map<String, IPersistentObject> replacer;
 
 	private static DecimalFormat df = new DecimalFormat(StringConstants.DOUBLE_ZERO);
 
@@ -146,7 +150,7 @@ public class Tarmedprinter {
 				+ File.separator + "tarmed44_page1.html";
 		String fname = "";
 		String outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR, CoreHub.getTempDir().getAbsolutePath());
-
+		replacer=new HashMap<>();
 		String page1;
 		File page1file = new File(page1filename);
 		if (!page1file.exists()) {
@@ -195,7 +199,17 @@ public class Tarmedprinter {
 		if (rnGarant == null) {
 			rnGarant = pat;
 		}
+		replacer.put("Biller", rnSteller);
+		replacer.put("Provider", rnMandant);
+		replacer.put("Patient", pat);
+		replacer.put("Adressat", rnGarant);
+		replacer.put("Fall", fall);
 		page1=processHeaders(page1,1);
+		page1 = addDiagnoses(page1, body.getTreatment());
+		page1 = addRemarks(page1, body.getRemark());
+		page1 = addReminderFields(page1, request.getPayload().getReminder(), rn.getNr());
+		Resolver resolver=new Resolver(replacer,true);
+		page1=resolver.resolve(page1);
 		FileTool.writeTextFile(outfile, page1);
 		monitor.worked(2);
 		Hub.setMandant(mSave);
@@ -376,8 +390,6 @@ public class Tarmedprinter {
 			page = page.replace("[Titel]", "TP-Rechnung");
 		}
 		page = page.replace("[DocID]", documentId).replace("[pagenr]", Integer.toString(pagenumber));
-		page = replaceIdentification("Biller", rnSteller, page);
-		page = replaceIdentification("Provider", rnMandant, page);
 		return page;
 	}
 
