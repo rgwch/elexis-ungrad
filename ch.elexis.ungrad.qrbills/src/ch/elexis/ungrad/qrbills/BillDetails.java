@@ -106,7 +106,6 @@ public class BillDetails {
 			sb.append(IBAN.substring(i, i + 4)).append(" ");
 		}
 		formattedIban = sb.append(IBAN.substring(20)).toString();
-		sb.setLength(0);
 	}
 
 	Object checkNull(Object o, String msg) throws BadParameterException {

@@ -160,14 +160,6 @@ public class Tarmedprinter {
 
 		Mandant mSave = (Mandant) ElexisEventDispatcher.getSelected(Mandant.class);
 		monitor.subTask(rn.getLabel());
-		ESR esr = new ESR(rnSteller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
-				rnSteller.getInfoString(TarmedACL.getInstance().ESRSUB), rn.getRnId(), ESR.ESR27);
-		String tcCode = null;
-		if (TarmedRequirements.hasTCContract(rnSteller) && paymentMode.equals(XMLExporter.TIERS_GARANT)) {
-			tcCode = TarmedRequirements.getTCCode(rnSteller);
-		} else if (paymentMode.equals(XMLExporter.TIERS_PAYANT)) {
-			tcCode = "01";
-		}
 
 		fall = rn.getFall();
 		rnMandant = rn.getMandant();
@@ -183,7 +175,6 @@ public class Tarmedprinter {
 			logger.error("Patient and/or Rechnungssteller is null");
 			return false;
 		}
-
 		request = TarmedJaxbUtil.unmarshalInvoiceRequest440(xmlRn);
 		if (request == null) {
 			logger.error("Could not unmarshall xml document for invoice");
@@ -201,6 +192,15 @@ public class Tarmedprinter {
 		if (body.getTiersGarant() != null) {
 			paymentMode = XMLExporter.TIERS_GARANT;
 		}
+
+		String tcCode = null;
+		if (TarmedRequirements.hasTCContract(rnSteller) && paymentMode.equals(XMLExporter.TIERS_GARANT)) {
+			tcCode = TarmedRequirements.getTCCode(rnSteller);
+		} else if (paymentMode.equals(XMLExporter.TIERS_PAYANT)) {
+			tcCode = "01";
+		}
+		ESR esr = new ESR(rnSteller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
+				rnSteller.getInfoString(TarmedACL.getInstance().ESRSUB), rn.getRnId(), ESR.ESR27);
 
 		rnGarant = getAddressat(paymentMode, fall);
 		if (rnGarant == null) {
@@ -259,38 +259,38 @@ public class Tarmedprinter {
 		cmAvail = cmFirstPage;
 		monitor.worked(2);
 		StringBuilder sb = new StringBuilder();
-		sb.append("<table>");
 		for (Object obj : serviceRecordsSorted) {
-			sb.setLength(0);
 			String recText = "";
 			String name = "";
 			if (obj instanceof RecordServiceType) {
 				RecordServiceType rec = (RecordServiceType) obj;
 				sb.append(getRecordServiceString(rec, eanMap));
-				sb.append("<tr><td colspan=\"13\">").append(rec.getName()).append("</td></tr>)");
+				sb.append("<tr><td colspan=\"13\" class=\"text\">").append(rec.getName()).append("</td></tr>)");
 			} else if (obj instanceof RecordTarmedType) {
 				RecordTarmedType tarmed = (RecordTarmedType) obj;
 				sb.append(getTarmedRecordString(tarmed, eanMap));
-				sb.append("<tr><td colspan=\"13\">").append(tarmed.getName()).append("</td></tr>)");
+				sb.append("<tr><td colspan=\"13\" class=\"text\">").append(tarmed.getName()).append("</td></tr>)");
 			}
 			if (recText == null) {
 				continue;
 			}
 			cmAvail -= cmPerLine;
+
 			if (cmAvail <= cmPerLine) {
-				sb.append("</table><span>Zwischentotal</span><span>").append(df.format(sideTotal)).append("</span>");
+				sb.append("<span>Zwischentotal</span><span>").append(df.format(sideTotal)).append("</span>");
 				sb.append("<p style=\"page-break-after: always;\">&nbsp;</p>"
 						+ "<p style=\"page-break-before: always;\">&nbsp;</p>");
 				addESRCodeLine(balance, tcCode, esr);
 				page += 1;
 			}
-			// addBalanceLines(cursor, tp, balance, ezData.paid);
-			// addESRCodeLine(balance, tcCode, esr);
 
 		}
+		// addBalanceLines(cursor, tp, balance, ezData.paid);
+
+		addESRCodeLine(balance, tcCode, esr);
 
 		// --------------------------------------
-
+		page1 = page1.replace("[Leistungen]", sb.toString());
 		FileTool.writeTextFile(outfile, page1);
 		monitor.worked(2);
 		Hub.setMandant(mSave);
@@ -302,7 +302,6 @@ public class Tarmedprinter {
 		return true;
 	}
 
-	
 	private String addReminderFields(String page, ReminderType reminder, String nr) {
 		String reminderDate = "";
 		String reminderNr = "";
@@ -462,53 +461,53 @@ public class Tarmedprinter {
 		}
 		StringBuilder sb = new StringBuilder();
 		tTime.set(rec.getDateBegin().toGregorianCalendar());
-		sb.append("<tr><td>").append(tTime.toString(TimeTool.DATE_GER)).append("</td>"); //$NON-NLS-1$
-		sb.append("<td>").append(getTarifType(rec)).append("</td>");//$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<tr><td class=\"ziffer\">").append(tTime.toString(TimeTool.DATE_GER)).append("</td>"); //$NON-NLS-1$
+		sb.append("<td class=\"ziffer\">").append(getTarifType(rec)).append("</td>");//$NON-NLS-1$ //$NON-NLS-2$
 		String code = rec.getCode();
-		sb.append("<td>").append(code).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(code).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (code.length() < 10) {
 			String refCode = rec.getRefCode();
 			if (refCode == null) {
 				refCode = SPACE;
 			}
-			sb.append("<td>").append(refCode).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("<td class=\"ziffer\">").append(refCode).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		sb.append("<td>").append(rec.getSession()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(rec.getSession()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(" </td>");
-		sb.append("<td>").append(rec.getQuantity()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(rec.getQuantity()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// unit, scale factor, unit factor mt & tt
-		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$
-		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(SPACE).append("</td>"); //$NON-NLS-1$
+		sb.append("<td class=\"ziffer\">").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String providerEAN = rec.getProviderId();
 		String responsibleEAN = rec.getResponsibleId();
 		if (getTarifType(rec) != null) {
 			if (providerEAN != null && !providerEAN.isEmpty()) {
-				sb.append("<td>").append(eanMap.get(providerEAN) + "</td>");//$NON-NLS-1$
+				sb.append("<td class=\"ziffer\">").append(eanMap.get(providerEAN) + "</td>");//$NON-NLS-1$
 			}
 
 			if (responsibleEAN != null && !responsibleEAN.isEmpty()) {
-				sb.append("<td>").append(eanMap.get(responsibleEAN) + "</td>"); //$NON-NLS-1$
+				sb.append("<td class=\"ziffer\">").append(eanMap.get(responsibleEAN) + "</td>"); //$NON-NLS-1$
 			}
 		} else {
-			sb.append("<td></td>");
+			sb.append("<td class=\"ziffer\"></td>");
 		}
 
 		if (rec.isObligation()) {
-			sb.append("<td>1</td>"); //$NON-NLS-1$
+			sb.append("<td class=\"ziffer\">1</td>"); //$NON-NLS-1$
 		} else {
-			sb.append("<td>0</td>"); //$NON-NLS-1$
+			sb.append("<td class=\"ziffer\">0</td>"); //$NON-NLS-1$
 		}
 
 		double amount = rec.getAmount();
 		double vatRate = rec.getVatRate();
-		sb.append("<td>").append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("</td>"); //$NON-NLS-1$
-		sb.append("<td>").append(df.format(amount));
+		sb.append("<td class=\"ziffer\">").append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("</td>"); //$NON-NLS-1$
+		sb.append("<td class=\"ziffer\">").append(df.format(amount));
 		sideTotal += amount;
 		sb.append("</td></tr>"); //$NON-NLS-1$
 
@@ -522,58 +521,58 @@ public class Tarmedprinter {
 		}
 		StringBuilder sb = new StringBuilder();
 		tTime.set(tarmed.getDateBegin().toGregorianCalendar());
-		sb.append("<tr><td>").append(tTime.toString(TimeTool.DATE_GER)).append("</td>");
-		sb.append("<td>").append(tarmed.getTariffType()).append("</td>");
-		sb.append("<td>").append(tarmed.getCode()).append("</td>");
+		sb.append("<tr><td class=\"ziffer\">").append(tTime.toString(TimeTool.DATE_GER)).append("</td>");
+		sb.append("<td class=\"ziffer\">").append(tarmed.getTariffType()).append("</td>");
+		sb.append("<td class=\"ziffer\">").append(tarmed.getCode()).append("</td>");
 		String refCode = tarmed.getRefCode();
 		if (refCode == null) {
 			refCode = SPACE;
 		}
-		sb.append("<td>").append(refCode).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<td>").append(tarmed.getSession()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(refCode).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(tarmed.getSession()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String bodyLocation = tarmed.getBodyLocation();
 		if (bodyLocation.startsWith("l")) { //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append("<td>L</td>");
+			sb.append("<td class=\"ziffer\">L</td>");
 		} else if (bodyLocation.startsWith("r")) { //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append("<td>R</td>");
+			sb.append("<td class=\"ziffer\">R</td>");
 		} else {
-			sb.append("<td> </td>");
+			sb.append("<td class=\"ziffer\"> </td>");
 		}
 
-		sb.append("<td>").append(tarmed.getQuantity()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<td>").append(tarmed.getUnitMt()).append("</td>"); //$NON-NLS-1$
-		sb.append("<td>").append(tarmed.getScaleFactorMt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<td>").append(roundDouble(tarmed.getUnitFactorMt() * tarmed.getExternalFactorMt())).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(tarmed.getQuantity()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(tarmed.getUnitMt()).append("</td>"); //$NON-NLS-1$
+		sb.append("<td class=\"ziffer\">").append(tarmed.getScaleFactorMt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(roundDouble(tarmed.getUnitFactorMt() * tarmed.getExternalFactorMt())).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		sb.append("<td>").append(tarmed.getUnitTt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<td>").append(tarmed.getScaleFactorTt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<td>").append(tarmed.getUnitFactorTt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(tarmed.getUnitTt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(tarmed.getScaleFactorTt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(tarmed.getUnitFactorTt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String providerEAN = tarmed.getProviderId();
 		String responsibleEAN = tarmed.getResponsibleId();
 		if (tarmed.getTariffType() != null) {
 			if (providerEAN != null && !providerEAN.isEmpty()) {
-				sb.append("<td>").append(eanMap.get(providerEAN) + "</td>");//$NON-NLS-1$
+				sb.append("<td class=\"ziffer\">").append(eanMap.get(providerEAN) + "</td>");//$NON-NLS-1$
 			}
 
 			if (responsibleEAN != null && !responsibleEAN.isEmpty()) {
-				sb.append("<td>").append(eanMap.get(responsibleEAN) + "</td>"); //$NON-NLS-1$
+				sb.append("<td class=\"ziffer\">").append(eanMap.get(responsibleEAN) + "</td>"); //$NON-NLS-1$
 			}
 		} else {
-			sb.append("<td></td>");
+			sb.append("<td class=\"ziffer\"></td>");
 		}
 
 		if (tarmed.isObligation()) {
-			sb.append("<td>1</td>"); //$NON-NLS-1$
+			sb.append("<td class=\"ziffer\">1</td>"); //$NON-NLS-1$
 		} else {
-			sb.append("<td>0</td>"); //$NON-NLS-1$
+			sb.append("<td class=\"ziffer\">0</td>"); //$NON-NLS-1$
 		}
 
 		double amount = tarmed.getAmount();
 		double vatRate = tarmed.getVatRate();
-		sb.append("<td>").append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("</td>"); //$NON-NLS-1$
-		sb.append("<td>").append(df.format(amount));
+		sb.append("<td class=\"ziffer\">").append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("</td>"); //$NON-NLS-1$
+		sb.append("<td class=\"ziffer\">").append(df.format(amount));
 		sideTotal += amount;
 		sb.append("</td></tr>"); //$NON-NLS-1$
 
