@@ -44,7 +44,6 @@ import ch.elexis.data.Rechnung;
 import ch.elexis.data.RnStatus;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
-import ch.elexis.ungrad.qrbills.views.RnPrintViewQR;
 import ch.elexis.views.RnPrintView2;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
@@ -202,7 +201,7 @@ public class QR_Outputter implements IRnOutputter {
 					.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);
 
 			File file = new File(outputDir, rn.getNr() + ".html");
-			File pdfFile = new File(outputDir, rn.getNr() + ".pdf");
+			File pdfFile = new File(outputDir, rn.getNr() + "_qr.pdf");
 			FileTool.writeTextFile(file, finished);
 			FileOutputStream fout = new FileOutputStream(pdfFile);
 			PdfRendererBuilder builder = new PdfRendererBuilder();
@@ -233,6 +232,7 @@ public class QR_Outputter implements IRnOutputter {
 			builder=new PdfRendererBuilder();
 			builder.useFastMode().withFile(rfhtml).toStream(rfpdf).run();
 			monitor.worked(5);
+			rfhtml.delete();
 			// rnp.doPrint(rn, type, , monitor);
 			res.add(new Result<Rechnung>(rn));
 

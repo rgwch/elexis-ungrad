@@ -145,7 +145,8 @@ public class Tarmedprinter {
 		return ret;
 	}
 
-	public boolean print(Rechnung rn, Document xmlRn, TYPE rnType, File outfile, IProgressMonitor monitor) throws Exception {
+	public boolean print(Rechnung rn, Document xmlRn, TYPE rnType, File outfile, IProgressMonitor monitor)
+			throws Exception {
 		String page1filename = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 				+ File.separator + "tarmed44_page1.html";
 		String fname = "";
@@ -155,10 +156,18 @@ public class Tarmedprinter {
 			throw new Exception("Template Tarmed44 not found");
 		}
 		page1 = FileTool.readTextFile(page1file);
-		replacer=new HashMap<>();
-		
+		replacer = new HashMap<>();
+
 		Mandant mSave = (Mandant) ElexisEventDispatcher.getSelected(Mandant.class);
 		monitor.subTask(rn.getLabel());
+		ESR esr = new ESR(rnSteller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
+				rnSteller.getInfoString(TarmedACL.getInstance().ESRSUB), rn.getRnId(), ESR.ESR27);
+		String tcCode = null;
+		if (TarmedRequirements.hasTCContract(rnSteller) && paymentMode.equals(XMLExporter.TIERS_GARANT)) {
+			tcCode = TarmedRequirements.getTCCode(rnSteller);
+		} else if (paymentMode.equals(XMLExporter.TIERS_PAYANT)) {
+			tcCode = "01";
+		}
 
 		fall = rn.getFall();
 		rnMandant = rn.getMandant();
@@ -197,124 +206,45 @@ public class Tarmedprinter {
 		if (rnGarant == null) {
 			rnGarant = pat;
 		}
-		page1=processHeaders(page1,1);
-		page1 = addDiagnoses(page1, body.getTreatment());
-		page1 = addRemarks(page1, body.getRemark());
-		page1 = addReminderFields(page1, request.getPayload().getReminder(), rn.getNr());
 		if (request.getPayload().isCopy()) {
 			page1 = page1.replace("[F5]", Messages.RnPrintView_yes); //$NON-NLS-1$
 		} else {
 			page1 = page1.replace("[F5]", Messages.RnPrintView_no); //$NON-NLS-1$
 		}
+		String gesetzDatum = "Falldatum";
+		String gesetzNummer = "Fall-Nr.";
+		String gesetzZSRNIF = "ZSR-Nr.(P)";
+		if (body.getUvg() != null) {
+			gesetzDatum = "Unfalldatum";
+			gesetzNummer = "Unfall-Nr.";
+		}
+		if (body.getIvg() != null) {
+			gesetzDatum = "Verfügungsdatum";
+			gesetzNummer = "Verfügungs-Nr.";
+			gesetzZSRNIF = "NIF-Nr.(P)";
+		}
+		String vekaNumber = StringTool.unNull((String) fall.getExtInfoStoredObjectByKey("VEKANr"));
+
+		page1 = page1.replace("[F44.Datum]", gesetzDatum).replace("[F44.Nummer]", gesetzNummer);
+		page1 = page1.replace("[F44.FDatum]", getFDatum(body, fall)).replace("[F44.FNummer]", getFNummer(body, fall));
+		page1 = page1.replace("[F44.ZSRNIF]", gesetzZSRNIF).replace("[F44.VEKANr]", vekaNumber);
+
+		page1 = processHeaders(page1, 1);
+		page1 = addDiagnoses(page1, body.getTreatment());
+		page1 = addRemarks(page1, body.getRemark());
+		page1 = addReminderFields(page1, request.getPayload().getReminder(), rn.getNr());
+
 		replacer.put("Biller", rnSteller);
 		replacer.put("Provider", rnMandant);
 		replacer.put("Patient", pat);
 		replacer.put("Adressat", rnGarant);
 		replacer.put("Fall", fall);
-		Resolver resolver=new Resolver(replacer,true);
-		page1=resolver.resolve(page1);
+		Resolver resolver = new Resolver(replacer, true);
+		page1 = resolver.resolve(page1);
 		// Remove all unreplaced fields
 		page1 = page1.replaceAll("\\[F.+\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
-		FileTool.writeTextFile(outfile, page1);
-		monitor.worked(2);
-		Hub.setMandant(mSave);
-		try {
-			Thread.sleep(5);
-		} catch (InterruptedException e) {
-			// never mind
-		}
-		return true;
-	}
-
-	public boolean printold(Rechnung rn, Document xmlRn, TYPE rnType, IProgressMonitor monitor) throws Exception {
-		String page1filename = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
-				+ File.separator + "tarmed44_page1.html";
-		String fname = "";
-		String outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR, CoreHub.getTempDir().getAbsolutePath());
-
-		String page1;
-		File page1file = new File(page1filename);
-		if (!page1file.exists()) {
-			throw new Exception("Template Tarmed44 not found");
-		}
-		page1 = FileTool.readTextFile(page1file);
-		File outfile=new File(outputDir, rn.getNr() + "_tr.html");
-		
-		Mandant mSave = (Mandant) ElexisEventDispatcher.getSelected(Mandant.class);
-		monitor.subTask(rn.getLabel());
-
-		fall = rn.getFall();
-		rnMandant = rn.getMandant();
-		if (fall == null || rnMandant == null) {
-			logger.error("Fall and/or Mandant of invoice is null");
-			return false;
-		}
-
-		pat = fall.getPatient();
-		Hub.setMandant(rnMandant);
-		rnSteller = rnMandant.getRechnungssteller();
-		if (pat == null || rnSteller == null) {
-			logger.error("Patient and/or Rechnungssteller is null");
-			return false;
-		}
-
-		request = TarmedJaxbUtil.unmarshalInvoiceRequest440(xmlRn);
-		if (request == null) {
-			logger.error("Could not unmarshall xml document for invoice");
-			throw new Exception("Bad xml structure in "+rn.getNr());
-		}
-
-
-		BodyType body = request.getPayload().getBody();
-		BalanceType balance = body.getBalance();
-		ServicesType services = body.getServices();
-		EZPrinterData ezData = getEZPrintData(balance, services, body);
-
-		String tcCode = null;
-		if (TarmedRequirements.hasTCContract(rnSteller) && ezData.paymentMode.equals(XMLExporter.TIERS_GARANT)) {
-			tcCode = TarmedRequirements.getTCCode(rnSteller);
-		} else if (ezData.paymentMode.equals(XMLExporter.TIERS_PAYANT)) {
-			tcCode = "01";
-		}
-
-		XMLPrinterUtil.updateContext(rn, fall, pat, rnMandant, rnSteller, ezData.paymentMode);
-
-		ESR esr = new ESR(rnSteller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
-				rnSteller.getInfoString(TarmedACL.getInstance().ESRSUB), rn.getRnId(), ESR.ESR27);
-
-		Kontakt adressat = getAddressat(ezData.paymentMode, fall);
-		if (request.getPayload().isCopy()) {
-			page1 = page1.replace("[F5]", Messages.RnPrintView_yes); //$NON-NLS-1$
-		} else {
-			page1 = page1.replace("[F5]", Messages.RnPrintView_no); //$NON-NLS-1$
-		}
-
-		if (body != null) {
-			String gesetzDatum = "Falldatum";
-			String gesetzNummer = "Fall-Nr.";
-			String gesetzZSRNIF = "ZSR-Nr.(P)";
-			if (body.getUvg() != null) {
-				gesetzDatum = "Unfalldatum";
-				gesetzNummer = "Unfall-Nr.";
-			}
-			if (body.getIvg() != null) {
-				gesetzDatum = "Verfügungsdatum";
-				gesetzNummer = "Verfügungs-Nr.";
-				gesetzZSRNIF = "NIF-Nr.(P)";
-			}
-			String vekaNumber = StringTool.unNull((String) fall.getExtInfoStoredObjectByKey("VEKANr"));
-
-			page1 = page1.replace("[F44.Datum]", gesetzDatum).replace("[F44.Nummer]", gesetzNummer);
-			page1 = page1.replace("[F44.FDatum]", getFDatum(body, fall)).replace("[F44.FNummer]", getFNummer(body, fall));
-			page1 = page1.replace("[F44.ZSRNIF]", gesetzZSRNIF).replace("[F44.VEKANr]", vekaNumber);
-		}
-		
-		page1 = addDiagnoses(page1, body.getTreatment());
-		page1 = addRemarks(page1, body.getRemark());
-		// adds values to reminder fields or "" if it's no reminder
-		page1 = addReminderFields(page1, request.getPayload().getReminder(), rn.getNr());
-
+		// ------------ Service records ---------
 		List<Object> serviceRecords = services.getRecordTarmedOrRecordDrgOrRecordLab();
 
 		// lookup EAN numbers in services
@@ -324,41 +254,42 @@ public class Tarmedprinter {
 
 		// add the various record services
 		SortedList<Object> serviceRecordsSorted = new SortedList<Object>(serviceRecords, new Rn44Comparator());
+		int page = 1;
+		sideTotal = 0.0;
+		cmAvail = cmFirstPage;
+		monitor.worked(2);
+		StringBuilder sb = new StringBuilder();
+		sb.append("<table>");
+		for (Object obj : serviceRecordsSorted) {
+			sb.setLength(0);
+			String recText = "";
+			String name = "";
+			if (obj instanceof RecordServiceType) {
+				RecordServiceType rec = (RecordServiceType) obj;
+				sb.append(getRecordServiceString(rec, eanMap));
+				sb.append("<tr><td colspan=\"13\">").append(rec.getName()).append("</td></tr>)");
+			} else if (obj instanceof RecordTarmedType) {
+				RecordTarmedType tarmed = (RecordTarmedType) obj;
+				sb.append(getTarmedRecordString(tarmed, eanMap));
+				sb.append("<tr><td colspan=\"13\">").append(tarmed.getName()).append("</td></tr>)");
+			}
+			if (recText == null) {
+				continue;
+			}
+			cmAvail -= cmPerLine;
+			if (cmAvail <= cmPerLine) {
+				sb.append("</table><span>Zwischentotal</span><span>").append(df.format(sideTotal)).append("</span>");
+				sb.append("<p style=\"page-break-after: always;\">&nbsp;</p>"
+						+ "<p style=\"page-break-before: always;\">&nbsp;</p>");
+				addESRCodeLine(balance, tcCode, esr);
+				page += 1;
+			}
+			// addBalanceLines(cursor, tp, balance, ezData.paid);
+			// addESRCodeLine(balance, tcCode, esr);
 
-		page1 = replaceHeaderFields(page1, rn, xmlRn, ezData.paymentMode);
-		page1 = page1.replaceAll("\\[F.+\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		/*
-		 * Object cursor = text.getPlugin().insertText("[Rechnungszeilen]", "\n",
-		 * SWT.LEFT); //$NON-NLS-1$ //$NON-NLS-2$ int page = 1; sideTotal = 0.0; cmAvail
-		 * = cmFirstPage; monitor.worked(2); StringBuilder sb = new StringBuilder();
-		 * 
-		 * for (Object obj : serviceRecordsSorted) { tp.setFont("Helvetica", SWT.NORMAL,
-		 * 8); //$NON-NLS-1$ sb.setLength(0); String recText = ""; String name = "";
-		 * 
-		 * if (obj instanceof RecordServiceType) { RecordServiceType rec =
-		 * (RecordServiceType) obj; recText = getRecordServiceString(rec, sb, eanMap);
-		 * name = rec.getName(); } else if (obj instanceof RecordTarmedType) {
-		 * RecordTarmedType tarmed = (RecordTarmedType) obj; recText =
-		 * getTarmedRecordString(tarmed, sb, eanMap); name = tarmed.getName(); }
-		 * 
-		 * if (recText == null) { continue; } cursor = tp.insertText(cursor, recText,
-		 * SWT.LEFT); tp.setFont("Helvetica", SWT.BOLD, 7); //$NON-NLS-1$ cursor =
-		 * tp.insertText(cursor, "\t" + name + "\n", SWT.LEFT); //$NON-NLS-1$
-		 * //$NON-NLS-2$
-		 * 
-		 * cmAvail -= cmPerLine; if (cmAvail <= cmPerLine) { addSubTotalLine(cursor, tp,
-		 * balance, tcCode, esr); addESRCodeLine(balance, tcCode, esr); if
-		 * (needDeadLetterAvoidance(mSave)) { return false; }
-		 * 
-		 * XMLPrinterUtil.insertPage(TT_TARMED_44_S2, ++page, adressat, rn, xmlRn,
-		 * ezData.paymentMode, text); cursor =
-		 * text.getPlugin().insertText("[Rechnungszeilen]", "\n", SWT.LEFT);
-		 * //$NON-NLS-1$ //$NON-NLS-2$ cmAvail = cmMiddlePage; monitor.worked(2); }
-		 * 
-		 * }
-		 */
-		// addBalanceLines(cursor, tp, balance, ezData.paid);
-		// addESRCodeLine(balance, tcCode, esr);
+		}
+
+		// --------------------------------------
 
 		FileTool.writeTextFile(outfile, page1);
 		monitor.worked(2);
@@ -371,6 +302,7 @@ public class Tarmedprinter {
 		return true;
 	}
 
+	
 	private String addReminderFields(String page, ReminderType reminder, String nr) {
 		String reminderDate = "";
 		String reminderNr = "";
@@ -396,67 +328,6 @@ public class Tarmedprinter {
 			page = page.replace("[Titel]", "TP-Rechnung");
 		}
 		page = page.replace("[DocID]", documentId).replace("[pagenr]", Integer.toString(pagenumber));
-		return page;
-	}
-
-	private String replaceIdentification(String t, Kontakt k, String p) {
-		String l="["+t;
-		p=p.replace(l+".EAN]", (String)k.getExtInfoStoredObjectByKey("EAN"));
-		p=p.replace(l+".Bezeichnung]", k.get("Bezeichnung1")+" "+k.get("Bezeichnung2"));
-		p=p.replace(l+".Telefon]", k.get("Telefon1")).replace(l+".Fax]", k.get("Fax"));
-		p=p.replace(l+".ZSR]", (String)k.getExtInfoStoredObjectByKey("KSK"));
-		p=p.replace(l+".Adresse]", k.get("Strasse")+" "+k.get("Plz")+" "+k.get("Ort"));
-		return p;
-	}
-
-	public String replaceHeaderFields(String page, final Rechnung rn, final Document xmlRn, final String paymentMode) {
-
-		String titel;
-		String titelMahnung;
-
-		Element xmlPayload = xmlRn.getRootElement().getChild("payload", XMLExporter.nsinvoice);
-		Element xmlInvoice = xmlPayload.getChild("invoice", XMLExporter.nsinvoice);
-		if (xmlInvoice != null) {
-			String requestId = xmlInvoice.getAttributeValue(XMLExporter.ATTR_REQUEST_ID);
-			String requestDate = xmlInvoice.getAttributeValue(XMLExporter.ATTR_REQUEST_DATE);
-			TimeTool date = new TimeTool(requestDate);
-			page = page.replace("[DocID]",
-					requestId + " - " + date.toString(TimeTool.DATE_GER) + " " + date.toString(TimeTool.TIME_FULL));
-		} else {
-			page = page.replace("[DocID]", rn.getRnId()); //$NON-NLS-1$
-		}
-
-		if (paymentMode.equals(XMLExporter.TIERS_PAYANT)) { // $NON-NLS-1$
-			titel = Messages.RnPrintView_tbBill; // TP-Rechung
-
-			switch (rn.getStatus()) {
-			case RnStatus.MAHNUNG_1_GEDRUCKT:
-			case RnStatus.MAHNUNG_1:
-				titelMahnung = Messages.RnPrintView_firstM;
-				break;
-			case RnStatus.MAHNUNG_2:
-			case RnStatus.MAHNUNG_2_GEDRUCKT:
-				titelMahnung = Messages.RnPrintView_secondM;
-				break;
-			case RnStatus.IN_BETREIBUNG:
-			case RnStatus.TEILVERLUST:
-			case RnStatus.TOTALVERLUST:
-			case RnStatus.MAHNUNG_3:
-			case RnStatus.MAHNUNG_3_GEDRUCKT:
-				titelMahnung = Messages.RnPrintView_thirdM;
-				break;
-			default:
-				titelMahnung = ""; //$NON-NLS-1$
-			}
-			;
-		} else {
-			titel = Messages.RnPrintView_getback; // Rückforderungsbeleg
-			titelMahnung = ""; //$NON-NLS-1$
-		}
-
-		page = page.replace("[Titel]", titel); //$NON-NLS-1$
-		page = page.replace("[TitelMahnung]", titelMahnung); //$NON-NLS-1$
-
 		if (fall.getAbrechnungsSystem().equals("IV")) { //$NON-NLS-1$
 			page = page.replace("[NIF]", TarmedRequirements.getNIF(rnMandant)); //$NON-NLS-1$
 			String ahv = TarmedRequirements.getAHV(fall.getPatient());
@@ -471,22 +342,6 @@ public class Tarmedprinter {
 		return page.replaceAll("\\?\\?\\??[a-zA-Z0-9 \\.]+\\?\\?\\??", "");
 	}
 
-	/*
-	 * private void addSubTotalLine(Object cursor, ITextPlugin tp, BalanceType
-	 * balance, String tcCode, ESR esr) { StringBuilder footer = new
-	 * StringBuilder(); int places = Double.toString(sideTotal).indexOf('.'); if
-	 * (places > 6) {
-	 * footer.append("\t\t\t\t\t\t\t\t\t\t\t\t\tZwischentotal\t").append(df.format(
-	 * sideTotal)); //$NON-NLS-1$ } else if (places > 3) {
-	 * footer.append("\t\t\t\t\t\t\t\t\t\t\t\t\t\tZwischentotal\t").append(df.format
-	 * (sideTotal)); //$NON-NLS-1$ } else {
-	 * footer.append("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tZwischentotal\t").append(df.
-	 * format(sideTotal)); //$NON-NLS-1$ } tp.setFont("Helvetica", SWT.BOLD, 7);
-	 * //$NON-NLS-1$ cursor = tp.insertText(cursor, footer.toString(), SWT.LEFT); //
-	 * needed to make sure ESRCodeLine gets inserted correctly cursor =
-	 * text.getPlugin().insertTextAt(0, 0, 0, 0, "", SWT.LEFT); //$NON-NLS-1$
-	 * sideTotal = 0.0; }
-	 */
 	private String addFallSpecificLines(String page) {
 		BodyType body = request.getPayload().getBody();
 		if (body != null) {
@@ -559,8 +414,8 @@ public class Tarmedprinter {
 	private String addRemarks(String page, final String remark) {
 		if (remark != null && !remark.isEmpty()) {
 			page = page.replace("[remark]", remark);
-		}else {
-			page=page.replace("[remark]", "");
+		} else {
+			page = page.replace("[remark]", "");
 		}
 		return page;
 	}
@@ -601,125 +456,126 @@ public class Tarmedprinter {
 		return XMLPrinterUtil.getEANArray(eanUniqueSet);
 	}
 
-	private String getRecordServiceString(RecordServiceType rec, StringBuilder sb, HashMap<String, String> eanMap) {
+	private String getRecordServiceString(RecordServiceType rec, HashMap<String, String> eanMap) {
 		if (rec.getDateBegin() == null) {
 			return null;
 		}
-
+		StringBuilder sb = new StringBuilder();
 		tTime.set(rec.getDateBegin().toGregorianCalendar());
-		sb.append(tTime.toString(TimeTool.DATE_GER)).append("\t"); //$NON-NLS-1$
-		sb.append(getTarifType(rec)).append("\t");//$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<tr><td>").append(tTime.toString(TimeTool.DATE_GER)).append("</td>"); //$NON-NLS-1$
+		sb.append("<td>").append(getTarifType(rec)).append("</td>");//$NON-NLS-1$ //$NON-NLS-2$
 		String code = rec.getCode();
-		sb.append(code).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(code).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (code.length() < 10) {
 			String refCode = rec.getRefCode();
 			if (refCode == null) {
 				refCode = SPACE;
 			}
-			sb.append(refCode).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("<td>").append(refCode).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		sb.append(rec.getSession()).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(" \t");
-		sb.append(rec.getQuantity()).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(rec.getSession()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(" </td>");
+		sb.append("<td>").append(rec.getQuantity()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// unit, scale factor, unit factor mt & tt
-		sb.append(SPACE).append("\t"); //$NON-NLS-1$
-		sb.append(SPACE).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(SPACE).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(SPACE).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(SPACE).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(SPACE).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$
+		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(SPACE).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String providerEAN = rec.getProviderId();
 		String responsibleEAN = rec.getResponsibleId();
 		if (getTarifType(rec) != null) {
 			if (providerEAN != null && !providerEAN.isEmpty()) {
-				sb.append(eanMap.get(providerEAN) + "\t");//$NON-NLS-1$
+				sb.append("<td>").append(eanMap.get(providerEAN) + "</td>");//$NON-NLS-1$
 			}
 
 			if (responsibleEAN != null && !responsibleEAN.isEmpty()) {
-				sb.append(eanMap.get(responsibleEAN) + "\t"); //$NON-NLS-1$
+				sb.append("<td>").append(eanMap.get(responsibleEAN) + "</td>"); //$NON-NLS-1$
 			}
 		} else {
-			sb.append("\t\t");
+			sb.append("<td></td>");
 		}
 
 		if (rec.isObligation()) {
-			sb.append("1\t"); //$NON-NLS-1$
+			sb.append("<td>1</td>"); //$NON-NLS-1$
 		} else {
-			sb.append("0\t"); //$NON-NLS-1$
+			sb.append("<td>0</td>"); //$NON-NLS-1$
 		}
 
 		double amount = rec.getAmount();
 		double vatRate = rec.getVatRate();
-		sb.append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("\t"); //$NON-NLS-1$
-		sb.append(df.format(amount));
+		sb.append("<td>").append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("</td>"); //$NON-NLS-1$
+		sb.append("<td>").append(df.format(amount));
 		sideTotal += amount;
-		sb.append("\n"); //$NON-NLS-1$
+		sb.append("</td></tr>"); //$NON-NLS-1$
 
 		return sb.toString();
 	}
 
-	private String getTarmedRecordString(RecordTarmedType tarmed, StringBuilder sb, HashMap<String, String> eanMap) {
+	private String getTarmedRecordString(RecordTarmedType tarmed, HashMap<String, String> eanMap) {
 
 		if (tarmed.getDateBegin() == null) {
 			return null;
 		}
+		StringBuilder sb = new StringBuilder();
 		tTime.set(tarmed.getDateBegin().toGregorianCalendar());
-		sb.append(tTime.toString(TimeTool.DATE_GER)).append("\t"); //$NON-NLS-1$
-		sb.append(tarmed.getTariffType()).append("\t");//$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(tarmed.getCode()).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<tr><td>").append(tTime.toString(TimeTool.DATE_GER)).append("</td>");
+		sb.append("<td>").append(tarmed.getTariffType()).append("</td>");
+		sb.append("<td>").append(tarmed.getCode()).append("</td>");
 		String refCode = tarmed.getRefCode();
 		if (refCode == null) {
 			refCode = SPACE;
 		}
-		sb.append(refCode).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(tarmed.getSession()).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(refCode).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(tarmed.getSession()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String bodyLocation = tarmed.getBodyLocation();
 		if (bodyLocation.startsWith("l")) { //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append("L\t");
+			sb.append("<td>L</td>");
 		} else if (bodyLocation.startsWith("r")) { //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append("R\t");
+			sb.append("<td>R</td>");
 		} else {
-			sb.append(" \t");
+			sb.append("<td> </td>");
 		}
 
-		sb.append(tarmed.getQuantity()).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(tarmed.getUnitMt()).append("\t"); //$NON-NLS-1$
-		sb.append(tarmed.getScaleFactorMt()).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(roundDouble(tarmed.getUnitFactorMt() * tarmed.getExternalFactorMt())).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(tarmed.getQuantity()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(tarmed.getUnitMt()).append("</td>"); //$NON-NLS-1$
+		sb.append("<td>").append(tarmed.getScaleFactorMt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(roundDouble(tarmed.getUnitFactorMt() * tarmed.getExternalFactorMt())).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		sb.append(tarmed.getUnitTt()).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(tarmed.getScaleFactorTt()).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(tarmed.getUnitFactorTt()).append("\t"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(tarmed.getUnitTt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(tarmed.getScaleFactorTt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td>").append(tarmed.getUnitFactorTt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String providerEAN = tarmed.getProviderId();
 		String responsibleEAN = tarmed.getResponsibleId();
 		if (tarmed.getTariffType() != null) {
 			if (providerEAN != null && !providerEAN.isEmpty()) {
-				sb.append(eanMap.get(providerEAN) + "\t");//$NON-NLS-1$
+				sb.append("<td>").append(eanMap.get(providerEAN) + "</td>");//$NON-NLS-1$
 			}
 
 			if (responsibleEAN != null && !responsibleEAN.isEmpty()) {
-				sb.append(eanMap.get(responsibleEAN) + "\t"); //$NON-NLS-1$
+				sb.append("<td>").append(eanMap.get(responsibleEAN) + "</td>"); //$NON-NLS-1$
 			}
 		} else {
-			sb.append("\t\t");
+			sb.append("<td></td>");
 		}
 
 		if (tarmed.isObligation()) {
-			sb.append("1\t"); //$NON-NLS-1$
+			sb.append("<td>1</td>"); //$NON-NLS-1$
 		} else {
-			sb.append("0\t"); //$NON-NLS-1$
+			sb.append("<td>0</td>"); //$NON-NLS-1$
 		}
 
 		double amount = tarmed.getAmount();
 		double vatRate = tarmed.getVatRate();
-		sb.append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("\t"); //$NON-NLS-1$
-		sb.append(df.format(amount));
+		sb.append("<td>").append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("</td>"); //$NON-NLS-1$
+		sb.append("<td>").append(df.format(amount));
 		sideTotal += amount;
-		sb.append("\n"); //$NON-NLS-1$
+		sb.append("</td></tr>"); //$NON-NLS-1$
 
 		return sb.toString();
 	}
