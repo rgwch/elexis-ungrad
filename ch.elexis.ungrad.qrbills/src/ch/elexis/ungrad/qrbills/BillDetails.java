@@ -16,6 +16,7 @@ package ch.elexis.ungrad.qrbills;
 import ch.elexis.TarmedRechnung.Messages;
 import ch.elexis.TarmedRechnung.TarmedACL;
 import ch.elexis.base.ch.ebanking.esr.ESR;
+import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
@@ -37,10 +38,9 @@ public class BillDetails {
 	Kontakt adressat;
 	String IBAN = "CH000NUR00ZUR00DEMO00";
 	String formattedIban;
-	String ESRNr = "";
 	String currency;
 	Kontakt bank;
-	String qrIBAN;
+	String qrReference;
 	String formattedReference;
 	String biller_address;
 	String addressee;
@@ -84,7 +84,6 @@ public class BillDetails {
 			throw new BadParameterException("Bank was not valid", 2);
 		}
 		checkNull(rn.getNr(), "Bill Number");
-		qrIBAN = StringTool.pad(StringTool.LEFT, '0', StringTool.addModulo10(patnr + "0" + rn.getNr()), 27);
 		checkNull(biller.getPostAnschrift(), "Postanschrift");
 		biller_address = biller.getPostAnschrift(true).trim().replaceAll("\\r", "").replaceAll("\\n+", "<br />");
 		checkNull(adressat.getPostAnschrift(), "Postanschrift");
@@ -100,18 +99,14 @@ public class BillDetails {
 		lastDate = new TimeTool(rn.getDatumBis()).toString(TimeTool.DATE_GER);
 		ESR esr = new ESR((String) biller.getExtInfoStoredObjectByKey(ta.ESRNUMBER),
 				(String) biller.getExtInfoStoredObjectByKey(ta.ESRSUB), rn.getRnId(), 27);
-		ESRNr = esr.makeRefNr(true);
+		formattedReference = esr.makeRefNr(true);
+		qrReference=esr.makeRefNr(false);
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 20; i += 4) {
 			sb.append(IBAN.substring(i, i + 4)).append(" ");
 		}
 		formattedIban = sb.append(IBAN.substring(20)).toString();
 		sb.setLength(0);
-		sb.append(qrIBAN.substring(0, 2)).append(" ");
-		for (int i = 2; i < 25; i += 5) {
-			sb.append(qrIBAN.substring(i, i + 5)).append(" ");
-		}
-		formattedReference = sb.toString().trim();
 	}
 
 	Object checkNull(Object o, String msg) throws BadParameterException {
@@ -120,4 +115,5 @@ public class BillDetails {
 		}
 		return o;
 	}
+
 }

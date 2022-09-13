@@ -26,7 +26,7 @@ public class QR_Encoder {
 						.addressLine1(bill.patient.get(Kontakt.FLD_STREET))
 						.addressLine2(bill.patient.get(Kontakt.FLD_ZIP) + " " + bill.patient.get(Kontakt.FLD_PLACE))
 						.country("CH"))
-				.paymentReference(r -> r.qrReference(bill.qrIBAN)).build();
+				.paymentReference(r -> r.qrReference(bill.qrReference)).build();
 
 		final QrCode qrCode = QrInvoiceCodeCreator.create().qrInvoice(qr).outputFormat(OutputFormat.PNG)
 				.desiredQrCodeSize(500).createQrCode();

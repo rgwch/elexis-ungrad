@@ -145,20 +145,18 @@ public class Tarmedprinter {
 		return ret;
 	}
 
-	public boolean print(Rechnung rn, Document xmlRn, TYPE rnType, IProgressMonitor monitor) throws Exception {
+	public boolean print(Rechnung rn, Document xmlRn, TYPE rnType, File outfile, IProgressMonitor monitor) throws Exception {
 		String page1filename = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 				+ File.separator + "tarmed44_page1.html";
 		String fname = "";
-		String outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR, CoreHub.getTempDir().getAbsolutePath());
-		replacer=new HashMap<>();
 		String page1;
 		File page1file = new File(page1filename);
 		if (!page1file.exists()) {
 			throw new Exception("Template Tarmed44 not found");
 		}
 		page1 = FileTool.readTextFile(page1file);
-		File outfile = new File(outputDir, rn.getNr() + "_rf.html");
-
+		replacer=new HashMap<>();
+		
 		Mandant mSave = (Mandant) ElexisEventDispatcher.getSelected(Mandant.class);
 		monitor.subTask(rn.getLabel());
 
@@ -199,15 +197,20 @@ public class Tarmedprinter {
 		if (rnGarant == null) {
 			rnGarant = pat;
 		}
+		page1=processHeaders(page1,1);
+		page1 = addDiagnoses(page1, body.getTreatment());
+		page1 = addRemarks(page1, body.getRemark());
+		page1 = addReminderFields(page1, request.getPayload().getReminder(), rn.getNr());
+		if (request.getPayload().isCopy()) {
+			page1 = page1.replace("[F5]", Messages.RnPrintView_yes); //$NON-NLS-1$
+		} else {
+			page1 = page1.replace("[F5]", Messages.RnPrintView_no); //$NON-NLS-1$
+		}
 		replacer.put("Biller", rnSteller);
 		replacer.put("Provider", rnMandant);
 		replacer.put("Patient", pat);
 		replacer.put("Adressat", rnGarant);
 		replacer.put("Fall", fall);
-		page1=processHeaders(page1,1);
-		page1 = addDiagnoses(page1, body.getTreatment());
-		page1 = addRemarks(page1, body.getRemark());
-		page1 = addReminderFields(page1, request.getPayload().getReminder(), rn.getNr());
 		Resolver resolver=new Resolver(replacer,true);
 		page1=resolver.resolve(page1);
 		// Remove all unreplaced fields
