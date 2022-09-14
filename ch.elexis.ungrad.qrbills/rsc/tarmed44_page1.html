@@ -50,7 +50,7 @@
 			left: 0;
 			height: 6mm;
 			width: 60mm;
-			font-size: 12pt;
+			font-size: 14pt;
 			font-weight: bold;
 		}
 
@@ -58,17 +58,17 @@
 			position: absolute;
 			top: 28mm;
 			left: 0;
-			height: 18mm;
+			height: 20mm;
 			width: 198mm;
 			border: black 0.5px solid;
 		}
 
 		#frame2 {
 			position: absolute;
-			top: 46mm;
+			top: 48mm;
 			left: 0;
 			width: 200mm;
-			height: 70mm;
+			height: 72mm;
 			border-left: black 0.5px solid;
 		}
 
@@ -76,7 +76,7 @@
 			position: absolute;
 			padding-top: 2px;
 			padding-bottom: 2px;
-			top: 116mm;
+			top: 120mm;
 			width: 200mm;
 			height: 4mm;
 			border: black 0.5px solid;
@@ -85,7 +85,7 @@
 		#frame4 {
 			position: absolute;
 			padding-top: 4px;
-			top: 120mm;
+			top: 124mm;
 			width: 200mm;
 			height: 4mm;
 			border-bottom: black 0.5px solid;
@@ -96,7 +96,7 @@
 		#frame5 {
 			position: absolute;
 			padding-top: 2px;
-			top: 124mm;
+			top: 128mm;
 			width: 200mm;
 			height: 4mm;
 			border-left: black 0.5px solid;
@@ -107,7 +107,7 @@
 		#frame6 {
 			position: absolute;
 			padding-top: 2px;
-			top: 128mm;
+			top: 132mm;
 			width: 200mm;
 			height: 4mm;
 			border-bottom: black 0.5px solid;
@@ -118,7 +118,7 @@
 		.frame7 {
 			position: absolute;
 			padding-top: 2px;
-			top: 46mm;
+			top: 48mm;
 			width: 200mm;
 			height: 4mm;
 			border-bottom: black 0.5px solid;
@@ -129,7 +129,7 @@
 		#details1 {
 			position: absolute;
 			padding-top: 2px;
-			top: 132mm;
+			top: 135mm;
 			width: 200mm;
 
 		}
@@ -148,22 +148,15 @@
 		}
 
 		.heading {
-			font-size: 8pt;
+			font-size: 7pt;
 			font-weight: bold;
+			padding: 0;
 		}
 
 		.normal {
-			font-size: 9pt;
+			font-size: 8pt;
 			font-weight: normal;
-		}
-
-		.entry {
-			font-size: 9pt;
-			margin: 2px;
-		}
-
-		.entrytitle {
-			font-weight: bolder;
+			padding: 0;
 		}
 
 		.ziffer {
@@ -290,7 +283,7 @@
 				</table>
 			</div>
 			<div id="frame2">
-				<div class="entry">
+				<div>
 					<span class="heading">Patient</span>
 					<div style="position:absolute; top:20mm; left: 120mm">
 						[Adressat.Anschrift]
@@ -396,21 +389,19 @@
 				<span class="normal">[F38] [F38a]</span>
 			</div>
 			<div id="frame4">
-				<table>
+				<table width="100%">
 					<tr>
 						<td class="col0 heading">Diagnose</td>
-						<td class="col1 normal">[F51] [F52] </td>
-						<td class="col2 normal">[F53]</td>
+						<td class="normal">[F51] [F52] [F53]</td>
 					</tr>
 				</table>
 
 			</div>
 			<div id="frame5">
-				<table>
+				<table width="100%">
 					<tr>
 						<td class="col0 heading">GLN-Liste</td>
-						<td class="col1 normal"></td>
-						<td class="col2 normal">1/[Mandant.EAN]</td>
+						<td class="normal">1/[Mandant.EAN]</td>
 					</tr>
 				</table>
 			</div>
