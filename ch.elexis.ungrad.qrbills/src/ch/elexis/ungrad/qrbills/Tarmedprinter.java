@@ -284,7 +284,8 @@ public class Tarmedprinter {
 
 			// End current page and begin new page
 			if (cmAvail <= cmPerLine) {
-				sb.append("</tbody></table><p>Zwischentotal: ").append(df.format(sideTotal)).append("</p>");
+				sb.append("</tbody></table><p style=\"text-align:right;margin-right:15mm;\">Zwischentotal: ")
+				.append("<b>").append(df.format(sideTotal)).append("</b></p>");
 				sb.append("</div></div><p style=\"page-break-after: always;\"></p>"
 						+ "<div style=\"position:relative;\">");
 				// addESRCodeLine(balance, tcCode, esr);
