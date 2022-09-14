@@ -228,9 +228,9 @@ public class QR_Outputter implements IRnOutputter {
 			Document doc = xmlex.doExport(rn, xmlfile.getAbsolutePath(), type, true);
 			File rfhtml = new File(outputDir, rn.getNr() + "_rf.html");
 			tp.print(rn, doc, type, rfhtml, monitor);
-			// FileOutputStream rfpdf=new FileOutputStream(new File(outputDir,rn.getNr()+"_rf.pdf"));
-			// builder=new PdfRendererBuilder();
-			// builder.useFastMode().withFile(rfhtml).toStream(rfpdf).run();
+			FileOutputStream rfpdf=new FileOutputStream(new File(outputDir,rn.getNr()+"_rf.pdf"));
+			builder=new PdfRendererBuilder();
+			builder.useFastMode().withFile(rfhtml).toStream(rfpdf).run();
 			monitor.worked(5);
 			// rfhtml.delete();
 			res.add(new Result<Rechnung>(rn));

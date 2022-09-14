@@ -1,0 +1,69 @@
+<div class="rn_type">[Titel]</div>
+<div class="release normal">Release 4.4G/de</div>
+<div class="frame1">
+    <table>
+        <tr>
+            <td class="col0 heading">Dokument</td>
+            <td class="col1 normal">Identifikation</td>
+            <td class="col3 normal" colspan="2">[DocID]</td>
+            <td class="col4 normal">Seite [pagenr]</td>
+        </tr>
+        <tr>
+            <td class="col0 heading">Rechnungs-</td>
+            <td class="col1 normal"> GLN-Nr (B)</td>
+            <td class="col2 normal">[Biller.EAN]</td>
+            <td class="col3 normal">[Biller.Bezeichnung1] [Biller.Bezeichnung2]</td>
+            <td class="col4 normal">Tel: [Biller.Telefon1]</td>
+        </tr>
+        <tr>
+            <td class="col0 heading">steller</td>
+            <td class="col1 normal">ZSR-Nr (B)</td>
+            <td class="col2 normal">[Biller.KSK]</td>
+            <td class="col3 normal">[Biller.Strasse] [Biller.Plz] [Biller.Ort]</td>
+            <td class="col4 normal">Fax: [Biller.Fax]</td>
+        </tr>
+        <tr>
+            <td class="col0 heading">Leistungs-</td>
+            <td class="col1 normal"> GLN-Nr (P)</td>
+            <td class="col2 normal">[Provider.EAN]</td>
+            <td class="col3 normal">[Provider.Bezeichnung1] [Provider.Bezeichnung2]</td>
+            <td class="col4 normal">Tel: [Provider.Telefon1]</td>
+        </tr>
+        <td class="col0 heading">erbringer-</td>
+        <td class="col1 normal"> GLN-Nr (P)</td>
+        <td class="col2 normal">[Provider.KSK]</td>
+        <td class="col3 normal">[Provider.Strasse] [Provider.Plz] [Provider.Ort]</td>
+        <td class="col4 normal">Fax: [Provider.Fax]</td>
+    </table>
+</div>
+<div class="frame7">
+    <table>
+        <tr>
+            <td class="col0 heading">Patient</td>
+            <td class="col4">[Patient.Name] [Patient.Vorname] [Patient.Geburtsdatum]</td>
+        </tr>
+    </table>
+</div>
+<div class="details2">
+    <table style="text-align:right">
+        <thead>
+            <th class="d1">Datum</th>
+            <th class="d2">Tarif</th>
+            <th class="d3">Tarifziffer</th>
+            <th class="d4">Bezugsziffer</th>
+            <th class="d5">Si</th>
+            <th class="d5">St</th>
+            <th class="d6">Anzahl</th>
+            <th class="d7">TP AL/Preis</th>
+            <th class="d8">f AL</th>
+            <th class="d9">TPW AL</th>
+            <th class="d7">TP TL</th>
+            <th class="d8">f TL</th>
+            <th class="d9">TPW TL</th>
+            <th class="d5">A</th>
+            <th class="d5">V</th>
+            <th class="d5">P</th>
+            <th class="d6">M</th>
+            <th class="d10">Betrag</th>
+        </thead>
+        <tbody>

@@ -145,17 +145,20 @@ public class Tarmedprinter {
 		return ret;
 	}
 
+	private String loadTemplate(String name) throws Exception {
+		String filename = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
+				+ File.separator + name;
+		File templatefile = new File(filename);
+		if (!templatefile.exists()) {
+			throw new Exception("Template not found: " + filename);
+		}
+		return FileTool.readTextFile(templatefile);
+	}
+
 	public boolean print(Rechnung rn, Document xmlRn, TYPE rnType, File outfile, IProgressMonitor monitor)
 			throws Exception {
-		String page1filename = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
-				+ File.separator + "tarmed44_page1.html";
-		String fname = "";
-		String page1;
-		File page1file = new File(page1filename);
-		if (!page1file.exists()) {
-			throw new Exception("Template Tarmed44 not found");
-		}
-		page1 = FileTool.readTextFile(page1file);
+
+		String currentPage = loadTemplate("tarmed44_page1.html");
 		replacer = new HashMap<>();
 
 		Mandant mSave = (Mandant) ElexisEventDispatcher.getSelected(Mandant.class);
@@ -207,9 +210,9 @@ public class Tarmedprinter {
 			rnGarant = pat;
 		}
 		if (request.getPayload().isCopy()) {
-			page1 = page1.replace("[F5]", Messages.RnPrintView_yes); //$NON-NLS-1$
+			currentPage = currentPage.replace("[F5]", Messages.RnPrintView_yes); //$NON-NLS-1$
 		} else {
-			page1 = page1.replace("[F5]", Messages.RnPrintView_no); //$NON-NLS-1$
+			currentPage = currentPage.replace("[F5]", Messages.RnPrintView_no); //$NON-NLS-1$
 		}
 		String gesetzDatum = "Falldatum";
 		String gesetzNummer = "Fall-Nr.";
@@ -225,14 +228,15 @@ public class Tarmedprinter {
 		}
 		String vekaNumber = StringTool.unNull((String) fall.getExtInfoStoredObjectByKey("VEKANr"));
 
-		page1 = page1.replace("[F44.Datum]", gesetzDatum).replace("[F44.Nummer]", gesetzNummer);
-		page1 = page1.replace("[F44.FDatum]", getFDatum(body, fall)).replace("[F44.FNummer]", getFNummer(body, fall));
-		page1 = page1.replace("[F44.ZSRNIF]", gesetzZSRNIF).replace("[F44.VEKANr]", vekaNumber);
+		currentPage = currentPage.replace("[F44.Datum]", gesetzDatum).replace("[F44.Nummer]", gesetzNummer);
+		currentPage = currentPage.replace("[F44.FDatum]", getFDatum(body, fall)).replace("[F44.FNummer]",
+				getFNummer(body, fall));
+		currentPage = currentPage.replace("[F44.ZSRNIF]", gesetzZSRNIF).replace("[F44.VEKANr]", vekaNumber);
 
-		page1 = processHeaders(page1, 1);
-		page1 = addDiagnoses(page1, body.getTreatment());
-		page1 = addRemarks(page1, body.getRemark());
-		page1 = addReminderFields(page1, request.getPayload().getReminder(), rn.getNr());
+		currentPage = processHeaders(currentPage, 1);
+		currentPage = addDiagnoses(currentPage, body.getTreatment());
+		currentPage = addRemarks(currentPage, body.getRemark());
+		currentPage = addReminderFields(currentPage, request.getPayload().getReminder(), rn.getNr());
 
 		replacer.put("Biller", rnSteller);
 		replacer.put("Provider", rnMandant);
@@ -240,9 +244,9 @@ public class Tarmedprinter {
 		replacer.put("Adressat", rnGarant);
 		replacer.put("Fall", fall);
 		Resolver resolver = new Resolver(replacer, true);
-		page1 = resolver.resolve(page1);
+		currentPage = resolver.resolve(currentPage);
 		// Remove all unreplaced fields
-		page1 = page1.replaceAll("\\[F.+\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		currentPage = currentPage.replaceAll("\\[F.+\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// ------------ Service records ---------
 		List<Object> serviceRecords = services.getRecordTarmedOrRecordDrgOrRecordLab();
@@ -250,11 +254,11 @@ public class Tarmedprinter {
 		// lookup EAN numbers in services
 		String[] eanArray = initEanArray(serviceRecords);
 		HashMap<String, String> eanMap = XMLPrinterUtil.getEANHashMap(eanArray);
-		page1 = page1.replace("[F98]", XMLPrinterUtil.getEANList(eanArray));
+		currentPage = currentPage.replace("[F98]", XMLPrinterUtil.getEANList(eanArray));
 
 		// add the various record services
 		SortedList<Object> serviceRecordsSorted = new SortedList<Object>(serviceRecords, new Rn44Comparator());
-		int page = 1;
+		int pageNumber = 1;
 		sideTotal = 0.0;
 		cmAvail = cmFirstPage;
 		monitor.worked(2);
@@ -265,33 +269,39 @@ public class Tarmedprinter {
 			if (obj instanceof RecordServiceType) {
 				RecordServiceType rec = (RecordServiceType) obj;
 				sb.append(getRecordServiceString(rec, eanMap));
-				sb.append("<tr><td></td><td></td><td colspan=\"11\" class=\"text\">").append(rec.getName()).append("</td></tr>");
+				sb.append("<tr><td></td><td></td><td colspan=\"11\" class=\"text\">").append(rec.getName())
+						.append("</td></tr>");
 			} else if (obj instanceof RecordTarmedType) {
 				RecordTarmedType tarmed = (RecordTarmedType) obj;
 				sb.append(getTarmedRecordString(tarmed, eanMap));
-				sb.append("<tr><td></td><td></td><td colspan=\"11\" class=\"text\">").append(tarmed.getName()).append("</td></tr>");
+				sb.append("<tr><td></td><td></td><td colspan=\"11\" class=\"text\">").append(tarmed.getName())
+						.append("</td></tr>");
 			}
 			if (recText == null) {
 				continue;
 			}
 			cmAvail -= cmPerLine;
 
+			// End current page and begin new page
 			if (cmAvail <= cmPerLine) {
-				sb.append("<span>Zwischentotal</span><span>").append(df.format(sideTotal)).append("</span>");
-				sb.append("<p style=\"page-break-after: always;\">&nbsp;</p>"
-						+ "<p style=\"page-break-before: always;\">&nbsp;</p>");
-				addESRCodeLine(balance, tcCode, esr);
-				page += 1;
+				sb.append("</tbody></table><p>Zwischentotal: ").append(df.format(sideTotal)).append("</p>");
+				sb.append("</div></div><p style=\"page-break-after: always;\"></p>"
+						+ "<div style=\"position:relative;\">");
+				// addESRCodeLine(balance, tcCode, esr);
+				pageNumber += 1;
+				cmAvail = cmMiddlePage;
+				String page_n = processHeaders(loadTemplate("tarmed44_page_n.fragment"), pageNumber);
+				page_n = resolver.resolve(page_n);
+				sb.append(page_n);
 			}
-
 		}
 		// addBalanceLines(cursor, tp, balance, ezData.paid);
 
-		addESRCodeLine(balance, tcCode, esr);
+		// addESRCodeLine(balance, tcCode, esr);
 
 		// --------------------------------------
-		page1 = page1.replace("[Leistungen]", sb.toString());
-		FileTool.writeTextFile(outfile, page1);
+		currentPage = currentPage.replace("[Leistungen]", sb.toString());
+		FileTool.writeTextFile(outfile, currentPage);
 		monitor.worked(2);
 		Hub.setMandant(mSave);
 		try {
@@ -473,7 +483,7 @@ public class Tarmedprinter {
 			sb.append("<td class=\"ziffer\">").append(refCode).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		sb.append("<td class=\"ziffer\">").append(rec.getSession()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(" </td>");
+		sb.append("<td></td>");
 		sb.append("<td class=\"ziffer\">").append(rec.getQuantity()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// unit, scale factor, unit factor mt & tt
@@ -506,7 +516,8 @@ public class Tarmedprinter {
 
 		double amount = rec.getAmount();
 		double vatRate = rec.getVatRate();
-		sb.append("<td class=\"ziffer\">").append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("</td>"); //$NON-NLS-1$
+		sb.append("<td class=\"ziffer\">").append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))) //$NON-NLS-1$
+				.append("</td>");
 		sb.append("<td class=\"ziffer\">").append(df.format(amount));
 		sideTotal += amount;
 		sb.append("</td></tr>"); //$NON-NLS-1$
@@ -543,7 +554,8 @@ public class Tarmedprinter {
 		sb.append("<td class=\"ziffer\">").append(tarmed.getQuantity()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append("<td class=\"ziffer\">").append(tarmed.getUnitMt()).append("</td>"); //$NON-NLS-1$
 		sb.append("<td class=\"ziffer\">").append(tarmed.getScaleFactorMt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("<td class=\"ziffer\">").append(roundDouble(tarmed.getUnitFactorMt() * tarmed.getExternalFactorMt())).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<td class=\"ziffer\">").append(roundDouble(tarmed.getUnitFactorMt() * tarmed.getExternalFactorMt())) //$NON-NLS-1$
+				.append("</td>"); //$NON-NLS-1$
 
 		sb.append("<td class=\"ziffer\">").append(tarmed.getUnitTt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append("<td class=\"ziffer\">").append(tarmed.getScaleFactorTt()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -571,7 +583,8 @@ public class Tarmedprinter {
 
 		double amount = tarmed.getAmount();
 		double vatRate = tarmed.getVatRate();
-		sb.append("<td class=\"ziffer\">").append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("</td>"); //$NON-NLS-1$
+		sb.append("<td class=\"ziffer\">").append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))) //$NON-NLS-1$
+				.append("</td>");
 		sb.append("<td class=\"ziffer\">").append(df.format(amount));
 		sideTotal += amount;
 		sb.append("</td></tr>"); //$NON-NLS-1$

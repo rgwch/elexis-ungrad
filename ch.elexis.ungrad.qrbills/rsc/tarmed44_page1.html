@@ -35,7 +35,7 @@
 
 		#container {
 			box-sizing: border-box;
-			position: absolute;
+			position: relative;
 			font-size: 10pt;
 			left: 5mm;
 			top: 0mm;
@@ -43,7 +43,7 @@
 			height: 297mm;
 		}
 
-		#rn_type {
+		.rn_type {
 			position: absolute;
 			top: 20mm;
 			left: 0;
@@ -53,7 +53,7 @@
 			font-weight: bold;
 		}
 
-		#frame1 {
+		.frame1 {
 			position: absolute;
 			top: 28mm;
 			left: 0;
@@ -109,8 +109,16 @@
 			border-bottom: black 0.5px solid;
 		}
 
-		#details {
+		.frame7 {
 			position: absolute;
+			padding-top: 2px;
+			top: 46mm;
+			width: 200mm;
+			height: 4mm;
+			border-bottom: black 0.5px solid;
+		}
+
+		#details1 {
 			position: absolute;
 			padding-top: 2px;
 			top: 132mm;
@@ -118,7 +126,14 @@
 
 		}
 
-		#release {
+		.details2 {
+			position: absolute;
+			padding-top: 2px;
+			top: 48mm;
+			width: 200mm;
+		}
+
+		.release {
 			position: absolute;
 			top: 25mm;
 			left: 180mm;
@@ -143,12 +158,13 @@
 			font-weight: bolder;
 		}
 
-		.ziffer{
+		.ziffer {
 			font-family: Helvetica, sans-serif;
 			font-size: 8pt;
 			font-weight: normal;
 		}
-		.text{
+
+		.text {
 			font-family: Helvetica, sans-serif;
 			font-size: 7pt;
 			font-weight: bold;
@@ -230,206 +246,208 @@
 
 <body>
 	<div id="container">
-		<div id="rn_type">[Titel]</div>
-		<div id="release" class="normal">Release 4.4G/de</div>
-		<div id="frame1">
-			<table>
-				<tr>
-					<td class="col0 heading">Dokument</td>
-					<td class="col1 normal">Identifikation</td>
-					<td class="col3 normal" colspan="2">[DocID]</td>
-					<td class="col4 normal">Seite [pagenr]</td>
-				</tr>
-				<tr>
-					<td class="col0 heading">Rechnungs-</td>
-					<td class="col1 normal"> GLN-Nr (B)</td>
-					<td class="col2 normal">[Biller.EAN]</td>
-					<td class="col3 normal">[Biller.Bezeichnung1] [Biller.Bezeichnung2]</td>
-					<td class="col4 normal">Tel: [Biller.Telefon1]</td>
-				</tr>
-				<tr>
-					<td class="col0 heading">steller</td>
-					<td class="col1 normal">ZSR-Nr (B)</td>
-					<td class="col2 normal">[Biller.KSK]</td>
-					<td class="col3 normal">[Biller.Strasse] [Biller.Plz] [Biller.Ort]</td>
-					<td class="col4 normal">Fax: [Biller.Fax]</td>
-				</tr>
-				<tr>
-					<td class="col0 heading">Leistungs-</td>
+		<div style="position:relative;">
+			<div class="rn_type">[Titel]</div>
+			<div class="release normal">Release 4.4G/de</div>
+			<div class="frame1">
+				<table>
+					<tr>
+						<td class="col0 heading">Dokument</td>
+						<td class="col1 normal">Identifikation</td>
+						<td class="col3 normal" colspan="2">[DocID]</td>
+						<td class="col4 normal">Seite [pagenr]</td>
+					</tr>
+					<tr>
+						<td class="col0 heading">Rechnungs-</td>
+						<td class="col1 normal"> GLN-Nr (B)</td>
+						<td class="col2 normal">[Biller.EAN]</td>
+						<td class="col3 normal">[Biller.Bezeichnung1] [Biller.Bezeichnung2]</td>
+						<td class="col4 normal">Tel: [Biller.Telefon1]</td>
+					</tr>
+					<tr>
+						<td class="col0 heading">steller</td>
+						<td class="col1 normal">ZSR-Nr (B)</td>
+						<td class="col2 normal">[Biller.KSK]</td>
+						<td class="col3 normal">[Biller.Strasse] [Biller.Plz] [Biller.Ort]</td>
+						<td class="col4 normal">Fax: [Biller.Fax]</td>
+					</tr>
+					<tr>
+						<td class="col0 heading">Leistungs-</td>
+						<td class="col1 normal"> GLN-Nr (P)</td>
+						<td class="col2 normal">[Provider.EAN]</td>
+						<td class="col3 normal">[Provider.Bezeichnung1] [Provider.Bezeichnung2]</td>
+						<td class="col4 normal">Tel: [Provider.Telefon1]</td>
+					</tr>
+					<td class="col0 heading">erbringer-</td>
 					<td class="col1 normal"> GLN-Nr (P)</td>
-					<td class="col2 normal">[Provider.EAN]</td>
-					<td class="col3 normal">[Provider.Bezeichnung1] [Provider.Bezeichnung2]</td>
-					<td class="col4 normal">Tel: [Provider.Telefon1]</td>
-				</tr>
-				<td class="col0 heading">erbringer-</td>
-				<td class="col1 normal"> GLN-Nr (P)</td>
-				<td class="col2 normal">[Provider.KSK]</td>
-				<td class="col3 normal">[Provider.Strasse] [Provider.Plz] [Provider.Ort]</td>
-				<td class="col4 normal">Fax: [Provider.Fax]</td>
-			</table>
-		</div>
-		<div id="frame2">
-			<div class="entry">
-				<span class="heading">Patient</span>
-				<div style="position:absolute; top:20mm; left: 120mm">
-					[Adressat.Anschrift]
-				</div>
-				<div style="position:absolute; top:60mm; left:120mm">
-					<table>
-						<tr>
-							<td class="col1 normal">Rechnungsnr</td>
-							<td class="col2 normal">[Rechnung.RnNummer]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Rechnung/Mahndatum</td>
-							<td class="col2 normal">[Rechnung.RnDatum]</td>
-						</tr>
-					</table>
-				</div>
-				<div style="position:absolute; top:0; left:18mm;">
-					<table>
-						<tr>
-							<td class="col1 normal">Name</td>
-							<td class="col2 normal">[Patient.Name]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Vorname</td>
-							<td class="col2 normal">[Patient.Vorname]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Strasse</td>
-							<td class="col2 normal">[Patient.Strasse]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">PLZ</td>
-							<td class="col2 normal">[Patient.Plz]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Ort</td>
-							<td class="col2 normal">[Patient.Ort]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Geburtsdatum</td>
-							<td class="col2 normal">[Patient.Geburtsdatum]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Geschlecht</td>
-							<td class="col2 normal">[Patient.Geschlecht]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">[F44.Datum]</td>
-							<td class="col2 normal">[F44.FDatum]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">[F44.Nummer]</td>
-							<td class="col2 normal">[F44.FNummer]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">[F44.ZSRNIF]</td>
-							<td class="col2 normal">[F60]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Veka-Nr</td>
-							<td class="col2 normal">[F44.VEKANr]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Versicherten-Nr</td>
-							<td class="col2 normal">[Fall.Versicherungsnummer]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Kanton</td>
-							<td class="col2 normal">[Mandant.TarmedKanton]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Kopie</td>
-							<td class="col2 normal">[F5]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Vergütungsart</td>
-							<td class="col2 normal">[Fall.payment]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Gesetz</td>
-							<td class="col2 normal">[Fall.Gesetz]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Behandlungsgrund</td>
-							<td class="col2 normal">[Fall.Grund]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Behandlung</td>
-							<td class="col3 normal">[Rechnung.RnDatumVon]-[Rechnung.RnDatumBis]</td>
-						</tr>
-						<tr>
-							<td class="col1 normal">Rolle/Ort</td>
-							<td class="col2 normal">Arzt/Ärztin Praxis</td>
-						</tr>
-					</table>
+					<td class="col2 normal">[Provider.KSK]</td>
+					<td class="col3 normal">[Provider.Strasse] [Provider.Plz] [Provider.Ort]</td>
+					<td class="col4 normal">Fax: [Provider.Fax]</td>
+				</table>
+			</div>
+			<div id="frame2">
+				<div class="entry">
+					<span class="heading">Patient</span>
+					<div style="position:absolute; top:20mm; left: 120mm">
+						[Adressat.Anschrift]
+					</div>
+					<div style="position:absolute; top:60mm; left:120mm">
+						<table>
+							<tr>
+								<td class="col1 normal">Rechnungsnr</td>
+								<td class="col2 normal">[Rechnung.RnNummer]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Rechnung/Mahndatum</td>
+								<td class="col2 normal">[Rechnung.RnDatum]</td>
+							</tr>
+						</table>
+					</div>
+					<div style="position:absolute; top:0; left:18mm;">
+						<table>
+							<tr>
+								<td class="col1 normal">Name</td>
+								<td class="col2 normal">[Patient.Name]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Vorname</td>
+								<td class="col2 normal">[Patient.Vorname]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Strasse</td>
+								<td class="col2 normal">[Patient.Strasse]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">PLZ</td>
+								<td class="col2 normal">[Patient.Plz]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Ort</td>
+								<td class="col2 normal">[Patient.Ort]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Geburtsdatum</td>
+								<td class="col2 normal">[Patient.Geburtsdatum]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Geschlecht</td>
+								<td class="col2 normal">[Patient.Geschlecht]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">[F44.Datum]</td>
+								<td class="col2 normal">[F44.FDatum]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">[F44.Nummer]</td>
+								<td class="col2 normal">[F44.FNummer]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">[F44.ZSRNIF]</td>
+								<td class="col2 normal">[F60]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Veka-Nr</td>
+								<td class="col2 normal">[F44.VEKANr]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Versicherten-Nr</td>
+								<td class="col2 normal">[Fall.Versicherungsnummer]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Kanton</td>
+								<td class="col2 normal">[Mandant.TarmedKanton]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Kopie</td>
+								<td class="col2 normal">[F5]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Vergütungsart</td>
+								<td class="col2 normal">[Fall.payment]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Gesetz</td>
+								<td class="col2 normal">[Fall.Gesetz]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Behandlungsgrund</td>
+								<td class="col2 normal">[Fall.Grund]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Behandlung</td>
+								<td class="col3 normal">[Rechnung.RnDatumVon]-[Rechnung.RnDatumBis]</td>
+							</tr>
+							<tr>
+								<td class="col1 normal">Rolle/Ort</td>
+								<td class="col2 normal">Arzt/Ärztin Praxis</td>
+							</tr>
+						</table>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div id="frame3">
-			<span class="heading">Zuweiser</span>
-			<span class="normal" style="margin-left:5mm;">GLN/ZSR-Nr.</span>
-			<span class="normal" style="margin-left:10mm;">[F23]/F[37]</span>
-			<span class="normal">[F38] [F38a]</span>
-		</div>
-		<div id="frame4">
-			<table>
-				<tr>
-					<td class="col0 heading">Diagnose</td>
-					<td class="col1 normal">[F51] [F52] </td>
-					<td class="col2 normal">[F53]</td>
-				</tr>
-			</table>
+			<div id="frame3">
+				<span class="heading">Zuweiser</span>
+				<span class="normal" style="margin-left:5mm;">GLN/ZSR-Nr.</span>
+				<span class="normal" style="margin-left:10mm;">[F23]/F[37]</span>
+				<span class="normal">[F38] [F38a]</span>
+			</div>
+			<div id="frame4">
+				<table>
+					<tr>
+						<td class="col0 heading">Diagnose</td>
+						<td class="col1 normal">[F51] [F52] </td>
+						<td class="col2 normal">[F53]</td>
+					</tr>
+				</table>
 
-		</div>
-		<div id="frame5">
-			<table>
-				<tr>
-					<td class="col0 heading">GLN-Liste</td>
-					<td class="col1 normal"></td>
-					<td class="col2 normal">1/[Mandant.EAN]</td>
-				</tr>
-			</table>
-		</div>
-		<div id="frame6">
-			<table>
-				<tr>
-					<td class="col0 heading">Bemerkung</td>
-					<td class="col3 normal">[remark]</td>
-				</tr>
-			</table>
-		</div>
-		<div id="details">
-			<table style="text-align:right">
-				<thead>
-					<th class="d1">Datum</th>
-					<th class="d2">Tarif</th>
-					<th class="d3">Tarifziffer</th>
-					<th class="d4">Bezugsziffer</th>
-					<th class="d5">Si</th>
-					<th class="d5">St</th>
-					<th class="d6">Anzahl</th>
-					<th class="d7">TP AL/Preis</th>
-					<th class="d8">f AL</th>
-					<th class="d9">TPW AL</th>
-					<th class="d7">TP TL</th>
-					<th class="d8">f TL</th>
-					<th class="d9">TPW TL</th>
-					<th class="d5">A</th>
-					<th class="d5">V</th>
-					<th class="d5">P</th>
-					<th class="d6">M</th>
-					<th class="d10">Betrag</th>
-				</thead>
-				<tbody>
-					[Leistungen]
-				</tbody>
-			</table>
+			</div>
+			<div id="frame5">
+				<table>
+					<tr>
+						<td class="col0 heading">GLN-Liste</td>
+						<td class="col1 normal"></td>
+						<td class="col2 normal">1/[Mandant.EAN]</td>
+					</tr>
+				</table>
+			</div>
+			<div id="frame6">
+				<table>
+					<tr>
+						<td class="col0 heading">Bemerkung</td>
+						<td class="col3 normal">[remark]</td>
+					</tr>
+				</table>
+			</div>
+
+			<div id="details1">
+				<table style="text-align:right">
+					<thead>
+						<th class="d1">Datum</th>
+						<th class="d2">Tarif</th>
+						<th class="d3">Tarifziffer</th>
+						<th class="d4">Bezugsziffer</th>
+						<th class="d5">Si</th>
+						<th class="d5">St</th>
+						<th class="d6">Anzahl</th>
+						<th class="d7">TP AL/Preis</th>
+						<th class="d8">f AL</th>
+						<th class="d9">TPW AL</th>
+						<th class="d7">TP TL</th>
+						<th class="d8">f TL</th>
+						<th class="d9">TPW TL</th>
+						<th class="d5">A</th>
+						<th class="d5">V</th>
+						<th class="d5">P</th>
+						<th class="d6">M</th>
+						<th class="d10">Betrag</th>
+					</thead>
+					<tbody>
+						[Leistungen]
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
-
 </body>
 
 </html>
