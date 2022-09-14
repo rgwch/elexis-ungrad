@@ -265,11 +265,11 @@ public class Tarmedprinter {
 			if (obj instanceof RecordServiceType) {
 				RecordServiceType rec = (RecordServiceType) obj;
 				sb.append(getRecordServiceString(rec, eanMap));
-				sb.append("<tr><td colspan=\"13\" class=\"text\">").append(rec.getName()).append("</td></tr>)");
+				sb.append("<tr><td></td><td colspan=\"13\" class=\"text\">").append(rec.getName()).append("</td></tr>");
 			} else if (obj instanceof RecordTarmedType) {
 				RecordTarmedType tarmed = (RecordTarmedType) obj;
 				sb.append(getTarmedRecordString(tarmed, eanMap));
-				sb.append("<tr><td colspan=\"13\" class=\"text\">").append(tarmed.getName()).append("</td></tr>)");
+				sb.append("<tr><td></td><td colspan=\"13\" class=\"text\">").append(tarmed.getName()).append("</td></tr>");
 			}
 			if (recText == null) {
 				continue;
