@@ -213,7 +213,7 @@ public class Tarmedprinter {
 		}
 		String gesetzDatum = "Falldatum";
 		String gesetzNummer = "Fall-Nr.";
-		String gesetzZSRNIF = "ZSR-Nr.(P)";
+		String gesetzZSRNIF = "AHV-Nr.";
 		if (body.getUvg() != null) {
 			gesetzDatum = "Unfalldatum";
 			gesetzNummer = "Unfall-Nr.";
