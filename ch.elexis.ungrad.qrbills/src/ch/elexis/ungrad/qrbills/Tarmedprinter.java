@@ -285,7 +285,7 @@ public class Tarmedprinter {
 			// End current page and begin new page
 			if (cmAvail <= cmPerLine) {
 				sb.append("</tbody></table><p style=\"text-align:right;margin-right:15mm;\">Zwischentotal: ")
-				.append("<b>").append(df.format(sideTotal)).append("</b></p>");
+						.append("<b>").append(df.format(sideTotal)).append("</b></p>");
 				sb.append("</div></div><p style=\"page-break-after: always;\"></p>"
 						+ "<div style=\"position:relative;\">");
 				// addESRCodeLine(balance, tcCode, esr);
@@ -300,8 +300,11 @@ public class Tarmedprinter {
 
 		// addESRCodeLine(balance, tcCode, esr);
 
+		sb.append("<tr><td span=\"11\">Only last page</td></tr>");
 		// --------------------------------------
 		currentPage = currentPage.replace("[Leistungen]", sb.toString());
+		currentPage = createBalance(currentPage, balance, new Money(0.0));
+
 		FileTool.writeTextFile(outfile, currentPage);
 		monitor.worked(2);
 		Hub.setMandant(mSave);
@@ -597,6 +600,19 @@ public class Tarmedprinter {
 		BigDecimal bd = new BigDecimal(value);
 		bd = bd.setScale(2, RoundingMode.HALF_UP);
 		return bd.doubleValue();
+	}
+
+	private String createBalance(String page, BalanceType balance, Money paid) {
+		VatType vat = balance.getVat();
+		String vatNumber = vat.getVatNumber();
+		if (vatNumber == null || vatNumber.equals(" ")) {
+			vatNumber = "keine";
+		} else {
+			vatNumber = vatNumber + " MWST";
+		}
+		page=page.replace("[anzahlung]", df.format(paid));
+		page=page.replace("[total]", df.format(balance.getAmount()));
+		return page;
 	}
 
 	/*

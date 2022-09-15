@@ -31,6 +31,7 @@
 			margin-left: 5mm;
 			margin-bottom: 0mm;
 			margin-right: 5mm;
+
 		}
 
 		#container {
@@ -171,6 +172,13 @@
 			font-weight: bold;
 			text-align: left;
 		}
+
+
+		.balance {
+			font-size: 8pt;
+			background-color: bisque;
+		}
+
 
 		table,
 		tr,
@@ -441,6 +449,51 @@
 					</tbody>
 				</table>
 			</div>
+		</div>
+		<div class="balance">
+			<table>
+				<tr class="heading">
+					<td>Code</td>
+					<td>Satz</td>
+					<td>Betrag</td>
+					<td>MWSt</td>
+					<td>MWst.Nr.:</td>
+					<td>[MWST]</td>
+					<td>Anzahlung</td>
+					<td>[anzahlung]</td>
+					<td>Gesamtbetrag:</td>
+					<td>[total]</td>
+				</tr>
+				<tr class="ziffer">
+					<td>0</td>
+					<td>[vat0]</td>
+					<td>[vat0amount]</td>
+					<td>[vat0vat]</td>
+					<td>Währung:</td>
+					<td>CHF</td>
+					<td></td>
+					<td>davon PFL</td>
+					<td>[amountObl]</td>
+				</tr>
+				<tr class="ziffer">
+					<td>1</td>
+					<td>[vat1]</td>
+					<td>[vat1amount]</td>
+					<td>[vat1vat]</td>
+				</tr>
+				<tr class="ziffer">
+					<td>2</td>
+					<td>[vat2]</td>
+					<td>[vat2amount]</td>
+					<td>[vat2vat]</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>Fälliger Betrag:</td>
+					<td>[amountdue]</td>
+				</tr>
+			</table>
 		</div>
 	</div>
 </body>
