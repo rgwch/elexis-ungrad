@@ -150,11 +150,24 @@ public class QR_Outputter implements IRnOutputter {
 	public void doPrint(Rechnung rn, IProgressMonitor monitor, TYPE type, Result<Rechnung> res) {
 		try {
 			monitor.subTask(rn.getNr());
+			String outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR,
+					CoreHub.getTempDir().getAbsolutePath());
+
+			Tarmedprinter tp = new Tarmedprinter();
+			File xmlfile = new File(outputDir, rn.getNr() + ".xml");
+			Document doc = xmlex.doExport(rn, xmlfile.getAbsolutePath(), type, true);
+			File rfhtml = new File(outputDir, rn.getNr() + "_rf.html");
+			tp.print(rn, doc, type, rfhtml, monitor);
+			FileOutputStream rfpdf = new FileOutputStream(new File(outputDir, rn.getNr() + "_rf.pdf"));
+			PdfRendererBuilder builder = new PdfRendererBuilder();
+
+			builder.useFastMode().withFile(rfhtml).toStream(rfpdf).run();
+			monitor.worked(5);
+			// rfhtml.delete();
+
 			String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 					+ File.separator + "qrbill_template_v4.html";
 			String fname = "";
-			String outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR,
-					CoreHub.getTempDir().getAbsolutePath());
 			switch (rn.getStatus()) {
 			case RnStatus.OFFEN:
 			case RnStatus.OFFEN_UND_GEDRUCKT:
@@ -204,7 +217,7 @@ public class QR_Outputter implements IRnOutputter {
 			File pdfFile = new File(outputDir, rn.getNr() + "_qr.pdf");
 			FileTool.writeTextFile(file, finished);
 			FileOutputStream fout = new FileOutputStream(pdfFile);
-			PdfRendererBuilder builder = new PdfRendererBuilder();
+			builder = new PdfRendererBuilder();
 			builder.useFastMode();
 			builder.withFile(file);
 			builder.toStream(fout);
@@ -223,16 +236,6 @@ public class QR_Outputter implements IRnOutputter {
 			imgFile.delete();
 			file.delete();
 
-			Tarmedprinter tp = new Tarmedprinter();
-			File xmlfile = new File(outputDir, rn.getNr() + ".xml");
-			Document doc = xmlex.doExport(rn, xmlfile.getAbsolutePath(), type, true);
-			File rfhtml = new File(outputDir, rn.getNr() + "_rf.html");
-			tp.print(rn, doc, type, rfhtml, monitor);
-			FileOutputStream rfpdf=new FileOutputStream(new File(outputDir,rn.getNr()+"_rf.pdf"));
-			builder=new PdfRendererBuilder();
-			builder.useFastMode().withFile(rfhtml).toStream(rfpdf).run();
-			monitor.worked(5);
-			// rfhtml.delete();
 			res.add(new Result<Rechnung>(rn));
 
 		} catch (Exception ex) {
