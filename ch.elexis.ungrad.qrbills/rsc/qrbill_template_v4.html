@@ -19,242 +19,253 @@
 <html lang="de">
 
 <head>
-<meta charset="UTF-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Document</title>
-<!-- link rel="stylesheet" href="qrbill_styles.css" / -->
-<style>
-@page {
-	size: A4 portrait;
-	margin-top: 5mm;
-	margin-left: 5mm;
-	margin-bottom: 5mm;
-	margin-right: 5mm;
-}
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Document</title>
+	<!-- link rel="stylesheet" href="qrbill_styles.css" / -->
+	<style>
+		@page {
+			size: A4 portrait;
+			margin-top: 5mm;
+			margin-left: 5mm;
+			margin-bottom: 5mm;
+			margin-right: 5mm;
+		}
 
-#container {
-	box-sizing: border-box;
-	position: absolute;
-	font-size: 10pt;
-	left: 5;
-	top: 0;
-	width: 200mm;
-	height: 287mm;
-}
+		#container {
+			box-sizing: border-box;
+			position: absolute;
+			font-size: 10pt;
+			left: 5;
+			top: 0;
+			width: 200mm;
+			height: 287mm;
+		}
 
-#date {
-	position: absolute;
-	right: 20mm;
-	top: 24mm;
-	width: 50mm;
-}
+		#date {
+			position: absolute;
+			right: 20mm;
+			top: 24mm;
+			width: 50mm;
+		}
 
-/* The heading with sender informations and practice logo*/
-#header {
-	color: green;
-	text-align: center;
-	margin-top: 0mm;
-	padding-bottom: 0;
-	padding-top: 0;
-}
+		/* The heading with sender informations and practice logo*/
+		#header {
+			color: green;
+			text-align: center;
+			margin-top: 0mm;
+			padding-bottom: 0;
+			padding-top: 0;
+		}
 
-h1 {
-	font-size: 12pt;
-	margin-bottom: 0;
-	padding-bottom: 0;
-}
+		h1 {
+			font-size: 12pt;
+			margin-bottom: 0;
+			padding-bottom: 0;
+		}
 
-/* Make tables more compact */
-table, tr, td {
-	padding-bottom: 0;
-	padding-top: 0;
-	margin-bottom: 0;
-	margin-top: 0;
-}
+		/* Make tables more compact */
+		table,
+		tr,
+		td {
+			padding-bottom: 0;
+			padding-top: 0;
+			margin-bottom: 0;
+			margin-top: 0;
+		}
 
-#sender {
-	position: absolute;
-	left: 10mm;
-	top: 24mm;
-	margin-right: 20px;
-	width: 70mm;
-}
+		#sender {
+			position: absolute;
+			left: 10mm;
+			top: 24mm;
+			margin-right: 20px;
+			width: 70mm;
+		}
 
-.absender{
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 5pt;
-	font-weight: normal;
-	margin-bottom: 2mm;
-}
-/* Modify the position to match your envelopes */
-#address {
-	position: absolute;
-	right: 20mm;
-	top: 45mm;
-	width: 60mm;
-	background-color: light-gray;
-}
+		.absender {
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 6pt;
+			font-weight: normal;
+			margin-bottom: 3mm;
+		}
 
-/* The summary box for the details of the Bill */
-#bill_summary {
-	position: absolute;
-	background-color: gainsboro;
-	left: 10mm;
-	top: 70mm;
-	width: 80mm;
-	padding: 5px;
-}
+		/* Modify the position to match your envelopes */
+		#address {
+			position: absolute;
+			right: 20mm;
+			top: 45mm;
+			width: 60mm;
+			background-color: light-gray;
+		}
 
-/* The Text for the Bill */
-#maintext {
-	position: absolute;
-	left: 10mm;
-	top: 110mm;
-}
+		/* The summary box for the details of the Bill */
+		#bill_summary {
+			position: absolute;
+			background-color: gainsboro;
+			left: 10mm;
+			top: 70mm;
+			width: 80mm;
+			padding: 5px;
+		}
 
-.rectangle {
-	position: absolute;
-	border-color: black;
-	border-style: solid;
-	border-width: 2px;
-	width: 100mm;
-	height: 100mm;
-	top: 20mm;
-	left: 40mm;
-}
+		/* The Text for the Bill */
+		#maintext {
+			position: absolute;
+			left: 10mm;
+			top: 110mm;
+		}
 
-.scissors {
-	position: absolute;
-	width: 7mm;
-	max-width: 7mm;
-	top: 189mm;
-	left: 70mm;
-}
+		.rectangle {
+			position: absolute;
+			border-color: black;
+			border-style: solid;
+			border-width: 2px;
+			width: 100mm;
+			height: 100mm;
+			top: 20mm;
+			left: 40mm;
+		}
 
-/***** Do not modify or reposition the parts between here and /style   ******/
+		.scissors {
+			position: absolute;
+			width: 7mm;
+			max-width: 7mm;
+			top: 189mm;
+			left: 70mm;
+		}
 
-/* The payment slip must be A6 and located in the lower right edge of the page 
+		.scissorstext {
+			position: absolute;
+			left: 60mm;
+			top: 183mm;
+			font-size: 8pt;
+			color: gray;
+		}
+
+		/***** Do not modify or reposition the parts between here and /style   ******/
+
+		/* The payment slip must be A6 and located in the lower right edge of the page 
 It must be separated with lines or perforations from the rest of the document. 
 
 Must conform to the following paper:
 https://www.paymentstandards.ch/dam/downloads/style-guide-de.pdf 
         */
-#payment_part {
-	position: absolute;
-	left: 0mm;
-	width: 200mm;
-	top: 190mm;
-	border-top: black 0.5px dashed;
-	font-family: Arial, Helvetica, sans-serif;
-}
+		#payment_part {
+			position: absolute;
+			left: 0mm;
+			width: 200mm;
+			top: 190mm;
+			border-top: black 0.5px dashed;
+			font-family: Arial, Helvetica, sans-serif;
+		}
 
-#payment_slip {
-	position: absolute;
-	width: 143mm;
-	left: 57mm;
-	height: 95mm;
-	border-left: black 0.5px dashed;
-}
+		#payment_slip {
+			position: absolute;
+			width: 143mm;
+			left: 57mm;
+			height: 95mm;
+			border-left: black 0.5px dashed;
+		}
 
-/* The Text "Zahlteil" */
-#payment_slip_title {
-	position: absolute;
-	font-size: 11pt;
-	font-weight: bold;
-	top: 5mm;
-	left: 5mm;
-	height: 7mm;
-}
+		/* The Text "Zahlteil" */
+		#payment_slip_title {
+			position: absolute;
+			font-size: 11pt;
+			font-weight: bold;
+			top: 5mm;
+			left: 5mm;
+			height: 7mm;
+		}
 
-#payment_slip_qrzone {
-	position: absolute;
-	left: 5mm;
-	top: 18mm;
-	width: 47mm;
-	height: 47mm;
-}
+		#payment_slip_qrzone {
+			position: absolute;
+			left: 5mm;
+			top: 18mm;
+			width: 47mm;
+			height: 47mm;
+		}
 
-/** Currency and amount */
-#payment_slip_amount {
-	position: absolute;
-	left: 5mm;
-	top: 69mm;
-	height: 22mm;
-}
+		/** Currency and amount */
+		#payment_slip_amount {
+			position: absolute;
+			left: 5mm;
+			top: 69mm;
+			height: 22mm;
+		}
 
-/* Right side of the payment slip */
-#payment_slip_details {
-	position: absolute;
-	left: 57mm;
-	top: 5mm;
-}
+		/* Right side of the payment slip */
+		#payment_slip_details {
+			position: absolute;
+			left: 57mm;
+			top: 5mm;
+		}
 
-/* Font for headings in the payment slip */
-.payment_slip_heading {
-	font-size: 8pt;
-	font-weight: bold;
-	padding-bottom: 0;
-	margin-bottom: 0;
-}
+		/* Font for headings in the payment slip */
+		.payment_slip_heading {
+			font-size: 8pt;
+			font-weight: bold;
+			padding-bottom: 0;
+			margin-bottom: 0;
+		}
 
-/* Font for Text in the payment slip */
-.payment_slip_default {
-	font-size: 10pt;
-	padding-top: 0;
-	margin-top: 0;
-}
+		/* Font for Text in the payment slip */
+		.payment_slip_default {
+			font-size: 10pt;
+			padding-top: 0;
+			margin-top: 0;
+		}
 
-#receipt_slip {
-	position: absolute;
-	width: 57mm;
-	left: 0mm;
-}
+		#receipt_slip {
+			position: absolute;
+			width: 57mm;
+			left: 0mm;
+		}
 
-#receipt_slip_title {
-	position: absolute;
-	font-size: 11pt;
-	font-weight: bold;
-	left: 0mm;
-	top: 5mm;
-	height: 7mm;
-}
+		#receipt_slip_title {
+			position: absolute;
+			font-size: 11pt;
+			font-weight: bold;
+			left: 0mm;
+			top: 5mm;
+			height: 7mm;
+		}
 
-#receipt_slip_details {
-	position: absolute;
-	left: 0mm;
-	top: 12mm;
-	height: 56mm;
-}
+		#receipt_slip_details {
+			position: absolute;
+			left: 0mm;
+			top: 12mm;
+			height: 56mm;
+		}
 
-/** Currency and amount */
-#receipt_slip_amount {
-	position: absolute;
-	left: 0mm;
-	top: 68mm;
-	height: 14mm;
-}
+		/** Currency and amount */
+		#receipt_slip_amount {
+			position: absolute;
+			left: 0mm;
+			top: 68mm;
+			height: 14mm;
+		}
 
-#receipt_slip_intermediate {
-	position: absolute;
-	right: 2mm;
-	top: 82mm;
-}
+		#receipt_slip_intermediate {
+			position: absolute;
+			right: 2mm;
+			top: 82mm;
+		}
 
-.receipt_slip_heading {
-	font-size: 6pt;
-	font-weight: bold;
-	padding-bottom: 0;
-	margin-bottom: 0;
-}
+		.receipt_slip_heading {
+			font-size: 6pt;
+			font-weight: bold;
+			padding-bottom: 0;
+			margin-bottom: 0;
+		}
 
-.receipt_slip_default {
-	font-size: 8pt;
-	font-weight: normal;
-	padding-top: 0;
-	margin-top: 0;
-}
-</style>
+		.receipt_slip_default {
+			font-size: 8pt;
+			font-weight: normal;
+			padding-top: 0;
+			margin-top: 0;
+		}
+	</style>
 </head>
 
 <body>
@@ -317,6 +328,7 @@ https://www.paymentstandards.ch/dam/downloads/style-guide-de.pdf
       User-modifiable part ends here 
      ********************************************************************************************* -->
 
+		<p class="scissorstext">Vor der Einzahlung abzutrennen</p>
 		<!-- Do not reposition the payment slip and any elements therein -->
 
 		<div id="payment_part">

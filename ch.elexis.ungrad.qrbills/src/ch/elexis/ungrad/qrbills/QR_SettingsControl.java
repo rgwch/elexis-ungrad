@@ -27,7 +27,7 @@ public class QR_SettingsControl extends Composite {
 	String outputDir;
 	Combo cbPrinters;
 	PrintService[] printers;
-	Button cbDoPrint, cbDirectPrint, cbDoDelete;
+	Button cbQRPage, cbTarmedForm, cbDoPrint, cbDirectPrint, cbDoDelete;
 	Text tOutdir;
 
 	public QR_SettingsControl(Composite parent) {
@@ -52,6 +52,14 @@ public class QR_SettingsControl extends Composite {
 		b.setText("Ändern");
 		outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR, CorePreferenceInitializer.getDefaultDBPath());
 		tOutdir.setText(outputDir);
+		cbQRPage = new Button(this, SWT.CHECK);
+		cbQRPage.setText("Seite mit QR ausgeben");
+		cbQRPage.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		cbQRPage.setSelection(CoreHub.localCfg.get(PreferenceConstants.PRINT_QR, true));
+		cbTarmedForm = new Button(this, SWT.CHECK);
+		cbTarmedForm.setText("Rechnungsformular ausgeben");
+		cbTarmedForm.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		cbTarmedForm.setSelection(CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true));
 		cbDoPrint = new Button(this, SWT.CHECK);
 		cbDoPrint.setText("Rechnung ausdrucken");
 		cbDoPrint.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
@@ -78,11 +86,15 @@ public class QR_SettingsControl extends Composite {
 	}
 
 	public void doSave() {
+
 		CoreHub.localCfg.set(PreferenceConstants.RNN_DIR, tOutdir.getText());
+		CoreHub.localCfg.set(PreferenceConstants.PRINT_QR, cbQRPage.getSelection());
+		CoreHub.localCfg.set(PreferenceConstants.PRINT_TARMED, cbTarmedForm.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DO_PRINT, cbDoPrint.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DIRECT_PRINT, cbDirectPrint.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DELETE_AFTER_PRINT, cbDoDelete.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
+
 		if (cbPrinters.getSelectionIndex() > -1) {
 			PrintService printService = printers[cbPrinters.getSelectionIndex()];
 			Class[] attributes = printService.getSupportedAttributeCategories();
