@@ -290,7 +290,7 @@ public class Tarmedprinter {
 
 		// addESRCodeLine(balance, tcCode, esr);
 
-		sb.append("<tr><td span=\"11\">Only last page</td></tr>");
+		// sb.append("<tr><td span=\"11\">Only last page</td></tr>");
 		// --------------------------------------
 		currentPage = currentPage.replace("[Leistungen]", sb.toString());
 		currentPage = createBalance(currentPage, balance, new Money(0.0));
