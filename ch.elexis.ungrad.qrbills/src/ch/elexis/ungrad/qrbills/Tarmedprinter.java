@@ -192,6 +192,8 @@ public class Tarmedprinter {
 		} else if (paymentMode.equals(XMLExporter.TIERS_PAYANT)) {
 			tcCode = "01";
 		}
+		XMLPrinterUtil.updateContext(rn, fall, pat, rnMandant, rnSteller, paymentMode);
+		
 		ESR esr = new ESR(rnSteller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
 				rnSteller.getInfoString(TarmedACL.getInstance().ESRSUB), rn.getRnId(), ESR.ESR27);
 
