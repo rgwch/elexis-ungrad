@@ -164,7 +164,7 @@ public class QR_Outputter implements IRnOutputter {
 
 				builder.useFastMode().withFile(rfhtml).toStream(rfpdf).run();
 				monitor.worked(5);
-				rfhtml.delete();
+				// rfhtml.delete();
 			}
 			if (CoreHub.localCfg.get(PreferenceConstants.PRINT_QR, true)) {
 				String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator
