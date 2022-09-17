@@ -197,7 +197,7 @@ public class Tarmedprinter {
 		ESR esr = new ESR(rnSteller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
 				rnSteller.getInfoString(TarmedACL.getInstance().ESRSUB), rn.getRnId(), ESR.ESR27);
 
-		rnGarant = getAddressat(paymentMode, fall);
+		rnGarant = getAddressat(fall);
 		if (rnGarant == null) {
 			rnGarant = pat;
 		}
@@ -775,7 +775,7 @@ public class Tarmedprinter {
 		return null;
 	}
 
-	private Kontakt getAddressat(String paymentMode, Fall fall) {
+	public Kontakt getAddressat(Fall fall) {
 		Tiers tiersType = fall.getTiersType();
 		switch (tiersType) {
 		case PAYANT:

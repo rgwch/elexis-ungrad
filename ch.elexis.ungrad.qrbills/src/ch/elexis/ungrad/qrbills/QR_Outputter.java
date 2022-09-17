@@ -40,6 +40,7 @@ import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.core.model.IPersistentObject;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
+import ch.elexis.data.Kontakt;
 import ch.elexis.data.Rechnung;
 import ch.elexis.data.RnStatus;
 import ch.elexis.ungrad.Resolver;
@@ -197,7 +198,11 @@ public class QR_Outputter implements IRnOutputter {
 				String rawHTML = FileTool.readTextFile(template);
 
 				BillDetails bill = new BillDetails(rn);
-				replacer.put("Adressat", bill.adressat);
+				Kontakt adressat=tp.getAddressat(rn.getFall());
+				if(adressat==null) {
+					adressat=bill.adressat;
+				}
+				replacer.put("Adressat", adressat);
 				replacer.put("Mandant", bill.biller);
 				replacer.put("Patient", bill.patient);
 				replacer.put("Rechnung", rn);
