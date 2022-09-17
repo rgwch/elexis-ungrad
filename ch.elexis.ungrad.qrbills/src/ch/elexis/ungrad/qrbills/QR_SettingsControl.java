@@ -24,11 +24,13 @@ import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.rgw.tools.StringTool;
 
 public class QR_SettingsControl extends Composite {
-	String outputDir;
+	String outputDirPDF;
+	String outputDirXML;
 	Combo cbPrinters;
 	PrintService[] printers;
-	Button cbQRPage, cbTarmedForm, cbDoPrint, cbDirectPrint, cbDoDelete;
-	Text tOutdir;
+	Button cbQRPage, cbTarmedForm, cbDoPrint, cbDirectPrint, cbDoDelete, cbDebug;
+	Text tOutdirPDF;
+	Text tOutdirXML;
 
 	public QR_SettingsControl(Composite parent) {
 		super(parent, SWT.NONE);
@@ -38,20 +40,40 @@ public class QR_SettingsControl extends Composite {
 		Label l = new Label(this, SWT.NONE);
 		l.setText("Zielverzeichnis für PDFs");
 		l.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		tOutdir = new Text(this, SWT.READ_ONLY | SWT.BORDER);
-		tOutdir.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		tOutdirPDF = new Text(this, SWT.READ_ONLY | SWT.BORDER);
+		tOutdirPDF.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		Button b = new Button(this, SWT.PUSH);
 		b.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				outputDir = new DirectoryDialog(parent.getShell(), SWT.OPEN).open();
-				CoreHub.localCfg.set(PreferenceConstants.RNN_DIR, outputDir);
-				tOutdir.setText(outputDir);
+				outputDirPDF = new DirectoryDialog(parent.getShell(), SWT.OPEN).open();
+				CoreHub.localCfg.set(PreferenceConstants.RNN_DIR_PDF, outputDirPDF);
+				tOutdirPDF.setText(outputDirPDF);
 			}
 		});
 		b.setText("Ändern");
-		outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR, CorePreferenceInitializer.getDefaultDBPath());
-		tOutdir.setText(outputDir);
+		outputDirPDF = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF, CorePreferenceInitializer.getDefaultDBPath());
+		tOutdirPDF.setText(outputDirPDF);
+		
+		Label lx=new Label(this,SWT.NONE);
+		lx.setText("Zielverzeichnis für XMLs");
+		lx.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		tOutdirXML=new Text(this, SWT.READ_ONLY|SWT.BORDER);
+		tOutdirXML.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		Button bx= new Button(this,SWT.PUSH);
+		bx.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				outputDirXML = new DirectoryDialog(parent.getShell(), SWT.OPEN).open();
+				CoreHub.localCfg.set(PreferenceConstants.RNN_DIR_XML, outputDirXML);
+				tOutdirXML.setText(outputDirXML);
+			}
+		});
+		bx.setText("Ändern");
+		outputDirXML = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_XML, CorePreferenceInitializer.getDefaultDBPath());
+		tOutdirXML.setText(outputDirXML);
+	
+		new Label(this, SWT.SEPARATOR);
 		cbQRPage = new Button(this, SWT.CHECK);
 		cbQRPage.setText("Seite mit QR ausgeben");
 		cbQRPage.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
@@ -82,19 +104,25 @@ public class QR_SettingsControl extends Composite {
 		cbDoDelete.setText("PDF nach dem Drucken löschen");
 		cbDoDelete.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbDoDelete.setSelection(CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, true));
-
+		new Label(this, SWT.SEPARATOR);
+		cbDebug=new Button(this,SWT.CHECK);
+		cbDebug.setText("Debug: HTML Zwischendateien nicht löschen");
+		cbDebug.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		cbDebug.setSelection(CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, true));
 	}
 
 	public void doSave() {
 
-		CoreHub.localCfg.set(PreferenceConstants.RNN_DIR, tOutdir.getText());
+		CoreHub.localCfg.set(PreferenceConstants.RNN_DIR_PDF, tOutdirPDF.getText());
+		CoreHub.localCfg.set(PreferenceConstants.RNN_DIR_XML, tOutdirXML.getText());
 		CoreHub.localCfg.set(PreferenceConstants.PRINT_QR, cbQRPage.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.PRINT_TARMED, cbTarmedForm.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DO_PRINT, cbDoPrint.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DIRECT_PRINT, cbDirectPrint.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DELETE_AFTER_PRINT, cbDoDelete.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
-
+		CoreHub.localCfg.set(PreferenceConstants.DEBUGFILES, cbDebug.getText());
+		
 		if (cbPrinters.getSelectionIndex() > -1) {
 			PrintService printService = printers[cbPrinters.getSelectionIndex()];
 			Class[] attributes = printService.getSupportedAttributeCategories();

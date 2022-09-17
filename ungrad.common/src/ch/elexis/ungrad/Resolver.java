@@ -26,7 +26,8 @@ import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 /**
- * Resolve Elexis-Variables such as [Patient.Name] with the currently selected respective items
+ * Resolve Elexis-Variables such as [Patient.Name] with the currently selected
+ * respective items
  * 
  * @author gerry
  *
@@ -34,51 +35,54 @@ import ch.rgw.tools.TimeTool;
 public class Resolver {
 	Map<String, IPersistentObject> replmap;
 	boolean html = false;
-	
+
 	/**
-	 * Create a Resolver with some additional information how to resolve non-standard-classes
+	 * Create a Resolver with some additional information how to resolve
+	 * non-standard-classes
 	 * 
-	 * @param fld
-	 *            Map Variable Names to classes.
-	 *@param asHTML
-	 *			if true replace linefeeds (\n) with html linebreaks (<br />)
+	 * @param fld    Map Variable Names to classes.
+	 * @param asHTML if true replace linefeeds (\n) with html linebreaks (<br />
+	 *               )
 	 */
-	public Resolver(Map<String, IPersistentObject> fld, boolean asHTML){
+	public Resolver(Map<String, IPersistentObject> fld, boolean asHTML) {
 		replmap = fld;
 		html = asHTML;
 	}
-	
-	public Resolver(){
+
+	public Resolver() {
 		this(new HashMap<>(), false);
 	}
-	
-	public void asHTML(boolean html){
+
+	public void asHTML(boolean html) {
 		this.html = html;
 	}
-	
+
 	/**
 	 * Resolve Variables in a String
 	 * 
-	 * @param raw
-	 *            The input String containing Placeholders
+	 * @param raw The input String containing Placeholders
 	 * @return The String with resolved placeholders
-	 * @throws Exception
-	 *             If a Var references a class that could not be found in the running Elexis
-	 *             installation.
+	 * @throws Exception If a Var references a class that could not be found in the
+	 *                   running Elexis installation.
 	 */
-	public String resolve(String raw) throws Exception{
+	public String resolve(String raw) throws Exception {
 		Pattern pat = Pattern.compile(TextContainer.MATCH_TEMPLATE);
 		StringBuffer sb = new StringBuffer();
 		Matcher matcher = pat.matcher(raw);
 		while (matcher.find()) {
 			String found = matcher.group();
-			matcher.appendReplacement(sb, replaceTemplate(found));
+			String replacement = replaceTemplate(found);
+			if (!replacement.startsWith("**ERROR")) {
+				matcher.appendReplacement(sb, replacement);
+			} else {
+				matcher.appendReplacement(sb, " ");
+			}
 		}
 		matcher.appendTail(sb);
 		return sb.toString();
 	}
-	
-	private String replaceTemplate(String tmpl) throws ClassNotFoundException{
+
+	private String replaceTemplate(String tmpl) throws ClassNotFoundException {
 		String[] rooted = tmpl.substring(1, tmpl.length() - 1).split("\\.");
 		if (rooted.length == 2) {
 			if (rooted[0].equals("Datum")) {
@@ -87,9 +91,13 @@ public class Resolver {
 				IPersistentObject po = replmap.get(rooted[0]);
 				if (po == null) {
 					String fqname = "ch.elexis.data." + rooted[0]; //$NON-NLS-1$
-					po = ElexisEventDispatcher.getSelected(Class.forName(fqname));
+					try {
+						po = ElexisEventDispatcher.getSelected(Class.forName(fqname));
+					} catch (ClassNotFoundException cfe) {
+						return "";
+					}
 				}
-				String r=po.get(rooted[1]);
+				String r = po.get(rooted[1]);
 				String replacement = StringTool.unNull(r);
 				if (html) {
 					replacement = replacement.replaceAll("\\n", "<br />");

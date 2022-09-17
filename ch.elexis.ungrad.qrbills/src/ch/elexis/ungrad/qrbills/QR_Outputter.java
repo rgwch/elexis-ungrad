@@ -151,21 +151,25 @@ public class QR_Outputter implements IRnOutputter {
 	public void doPrint(Rechnung rn, IProgressMonitor monitor, TYPE type, Result<Rechnung> res) {
 		try {
 			monitor.subTask(rn.getNr());
-			String outputDir = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR,
+			String outputDirPDF = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF,
+					CoreHub.getTempDir().getAbsolutePath());
+			String outputDirXML = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_XML,
 					CoreHub.getTempDir().getAbsolutePath());
 
 			Tarmedprinter tp = new Tarmedprinter();
-			File xmlfile = new File(outputDir, rn.getNr() + ".xml");
+			File xmlfile = new File(outputDirXML, rn.getNr() + ".xml");
 			Document doc = xmlex.doExport(rn, xmlfile.getAbsolutePath(), type, true);
 			if (CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true)) {
-				File rfhtml = new File(outputDir, rn.getNr() + "_rf.html");
+				File rfhtml = new File(outputDirPDF, rn.getNr() + "_rf.html");
 				tp.print(rn, doc, type, rfhtml, monitor);
-				FileOutputStream rfpdf = new FileOutputStream(new File(outputDir, rn.getNr() + "_rf.pdf"));
+				FileOutputStream rfpdf = new FileOutputStream(new File(outputDirPDF, rn.getNr() + "_rf.pdf"));
 				PdfRendererBuilder builder = new PdfRendererBuilder();
 
 				builder.useFastMode().withFile(rfhtml).toStream(rfpdf).run();
 				monitor.worked(5);
-				// rfhtml.delete();
+				if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
+					rfhtml.delete();
+				}
 			}
 			if (CoreHub.localCfg.get(PreferenceConstants.PRINT_QR, true)) {
 				String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator
@@ -196,11 +200,11 @@ public class QR_Outputter implements IRnOutputter {
 					template = new File(default_template);
 				}
 				String rawHTML = FileTool.readTextFile(template);
-
+			
 				BillDetails bill = new BillDetails(rn);
-				Kontakt adressat=tp.getAddressat(rn.getFall());
-				if(adressat==null) {
-					adressat=bill.adressat;
+				Kontakt adressat = tp.getAddressat(rn.getFall());
+				if (adressat == null) {
+					adressat = bill.adressat;
 				}
 				replacer.put("Adressat", adressat);
 				replacer.put("Mandant", bill.biller);
@@ -210,7 +214,7 @@ public class QR_Outputter implements IRnOutputter {
 
 				String cookedHTML = resolver.resolve(rawHTML);
 				byte[] png = qr.generate(rn, bill);
-				File imgFile = new File(outputDir, rn.getRnId() + ".png");
+				File imgFile = new File(outputDirPDF, rn.getRnId() + ".png");
 				FileTool.writeFile(imgFile, png);
 
 				String finished = cookedHTML.replace("[QRIMG]", rn.getRnId() + ".png")
@@ -220,13 +224,13 @@ public class QR_Outputter implements IRnOutputter {
 						.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
 						.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);
 
-				File file = new File(outputDir, rn.getNr() + ".html");
-				File pdfFile = new File(outputDir, rn.getNr() + "_qr.pdf");
-				FileTool.writeTextFile(file, finished);
+				File htmlFile = new File(outputDirPDF, rn.getNr() + ".html");
+				File pdfFile = new File(outputDirPDF, rn.getNr() + "_qr.pdf");
+				FileTool.writeTextFile(htmlFile, finished);
 				FileOutputStream fout = new FileOutputStream(pdfFile);
 				PdfRendererBuilder builder = new PdfRendererBuilder();
 				builder.useFastMode();
-				builder.withFile(file);
+				builder.withFile(htmlFile);
 				builder.toStream(fout);
 				builder.run();
 				if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
@@ -241,7 +245,10 @@ public class QR_Outputter implements IRnOutputter {
 					}
 				}
 				imgFile.delete();
-				file.delete();
+				if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
+					htmlFile.delete();
+				}
+
 			}
 			res.add(new Result<Rechnung>(rn));
 

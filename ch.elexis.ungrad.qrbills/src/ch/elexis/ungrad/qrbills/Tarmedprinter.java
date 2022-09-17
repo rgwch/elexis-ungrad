@@ -193,7 +193,7 @@ public class Tarmedprinter {
 			tcCode = "01";
 		}
 		XMLPrinterUtil.updateContext(rn, fall, pat, rnMandant, rnSteller, paymentMode);
-		
+
 		ESR esr = new ESR(rnSteller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
 				rnSteller.getInfoString(TarmedACL.getInstance().ESRSUB), rn.getRnId(), ESR.ESR27);
 
@@ -229,6 +229,11 @@ public class Tarmedprinter {
 		currentPage = addDiagnoses(currentPage, body.getTreatment());
 		currentPage = addRemarks(currentPage, body.getRemark());
 		currentPage = addReminderFields(currentPage, request.getPayload().getReminder(), rn.getNr());
+
+		Kontakt zuweiser = fall.getRequiredContact("Zuweiser");
+		if (zuweiser != null) {
+			replacer.put("Zuweiser", zuweiser);
+		}
 
 		replacer.put("Biller", rnSteller);
 		replacer.put("Provider", rnMandant);
@@ -295,9 +300,9 @@ public class Tarmedprinter {
 		// sb.append("<tr><td span=\"11\">Only last page</td></tr>");
 		// --------------------------------------
 		currentPage = currentPage.replace("[Leistungen]", sb.toString());
-		double rest=Math.max(cmAvail-0.5,0.1);
+		double rest = Math.max(cmAvail - 0.5, 0.1);
 		currentPage = createBalance(currentPage, balance, new Money(0.0));
-		currentPage=currentPage.replace("[padding]", Long.toString(Math.round(rest*10)));
+		currentPage = currentPage.replace("[padding]", Long.toString(Math.round(rest * 10)));
 
 		FileTool.writeTextFile(outfile, currentPage);
 		monitor.worked(2);
@@ -604,22 +609,21 @@ public class Tarmedprinter {
 		} else {
 			vatNumber = vatNumber + " MWST";
 		}
-		page=page.replace("[anzahlung]", df.format(paid));
-		page=page.replace("[total]", df.format(balance.getAmount()));
-		page=page.replace("[MWST]", vatNumber);
-		page=page.replace("[vat0]", df.format(getVatRate(0,vat)));
-		page=page.replace("[vat0amount]", df.format(getVatAmount(0, vat)));
-		page=page.replace("[vat0vat]", df.format(getVatVat(0, vat)));
-		page=page.replace("[vat1]", df.format(getVatRate(1,vat)));
-		page=page.replace("[vat1amount]", df.format(getVatAmount(1, vat)));
-		page=page.replace("[vat1vat]", df.format(getVatVat(1, vat)));
-		page=page.replace("[vat2]", df.format(getVatRate(2,vat)));
-		page=page.replace("[vat2amount]", df.format(getVatAmount(2, vat)));
-		page=page.replace("[vat2vat]", df.format(getVatVat(2, vat)));
-		page=page.replace("[amountObl]", df.format(balance.getAmountObligations()));
-		page=page.replace("[amountdue]", df.format(balance.getAmountDue()));
-		
-		
+		page = page.replace("[anzahlung]", df.format(paid));
+		page = page.replace("[total]", df.format(balance.getAmount()));
+		page = page.replace("[MWST]", vatNumber);
+		page = page.replace("[vat0]", df.format(getVatRate(0, vat)));
+		page = page.replace("[vat0amount]", df.format(getVatAmount(0, vat)));
+		page = page.replace("[vat0vat]", df.format(getVatVat(0, vat)));
+		page = page.replace("[vat1]", df.format(getVatRate(1, vat)));
+		page = page.replace("[vat1amount]", df.format(getVatAmount(1, vat)));
+		page = page.replace("[vat1vat]", df.format(getVatVat(1, vat)));
+		page = page.replace("[vat2]", df.format(getVatRate(2, vat)));
+		page = page.replace("[vat2amount]", df.format(getVatAmount(2, vat)));
+		page = page.replace("[vat2vat]", df.format(getVatVat(2, vat)));
+		page = page.replace("[amountObl]", df.format(balance.getAmountObligations()));
+		page = page.replace("[amountdue]", df.format(balance.getAmountDue()));
+
 		return page;
 	}
 
