@@ -73,7 +73,8 @@ public class QR_SettingsControl extends Composite {
 		outputDirXML = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_XML, CorePreferenceInitializer.getDefaultDBPath());
 		tOutdirXML.setText(outputDirXML);
 	
-		new Label(this, SWT.SEPARATOR);
+		Label sep=new Label(this, SWT.SEPARATOR|SWT.HORIZONTAL);
+		sep.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbQRPage = new Button(this, SWT.CHECK);
 		cbQRPage.setText("Seite mit QR ausgeben");
 		cbQRPage.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
@@ -104,7 +105,9 @@ public class QR_SettingsControl extends Composite {
 		cbDoDelete.setText("PDF nach dem Drucken löschen");
 		cbDoDelete.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbDoDelete.setSelection(CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, true));
-		new Label(this, SWT.SEPARATOR);
+		Label sep2=new Label(this, SWT.SEPARATOR|SWT.HORIZONTAL);
+		sep2.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		
 		cbDebug=new Button(this,SWT.CHECK);
 		cbDebug.setText("Debug: HTML Zwischendateien nicht löschen");
 		cbDebug.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));

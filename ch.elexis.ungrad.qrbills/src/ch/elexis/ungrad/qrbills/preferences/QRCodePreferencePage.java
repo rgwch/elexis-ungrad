@@ -42,7 +42,7 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 	private Text txIban;
 	private FileFieldEditor ffe1,ffe2,ffe3,ffe4;
 	private Mandant currentMandator;
-	private static final String ERRMSG_BAD_IBAN = "Eine zulässige IBAN muss genau 21 Zeichen lang sein und mit CH oder LI beginnen.";
+	private static final String ERRMSG_BAD_IBAN = "Eine zulässige QR-IBAN muss genau 21 Zeichen lang sein und mit CH oder LI beginnen.";
 	private static final String ERRMSG_BAD_BANK = "Die gewählte Bank ist nicht gültig.";
 
 	public QRCodePreferencePage() {
@@ -89,7 +89,7 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 		txBank.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		lbIban = new Label(ret, SWT.NONE);
 		lbIban.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		lbIban.setText("IBAN");
+		lbIban.setText("QR-IBAN");
 		txIban = new Text(ret, SWT.NONE);
 		txIban.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		HashMap<String, Mandant> hMandanten = new HashMap<>();
