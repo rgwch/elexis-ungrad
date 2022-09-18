@@ -28,6 +28,7 @@ import ch.elexis.TarmedRechnung.XMLExporterTiers;
 import ch.elexis.arzttarife_schweiz.Messages;
 import ch.elexis.base.ch.ebanking.esr.ESR;
 import ch.elexis.core.constants.StringConstants;
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.interfaces.IRnOutputter.TYPE;
 import ch.elexis.core.data.util.PlatformHelper;
@@ -47,6 +48,7 @@ import ch.elexis.tarmed.printer.XML44Services;
 import ch.elexis.tarmed.printer.XMLPrinterUtil;
 import ch.elexis.tarmedprefs.TarmedRequirements;
 import ch.elexis.ungrad.Resolver;
+import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.fd.invoice440.request.BalanceType;
 import ch.fd.invoice440.request.BodyType;
 import ch.fd.invoice440.request.DiagnosisType;
@@ -304,7 +306,7 @@ public class Tarmedprinter {
 		// sb.append("<tr><td span=\"11\">Only last page</td></tr>");
 		// --------------------------------------
 		currentPage = currentPage.replace("[Leistungen]", sb.toString());
-		double rest = Math.max(cmAvail - 0.5, 0.1);
+		double rest = Math.max(cmAvail - 1.0, 0.1);
 		currentPage = createBalance(currentPage, balance, new Money(0.0));
 		currentPage = currentPage.replace("[padding]", Long.toString(Math.round(rest * 10)));
 

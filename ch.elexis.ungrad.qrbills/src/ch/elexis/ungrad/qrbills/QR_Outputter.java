@@ -162,10 +162,23 @@ public class QR_Outputter implements IRnOutputter {
 			if (CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true)) {
 				File rfhtml = new File(outputDirPDF, rn.getNr() + "_rf.html");
 				tp.print(rn, doc, type, rfhtml, monitor);
-				FileOutputStream rfpdf = new FileOutputStream(new File(outputDirPDF, rn.getNr() + "_rf.pdf"));
+				File pdfout=new File(outputDirPDF, rn.getNr() + "_rf.pdf");
+				FileOutputStream rfpdf = new FileOutputStream(pdfout);
 				PdfRendererBuilder builder = new PdfRendererBuilder();
 
 				builder.useFastMode().withFile(rfhtml).toStream(rfpdf).run();
+				if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
+					String defaultPrinter = null;
+					if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
+						defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
+					}
+					if (printer.print(pdfout, defaultPrinter)) {
+						if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
+							pdfout.delete();
+						}
+					}
+				}
+			
 				monitor.worked(5);
 				if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
 					rfhtml.delete();
