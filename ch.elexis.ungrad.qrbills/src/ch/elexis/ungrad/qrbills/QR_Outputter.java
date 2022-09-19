@@ -226,7 +226,7 @@ public class QR_Outputter implements IRnOutputter {
 				Resolver resolver = new Resolver(replacer, true);
 
 				String cookedHTML = resolver.resolve(rawHTML);
-				byte[] png = qr.generate(rn, bill);
+				byte[] png = qr.generate(rn, bill,adressat);
 				File imgFile = new File(outputDirPDF, rn.getRnId() + ".png");
 				FileTool.writeFile(imgFile, png);
 
@@ -235,7 +235,7 @@ public class QR_Outputter implements IRnOutputter {
 						.replace("[IBAN]", bill.formattedIban).replace("[BILLER]", bill.combinedAddress(bill.biller))
 						.replace("[ESRLINE]", bill.formattedReference)
 						.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
-						.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);
+						.replace("[ADDRESSEE]", bill.combinedAddress(adressat)).replace("[DUE]", bill.dateDue);
 
 				File htmlFile = new File(outputDirPDF, rn.getNr() + ".html");
 				File pdfFile = new File(outputDirPDF, rn.getNr() + "_qr.pdf");
