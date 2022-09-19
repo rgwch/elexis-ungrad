@@ -187,7 +187,6 @@ public class Tarmedprinter {
 		if (body.getTiersGarant() != null) {
 			paymentMode = XMLExporter.TIERS_GARANT;
 		}
-
 		String tcCode = null;
 		if (TarmedRequirements.hasTCContract(rnSteller) && paymentMode.equals(XMLExporter.TIERS_GARANT)) {
 			tcCode = TarmedRequirements.getTCCode(rnSteller);
@@ -274,8 +273,8 @@ public class Tarmedprinter {
 				RecordTarmedType tarmed = (RecordTarmedType) obj;
 				sb.append(getTarmedRecordString(tarmed, eanMap));
 				String posname = tarmed.getName();
-				if (posname.length() > 114) {
-					posname = posname.substring(0, 114);
+				if (posname.length() > 120) {
+					posname = posname.substring(0, 120);
 				}
 				sb.append("<tr><td></td><td></td><td colspan=\"14\" class=\"text\">").append(posname)
 						.append("</td></tr>");
@@ -307,7 +306,7 @@ public class Tarmedprinter {
 		// --------------------------------------
 		currentPage = currentPage.replace("[Leistungen]", sb.toString());
 		double rest = Math.max(cmAvail - 1.0, 0.1);
-		currentPage = createBalance(currentPage, balance, new Money(0.0));
+		currentPage = createBalance(currentPage, balance);
 		currentPage = currentPage.replace("[padding]", Long.toString(Math.round(rest * 10)));
 
 		FileTool.writeTextFile(outfile, currentPage);
@@ -607,8 +606,9 @@ public class Tarmedprinter {
 		return bd.doubleValue();
 	}
 
-	private String createBalance(String page, BalanceType balance, Money paid) {
+	private String createBalance(String page, BalanceType balance) {
 		VatType vat = balance.getVat();
+		Money paid = new Money(balance.getAmountPrepaid());
 		String vatNumber = vat.getVatNumber();
 		if (vatNumber == null || vatNumber.equals(" ")) {
 			vatNumber = "keine";
