@@ -87,19 +87,9 @@ public class Tarmedprinter {
 	private static double cmFooter = 4; // Platz für Endabrechnung
 	private double cmAvail = 21.4; // Verfügbare Druckhöhe in cm
 
-	private String printer;
-	private String tarmedTray;
 	private TimeTool tTime;
 	private double sideTotal;
-
-	private Fall fall;
-	private Patient pat;
-	private Mandant rnMandant;
-	private Rechnungssteller rnSteller;
-	private RequestType request;
-	private Kontakt rnGarant;
-	private String paymentMode;
-	private String documentId;
+	private BillDetails billDetails;
 	private Map<String, IPersistentObject> replacer;
 
 	private static DecimalFormat df = new DecimalFormat(StringConstants.DOUBLE_ZERO);
@@ -147,62 +137,24 @@ public class Tarmedprinter {
 		return FileTool.readTextFile(templatefile);
 	}
 
-	public boolean print(Rechnung rn, Document xmlRn, TYPE rnType, File outfile, IProgressMonitor monitor)
-			throws Exception {
+	public File print(BillDetails bill, IProgressMonitor monitor) throws Exception {
+
+		File outfile = new File(bill.outputDirPDF, bill.rn.getNr() + "_rf.html");
 
 		String currentPage = loadTemplate("tarmed44_page1.html");
 		replacer = new HashMap<>();
 
 		Mandant mSave = (Mandant) ElexisEventDispatcher.getSelected(Mandant.class);
-		monitor.subTask(rn.getLabel());
+		monitor.subTask(bill.rn.getLabel());
 
-		fall = rn.getFall();
-		rnMandant = rn.getMandant();
-		if (fall == null || rnMandant == null) {
-			logger.error("Fall and/or Mandant of invoice is null");
-			return false;
-		}
+		Hub.setMandant(bill.mandator);
 
-		pat = fall.getPatient();
-		Hub.setMandant(rnMandant);
-		rnSteller = rnMandant.getRechnungssteller();
-		if (pat == null || rnSteller == null) {
-			logger.error("Patient and/or Rechnungssteller is null");
-			return false;
-		}
-		request = TarmedJaxbUtil.unmarshalInvoiceRequest440(xmlRn);
-		if (request == null) {
-			logger.error("Could not unmarshall xml document for invoice");
-			throw new Exception("Bad xml structure in " + rn.getNr());
-		}
-		BodyType body = request.getPayload().getBody();
-		BalanceType balance = body.getBalance();
-		ServicesType services = body.getServices();
-		InvoiceType invoice = request.getPayload().getInvoice();
-		TimeTool date = new TimeTool(invoice.getRequestDate().toString());
-		documentId = invoice.getRequestId() + " - " + date.toString(TimeTool.DATE_GER) + " "
-				+ date.toString(TimeTool.TIME_FULL);
-
-		paymentMode = XMLExporter.TIERS_PAYANT;
-		if (body.getTiersGarant() != null) {
-			paymentMode = XMLExporter.TIERS_GARANT;
-		}
-		String tcCode = null;
-		if (TarmedRequirements.hasTCContract(rnSteller) && paymentMode.equals(XMLExporter.TIERS_GARANT)) {
-			tcCode = TarmedRequirements.getTCCode(rnSteller);
-		} else if (paymentMode.equals(XMLExporter.TIERS_PAYANT)) {
-			tcCode = "01";
-		}
-		XMLPrinterUtil.updateContext(rn, fall, pat, rnMandant, rnSteller, paymentMode);
-
-		ESR esr = new ESR(rnSteller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
-				rnSteller.getInfoString(TarmedACL.getInstance().ESRSUB), rn.getRnId(), ESR.ESR27);
-
-		rnGarant = getAddressat(fall);
-		if (rnGarant == null) {
-			rnGarant = pat;
-		}
-		if (request.getPayload().isCopy()) {
+		/*
+		 * ESR esr = new ESR(rnSteller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
+		 * rnSteller.getInfoString(TarmedACL.getInstance().ESRSUB), rn.getRnId(),
+		 * ESR.ESR27);
+		 */
+		if (bill.type == TYPE.COPY) {
 			currentPage = currentPage.replace("[F5]", Messages.RnPrintView_yes); //$NON-NLS-1$
 		} else {
 			currentPage = currentPage.replace("[F5]", Messages.RnPrintView_no); //$NON-NLS-1$
@@ -210,44 +162,42 @@ public class Tarmedprinter {
 		String gesetzDatum = "Falldatum";
 		String gesetzNummer = "Fall-Nr.";
 		String gesetzZSRNIF = "AHV-Nr.";
-		if (body.getUvg() != null) {
+		if (bill.fallType == BillDetails.FALL_UVG) {
 			gesetzDatum = "Unfalldatum";
 			gesetzNummer = "Unfall-Nr.";
 		}
-		if (body.getIvg() != null) {
+		if (bill.fallType == BillDetails.FALL_IVG) {
 			gesetzDatum = "Verfügungsdatum";
 			gesetzNummer = "Verfügungs-Nr.";
 			gesetzZSRNIF = "NIF-Nr.(P)";
 		}
-		String vekaNumber = StringTool.unNull((String) fall.getExtInfoStoredObjectByKey("VEKANr"));
+		String vekaNumber = StringTool.unNull((String) bill.fall.getExtInfoStoredObjectByKey("VEKANr"));
 
 		currentPage = currentPage.replace("[F44.Datum]", gesetzDatum).replace("[F44.Nummer]", gesetzNummer);
-		currentPage = currentPage.replace("[F44.FDatum]", getFDatum(body, fall)).replace("[F44.FNummer]",
-				getFNummer(body, fall));
+		currentPage = currentPage.replace("[F44.FDatum]", bill.caseDate).replace("[F44.FNummer]", bill.caseNumber);
 		currentPage = currentPage.replace("[F44.ZSRNIF]", gesetzZSRNIF).replace("[F44.VEKANr]", vekaNumber);
 
-		currentPage = processHeaders(currentPage, 1);
-		currentPage = addDiagnoses(currentPage, body.getTreatment());
-		currentPage = addRemarks(currentPage, body.getRemark());
-		currentPage = addReminderFields(currentPage, request.getPayload().getReminder(), rn.getNr());
+		currentPage = processHeaders(currentPage, bill, 1);
+		currentPage = addDiagnoses(currentPage, bill.treatments);
+		currentPage = addRemarks(currentPage, bill.remarks);
+		currentPage = addReminderFields(currentPage, bill.reminders, bill.rn.getNr());
 
-		Kontakt zuweiser = fall.getRequiredContact("Zuweiser");
-		if (zuweiser != null) {
-			replacer.put("Zuweiser", zuweiser);
+		if (bill.zuweiser != null) {
+			replacer.put("Zuweiser", bill.zuweiser);
 		}
 
-		replacer.put("Biller", rnSteller);
-		replacer.put("Provider", rnMandant);
-		replacer.put("Patient", pat);
-		replacer.put("Adressat", rnGarant);
-		replacer.put("Fall", fall);
+		replacer.put("Biller", bill.biller);
+		replacer.put("Provider", bill.mandator);
+		replacer.put("Patient", bill.patient);
+		replacer.put("Adressat", bill.adressat);
+		replacer.put("Fall", bill.fall);
 		Resolver resolver = new Resolver(replacer, true);
 		currentPage = resolver.resolve(currentPage);
 		// Remove all unreplaced fields
 		currentPage = currentPage.replaceAll("\\[F.+\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// ------------ Service records ---------
-		List<Object> serviceRecords = services.getRecordTarmedOrRecordDrgOrRecordLab();
+		List<Object> serviceRecords = bill.services.getRecordTarmedOrRecordDrgOrRecordLab();
 
 		// lookup EAN numbers in services
 		String[] eanArray = initEanArray(serviceRecords);
@@ -293,7 +243,7 @@ public class Tarmedprinter {
 				// addESRCodeLine(balance, tcCode, esr);
 				pageNumber += 1;
 				cmAvail = cmMiddlePage;
-				String page_n = processHeaders(loadTemplate("tarmed44_page_n.fragment"), pageNumber);
+				String page_n = processHeaders(loadTemplate("tarmed44_page_n.fragment"), bill,pageNumber);
 				page_n = resolver.resolve(page_n);
 				sb.append(page_n);
 			}
@@ -306,7 +256,7 @@ public class Tarmedprinter {
 		// --------------------------------------
 		currentPage = currentPage.replace("[Leistungen]", sb.toString());
 		double rest = Math.max(cmAvail - 1.0, 0.1);
-		currentPage = createBalance(currentPage, balance);
+		currentPage = createBalance(currentPage, bill.balance);
 		currentPage = currentPage.replace("[padding]", Long.toString(Math.round(rest * 10)));
 
 		FileTool.writeTextFile(outfile, currentPage);
@@ -317,7 +267,7 @@ public class Tarmedprinter {
 		} catch (InterruptedException e) {
 			// never mind
 		}
-		return true;
+		return outfile;
 	}
 
 	private String addReminderFields(String page, ReminderType reminder, String nr) {
@@ -338,94 +288,51 @@ public class Tarmedprinter {
 		return page;
 	}
 
-	private String processHeaders(String page, final int pagenumber) {
-		if (paymentMode == XMLExporter.TIERS_GARANT) {
+	private String processHeaders(String page, final BillDetails billDetails, final int pagenumber) {
+		if (billDetails.paymentMode == XMLExporter.TIERS_GARANT) {
 			page = page.replace("[Titel]", "Rückforderungsbeleg");
 		} else {
 			page = page.replace("[Titel]", "TP-Rechnung");
 		}
-		page = page.replace("[DocID]", documentId).replace("[pagenr]", Integer.toString(pagenumber));
-		if (fall.getAbrechnungsSystem().equals("IV")) { //$NON-NLS-1$
-			page = page.replace("[NIF]", TarmedRequirements.getNIF(rnMandant)); //$NON-NLS-1$
-			String ahv = TarmedRequirements.getAHV(fall.getPatient());
+		page = page.replace("[DocID]", billDetails.documentId).replace("[pagenr]", Integer.toString(pagenumber));
+		if (billDetails.fallType==BillDetails.FALL_IVG) { 
+			page = page.replace("[NIF]", TarmedRequirements.getNIF(billDetails.mandator)); //$NON-NLS-1$
+			String ahv = TarmedRequirements.getAHV(billDetails.patient);
 			if (StringTool.isNothing(ahv)) {
-				ahv = fall.getRequiredString("AHV-Nummer");
+				ahv = billDetails.fall.getRequiredString("AHV-Nummer");
 			}
 			page = page.replace("[F60]", ahv); //$NON-NLS-1$
 		} else {
-			page = page.replace("[NIF]", TarmedRequirements.getKSK(rnMandant)); //$NON-NLS-1$
+			page = page.replace("[NIF]", TarmedRequirements.getKSK(billDetails.mandator)); //$NON-NLS-1$
 			page = page.replace("[F60]", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return page.replaceAll("\\?\\?\\??[a-zA-Z0-9 \\.]+\\?\\?\\??", "");
 	}
 
-	private String addFallSpecificLines(String page) {
-		BodyType body = request.getPayload().getBody();
-		if (body != null) {
-			String gesetzDatum = "Falldatum";
-			String gesetzNummer = "Fall-Nr.";
-			String gesetzZSRNIF = "ZSR-Nr.(P)";
-			if (body.getUvg() != null) {
-				gesetzDatum = "Unfalldatum";
-				gesetzNummer = "Unfall-Nr.";
-			}
-			if (body.getIvg() != null) {
-				gesetzDatum = "Verfügungsdatum";
-				gesetzNummer = "Verfügungs-Nr.";
-				gesetzZSRNIF = "NIF-Nr.(P)";
-			}
-			String vekaNumber = StringTool.unNull((String) fall.getExtInfoStoredObjectByKey("VEKANr"));
-
-			page = page.replace("[F44.Datum]", gesetzDatum);
-			page = page.replace("[F44.Nummer]", gesetzNummer);
-
-			page = page.replace("[F44.FDatum]", getFDatum(body, fall));
-			page = page.replace("[F44.FNummer]", getFNummer(body, fall));
-
-			page = page.replace("[F44.ZSRNIF]", gesetzZSRNIF);
-			page = page.replace("[F44.VEKANr]", vekaNumber);
+	private String addFallSpecificLines(BillDetails b, String page) {
+		String gesetzDatum = "Falldatum";
+		String gesetzNummer = "Fall-Nr.";
+		String gesetzZSRNIF = "ZSR-Nr.(P)";
+		if (b.fallType == BillDetails.FALL_UVG) {
+			gesetzDatum = "Unfalldatum";
+			gesetzNummer = "Unfall-Nr.";
 		}
+		if (b.fallType == BillDetails.FALL_IVG) {
+			gesetzDatum = "Verfügungsdatum";
+			gesetzNummer = "Verfügungs-Nr.";
+			gesetzZSRNIF = "NIF-Nr.(P)";
+		}
+		String vekaNumber = StringTool.unNull((String) b.fall.getExtInfoStoredObjectByKey("VEKANr"));
+
+		page = page.replace("[F44.Datum]", gesetzDatum);
+		page = page.replace("[F44.Nummer]", gesetzNummer);
+
+		page = page.replace("[F44.FDatum]", b.caseDate);
+		page = page.replace("[F44.FNummer]", b.caseNumber);
+
+		page = page.replace("[F44.ZSRNIF]", gesetzZSRNIF);
+		page = page.replace("[F44.VEKANr]", vekaNumber);
 		return page;
-	}
-
-	private String getFDatum(BodyType body, Fall fall) {
-		if (body.getUvg() != null) {
-			String ret = fall.getInfoString("Unfalldatum");
-			if (ret != null && !ret.isEmpty()) {
-				return ret;
-			}
-		}
-		if (body.getIvg() != null) {
-			String ret = fall.getInfoString("Verfügungsdatum");
-			if (ret != null && !ret.isEmpty()) {
-				return ret;
-			}
-		}
-		return fall.getBeginnDatum();
-	}
-
-	private String getFNummer(BodyType body, Fall fall) {
-		if (body.getUvg() != null) {
-			String ret = fall.getInfoString("Unfall-Nr.");
-			if (ret != null && !ret.isEmpty()) {
-				return ret;
-			}
-			ret = fall.getInfoString("Unfallnummer");
-			if (ret != null && !ret.isEmpty()) {
-				return ret;
-			}
-		}
-		if (body.getIvg() != null) {
-			String ret = fall.getInfoString("Verfügungs-Nr.");
-			if (ret != null && !ret.isEmpty()) {
-				return ret;
-			}
-			ret = fall.getInfoString("Verfügungsnummer");
-			if (ret != null && !ret.isEmpty()) {
-				return ret;
-			}
-		}
-		return fall.getFallNummer();
 	}
 
 	private String addRemarks(String page, final String remark) {
@@ -785,13 +692,4 @@ public class Tarmedprinter {
 		return null;
 	}
 
-	public Kontakt getAddressat(Fall fall) {
-		Tiers tiersType = fall.getTiersType();
-		switch (tiersType) {
-		case PAYANT:
-			return fall.getCostBearer();
-		default:
-			return XMLExporterTiers.getGuarantor(XMLExporter.TIERS_GARANT, fall.getPatient(), fall);
-		}
-	}
 }

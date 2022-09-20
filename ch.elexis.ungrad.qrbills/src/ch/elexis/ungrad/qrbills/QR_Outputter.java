@@ -151,18 +151,12 @@ public class QR_Outputter implements IRnOutputter {
 	public void doPrint(Rechnung rn, IProgressMonitor monitor, TYPE type, Result<Rechnung> res) {
 		try {
 			monitor.subTask(rn.getNr());
-			String outputDirPDF = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF,
-					CoreHub.getTempDir().getAbsolutePath());
-			String outputDirXML = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_XML,
-					CoreHub.getTempDir().getAbsolutePath());
-
+			BillDetails bill=new BillDetails(rn, type);
 			Tarmedprinter tp = new Tarmedprinter();
-			File xmlfile = new File(outputDirXML, rn.getNr() + ".xml");
-			Document doc = xmlex.doExport(rn, xmlfile.getAbsolutePath(), type, true);
 			if (CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true)) {
-				File rfhtml = new File(outputDirPDF, rn.getNr() + "_rf.html");
-				tp.print(rn, doc, type, rfhtml, monitor);
-				File pdfout=new File(outputDirPDF, rn.getNr() + "_rf.pdf");
+				
+				File rfhtml=tp.print(bill, monitor);
+				File pdfout=new File(bill.outputDirPDF, rn.getNr() + "_rf.pdf");
 				FileOutputStream rfpdf = new FileOutputStream(pdfout);
 				PdfRendererBuilder builder = new PdfRendererBuilder();
 
@@ -214,11 +208,7 @@ public class QR_Outputter implements IRnOutputter {
 				}
 				String rawHTML = FileTool.readTextFile(template);
 			
-				BillDetails bill = new BillDetails(rn);
-				Kontakt adressat = tp.getAddressat(rn.getFall());
-				if (adressat == null) {
-					adressat = bill.adressat;
-				}
+				Kontakt adressat = bill.adressat;
 				replacer.put("Adressat", adressat);
 				replacer.put("Mandant", bill.biller);
 				replacer.put("Patient", bill.patient);
@@ -227,18 +217,18 @@ public class QR_Outputter implements IRnOutputter {
 
 				String cookedHTML = resolver.resolve(rawHTML);
 				byte[] png = qr.generate(rn, bill,adressat);
-				File imgFile = new File(outputDirPDF, rn.getRnId() + ".png");
+				File imgFile = new File(bill.outputDirPDF, rn.getRnId() + ".png");
 				FileTool.writeFile(imgFile, png);
 
 				String finished = cookedHTML.replace("[QRIMG]", rn.getRnId() + ".png")
-						.replace("[CURRENCY]", bill.currency).replace("[AMOUNT]", bill.amount.getAmountAsString())
+						.replace("[CURRENCY]", bill.currency).replace("[AMOUNT]", bill.amountDue.getAmountAsString())
 						.replace("[IBAN]", bill.formattedIban).replace("[BILLER]", bill.combinedAddress(bill.biller))
 						.replace("[ESRLINE]", bill.formattedReference)
 						.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
 						.replace("[ADDRESSEE]", bill.combinedAddress(adressat)).replace("[DUE]", bill.dateDue);
 
-				File htmlFile = new File(outputDirPDF, rn.getNr() + ".html");
-				File pdfFile = new File(outputDirPDF, rn.getNr() + "_qr.pdf");
+				File htmlFile = new File(bill.outputDirPDF, rn.getNr() + ".html");
+				File pdfFile = new File(bill.outputDirPDF, rn.getNr() + "_qr.pdf");
 				FileTool.writeTextFile(htmlFile, finished);
 				FileOutputStream fout = new FileOutputStream(pdfFile);
 				PdfRendererBuilder builder = new PdfRendererBuilder();

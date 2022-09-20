@@ -124,7 +124,7 @@ public class QR_SettingsControl extends Composite {
 		CoreHub.localCfg.set(PreferenceConstants.DIRECT_PRINT, cbDirectPrint.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DELETE_AFTER_PRINT, cbDoDelete.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
-		CoreHub.localCfg.set(PreferenceConstants.DEBUGFILES, cbDebug.getText());
+		CoreHub.localCfg.set(PreferenceConstants.DEBUGFILES, cbDebug.getSelection());
 		
 		if (cbPrinters.getSelectionIndex() > -1) {
 			PrintService printService = printers[cbPrinters.getSelectionIndex()];

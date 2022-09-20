@@ -14,8 +14,8 @@ import ch.rgw.crypt.BadParameterException;
 
 public class QR_Encoder {
 	public byte[] generate(Rechnung rn, BillDetails bill, Kontakt adressat) throws BadParameterException, UnsupportedEncodingException {
-		final QrInvoice qr = QrInvoiceBuilder.create().creditorIBAN(bill.IBAN)
-				.paymentAmountInformation(p -> p.chf(bill.amount.getAmount()))
+		final QrInvoice qr = QrInvoiceBuilder.create().creditorIBAN(bill.qrIBAN)
+				.paymentAmountInformation(p -> p.chf(bill.amountDue.getAmount()))
 				.creditor(c -> c.combinedAddress()
 						.name(bill.biller.get(Kontakt.FLD_NAME1) + " " + bill.biller.get(Kontakt.FLD_NAME2))
 						.addressLine1(bill.biller.get(Kontakt.FLD_STREET))
