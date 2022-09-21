@@ -149,11 +149,8 @@ public class Tarmedprinter {
 
 		Hub.setMandant(bill.mandator);
 
-		/*
-		 * ESR esr = new ESR(rnSteller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
-		 * rnSteller.getInfoString(TarmedACL.getInstance().ESRSUB), rn.getRnId(),
-		 * ESR.ESR27);
-		 */
+		
+		 
 		if (bill.type == TYPE.COPY) {
 			currentPage = currentPage.replace("[F5]", Messages.RnPrintView_yes); //$NON-NLS-1$
 		} else {
@@ -248,8 +245,6 @@ public class Tarmedprinter {
 				sb.append(page_n);
 			}
 		}
-		// addBalanceLines(cursor, tp, balance, ezData.paid);
-
 		// addESRCodeLine(balance, tcCode, esr);
 
 		// sb.append("<tr><td span=\"11\">Only last page</td></tr>");
@@ -344,10 +339,14 @@ public class Tarmedprinter {
 		return page;
 	}
 
-	private void addESRCodeLine(BalanceType balance, String tcCode, ESR esr) {
-		String offenRp = new Money(balance.getAmountDue()).getCentsAsString();
+	private void addESRCodeLine(BillDetails bill, String tcCode) {
+		String offenRp = bill.amountDue.getCentsAsString();
 		if (tcCode != null) {
-			// esr.printESRCodeLine(text.getPlugin(), offenRp, tcCode);
+			  ESR esr = new ESR(bill.biller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
+					  bill.biller.getInfoString(TarmedACL.getInstance().ESRSUB), bill.rn.getRnId(),
+					  ESR.ESR27);
+			  esr.createCodeline(offenRp, tcCode);
+
 		}
 	}
 
