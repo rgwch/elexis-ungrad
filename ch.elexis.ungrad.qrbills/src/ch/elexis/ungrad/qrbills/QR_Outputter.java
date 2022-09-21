@@ -231,7 +231,7 @@ public class QR_Outputter implements IRnOutputter {
 				FileTool.writeFile(imgFile, png);
 
 				String finished = cookedHTML.replace("[QRIMG]", rn.getRnId() + ".png")
-						.replace("[CURRENCY]", bill.currency).replace("[AMOUNT]", bill.amount.getAmountAsString())
+						.replace("[CURRENCY]", bill.currency).replace("[AMOUNT]", bill.amountDue.getAmountAsString())
 						.replace("[IBAN]", bill.formattedIban).replace("[BILLER]", bill.combinedAddress(bill.biller))
 						.replace("[ESRLINE]", bill.formattedReference)
 						.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")

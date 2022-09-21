@@ -33,7 +33,7 @@ public class BillDetails {
 	Rechnung rn;
 	Fall fall;
 	Patient patient;
-	Money amount;
+	Money amountDue;
 	Kontakt biller;
 	Kontakt adressat;
 	String IBAN = "CH000NUR00ZUR00DEMO00";
@@ -61,7 +61,10 @@ public class BillDetails {
 		this.rn = (Rechnung) checkNull(rn, "Rechnung");
 		fall = (Fall) checkNull(rn.getFall(), "Fall");
 		patient = (Patient) checkNull(fall.getPatient(), "Patient");
-		amount = (Money) checkNull(rn.getBetrag(), "Betrag");
+		Money amount = (Money) checkNull(rn.getBetrag(), "Betrag");
+		Money prepaid= rn.getAnzahlung();
+		amountDue=new Money(amount);
+		amountDue.subtractMoney(prepaid);
 		checkNull(rn.getMandant(), "Mandant");
 		biller = rn.getMandant().getRechnungssteller();
 		checkNull(biller, "Biller");
