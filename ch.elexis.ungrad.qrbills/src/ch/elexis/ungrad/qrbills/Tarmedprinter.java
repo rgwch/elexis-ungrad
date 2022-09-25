@@ -149,8 +149,6 @@ public class Tarmedprinter {
 
 		Hub.setMandant(bill.mandator);
 
-		
-		 
 		if (bill.type == TYPE.COPY) {
 			currentPage = currentPage.replace("[F5]", Messages.RnPrintView_yes); //$NON-NLS-1$
 		} else {
@@ -214,16 +212,13 @@ public class Tarmedprinter {
 			if (obj instanceof RecordServiceType) {
 				RecordServiceType rec = (RecordServiceType) obj;
 				sb.append(getRecordServiceString(rec, eanMap));
-				sb.append("<tr><td></td><td></td><td colspan=\"14\" class=\"text\">").append(rec.getName())
+				sb.append("<tr><td></td><td></td><td colspan=\"16\" class=\"text\">").append(rec.getName())
 						.append("</td></tr>");
 			} else if (obj instanceof RecordTarmedType) {
 				RecordTarmedType tarmed = (RecordTarmedType) obj;
 				sb.append(getTarmedRecordString(tarmed, eanMap));
 				String posname = tarmed.getName();
-				if (posname.length() > 120) {
-					posname = posname.substring(0, 120);
-				}
-				sb.append("<tr><td></td><td></td><td colspan=\"14\" class=\"text\">").append(posname)
+				sb.append("<tr><td></td><td></td><td colspan=\"15\" class=\"text\">").append(posname)
 						.append("</td></tr>");
 			}
 			if (recText == null) {
@@ -240,7 +235,7 @@ public class Tarmedprinter {
 				// addESRCodeLine(balance, tcCode, esr);
 				pageNumber += 1;
 				cmAvail = cmMiddlePage;
-				String page_n = processHeaders(loadTemplate("tarmed44_page_n.fragment"), bill,pageNumber);
+				String page_n = processHeaders(loadTemplate("tarmed44_page_n.fragment"), bill, pageNumber);
 				page_n = resolver.resolve(page_n);
 				sb.append(page_n);
 			}
@@ -290,7 +285,7 @@ public class Tarmedprinter {
 			page = page.replace("[Titel]", "TP-Rechnung");
 		}
 		page = page.replace("[DocID]", billDetails.documentId).replace("[pagenr]", Integer.toString(pagenumber));
-		if (billDetails.fallType==BillDetails.FALL_IVG) { 
+		if (billDetails.fallType == BillDetails.FALL_IVG) {
 			page = page.replace("[NIF]", TarmedRequirements.getNIF(billDetails.mandator)); //$NON-NLS-1$
 			String ahv = TarmedRequirements.getAHV(billDetails.patient);
 			if (StringTool.isNothing(ahv)) {
@@ -342,10 +337,9 @@ public class Tarmedprinter {
 	private void addESRCodeLine(BillDetails bill, String tcCode) {
 		String offenRp = bill.amountDue.getCentsAsString();
 		if (tcCode != null) {
-			  ESR esr = new ESR(bill.biller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
-					  bill.biller.getInfoString(TarmedACL.getInstance().ESRSUB), bill.rn.getRnId(),
-					  ESR.ESR27);
-			  esr.createCodeline(offenRp, tcCode);
+			ESR esr = new ESR(bill.biller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
+					bill.biller.getInfoString(TarmedACL.getInstance().ESRSUB), bill.rn.getRnId(), ESR.ESR27);
+			esr.createCodeline(offenRp, tcCode);
 
 		}
 	}
@@ -389,13 +383,12 @@ public class Tarmedprinter {
 		sb.append("<td class=\"ziffer\">").append(getTarifType(rec)).append("</td>");//$NON-NLS-1$ //$NON-NLS-2$
 		String code = rec.getCode();
 		sb.append("<td class=\"ziffer\">").append(code).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+		String refCode = SPACE;
 		if (code.length() < 10) {
-			String refCode = rec.getRefCode();
-			if (refCode == null) {
-				refCode = SPACE;
-			}
-			sb.append("<td class=\"ziffer\">").append(refCode).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+			refCode = rec.getRefCode();
+
 		}
+		sb.append("<td class=\"ziffer\">").append(refCode).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append("<td class=\"ziffer\">").append(rec.getSession()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append("<td></td>");
 		sb.append("<td class=\"ziffer\">").append(rec.getQuantity()).append("</td>"); //$NON-NLS-1$ //$NON-NLS-2$
