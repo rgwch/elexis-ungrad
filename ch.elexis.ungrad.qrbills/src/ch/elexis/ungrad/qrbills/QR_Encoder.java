@@ -13,8 +13,9 @@ import ch.elexis.data.Rechnung;
 import ch.rgw.crypt.BadParameterException;
 
 public class QR_Encoder {
-	public byte[] generate(Rechnung rn, BillDetails bill, Kontakt adressat) throws BadParameterException, UnsupportedEncodingException {
-		final QrInvoice qr = QrInvoiceBuilder.create().creditorIBAN(bill.IBAN)
+	public byte[] generate(Rechnung rn, BillDetails bill, Kontakt adressat)
+			throws BadParameterException, UnsupportedEncodingException {
+		final QrInvoice qr = QrInvoiceBuilder.create().creditorIBAN(bill.qrIBAN)
 				.paymentAmountInformation(p -> p.chf(bill.amountDue.getAmount()))
 				.creditor(c -> c.combinedAddress()
 						.name(bill.biller.get(Kontakt.FLD_NAME1) + " " + bill.biller.get(Kontakt.FLD_NAME2))
@@ -22,12 +23,14 @@ public class QR_Encoder {
 						.addressLine2(bill.biller.get(Kontakt.FLD_ZIP) + " " + bill.biller.get(Kontakt.FLD_PLACE))
 						.country("CH"))
 				/*
+				 * .ultimateDebtor(d -> d.combinedAddress()
+				 * .name(bill.patient.get(Kontakt.FLD_NAME1) + " " +
+				 * bill.patient.get(Kontakt.FLD_NAME2))
+				 * .addressLine1(bill.patient.get(Kontakt.FLD_STREET))
+				 * .addressLine2(bill.patient.get(Kontakt.FLD_ZIP) + " " +
+				 * bill.patient.get(Kontakt.FLD_PLACE))
+				 */
 				.ultimateDebtor(d -> d.combinedAddress()
-						.name(bill.patient.get(Kontakt.FLD_NAME1) + " " + bill.patient.get(Kontakt.FLD_NAME2))
-						.addressLine1(bill.patient.get(Kontakt.FLD_STREET))
-						.addressLine2(bill.patient.get(Kontakt.FLD_ZIP) + " " + bill.patient.get(Kontakt.FLD_PLACE))
-				*/
-				.ultimateDebtor(d->d.combinedAddress()
 						.name(adressat.get(Kontakt.FLD_NAME1) + " " + adressat.get(Kontakt.FLD_NAME2))
 						.addressLine1(adressat.get(Kontakt.FLD_STREET))
 						.addressLine2(adressat.get(Kontakt.FLD_ZIP) + " " + adressat.get(Kontakt.FLD_PLACE))
