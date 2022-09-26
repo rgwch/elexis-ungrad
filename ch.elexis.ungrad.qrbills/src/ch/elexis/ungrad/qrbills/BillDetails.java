@@ -235,7 +235,6 @@ public class BillDetails {
 		checkNull(rn.getMandant(), "Mandant");
 		biller = rn.getMandant().getRechnungssteller();
 		checkNull(biller, "Biller");
-		adressat = patient;
 		String patnr = (String) checkNull(patient.getPatCode(), "PatientNr.");
 		qrIBAN = (String) biller.getExtInfoStoredObjectByKey(PreferenceConstants.QRIBAN);
 		checkNull(qrIBAN, "IBAN");
