@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tarmed Bills 4.5 with QR Code
 Bundle-SymbolicName: ch.elexis.ungrad.qrbills;singleton:=true
-Bundle-Version: 2.2.3.qualifier
+Bundle-Version: 2.2.4.qualifier
 Bundle-Vendor: weirich@elexis.ch
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: ch.elexis.core.data;bundle-version="3.4.0",
