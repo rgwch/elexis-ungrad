@@ -85,7 +85,7 @@ public class Tarmedprinter {
 	private static double cmFirstPage = 12.0; // Platz auf der ersten Seite
 	private static double cmMiddlePage = 21.0; // Platz auf Folgeseiten
 	private static double cmFooter = 4; // Platz für Endabrechnung
-	private double cmAvail = 21.4; // Verfügbare Druckhöhe in cm
+	private double cmAvail = 20.0; // Verfügbare Druckhöhe in cm
 
 	private TimeTool tTime;
 	private double sideTotal;
