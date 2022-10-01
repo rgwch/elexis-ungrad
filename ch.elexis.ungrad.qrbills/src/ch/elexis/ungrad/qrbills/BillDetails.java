@@ -66,7 +66,9 @@ public class BillDetails {
 	Fall fall;
 	Mandant mandator;
 	Rechnungssteller biller;
+	String biller_address;
 	Kontakt adressat;
+	String addressee;
 	Kontakt guarantor;
 	Kontakt zuweiser;
 	TYPE type;
@@ -74,7 +76,7 @@ public class BillDetails {
 	int fallType = FALL_KVG;
 	Patient patient;
 	Money amountTarmed, amountDrug, amountLab, amountMigel, amountPhysio, amountUnclassified, amountDue, amountPaid,
-			amountTotal;
+			amountTotal, amountReminder;
 	TreatmentType treatments;
 	ReminderType reminders;
 	String qrIBAN = "CH000NUR00ZUR00DEMO00";
@@ -83,8 +85,6 @@ public class BillDetails {
 	Kontakt bank;
 	String qrReference;
 	String formattedReference;
-	String biller_address;
-	String addressee;
 	String dateDue;
 	String firstDate;
 	String lastDate;
@@ -150,7 +150,10 @@ public class BillDetails {
 
 		double dReminder = balance.getAmountReminder();
 		if (dReminder > 0) {
-			amountDue.subtractMoney(new Money(dReminder));
+			amountReminder=new Money(dReminder);
+			amountDue.subtractMoney(amountReminder);
+		}else {
+			amountReminder=new Money();
 		}
 		amountPaid = new Money(balance.getAmountPrepaid());
 		GarantType eTiers = body.getTiersGarant();

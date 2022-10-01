@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -38,6 +39,8 @@ import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
 import ch.elexis.TarmedRechnung.TarmedACL;
 import ch.elexis.TarmedRechnung.XMLExporter;
+import ch.elexis.arzttarife_schweiz.Messages;
+import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.data.util.PlatformHelper;
@@ -47,12 +50,14 @@ import ch.elexis.data.Fall;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Rechnung;
 import ch.elexis.data.RnStatus;
+import ch.elexis.data.Zahlung;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.elexis.views.RnPrintView2;
 import ch.rgw.crypt.BadParameterException;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
+import ch.rgw.tools.Money;
 import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
 
@@ -214,9 +219,47 @@ public class QR_Outputter implements IRnOutputter {
 			File imgFile = new File(bill.outputDirPDF, bill.rn.getRnId() + ".png");
 			FileTool.writeFile(imgFile, png);
 
-			String finished = cookedHTML.replace("[QRIMG]", bill.rn.getRnId() + ".png").replace("[CURRENCY]", bill.currency)
-					.replace("[AMOUNT]", bill.amountDue.getAmountAsString()).replace("[IBAN]", bill.formattedIban)
-					.replace("[BILLER]", bill.combinedAddress(bill.biller))
+			StringBuilder sbSummary = new StringBuilder();
+			sbSummary.append("<table>");
+			if (!bill.amountTarmed.isNeglectable()) {
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_tarmedPoints).append("</td><td>")
+						.append(bill.amountTarmed.getAmountAsString()).append("</td></tr>");
+			}
+			if (!bill.amountDrug.isNeglectable()) {
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_medicaments).append("</td><td>")
+						.append(bill.amountDrug.getAmountAsString()).append("</td></tr>");
+			}
+			if (!bill.amountLab.isNeglectable()) {
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_labpoints).append("</td><td>")
+						.append(bill.amountLab.getAmountAsString()).append("</td></tr>");
+			}
+			if (!bill.amountMigel.isNeglectable()) {
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_migelpoints).append("</td><td>")
+						.append(bill.amountMigel.getAmountAsString()).append("</td></tr>");
+			}
+			if (!bill.amountPhysio.isNeglectable()) {
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_physiopoints).append("</td><td>")
+						.append(bill.amountPhysio.getAmountAsString()).append("</td></tr>");
+			}
+			if (!bill.amountUnclassified.isNeglectable()) {
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_otherpoints).append("</td><td>")
+						.append(bill.amountUnclassified.getAmountAsString()).append("</td></tr>");
+			}
+			if (!bill.amountReminder.isNeglectable()) {
+				List<Zahlung> extra = bill.rn.getZahlungen();
+				for (Zahlung z : extra) {
+					Money betrag = new Money(z.getBetrag()).multiply(-1.0);
+					if (!betrag.isNegative()) {
+						sbSummary.append("<tr><td>").append(z.getBemerkung()).append("</td><td>")
+								.append(betrag.getAmountAsString()).append("</td></tr>");
+					}
+				}
+			}
+			sbSummary.append("</table>");
+			String finished = cookedHTML.replace("[QRIMG]", bill.rn.getRnId() + ".png")
+					.replace("[LEISTUNGEN]", sbSummary.toString())
+					.replace("[CURRENCY]", bill.currency).replace("[AMOUNT]", bill.amountDue.getAmountAsString())
+					.replace("[IBAN]", bill.formattedIban).replace("[BILLER]", bill.combinedAddress(bill.biller))
 					.replace("[ESRLINE]", bill.formattedReference)
 					.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
 					.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);
@@ -249,8 +292,7 @@ public class QR_Outputter implements IRnOutputter {
 		}
 	}
 
-	private void printDetails(BillDetails bill)
-			throws Exception, FileNotFoundException, IOException, PrinterException {
+	private void printDetails(BillDetails bill) throws Exception, FileNotFoundException, IOException, PrinterException {
 		Tarmedprinter tp = new Tarmedprinter();
 		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true)) {
 
