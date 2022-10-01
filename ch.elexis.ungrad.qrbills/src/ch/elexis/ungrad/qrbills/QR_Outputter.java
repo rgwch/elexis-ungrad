@@ -113,12 +113,8 @@ public class QR_Outputter implements IRnOutputter {
 		xmlex = new XMLExporter();
 		modifyInvoiceState = true;
 
-		// rnPage =
-		// PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 		try {
-			// rnp = (RnPrintViewQR) rnPage.showView(RnPrintViewQR.ID);
-
 			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {
 
 				@Override
@@ -155,16 +151,16 @@ public class QR_Outputter implements IRnOutputter {
 
 	private void doPrint(Rechnung rn, IProgressMonitor monitor, TYPE type, Result<Rechnung> res) {
 		try {
-			monitor.subTask(rn.getNr()+" wird ausgegeben");
+			monitor.subTask(rn.getNr() + " wird ausgegeben");
 			BillDetails bill = new BillDetails(rn, type);
 			if (CoreHub.localCfg.get(PreferenceConstants.FACE_DOWN, false)) {
-				printQRPage(rn, bill);
+				printQRPage(bill);
 				monitor.worked(1);
-				printDetails(rn, bill);
+				printDetails(bill);
 			} else {
-				printDetails(rn, bill);
+				printDetails(bill);
 				monitor.worked(1);
-				printQRPage(rn, bill);
+				printQRPage(bill);
 			}
 			res.add(new Result<Rechnung>(rn));
 			monitor.worked(1);
@@ -175,13 +171,13 @@ public class QR_Outputter implements IRnOutputter {
 		}
 	}
 
-	private void printQRPage(Rechnung rn, BillDetails bill) throws IOException, Exception, BadParameterException,
+	private void printQRPage(BillDetails bill) throws IOException, Exception, BadParameterException,
 			UnsupportedEncodingException, FileNotFoundException, PrinterException {
 		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_QR, true)) {
 			String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 					+ File.separator + "qrbill_template_v4.html";
 			String fname = "";
-			switch (rn.getStatus()) {
+			switch (bill.rn.getStatus()) {
 			case RnStatus.OFFEN:
 			case RnStatus.OFFEN_UND_GEDRUCKT:
 				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL, "");
@@ -207,27 +203,26 @@ public class QR_Outputter implements IRnOutputter {
 			}
 			String rawHTML = FileTool.readTextFile(template);
 
-			Kontakt adressat = bill.adressat;
-			replacer.put("Adressat", adressat);
+			replacer.put("Adressat", bill.adressat);
 			replacer.put("Mandant", bill.biller);
 			replacer.put("Patient", bill.patient);
-			replacer.put("Rechnung", rn);
+			replacer.put("Rechnung", bill.rn);
 			Resolver resolver = new Resolver(replacer, true);
 
 			String cookedHTML = resolver.resolve(rawHTML);
-			byte[] png = qr.generate(rn, bill, adressat);
-			File imgFile = new File(bill.outputDirPDF, rn.getRnId() + ".png");
+			byte[] png = qr.generate(bill);
+			File imgFile = new File(bill.outputDirPDF, bill.rn.getRnId() + ".png");
 			FileTool.writeFile(imgFile, png);
 
-			String finished = cookedHTML.replace("[QRIMG]", rn.getRnId() + ".png").replace("[CURRENCY]", bill.currency)
+			String finished = cookedHTML.replace("[QRIMG]", bill.rn.getRnId() + ".png").replace("[CURRENCY]", bill.currency)
 					.replace("[AMOUNT]", bill.amountDue.getAmountAsString()).replace("[IBAN]", bill.formattedIban)
 					.replace("[BILLER]", bill.combinedAddress(bill.biller))
 					.replace("[ESRLINE]", bill.formattedReference)
 					.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
-					.replace("[ADDRESSEE]", bill.combinedAddress(adressat)).replace("[DUE]", bill.dateDue);
+					.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);
 
-			File htmlFile = new File(bill.outputDirPDF, rn.getNr() + ".html");
-			File pdfFile = new File(bill.outputDirPDF, rn.getNr() + "_qr.pdf");
+			File htmlFile = new File(bill.outputDirPDF, bill.rn.getNr() + ".html");
+			File pdfFile = new File(bill.outputDirPDF, bill.rn.getNr() + "_qr.pdf");
 			FileTool.writeTextFile(htmlFile, finished);
 			FileOutputStream fout = new FileOutputStream(pdfFile);
 			PdfRendererBuilder builder = new PdfRendererBuilder();
@@ -254,13 +249,13 @@ public class QR_Outputter implements IRnOutputter {
 		}
 	}
 
-	private void printDetails(Rechnung rn, BillDetails bill)
+	private void printDetails(BillDetails bill)
 			throws Exception, FileNotFoundException, IOException, PrinterException {
 		Tarmedprinter tp = new Tarmedprinter();
 		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true)) {
 
 			File rfhtml = tp.print(bill);
-			File pdfout = new File(bill.outputDirPDF, rn.getNr() + "_rf.pdf");
+			File pdfout = new File(bill.outputDirPDF, bill.rn.getNr() + "_rf.pdf");
 			FileOutputStream rfpdf = new FileOutputStream(pdfout);
 			PdfRendererBuilder builder = new PdfRendererBuilder();
 
