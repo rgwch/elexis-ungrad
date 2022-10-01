@@ -13,8 +13,12 @@
  *********************************************************************************/
 package ch.elexis.ungrad.qrbills;
 
+import java.awt.print.PrinterException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,15 +50,16 @@ import ch.elexis.data.RnStatus;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.elexis.views.RnPrintView2;
+import ch.rgw.crypt.BadParameterException;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
 
 /**
- * An Elexis-IRnOutputter for ISO 20022 conformant bills. Embeds a QR Code in a
- * HTML template and writes the result in a html file. (To be converted to pdf
- * or to print directly, whatever).
+ * An Elexis-IRnOutputter for ISO 20022 conformant bills. Creates a Tarmed/4.4
+ * conformant details page and a summary page with Sqiss QR-conformant payment
+ * slip. Both are created from html templates and ultimately converted to PDF.
  * 
  * @author gerry
  *
@@ -118,7 +123,7 @@ public class QR_Outputter implements IRnOutputter {
 
 				@Override
 				public void run(final IProgressMonitor monitor) {
-					monitor.beginTask("Drucke Rechnungen", rnn.size() * 10);
+					monitor.beginTask("Drucke Rechnungen", rnn.size() * 2);
 					for (Rechnung rn : rnn) {
 						doPrint(rn, monitor, type, res);
 						if (modifyInvoiceState) {
@@ -148,116 +153,133 @@ public class QR_Outputter implements IRnOutputter {
 		return res;
 	}
 
-	public void doPrint(Rechnung rn, IProgressMonitor monitor, TYPE type, Result<Rechnung> res) {
+	private void doPrint(Rechnung rn, IProgressMonitor monitor, TYPE type, Result<Rechnung> res) {
 		try {
-			monitor.subTask(rn.getNr());
-			BillDetails bill=new BillDetails(rn, type);
-			Tarmedprinter tp = new Tarmedprinter();
-			if (CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true)) {
-				
-				File rfhtml=tp.print(bill, monitor);
-				File pdfout=new File(bill.outputDirPDF, rn.getNr() + "_rf.pdf");
-				FileOutputStream rfpdf = new FileOutputStream(pdfout);
-				PdfRendererBuilder builder = new PdfRendererBuilder();
-
-				builder.useFastMode().withFile(rfhtml).toStream(rfpdf).run();
-				if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
-					String defaultPrinter = null;
-					if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
-						defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
-					}
-					if (printer.print(pdfout, defaultPrinter)) {
-						if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
-							pdfout.delete();
-						}
-					}
-				}
-			
-				monitor.worked(5);
-				if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
-					rfhtml.delete();
-				}
-			}
-			if (CoreHub.localCfg.get(PreferenceConstants.PRINT_QR, true)) {
-				String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator
-						+ "rsc" + File.separator + "qrbill_template_v4.html";
-				String fname = "";
-				switch (rn.getStatus()) {
-				case RnStatus.OFFEN:
-				case RnStatus.OFFEN_UND_GEDRUCKT:
-					fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL, "");
-					break;
-				case RnStatus.MAHNUNG_1:
-				case RnStatus.MAHNUNG_1_GEDRUCKT:
-					fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1, "");
-					break;
-				case RnStatus.MAHNUNG_2:
-				case RnStatus.MAHNUNG_2_GEDRUCKT:
-					fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2, "");
-					break;
-				case RnStatus.MAHNUNG_3:
-				case RnStatus.MAHNUNG_3_GEDRUCKT:
-					fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3, "");
-					break;
-				default:
-					fname = default_template;
-				}
-				File template = new File(fname);
-				if (!template.exists()) {
-					template = new File(default_template);
-				}
-				String rawHTML = FileTool.readTextFile(template);
-			
-				Kontakt adressat = bill.adressat;
-				replacer.put("Adressat", adressat);
-				replacer.put("Mandant", bill.biller);
-				replacer.put("Patient", bill.patient);
-				replacer.put("Rechnung", rn);
-				Resolver resolver = new Resolver(replacer, true);
-
-				String cookedHTML = resolver.resolve(rawHTML);
-				byte[] png = qr.generate(rn, bill,adressat);
-				File imgFile = new File(bill.outputDirPDF, rn.getRnId() + ".png");
-				FileTool.writeFile(imgFile, png);
-
-				String finished = cookedHTML.replace("[QRIMG]", rn.getRnId() + ".png")
-						.replace("[CURRENCY]", bill.currency).replace("[AMOUNT]", bill.amountDue.getAmountAsString())
-						.replace("[IBAN]", bill.formattedIban).replace("[BILLER]", bill.combinedAddress(bill.biller))
-						.replace("[ESRLINE]", bill.formattedReference)
-						.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
-						.replace("[ADDRESSEE]", bill.combinedAddress(adressat)).replace("[DUE]", bill.dateDue);
-
-				File htmlFile = new File(bill.outputDirPDF, rn.getNr() + ".html");
-				File pdfFile = new File(bill.outputDirPDF, rn.getNr() + "_qr.pdf");
-				FileTool.writeTextFile(htmlFile, finished);
-				FileOutputStream fout = new FileOutputStream(pdfFile);
-				PdfRendererBuilder builder = new PdfRendererBuilder();
-				builder.useFastMode();
-				builder.withFile(htmlFile);
-				builder.toStream(fout);
-				builder.run();
-				if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
-					String defaultPrinter = null;
-					if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
-						defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
-					}
-					if (printer.print(pdfFile, defaultPrinter)) {
-						if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
-							pdfFile.delete();
-						}
-					}
-				}
-				imgFile.delete();
-				if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
-					htmlFile.delete();
-				}
-
+			monitor.subTask(rn.getNr()+" wird ausgegeben");
+			BillDetails bill = new BillDetails(rn, type);
+			if (CoreHub.localCfg.get(PreferenceConstants.FACE_DOWN, false)) {
+				printQRPage(rn, bill);
+				monitor.worked(1);
+				printDetails(rn, bill);
+			} else {
+				printDetails(rn, bill);
+				monitor.worked(1);
+				printQRPage(rn, bill);
 			}
 			res.add(new Result<Rechnung>(rn));
+			monitor.worked(1);
 
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
 			res.add(new Result<Rechnung>(SEVERITY.ERROR, 2, ex.getMessage(), rn, true));
+		}
+	}
+
+	private void printQRPage(Rechnung rn, BillDetails bill) throws IOException, Exception, BadParameterException,
+			UnsupportedEncodingException, FileNotFoundException, PrinterException {
+		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_QR, true)) {
+			String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
+					+ File.separator + "qrbill_template_v4.html";
+			String fname = "";
+			switch (rn.getStatus()) {
+			case RnStatus.OFFEN:
+			case RnStatus.OFFEN_UND_GEDRUCKT:
+				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL, "");
+				break;
+			case RnStatus.MAHNUNG_1:
+			case RnStatus.MAHNUNG_1_GEDRUCKT:
+				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1, "");
+				break;
+			case RnStatus.MAHNUNG_2:
+			case RnStatus.MAHNUNG_2_GEDRUCKT:
+				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2, "");
+				break;
+			case RnStatus.MAHNUNG_3:
+			case RnStatus.MAHNUNG_3_GEDRUCKT:
+				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3, "");
+				break;
+			default:
+				fname = default_template;
+			}
+			File template = new File(fname);
+			if (!template.exists()) {
+				template = new File(default_template);
+			}
+			String rawHTML = FileTool.readTextFile(template);
+
+			Kontakt adressat = bill.adressat;
+			replacer.put("Adressat", adressat);
+			replacer.put("Mandant", bill.biller);
+			replacer.put("Patient", bill.patient);
+			replacer.put("Rechnung", rn);
+			Resolver resolver = new Resolver(replacer, true);
+
+			String cookedHTML = resolver.resolve(rawHTML);
+			byte[] png = qr.generate(rn, bill, adressat);
+			File imgFile = new File(bill.outputDirPDF, rn.getRnId() + ".png");
+			FileTool.writeFile(imgFile, png);
+
+			String finished = cookedHTML.replace("[QRIMG]", rn.getRnId() + ".png").replace("[CURRENCY]", bill.currency)
+					.replace("[AMOUNT]", bill.amountDue.getAmountAsString()).replace("[IBAN]", bill.formattedIban)
+					.replace("[BILLER]", bill.combinedAddress(bill.biller))
+					.replace("[ESRLINE]", bill.formattedReference)
+					.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
+					.replace("[ADDRESSEE]", bill.combinedAddress(adressat)).replace("[DUE]", bill.dateDue);
+
+			File htmlFile = new File(bill.outputDirPDF, rn.getNr() + ".html");
+			File pdfFile = new File(bill.outputDirPDF, rn.getNr() + "_qr.pdf");
+			FileTool.writeTextFile(htmlFile, finished);
+			FileOutputStream fout = new FileOutputStream(pdfFile);
+			PdfRendererBuilder builder = new PdfRendererBuilder();
+			builder.useFastMode();
+			builder.withFile(htmlFile);
+			builder.toStream(fout);
+			builder.run();
+			if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
+				String defaultPrinter = null;
+				if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
+					defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
+				}
+				if (printer.print(pdfFile, defaultPrinter)) {
+					if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
+						pdfFile.delete();
+					}
+				}
+			}
+			imgFile.delete();
+			if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
+				htmlFile.delete();
+			}
+
+		}
+	}
+
+	private void printDetails(Rechnung rn, BillDetails bill)
+			throws Exception, FileNotFoundException, IOException, PrinterException {
+		Tarmedprinter tp = new Tarmedprinter();
+		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true)) {
+
+			File rfhtml = tp.print(bill);
+			File pdfout = new File(bill.outputDirPDF, rn.getNr() + "_rf.pdf");
+			FileOutputStream rfpdf = new FileOutputStream(pdfout);
+			PdfRendererBuilder builder = new PdfRendererBuilder();
+
+			builder.useFastMode().withFile(rfhtml).toStream(rfpdf).run();
+			if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
+				String defaultPrinter = null;
+				if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
+					defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
+				}
+				if (printer.print(pdfout, defaultPrinter)) {
+					if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
+						pdfout.delete();
+					}
+				}
+			}
+
+			if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
+				rfhtml.delete();
+			}
 		}
 	}
 

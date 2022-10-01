@@ -31,6 +31,7 @@ public class QR_SettingsControl extends Composite {
 	Button cbQRPage, cbTarmedForm, cbDoPrint, cbDirectPrint, cbDoDelete, cbDebug;
 	Text tOutdirPDF;
 	Text tOutdirXML;
+	private Button cbFaceDown;
 
 	public QR_SettingsControl(Composite parent) {
 		super(parent, SWT.NONE);
@@ -52,15 +53,16 @@ public class QR_SettingsControl extends Composite {
 			}
 		});
 		b.setText("Ändern");
-		outputDirPDF = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF, CorePreferenceInitializer.getDefaultDBPath());
+		outputDirPDF = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF,
+				CorePreferenceInitializer.getDefaultDBPath());
 		tOutdirPDF.setText(outputDirPDF);
-		
-		Label lx=new Label(this,SWT.NONE);
+
+		Label lx = new Label(this, SWT.NONE);
 		lx.setText("Zielverzeichnis für XMLs");
 		lx.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		tOutdirXML=new Text(this, SWT.READ_ONLY|SWT.BORDER);
+		tOutdirXML = new Text(this, SWT.READ_ONLY | SWT.BORDER);
 		tOutdirXML.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		Button bx= new Button(this,SWT.PUSH);
+		Button bx = new Button(this, SWT.PUSH);
 		bx.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -70,10 +72,11 @@ public class QR_SettingsControl extends Composite {
 			}
 		});
 		bx.setText("Ändern");
-		outputDirXML = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_XML, CorePreferenceInitializer.getDefaultDBPath());
+		outputDirXML = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_XML,
+				CorePreferenceInitializer.getDefaultDBPath());
 		tOutdirXML.setText(outputDirXML);
-	
-		Label sep=new Label(this, SWT.SEPARATOR|SWT.HORIZONTAL);
+
+		Label sep = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL);
 		sep.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbQRPage = new Button(this, SWT.CHECK);
 		cbQRPage.setText("Seite mit QR ausgeben");
@@ -85,8 +88,12 @@ public class QR_SettingsControl extends Composite {
 		cbTarmedForm.setSelection(CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true));
 		cbDoPrint = new Button(this, SWT.CHECK);
 		cbDoPrint.setText("Rechnung ausdrucken");
-		cbDoPrint.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		cbDoPrint.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		cbDoPrint.setSelection(CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false));
+		cbFaceDown = new Button(this, SWT.CHECK);
+		cbFaceDown.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		cbFaceDown.setText("Druckseite unten");
+		cbFaceDown.setSelection(CoreHub.localCfg.get(PreferenceConstants.FACE_DOWN, false));
 		cbDirectPrint = new Button(this, SWT.CHECK);
 		cbDirectPrint.setText("Direkt ausdrucken auf:");
 		cbDirectPrint.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
@@ -105,10 +112,10 @@ public class QR_SettingsControl extends Composite {
 		cbDoDelete.setText("PDF nach dem Drucken löschen");
 		cbDoDelete.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbDoDelete.setSelection(CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, true));
-		Label sep2=new Label(this, SWT.SEPARATOR|SWT.HORIZONTAL);
+		Label sep2 = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL);
 		sep2.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		
-		cbDebug=new Button(this,SWT.CHECK);
+
+		cbDebug = new Button(this, SWT.CHECK);
 		cbDebug.setText("Debug: HTML Zwischendateien nicht löschen");
 		cbDebug.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbDebug.setSelection(CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, true));
@@ -125,7 +132,8 @@ public class QR_SettingsControl extends Composite {
 		CoreHub.localCfg.set(PreferenceConstants.DELETE_AFTER_PRINT, cbDoDelete.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
 		CoreHub.localCfg.set(PreferenceConstants.DEBUGFILES, cbDebug.getSelection());
-		
+		CoreHub.localCfg.set(PreferenceConstants.FACE_DOWN, cbFaceDown.getSelection());
+
 		if (cbPrinters.getSelectionIndex() > -1) {
 			PrintService printService = printers[cbPrinters.getSelectionIndex()];
 			Class[] attributes = printService.getSupportedAttributeCategories();

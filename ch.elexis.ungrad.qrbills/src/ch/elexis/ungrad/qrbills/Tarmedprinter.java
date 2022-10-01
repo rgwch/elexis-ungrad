@@ -137,7 +137,7 @@ public class Tarmedprinter {
 		return FileTool.readTextFile(templatefile);
 	}
 
-	public File print(BillDetails bill, IProgressMonitor monitor) throws Exception {
+	public File print(BillDetails bill) throws Exception {
 
 		File outfile = new File(bill.outputDirPDF, bill.rn.getNr() + "_rf.html");
 
@@ -145,7 +145,6 @@ public class Tarmedprinter {
 		replacer = new HashMap<>();
 
 		Mandant mSave = (Mandant) ElexisEventDispatcher.getSelected(Mandant.class);
-		monitor.subTask(bill.rn.getLabel());
 
 		Hub.setMandant(bill.mandator);
 
@@ -204,7 +203,6 @@ public class Tarmedprinter {
 		int pageNumber = 1;
 		sideTotal = 0.0;
 		cmAvail = cmFirstPage;
-		monitor.worked(2);
 		StringBuilder sb = new StringBuilder();
 		for (Object obj : serviceRecordsSorted) {
 			String recText = "";
@@ -250,7 +248,6 @@ public class Tarmedprinter {
 		currentPage = currentPage.replace("[padding]", Long.toString(Math.round(rest * 10)));
 
 		FileTool.writeTextFile(outfile, currentPage);
-		monitor.worked(2);
 		Hub.setMandant(mSave);
 		try {
 			Thread.sleep(5);

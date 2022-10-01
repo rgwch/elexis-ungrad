@@ -28,9 +28,10 @@ public class PreferenceConstants {
 	public static final String DIRECT_PRINT = BASE + "/direct_print";
 	public static final String DELETE_AFTER_PRINT = BASE + "/delete_after_print";
 	public static final String PRINT_QR = BASE + "/print_qr";
+	public static final String FACE_DOWN = BASE + "/face_down";
 	public static final String PRINT_TARMED = BASE + "/print_tarmed";
 	public static final String DEBUGFILES = BASE + "/debugfiles";
-	
+
 	// Extinfo entries
 	public static final String QRBANK = BASE + "/bank";
 	public static final String QRIBAN = BASE + "/iban";

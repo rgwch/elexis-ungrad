@@ -12,6 +12,12 @@ import ch.elexis.data.Kontakt;
 import ch.elexis.data.Rechnung;
 import ch.rgw.crypt.BadParameterException;
 
+/**
+ * Create the QR-Code as image
+ * uses the qr-invoice library (https://docs.qr-invoice.ch/latest/welcome/index.html)
+ * @author gerry
+ *
+ */
 public class QR_Encoder {
 	public byte[] generate(Rechnung rn, BillDetails bill, Kontakt adressat)
 			throws BadParameterException, UnsupportedEncodingException {
@@ -22,14 +28,6 @@ public class QR_Encoder {
 						.addressLine1(bill.biller.get(Kontakt.FLD_STREET))
 						.addressLine2(bill.biller.get(Kontakt.FLD_ZIP) + " " + bill.biller.get(Kontakt.FLD_PLACE))
 						.country("CH"))
-				/*
-				 * .ultimateDebtor(d -> d.combinedAddress()
-				 * .name(bill.patient.get(Kontakt.FLD_NAME1) + " " +
-				 * bill.patient.get(Kontakt.FLD_NAME2))
-				 * .addressLine1(bill.patient.get(Kontakt.FLD_STREET))
-				 * .addressLine2(bill.patient.get(Kontakt.FLD_ZIP) + " " +
-				 * bill.patient.get(Kontakt.FLD_PLACE))
-				 */
 				.ultimateDebtor(d -> d.combinedAddress()
 						.name(adressat.get(Kontakt.FLD_NAME1) + " " + adressat.get(Kontakt.FLD_NAME2))
 						.addressLine1(adressat.get(Kontakt.FLD_STREET))
@@ -40,13 +38,6 @@ public class QR_Encoder {
 		final QrCode qrCode = QrInvoiceCodeCreator.create().qrInvoice(qr).outputFormat(OutputFormat.PNG)
 				.desiredQrCodeSize(500).createQrCode();
 		final byte[] image = qrCode.getData();
-		/*
-		 * final PaymentPartReceipt ppr=QrInvoicePaymentPartReceiptCreator.create()
-		 * .qrInvoice(qr) .outputFormat(OutputFormat.PDF)
-		 * .fontFamily(FontFamily.LIBERATION_SANS) .locale(Locale.GERMAN)
-		 * .createPaymentPartReceipt(); //return new String(image,"utf-8"); final byte[]
-		 * image=ppr.getData();
-		 */
 		return image;
 	}
 }
