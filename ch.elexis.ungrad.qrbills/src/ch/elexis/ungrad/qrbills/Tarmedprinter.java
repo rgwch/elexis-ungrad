@@ -240,7 +240,6 @@ public class Tarmedprinter {
 		}
 		// addESRCodeLine(balance, tcCode, esr);
 
-		// sb.append("<tr><td span=\"11\">Only last page</td></tr>");
 		// --------------------------------------
 		currentPage = currentPage.replace("[Leistungen]", sb.toString());
 		double rest = Math.max(cmAvail - 1.0, 0.1);
@@ -516,6 +515,9 @@ public class Tarmedprinter {
 		Money netto=new Money(bill.amountDue);
 		Money prepaid=new Money(bill.amountPaid);
 		prepaid.subtractMoney(bill.amountCharges);
+		if(prepaid.isNegative()) {
+			prepaid=new Money();
+		}
 		netto.subtractMoney(prepaid);
 		netto.roundTo5();
 		page = page.replace("[anzahlung]", df.format(prepaid));

@@ -105,7 +105,6 @@ public class BillDetails {
 		patient = (Patient) checkNull(fall.getPatient(), "Patient");
 		mandator = (Mandant) checkNull(rn.getMandant(), "Mandant");
 		biller = (Rechnungssteller) checkNull(mandator.getRechnungssteller(), "Rechnungssteller");
-		checkNull(biller, "Biller");
 		outputDirPDF = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF, CoreHub.getTempDir().getAbsolutePath());
 		outputDirXML = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
 		File xmlfile = new File(outputDirXML, rn.getNr() + ".xml");
@@ -166,18 +165,19 @@ public class BillDetails {
 		amountTotalWithCharges.roundTo5();
 		// amountPaid = new Money(balance.getAmountPrepaid());
 		GarantType eTiers = body.getTiersGarant();
+		adressat=fall.getInvoiceRecipient();
+		checkNull(adressat,"Adressat");
 		if (eTiers == null) {
 			paymentMode = XMLExporter.TIERS_PAYANT;
 			guarantor = fall.getCostBearer();
 			if (guarantor == null) {
 				guarantor = patient;
 			}
-			adressat = guarantor;
 		} else {
 			paymentMode = XMLExporter.TIERS_GARANT;
 			guarantor = XMLExporterTiers.getGuarantor(XMLExporter.TIERS_GARANT, patient, fall);
-			adressat = patient;
 		}
+		checkNull(guarantor, "Garant");
 		if (body.getUvg() != null) {
 			fallType = FALL_UVG;
 		} else if (body.getIvg() != null) {
@@ -220,9 +220,10 @@ public class BillDetails {
 		checkNull(rn.getNr(), "Bill Number");
 		checkNull(biller.getPostAnschrift(), "Postanschrift");
 		biller_address = biller.getPostAnschrift(true).trim().replaceAll("\\r", "").replaceAll("\\n+", "<br />");
-
+		checkNull(biller_address, "Absender");
 		checkNull(adressat.getPostAnschrift(), "Postanschrift");
 		addressee = adressat.getPostAnschrift(true).trim().replaceAll("\\r", "").replaceAll("\\n+", "<br />");
+		checkNull(addressee, "Anschrift");
 		TimeTool now = new TimeTool();
 		now.addDays(30);
 		dateDue = now.toString(TimeTool.DATE_GER);
@@ -241,12 +242,7 @@ public class BillDetails {
 			sb.append(qrIBAN.substring(i, i + 4)).append(" ");
 		}
 		formattedIban = sb.append(qrIBAN.substring(20)).toString();
-		checkNull(mandator, "Mandant");
-		checkNull(guarantor, "Garant");
-		checkNull(adressat, "Adressat");
-		checkNull(addressee, "Anschrift");
-		checkNull(biller, "Rechnungssteller");
-		checkNull(biller_address, "Absender");
+		
 	}
 
 	private String getFDatum() {
