@@ -244,7 +244,7 @@ public class Tarmedprinter {
 		// --------------------------------------
 		currentPage = currentPage.replace("[Leistungen]", sb.toString());
 		double rest = Math.max(cmAvail - 1.0, 0.1);
-		currentPage = createBalance(currentPage, bill.balance);
+		currentPage = createBalance(currentPage, bill);
 		currentPage = currentPage.replace("[padding]", Long.toString(Math.round(rest * 10)));
 
 		FileTool.writeTextFile(outfile, currentPage);
@@ -502,17 +502,24 @@ public class Tarmedprinter {
 		return bd.doubleValue();
 	}
 
-	private String createBalance(String page, BalanceType balance) {
-		VatType vat = balance.getVat();
-		Money paid = new Money(balance.getAmountPrepaid());
+	/*
+	 * Create the final balance. Amount due is the amount of the bill minus prepayments plus charges for reminders.
+	 */
+	private String createBalance(String page, BillDetails bill) {
+		VatType vat = bill.balance.getVat();
 		String vatNumber = vat.getVatNumber();
 		if (vatNumber == null || vatNumber.equals(" ")) {
 			vatNumber = "keine";
 		} else {
 			vatNumber = vatNumber + " MWST";
 		}
-		page = page.replace("[anzahlung]", df.format(paid));
-		page = page.replace("[total]", df.format(balance.getAmount()));
+		Money netto=new Money(bill.amountDue);
+		Money prepaid=new Money(bill.amountPaid);
+		prepaid.subtractMoney(bill.amountCharges);
+		netto.subtractMoney(prepaid);
+		netto.roundTo5();
+		page = page.replace("[anzahlung]", df.format(prepaid));
+		page = page.replace("[total]", df.format(bill.amountDue));
 		page = page.replace("[MWST]", vatNumber);
 		page = page.replace("[vat0]", df.format(getVatRate(0, vat)));
 		page = page.replace("[vat0amount]", df.format(getVatAmount(0, vat)));
@@ -523,58 +530,13 @@ public class Tarmedprinter {
 		page = page.replace("[vat2]", df.format(getVatRate(2, vat)));
 		page = page.replace("[vat2amount]", df.format(getVatAmount(2, vat)));
 		page = page.replace("[vat2vat]", df.format(getVatVat(2, vat)));
-		page = page.replace("[amountObl]", df.format(balance.getAmountObligations()));
-		page = page.replace("[amountdue]", df.format(balance.getAmountDue()));
+		page = page.replace("[amountObl]", df.format(bill.balance.getAmountObligations()));
+		page = page.replace("[amountdue]", df.format(netto));
 
 		return page;
 	}
 
-	/*
-	 * private void addBalanceLines(Object cursor, ITextPlugin tp, BalanceType
-	 * balance, Money paid) { cursor = text.getPlugin().insertTextAt(0, 255, 190,
-	 * 45, " ", SWT.LEFT); //$NON-NLS-1$ String balanceHeaders =
-	 * "Code\tSatz\tBetrag\tMWSt\tMWSt.-Nr.:\t"; //$NON-NLS-1$ cursor =
-	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, true, balanceHeaders);
-	 * 
-	 * VatType vat = balance.getVat(); String vatNumber = vat.getVatNumber(); if
-	 * (vatNumber == null || vatNumber.equals(" ")) { vatNumber = "keine"; } else {
-	 * vatNumber = vatNumber + " MWST"; } cursor = XMLPrinterUtil.print(cursor, tp,
-	 * 7, SWT.LEFT, false, vatNumber + "\t"); //$NON-NLS-1$ cursor =
-	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, true, "Anzahlung:\t");
-	 * //$NON-NLS-1$ cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false,
-	 * df.format(paid) + "\t\t\t"); //$NON-NLS-1$ cursor =
-	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true, "Gesamtbetrag:\t");
-	 * //$NON-NLS-1$ cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, false,
-	 * df.format(balance.getAmount()) + "\n"); //$NON-NLS-1$
-	 * 
-	 * // second line String secondLine = "0\t" + df.format(getVatRate(0, vat)) +
-	 * "\t" + df.format(getVatAmount(0, vat)) + "\t" + df.format(getVatVat(0, vat))
-	 * + "\t"; cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false,
-	 * secondLine); // $NON-NLS-1$ cursor = XMLPrinterUtil.print(cursor, tp, 7,
-	 * SWT.LEFT, true, "Währung:\t\t"); //$NON-NLS-1$ cursor =
-	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, "CHF\t"); //$NON-NLS-1$
-	 * if (balance.getAmountReminder() > 0) { cursor = XMLPrinterUtil.print(cursor,
-	 * tp, 7, SWT.LEFT, true, "Mahngebühr:\t"); //$NON-NLS-1$ cursor =
-	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false,
-	 * df.format(balance.getAmountReminder()) + "\t\t\t"); //$NON-NLS-1$ } else {
-	 * cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, "\t\t\t\t\t");
-	 * //$NON-NLS-1$ } cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true,
-	 * "davon PFL:\t"); //$NON-NLS-1$ cursor = XMLPrinterUtil.print(cursor, tp, 7,
-	 * SWT.RIGHT, false, df.format(balance.getAmountObligations()) + "\n");
-	 * //$NON-NLS-1$ // third line String thirdLine = "1\t" +
-	 * df.format(getVatRate(1, vat)) + "\t" + df.format(getVatAmount(1, vat)) + "\t"
-	 * //$NON-NLS-1$ + df.format(getVatVat(1, vat)) + "\n"; //$NON-NLS-1$ cursor =
-	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, thirdLine); //
-	 * $NON-NLS-1$
-	 * 
-	 * // forth line String forthLine = "2\t" + df.format(getVatRate(2, vat)) + "\t"
-	 * + df.format(getVatAmount(2, vat)) + "\t" //$NON-NLS-1$ +
-	 * df.format(vat.getVat()) + "\t\t\t\t\t\t\t\t\t"; cursor =
-	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.LEFT, false, forthLine); cursor =
-	 * XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true, "Fälliger Betrag:\t");
-	 * //$NON-NLS-1$ cursor = XMLPrinterUtil.print(cursor, tp, 7, SWT.RIGHT, true,
-	 * df.format(balance.getAmountDue()) + "\n"); //$NON-NLS-1$ }
-	 */
+	
 	private String addDiagnoses(String page, TreatmentType treatment) {
 		if (treatment == null) {
 			logger.debug("no treatments defined");

@@ -19,10 +19,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -30,30 +28,25 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
-import org.jdom.Document;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
 import ch.elexis.TarmedRechnung.TarmedACL;
 import ch.elexis.TarmedRechnung.XMLExporter;
 import ch.elexis.arzttarife_schweiz.Messages;
-import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.core.model.IPersistentObject;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
-import ch.elexis.data.Kontakt;
 import ch.elexis.data.Rechnung;
 import ch.elexis.data.RnStatus;
 import ch.elexis.data.Zahlung;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
-import ch.elexis.views.RnPrintView2;
 import ch.rgw.crypt.BadParameterException;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
@@ -70,14 +63,10 @@ import ch.rgw.tools.Result.SEVERITY;
  *
  */
 public class QR_Outputter implements IRnOutputter {
-	Map<String, IPersistentObject> replacer = new HashMap<>();
-	QR_SettingsControl qrs;
-	// IWorkbenchPage rnPage;
-	// RnPrintViewQR rnp;
-	XMLExporter xmlex;
-	TarmedACL ta = TarmedACL.getInstance();
-	QR_Encoder qr;
-	QR_Printer printer;
+	private Map<String, IPersistentObject> replacer = new HashMap<>();
+	private QR_SettingsControl qrs;
+	private QR_Encoder qr;
+	private PDF_Printer printer;
 	private boolean modifyInvoiceState;
 
 	public QR_Outputter() {
@@ -89,12 +78,12 @@ public class QR_Outputter implements IRnOutputter {
 	}
 
 	@Override
-	public boolean canStorno(Rechnung rn) {
+	public boolean canStorno(final Rechnung rn) {
 		return false;
 	}
 
 	@Override
-	public boolean canBill(Fall fall) {
+	public boolean canBill(final Fall fall) {
 		return true;
 	}
 
@@ -111,11 +100,10 @@ public class QR_Outputter implements IRnOutputter {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, Properties props) {
+	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, final Properties props) {
 		Result<Rechnung> res = new Result<Rechnung>();
 		qr = new QR_Encoder();
-		printer = new QR_Printer();
-		xmlex = new XMLExporter();
+		printer = new PDF_Printer();
 		modifyInvoiceState = true;
 
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
@@ -124,7 +112,7 @@ public class QR_Outputter implements IRnOutputter {
 
 				@Override
 				public void run(final IProgressMonitor monitor) {
-					monitor.beginTask("Drucke Rechnungen", rnn.size() * 2);
+					monitor.beginTask("Drucke Rechnungen", rnn.size() * 3);
 					for (Rechnung rn : rnn) {
 						doPrint(rn, monitor, type, res);
 						if (modifyInvoiceState) {
@@ -136,8 +124,9 @@ public class QR_Outputter implements IRnOutputter {
 							rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
 									+ RnStatus.getStatusText(rn.getStatus()));
 						}
+						monitor.worked(1);
 					}
-
+					monitor.done();
 				}
 			}, null);
 
@@ -155,7 +144,7 @@ public class QR_Outputter implements IRnOutputter {
 		return res;
 	}
 
-	private void doPrint(Rechnung rn, IProgressMonitor monitor, TYPE type, Result<Rechnung> res) {
+	private void doPrint(final Rechnung rn, final IProgressMonitor monitor, final TYPE type, Result<Rechnung> res) {
 		try {
 			monitor.subTask(rn.getNr() + " wird ausgegeben");
 			BillDetails bill = new BillDetails(rn, type);
@@ -177,7 +166,7 @@ public class QR_Outputter implements IRnOutputter {
 		}
 	}
 
-	private void printQRPage(BillDetails bill) throws IOException, Exception, BadParameterException,
+	private void printQRPage(final BillDetails bill) throws IOException, Exception, BadParameterException,
 			UnsupportedEncodingException, FileNotFoundException, PrinterException {
 		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_QR, true)) {
 			String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
@@ -251,17 +240,18 @@ public class QR_Outputter implements IRnOutputter {
 						.append("</td><td class=\"amount\">").append(bill.amountUnclassified.getAmountAsString())
 						.append("</td></tr>");
 			}
-			Money totalWithCharges = new Money(bill.amountDue);
 			for (Zahlung z : bill.charges) {
 				Money betrag = new Money(z.getBetrag()).multiply(-1.0);
-				totalWithCharges.addMoney(betrag);
 				sbSummary.append("<tr><td>").append(z.getBemerkung()).append(":</td><td class=\"amount\">")
 						.append(betrag.getAmountAsString()).append("</td></tr>");
+			}
+			if(!bill.amountPaid.isNeglectable()) {
+				sbSummary.append("<tr><td>Angezahlt:</td><td class=\"amount\">").append("-"+bill.amountPaid.getAmountAsString()).append("</td></tr>");
 			}
 			sbSummary.append("</table>");
 			String finished = cookedHTML.replace("[QRIMG]", bill.rn.getRnId() + ".png")
 					.replace("[LEISTUNGEN]", sbSummary.toString()).replace("[CURRENCY]", bill.currency)
-					.replace("[AMOUNT]", totalWithCharges.getAmountAsString()).replace("[IBAN]", bill.formattedIban)
+					.replace("[AMOUNT]", bill.amountTotalWithCharges.getAmountAsString()).replace("[IBAN]", bill.formattedIban)
 					.replace("[BILLER]", bill.combinedAddress(bill.biller))
 					.replace("[ESRLINE]", bill.formattedReference)
 					.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
@@ -295,7 +285,7 @@ public class QR_Outputter implements IRnOutputter {
 		}
 	}
 
-	private void printDetails(BillDetails bill) throws Exception, FileNotFoundException, IOException, PrinterException {
+	private void printDetails(final BillDetails bill) throws Exception, FileNotFoundException, IOException, PrinterException {
 		Tarmedprinter tp = new Tarmedprinter();
 		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true)) {
 

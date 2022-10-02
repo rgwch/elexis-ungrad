@@ -31,7 +31,7 @@ import org.apache.pdfbox.printing.PDFPrintable;
 import ch.elexis.ungrad.Resolver;
 import ch.rgw.tools.StringTool;
 
-public class QR_Printer {
+public class PDF_Printer {
 
 	/**
 	 * Print a pdf from a File

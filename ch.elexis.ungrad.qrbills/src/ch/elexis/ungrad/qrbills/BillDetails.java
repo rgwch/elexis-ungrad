@@ -29,28 +29,12 @@ import ch.elexis.TarmedRechnung.XMLExporterTiers;
 import ch.elexis.base.ch.ebanking.esr.ESR;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter.TYPE;
-import ch.elexis.core.ui.util.SWTHelper;
-import ch.elexis.data.Fall;
-import ch.elexis.data.Kontakt;
-import ch.elexis.data.Mandant;
-import ch.elexis.data.Patient;
-import ch.elexis.data.Rechnung;
-import ch.elexis.data.Rechnungssteller;
-import ch.elexis.data.RnStatus;
-import ch.elexis.data.Zahlung;
-import ch.elexis.data.Fall.Tiers;
+import ch.elexis.data.*;
 import ch.elexis.tarmed.printer.XML44Services;
 import ch.elexis.tarmed.printer.XMLPrinterUtil;
 import ch.elexis.tarmedprefs.TarmedRequirements;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
-import ch.fd.invoice440.request.BalanceType;
-import ch.fd.invoice440.request.BodyType;
-import ch.fd.invoice440.request.GarantType;
-import ch.fd.invoice440.request.InvoiceType;
-import ch.fd.invoice440.request.ReminderType;
-import ch.fd.invoice440.request.RequestType;
-import ch.fd.invoice440.request.ServicesType;
-import ch.fd.invoice440.request.TreatmentType;
+import ch.fd.invoice440.request.*;
 import ch.rgw.crypt.BadParameterException;
 import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
@@ -79,9 +63,12 @@ public class BillDetails {
 
 	int fallType = FALL_KVG;
 	Patient patient;
-	Money amountTarmed, amountDrug, amountLab, amountMigel, amountPhysio, amountUnclassified, amountDue, amountPaid,
-			amountTotalWithCharges;
-	List<Zahlung> charges = new ArrayList<Zahlung>();
+	Money amountTarmed, amountDrug, amountLab, amountMigel, amountPhysio, amountUnclassified, 
+	amountDue, //original amount before charges and payments 
+	amountPaid,
+	amountCharges,
+	amountTotalWithCharges;  // end amount with charges and minus payments
+	List<Zahlung> charges = new ArrayList<Zahlung>(); // all charges
 	TreatmentType treatments;
 	ReminderType reminders;
 	String qrIBAN = "CH000NUR00ZUR00DEMO00";
@@ -148,22 +135,36 @@ public class BillDetails {
 			paymentMode = XMLExporter.TIERS_GARANT;
 		}
 		XML44Services xmlservices = new XML44Services(services);
+		amountDue=new Money();
 		amountTarmed = xmlservices.getTarmedMoney();
+		amountDue.addMoney(amountTarmed);
 		amountDrug = xmlservices.getDrugMoney();
+		amountDue.addMoney(amountDrug);
 		amountLab = xmlservices.getLabMoney();
+		amountDue.addMoney(amountLab);
 		amountMigel = xmlservices.getMigelMoney();
+		amountDue.addMoney(amountMigel);
 		amountPhysio = xmlservices.getParamedMoney();
+		amountDue.addMoney(amountPhysio);
 		amountUnclassified = xmlservices.getOtherMoney();
-		amountDue = new Money(balance.getAmountDue());
+		amountDue.addMoney(amountUnclassified);
+		// amountDue = new Money(balance.getAmountDue());
 		amountTotalWithCharges = new Money(amountDue);
 
+		amountPaid=new Money();
+		amountCharges=new Money();
 		for (Zahlung z : rn.getZahlungen()) {
-			if (z.getBetrag().isNegative()) {
+			Money betrag=z.getBetrag();
+			if (betrag.isNegative()) {
 				charges.add(z);
-				amountTotalWithCharges.subtractMoney(z.getBetrag());
+				amountCharges.subtractMoney(betrag);
+			}else {
+				amountPaid.addMoney(betrag);
 			}
+			amountTotalWithCharges.subtractMoney(betrag);
 		}
-		amountPaid = new Money(balance.getAmountPrepaid());
+		amountTotalWithCharges.roundTo5();
+		// amountPaid = new Money(balance.getAmountPrepaid());
 		GarantType eTiers = body.getTiersGarant();
 		if (eTiers == null) {
 			paymentMode = XMLExporter.TIERS_PAYANT;
