@@ -148,7 +148,8 @@ public class QR_Outputter implements IRnOutputter {
 		if (res.isOK()) {
 			SWTHelper.showInfo("Ausgabe beendet", rnn.size() + " QR-Rechnung(en) wurde(n) ausgegeben");
 		} else {
-			SWTHelper.showError("QR-Output", "Fehler bei der Rechnungsausgabe", res.toString());
+			SWTHelper.showError("QR-Output", "Fehler bei der Rechnungsausgabe", res.toString()
+					+ "\nSie können die fehlerhaften Rechnungen mit Status fehlerhaft in der Rechnungsliste anzeigen und korrigieren");
 
 		}
 		return res;
@@ -246,7 +247,7 @@ public class QR_Outputter implements IRnOutputter {
 						.append("</td></tr>");
 			}
 			if (!bill.amountUnclassified.isNeglectable()) {
-				sbSummary.append("<tr><td>").append("Diverse Nicht-Pflichleistungen")
+				sbSummary.append("<tr><td>").append("Diverse Nicht-Pflichleistungen:")
 						.append("</td><td class=\"amount\">").append(bill.amountUnclassified.getAmountAsString())
 						.append("</td></tr>");
 			}
@@ -254,7 +255,7 @@ public class QR_Outputter implements IRnOutputter {
 			for (Zahlung z : bill.charges) {
 				Money betrag = new Money(z.getBetrag()).multiply(-1.0);
 				totalWithCharges.addMoney(betrag);
-				sbSummary.append("<tr><td>").append(z.getBemerkung()).append("</td><td class=\"amount\">")
+				sbSummary.append("<tr><td>").append(z.getBemerkung()).append(":</td><td class=\"amount\">")
 						.append(betrag.getAmountAsString()).append("</td></tr>");
 			}
 			sbSummary.append("</table>");

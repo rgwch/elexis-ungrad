@@ -36,6 +36,7 @@ import ch.elexis.data.Mandant;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Rechnung;
 import ch.elexis.data.Rechnungssteller;
+import ch.elexis.data.RnStatus;
 import ch.elexis.data.Zahlung;
 import ch.elexis.data.Fall.Tiers;
 import ch.elexis.tarmed.printer.XML44Services;
@@ -124,6 +125,9 @@ public class BillDetails {
 		XMLExporter xmlex = new XMLExporter();
 
 		Document xmlRn = xmlex.doExport(rn, xmlfile.getAbsolutePath(), type, true);
+		if(rn.getStatus() == RnStatus.FEHLERHAFT) {
+			throw new Exception("Fehler in Rechnung "+rn.getNr());
+		}
 
 		request = TarmedJaxbUtil.unmarshalInvoiceRequest440(xmlRn);
 		if (request == null) {
