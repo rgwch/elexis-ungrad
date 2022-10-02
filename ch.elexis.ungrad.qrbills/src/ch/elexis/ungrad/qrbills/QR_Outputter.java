@@ -242,7 +242,7 @@ public class QR_Outputter implements IRnOutputter {
 						.append(bill.amountPhysio.getAmountAsString()).append("</td></tr>");
 			}
 			if (!bill.amountUnclassified.isNeglectable()) {
-				sbSummary.append("<tr><td>").append(Messages.RnPrintView_otherpoints).append("</td><td>")
+				sbSummary.append("<tr><td>").append("Diverse Nicht-Pflichleistungen").append("</td><td>")
 						.append(bill.amountUnclassified.getAmountAsString()).append("</td></tr>");
 			}
 			if (!bill.amountReminder.isNeglectable()) {
