@@ -180,7 +180,7 @@ public class QR_Outputter implements IRnOutputter {
 			UnsupportedEncodingException, FileNotFoundException, PrinterException {
 		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_QR, true)) {
 			String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
-					+ File.separator + "qrbill_template_v4.html";
+					+ File.separator + "qrbill_template_v5.html";
 			String fname = "";
 			switch (bill.rn.getStatus()) {
 			case RnStatus.OFFEN:
@@ -220,46 +220,48 @@ public class QR_Outputter implements IRnOutputter {
 			FileTool.writeFile(imgFile, png);
 
 			StringBuilder sbSummary = new StringBuilder();
-			sbSummary.append("<table>");
+			sbSummary.append("<table style=\"width:100%\">");
 			if (!bill.amountTarmed.isNeglectable()) {
-				sbSummary.append("<tr><td>").append(Messages.RnPrintView_tarmedPoints).append("</td><td>")
-						.append(bill.amountTarmed.getAmountAsString()).append("</td></tr>");
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_tarmedPoints)
+						.append("</td><td class=\"amount\">").append(bill.amountTarmed.getAmountAsString())
+						.append("</td></tr>");
 			}
 			if (!bill.amountDrug.isNeglectable()) {
-				sbSummary.append("<tr><td>").append(Messages.RnPrintView_medicaments).append("</td><td>")
-						.append(bill.amountDrug.getAmountAsString()).append("</td></tr>");
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_medicaments)
+						.append("</td><td class=\"amount\">").append(bill.amountDrug.getAmountAsString())
+						.append("</td></tr>");
 			}
 			if (!bill.amountLab.isNeglectable()) {
-				sbSummary.append("<tr><td>").append(Messages.RnPrintView_labpoints).append("</td><td>")
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_labpoints).append("</td><td class=\"amount\">")
 						.append(bill.amountLab.getAmountAsString()).append("</td></tr>");
 			}
 			if (!bill.amountMigel.isNeglectable()) {
-				sbSummary.append("<tr><td>").append(Messages.RnPrintView_migelpoints).append("</td><td>")
-						.append(bill.amountMigel.getAmountAsString()).append("</td></tr>");
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_migelpoints)
+						.append("</td><td class=\"amount\">").append(bill.amountMigel.getAmountAsString())
+						.append("</td></tr>");
 			}
 			if (!bill.amountPhysio.isNeglectable()) {
-				sbSummary.append("<tr><td>").append(Messages.RnPrintView_physiopoints).append("</td><td>")
-						.append(bill.amountPhysio.getAmountAsString()).append("</td></tr>");
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_physiopoints)
+						.append("</td><td class=\"amount\">").append(bill.amountPhysio.getAmountAsString())
+						.append("</td></tr>");
 			}
 			if (!bill.amountUnclassified.isNeglectable()) {
-				sbSummary.append("<tr><td>").append("Diverse Nicht-Pflichleistungen").append("</td><td>")
-						.append(bill.amountUnclassified.getAmountAsString()).append("</td></tr>");
+				sbSummary.append("<tr><td>").append("Diverse Nicht-Pflichleistungen")
+						.append("</td><td class=\"amount\">").append(bill.amountUnclassified.getAmountAsString())
+						.append("</td></tr>");
 			}
-			if (!bill.amountReminder.isNeglectable()) {
-				List<Zahlung> extra = bill.rn.getZahlungen();
-				for (Zahlung z : extra) {
-					Money betrag = new Money(z.getBetrag()).multiply(-1.0);
-					if (!betrag.isNegative()) {
-						sbSummary.append("<tr><td>").append(z.getBemerkung()).append("</td><td>")
-								.append(betrag.getAmountAsString()).append("</td></tr>");
-					}
-				}
+			Money totalWithCharges = new Money(bill.amountDue);
+			for (Zahlung z : bill.charges) {
+				Money betrag = new Money(z.getBetrag()).multiply(-1.0);
+				totalWithCharges.addMoney(betrag);
+				sbSummary.append("<tr><td>").append(z.getBemerkung()).append("</td><td class=\"amount\">")
+						.append(betrag.getAmountAsString()).append("</td></tr>");
 			}
 			sbSummary.append("</table>");
 			String finished = cookedHTML.replace("[QRIMG]", bill.rn.getRnId() + ".png")
-					.replace("[LEISTUNGEN]", sbSummary.toString())
-					.replace("[CURRENCY]", bill.currency).replace("[AMOUNT]", bill.amountDue.getAmountAsString())
-					.replace("[IBAN]", bill.formattedIban).replace("[BILLER]", bill.combinedAddress(bill.biller))
+					.replace("[LEISTUNGEN]", sbSummary.toString()).replace("[CURRENCY]", bill.currency)
+					.replace("[AMOUNT]", totalWithCharges.getAmountAsString()).replace("[IBAN]", bill.formattedIban)
+					.replace("[BILLER]", bill.combinedAddress(bill.biller))
 					.replace("[ESRLINE]", bill.formattedReference)
 					.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
 					.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);

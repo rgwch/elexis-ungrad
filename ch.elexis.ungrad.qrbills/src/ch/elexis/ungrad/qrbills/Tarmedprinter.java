@@ -226,7 +226,7 @@ public class Tarmedprinter {
 
 			// End current page and begin new page
 			if (cmAvail <= cmPerLine) {
-				sb.append("</tbody></table><p style=\"text-align:right;margin-right:15mm;\">Zwischentotal: ")
+				sb.append("</tbody></table><p style=\"text-align:right;margin-right:15mm;font-size:8pt;\">Zwischentotal: ")
 						.append("<b>").append(df.format(sideTotal)).append("</b></p>");
 				sb.append("</div></div><p style=\"page-break-after: always;\"></p>"
 						+ "<div style=\"position:relative;\">");

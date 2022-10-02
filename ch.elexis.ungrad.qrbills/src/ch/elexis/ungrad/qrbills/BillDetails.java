@@ -14,6 +14,8 @@
 package ch.elexis.ungrad.qrbills;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jdom.Document;
 import org.slf4j.Logger;
@@ -34,6 +36,7 @@ import ch.elexis.data.Mandant;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Rechnung;
 import ch.elexis.data.Rechnungssteller;
+import ch.elexis.data.Zahlung;
 import ch.elexis.data.Fall.Tiers;
 import ch.elexis.tarmed.printer.XML44Services;
 import ch.elexis.tarmed.printer.XMLPrinterUtil;
@@ -76,7 +79,8 @@ public class BillDetails {
 	int fallType = FALL_KVG;
 	Patient patient;
 	Money amountTarmed, amountDrug, amountLab, amountMigel, amountPhysio, amountUnclassified, amountDue, amountPaid,
-			amountTotal, amountReminder;
+			amountTotalWithCharges;
+	List<Zahlung> charges = new ArrayList<Zahlung>();
 	TreatmentType treatments;
 	ReminderType reminders;
 	String qrIBAN = "CH000NUR00ZUR00DEMO00";
@@ -147,13 +151,13 @@ public class BillDetails {
 		amountPhysio = xmlservices.getParamedMoney();
 		amountUnclassified = xmlservices.getOtherMoney();
 		amountDue = new Money(balance.getAmountDue());
+		amountTotalWithCharges = new Money(amountDue);
 
-		double dReminder = balance.getAmountReminder();
-		if (dReminder > 0) {
-			amountReminder=new Money(dReminder);
-			amountDue.subtractMoney(amountReminder);
-		}else {
-			amountReminder=new Money();
+		for (Zahlung z : rn.getZahlungen()) {
+			if (z.getBetrag().isNegative()) {
+				charges.add(z);
+				amountTotalWithCharges.subtractMoney(z.getBetrag());
+			}
 		}
 		amountPaid = new Money(balance.getAmountPrepaid());
 		GarantType eTiers = body.getTiersGarant();
@@ -232,11 +236,11 @@ public class BillDetails {
 			sb.append(qrIBAN.substring(i, i + 4)).append(" ");
 		}
 		formattedIban = sb.append(qrIBAN.substring(20)).toString();
-		checkNull(mandator,"Mandant");
-		checkNull(guarantor,"Garant");
-		checkNull(adressat,"Adressat");
-		checkNull(addressee,"Anschrift");
-		checkNull(biller,"Rechnungssteller");
+		checkNull(mandator, "Mandant");
+		checkNull(guarantor, "Garant");
+		checkNull(adressat, "Adressat");
+		checkNull(addressee, "Anschrift");
+		checkNull(biller, "Rechnungssteller");
 		checkNull(biller_address, "Absender");
 	}
 
