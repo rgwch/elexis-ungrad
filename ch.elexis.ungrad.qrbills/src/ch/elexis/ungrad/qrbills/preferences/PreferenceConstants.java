@@ -31,7 +31,7 @@ public class PreferenceConstants {
 	public static final String FACE_DOWN = BASE + "/face_down";
 	public static final String PRINT_TARMED = BASE + "/print_tarmed";
 	public static final String DEBUGFILES = BASE + "/debugfiles";
-
+	public static final String MISSING_DATA = BASE + "/missing_data";
 	// Extinfo entries
 	public static final String QRBANK = BASE + "/bank";
 	public static final String QRIBAN = BASE + "/iban";

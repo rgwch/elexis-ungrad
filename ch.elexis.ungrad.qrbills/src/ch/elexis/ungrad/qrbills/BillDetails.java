@@ -98,7 +98,7 @@ public class BillDetails {
 		return sb.toString();
 	}
 
-	public BillDetails(Rechnung rn, TYPE type) throws Exception {
+	public BillDetails(Rechnung rn, TYPE type, boolean bStrict) throws Exception {
 		this.rn = (Rechnung) checkNull(rn, "Rechnung");
 		fall = (Fall) checkNull(rn.getFall(), "Fall");
 		this.type = type;
@@ -110,7 +110,7 @@ public class BillDetails {
 		File xmlfile = new File(outputDirXML, rn.getNr() + ".xml");
 		XMLExporter xmlex = new XMLExporter();
 
-		Document xmlRn = xmlex.doExport(rn, xmlfile.getAbsolutePath(), type, true);
+		Document xmlRn = xmlex.doExport(rn, xmlfile.getAbsolutePath(), type, !bStrict);
 		if(rn.getStatus() == RnStatus.FEHLERHAFT) {
 			throw new Exception("Fehler in Rechnung "+rn.getNr());
 		}

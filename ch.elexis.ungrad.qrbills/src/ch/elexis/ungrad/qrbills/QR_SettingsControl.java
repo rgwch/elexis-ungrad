@@ -28,7 +28,7 @@ public class QR_SettingsControl extends Composite {
 	String outputDirXML;
 	Combo cbPrinters;
 	PrintService[] printers;
-	Button cbQRPage, cbTarmedForm, cbDoPrint, cbDirectPrint, cbDoDelete, cbDebug;
+	Button cbQRPage, cbTarmedForm, cbDoPrint, cbDirectPrint, cbDoDelete, cbDebug, cbMissingData;
 	Text tOutdirPDF;
 	Text tOutdirXML;
 	private Button cbFaceDown;
@@ -36,6 +36,11 @@ public class QR_SettingsControl extends Composite {
 	public QR_SettingsControl(Composite parent) {
 		super(parent, SWT.NONE);
 		this.setLayout(new GridLayout(2, false));
+
+		cbMissingData = new Button(this, SWT.CHECK);
+		cbMissingData.setText("Bei fehlenden administrativen Daten trotzdem ausgeben");
+		cbMissingData.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		cbMissingData.setSelection(CoreHub.localCfg.get(PreferenceConstants.MISSING_DATA, true));
 
 		// PDF output directory
 		Label l = new Label(this, SWT.NONE);
@@ -133,6 +138,7 @@ public class QR_SettingsControl extends Composite {
 		CoreHub.localCfg.set(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
 		CoreHub.localCfg.set(PreferenceConstants.DEBUGFILES, cbDebug.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.FACE_DOWN, cbFaceDown.getSelection());
+		CoreHub.localCfg.set(PreferenceConstants.MISSING_DATA, cbMissingData.getSelection());
 
 		if (cbPrinters.getSelectionIndex() > -1) {
 			PrintService printService = printers[cbPrinters.getSelectionIndex()];

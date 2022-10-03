@@ -147,7 +147,7 @@ public class QR_Outputter implements IRnOutputter {
 	private void doPrint(final Rechnung rn, final IProgressMonitor monitor, final TYPE type, Result<Rechnung> res) {
 		try {
 			monitor.subTask(rn.getNr() + " wird ausgegeben");
-			BillDetails bill = new BillDetails(rn, type);
+			BillDetails bill = new BillDetails(rn, type, CoreHub.localCfg.get(PreferenceConstants.MISSING_DATA, true));
 			if (CoreHub.localCfg.get(PreferenceConstants.FACE_DOWN, false)) {
 				printQRPage(bill);
 				monitor.worked(1);
