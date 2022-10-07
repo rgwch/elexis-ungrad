@@ -101,10 +101,15 @@ public class Client3 {
 			params.put("query", query);
 			params.put("limit", Preferences.get(Preferences.MAXIMUM_HITS, "100"));
 			String result = doPost("/query", writeJson(params), HttpURLConnection.HTTP_OK);
-			Map<String, Object> json = new HashMap<String, Object>();
-			json.put("result", readJson(result).get("docs"));
-			json.put("status", "ok");
-			handler.signal(json);
+			if (result == null) {
+				handler.signal(make("status:failure", "message:Connection problem"));
+			} else {
+				Map<String, Object> json = new HashMap<String, Object>();
+
+				json.put("result", readJson(result).get("docs"));
+				json.put("status", "ok");
+				handler.signal(json);
+			}
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
