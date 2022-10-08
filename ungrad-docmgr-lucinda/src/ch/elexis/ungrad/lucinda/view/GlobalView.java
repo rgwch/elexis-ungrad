@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-2022 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -14,30 +14,16 @@
 
 package ch.elexis.ungrad.lucinda.view;
 
-import static ch.elexis.ungrad.lucinda.Preferences.COLUMN_WIDTHS;
-import static ch.elexis.ungrad.lucinda.Preferences.RESTRICT_CURRENT;
-import static ch.elexis.ungrad.lucinda.Preferences.SHOW_CONS;
-import static ch.elexis.ungrad.lucinda.Preferences.SHOW_INBOX;
-import static ch.elexis.ungrad.lucinda.Preferences.SHOW_OMNIVORE;
+import static ch.elexis.ungrad.lucinda.Preferences.*;
 
 import java.io.File;
 import java.util.List;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.GroupMarker;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.*;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 

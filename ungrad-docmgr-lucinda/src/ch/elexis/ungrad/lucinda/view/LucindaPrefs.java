@@ -48,8 +48,8 @@ public class LucindaPrefs extends FieldEditorPreferencePage implements IWorkbenc
 				getFieldEditorParent()));
 		addField(new IntegerFieldEditor(Preferences.MAXIMUM_HITS, "maximum hit count", getFieldEditorParent()));
 		addField(new FileFieldEditor(Preferences.AQUIRE_ACTION_SCRIPT, "Aquire script", getFieldEditorParent()));
-		addField(new StringFieldEditor(Preferences.DOCUMENT_STORE, Messages.LucindaPrefs_documentStore,
-				getFieldEditorParent()));
+		/* addField(new StringFieldEditor(Preferences.DOCUMENT_STORE, Messages.LucindaPrefs_documentStore,
+				getFieldEditorParent())); */
 		addField(new MultilineFieldEditor(Preferences.EXCLUDEMETA, Messages.LucindaPrefs_exclude_Metadata, 5, 0, true,
 				getFieldEditorParent()));
 		// addField(new MultilineFieldEditor(Preferences.MACROS, "Makros für das
