@@ -84,12 +84,7 @@ public class ConsultationIndexer implements Customer {
 		setActive(true);
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 		Sender sender = new Sender(this, (List<? extends PersistentObject>) konsen, false);
-		try {
-			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), sender, null);
-		} catch (Exception ex) {
-			ExHandler.handle(ex);
-			setActive(false);	
-		}
+		sender.schedule();
 		
 	}
 	

@@ -151,7 +151,12 @@ public class Controller implements IProgressController {
 	 */
 	public void runQuery(String input){
 		try {
-			Map result = lucinda.query(input);
+			/*
+			if(!input.matches("[\\:\\(\\)]")) {
+				input="contents:"+input;
+			}
+			*/
+			Map result = lucinda.query(buildQuery(input));
 			String status = (String) result.get("status");
 			
 			if ("ok".equals(status)) { //$NON-NLS-1$ //$NON-NLS-2$
