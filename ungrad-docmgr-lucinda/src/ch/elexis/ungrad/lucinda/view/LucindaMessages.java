@@ -28,94 +28,78 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.ungrad.lucinda.Activator;
-import ch.elexis.ungrad.lucinda.Handler;
 
-public class LucindaMessages extends ViewPart implements Handler {
+public class LucindaMessages extends ViewPart {
 	private TreeViewer tv;
-
-	public LucindaMessages() {
+	
+	public LucindaMessages(){
 		// TODO Auto-generated constructor stub
 	}
-
+	
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(Composite parent){
 		parent.setLayout(new FillLayout());
 		tv = new TreeViewer(parent);
 		tv.setContentProvider(new ITreeContentProvider() {
-
+			
 			@Override
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			}
-
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput){}
+			
 			@Override
-			public void dispose() {
-			}
-
+			public void dispose(){}
+			
 			@Override
-			public boolean hasChildren(Object element) {
+			public boolean hasChildren(Object element){
 				if (element instanceof Map) {
 					return true;
 				} else {
 					return false;
 				}
 			}
-
+			
 			@Override
-			public Object getParent(Object element) {
+			public Object getParent(Object element){
 				return null;
 			}
-
+			
 			@Override
-			public Object[] getElements(Object inputElement) {
+			public Object[] getElements(Object inputElement){
 				return Activator.getDefault().getMessages().toArray();
 			}
-
+			
 			@Override
-			public Object[] getChildren(Object parentElement) {
+			public Object[] getChildren(Object parentElement){
 				Map doc = (Map) parentElement;
 				Set<Entry<String, Object>> entries = doc.entrySet();
 				return entries.toArray();
 			}
 		});
-
+		
 		tv.setLabelProvider(new LabelProvider() {
-
+			
 			@Override
-			public String getText(Object element) {
+			public String getText(Object element){
 				if (element instanceof Map) {
-					return (String)((Map) element).get("status"); //$NON-NLS-1$
+					return (String) ((Map) element).get("status"); //$NON-NLS-1$
 				} else if (element instanceof Entry) {
 					Entry e = (Entry) element;
 					return e.getKey() + ": " + e.getValue(); //$NON-NLS-1$
 				} else {
 					return "?"; //$NON-NLS-1$
 				}
-
+				
 			}
-
+			
 		});
-		Activator.getDefault().addHandler(this);
-
+				
 		tv.setInput(Activator.getDefault().getMessages());
 	}
-
+	
 	@Override
-	public void setFocus() {
+	public void setFocus(){
 		// TODO Auto-generated method stub
-
+		
 	}
-
-	@Override
-	public void signal(Map msg) {
-		Display.getDefault().asyncExec(new Runnable() {
-
-			@Override
-			public void run() {
-				tv.add("/", msg); //$NON-NLS-1$
-			}
-
-		});
-
-	}
-
+	
+	
 }

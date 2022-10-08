@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-2022 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -38,7 +38,7 @@ public class DocumentHandler implements IDocumentHandler {
 	public DocumentHandler(){
 		icon = AbstractUIPlugin.imageDescriptorFromPlugin("ch.elexis.core.ui.icons", //$NON-NLS-1$
 			"/icons/16x16/book_open_view.png");
-			
+		
 	}
 	
 	@Override

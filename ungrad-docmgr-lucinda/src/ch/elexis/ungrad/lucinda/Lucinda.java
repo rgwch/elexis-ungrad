@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2022 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -18,48 +18,30 @@ import java.util.Map;
 
 import ch.rgw.io.FileTool;
 
-
 public class Lucinda {
 	private Client3 client;
 	private boolean connected = false;
-
-	public Lucinda() {
+	
+	public Lucinda(){
 		client = new Client3();
 	}
-
-	/*
-	public void connect(final Handler handler) throws IOException {
-		if (!connected) {
-			String server = Preferences.get(Preferences.SERVER_ADDR, "127.0.0.1"); //$NON-NLS-1$
-			int port = Integer.parseInt(Preferences.get(Preferences.SERVER_PORT, "9997")); //$NON-NLS-1$
-			client.connect(server, port, handler);
-		}
+	
+	public void rescan(){
+		client.rescan();
 	}
-
-	public void disconnect() {
-		if (connected) {
-			connected = false;
-			if (client != null) {
-				client.shutDown();
-			}
-		}
+	
+	public Map query(String q) throws Exception{
+		return client.query(q);
 	}
-	 */
-	public void rescan(Handler ha) {
-		client.rescan(ha);
+	
+	public Map get(String id) throws Exception{
+		return client.get(id);
 	}
-	public void query(String q, Handler ha) {
-		client.query(q, ha);
-	}
-
-	public void get(String id, Handler ha) {
-		client.get(id, ha);
-	}
-
-	public void addToIndex(String id, String title, String type, Map meta, byte[] contents, Handler handler,
-			boolean bCopy) {
+	
+	public Map addToIndex(String id, String title, String type, Map meta, byte[] contents,
+		boolean bCopy) throws Exception{
 		if (bCopy) {
-			String filetype = (String)meta.get("filetype");
+			String filetype = (String) meta.get("filetype");
 			if (filetype != null) {
 				String ext = FileTool.getExtension(filetype);
 				if (ext.length() == 0) {
@@ -67,10 +49,10 @@ public class Lucinda {
 				}
 				title += "." + ext;
 			}
-			client.addFile(id, title, (String)meta.get("concern"), type, meta, contents, handler);
+			return client.addFile(id, title, (String) meta.get("concern"), type, meta, contents);
 		} else {
-			client.addToIndex(id, title, type, meta, contents, handler);
+			return client.addToIndex(id, title, type, meta, contents);
 		}
 	}
-
+	
 }

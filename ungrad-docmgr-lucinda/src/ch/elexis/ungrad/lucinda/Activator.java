@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-2022 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -35,7 +35,6 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
-	private List<Handler> handlers = new ArrayList<>();
 	private List<Map<String, Object>> messages = new LinkedList<>();
 	private List<IDocumentHandler> addons;
 	
@@ -57,14 +56,6 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		addons = Extensions.getClasses("ch.elexis.ungrad.lucinda.addon", "DocumentHandler");
-	}
-
-	public void addHandler(Handler handler) {
-		handlers.add(handler);
-	}
-
-	public void removeHandler(Handler handler) {
-		handlers.remove(handler);
 	}
 
 	public List<IDocumentHandler> getAddons() {
