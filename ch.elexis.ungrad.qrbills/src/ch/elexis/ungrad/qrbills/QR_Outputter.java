@@ -268,9 +268,9 @@ public class QR_Outputter implements IRnOutputter {
 			String finished = cookedHTML.replace("[QRIMG]", bill.rn.getRnId() + ".png")
 				.replace("[LEISTUNGEN]", sbSummary.toString()).replace("[CURRENCY]", bill.currency)
 				.replace("[AMOUNT]", bill.amountTotalWithCharges.getAmountAsString())
-				.replace("[IBAN]", bill.formattedIban)
+				.replace("[IBAN]", bill.getFormatted(bill.qrIBAN))
 				.replace("[BILLER]", bill.combinedAddress(bill.biller))
-				.replace("[ESRLINE]", bill.formattedReference)
+				.replace("[ESRLINE]", bill.getFormatted(bill.qrReference))
 				.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
 				.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat))
 				.replace("[DUE]", bill.dateDue);
@@ -278,12 +278,7 @@ public class QR_Outputter implements IRnOutputter {
 			File htmlFile = new File(bill.outputDirPDF, bill.rn.getNr() + ".html");
 			File pdfFile = new File(bill.outputDirPDF, bill.rn.getNr() + "_qr.pdf");
 			FileTool.writeTextFile(htmlFile, finished);
-			FileOutputStream fout = new FileOutputStream(pdfFile);
-			PdfRendererBuilder builder = new PdfRendererBuilder();
-			builder.useFastMode();
-			builder.withFile(htmlFile);
-			builder.toStream(fout);
-			builder.run();
+			bill.writePDF(htmlFile, pdfFile);
 			if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
 				String defaultPrinter = null;
 				if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {

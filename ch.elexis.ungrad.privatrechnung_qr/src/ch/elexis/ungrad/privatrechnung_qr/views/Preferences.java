@@ -34,7 +34,7 @@ import ch.rgw.io.Settings;
 
 public class Preferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	
-	Settings cfg;
+	Settings localCfg, globalCfg;
 	List<Mandant> lMandanten;
 	ComboFieldEditor cfe;
 	StringFieldEditor sfBill, sfRem1, sfRem2, sfRem3, sfSecond, sfQRIban, sfKunde;
@@ -45,8 +45,9 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	
 	public Preferences(){
 		super(GRID);
-		cfg = CoreHub.localCfg;
-		setPreferenceStore(new SettingsPreferenceStore(cfg));
+		localCfg = CoreHub.localCfg;
+		globalCfg = CoreHub.globalCfg;
+		setPreferenceStore(new SettingsPreferenceStore(localCfg));
 	}
 	
 	@Override
@@ -76,7 +77,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 			getFieldEditorParent());
 		sfQRIban =
 			new StringFieldEditor(PreferenceConstants.QRIBAN, "QR-IBAN", getFieldEditorParent());
-		sfKunde = new StringFieldEditor(PreferenceConstants.bankClient, "Bank-Kundennummer",
+		sfKunde = new IntegerFieldEditor(PreferenceConstants.bankClient, "Bank-Kundennummer",
 			getFieldEditorParent());
 		addField(cfe);
 		addField(sfBill);
@@ -111,18 +112,18 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	public void flush(Mandant m){
 		if (m != null) {
 			String id = m.getId();
-			cfg.set(PreferenceConstants.TEMPLATE_BILL + "/" + id, sfBill.getStringValue());
-			cfg.set(PreferenceConstants.TEMPLATE_REMINDER1 + "/" + id, sfRem1.getStringValue());
-			cfg.set(PreferenceConstants.TEMPLATE_REMINDER2 + "/" + id, sfRem2.getStringValue());
-			cfg.set(PreferenceConstants.TEMPLATE_REMINDER3 + "/" + id, sfRem3.getStringValue());
-			cfg.set(PreferenceConstants.AVAILABLE_SPACE_1 + "/" + id, ifh1.getStringValue());
-			cfg.set(PreferenceConstants.AVAILABLE_SPACE_2 + "/" + id, if2nd.getStringValue());
+			localCfg.set(PreferenceConstants.TEMPLATE_BILL + "/" + id, sfBill.getStringValue());
+			localCfg.set(PreferenceConstants.TEMPLATE_REMINDER1 + "/" + id, sfRem1.getStringValue());
+			localCfg.set(PreferenceConstants.TEMPLATE_REMINDER2 + "/" + id, sfRem2.getStringValue());
+			localCfg.set(PreferenceConstants.TEMPLATE_REMINDER3 + "/" + id, sfRem3.getStringValue());
+			localCfg.set(PreferenceConstants.AVAILABLE_SPACE_1 + "/" + id, ifh1.getStringValue());
+			localCfg.set(PreferenceConstants.AVAILABLE_SPACE_2 + "/" + id, if2nd.getStringValue());
 			Kontakt kBank = kfBank.getValue();
 			if (kBank != null) {
-				cfg.set(PreferenceConstants.cfgBank + "/" + id, kfBank.getValue().getId());
+				globalCfg.set(PreferenceConstants.cfgBank + "/" + id, kfBank.getValue().getId());
 			}
-			cfg.set(PreferenceConstants.QRIBAN + "/" + id, sfQRIban.getStringValue());
-			cfg.set(PreferenceConstants.bankClient + "/" + id, sfKunde.getStringValue());
+			globalCfg.set(PreferenceConstants.QRIBAN + "/" + id, sfQRIban.getStringValue());
+			globalCfg.set(PreferenceConstants.bankClient + "/" + id, sfKunde.getStringValue());
 		}
 		
 	}
@@ -131,15 +132,15 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		if (m != null) {
 			String id = m.getId();
 			
-			sfBill.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_BILL + "/" + id, ""));
-			sfRem1.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_REMINDER1 + "/" + id, ""));
-			sfRem2.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_REMINDER2 + "/" + id, ""));
-			sfRem3.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_REMINDER3 + "/" + id, ""));
-			ifh1.setStringValue(cfg.get(PreferenceConstants.AVAILABLE_SPACE_1 + "/" + id, ""));
-			if2nd.setStringValue(cfg.get(PreferenceConstants.AVAILABLE_SPACE_2 + "/" + id, ""));	
-			kfBank.set(Kontakt.load(cfg.get(PreferenceConstants.cfgBank + "/" + id, "")));
-			sfQRIban.setStringValue(cfg.get(PreferenceConstants.QRIBAN + "/" + id, ""));
-			sfKunde.setStringValue(cfg.get(PreferenceConstants.bankClient + "/" + id, ""));
+			sfBill.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_BILL + "/" + id, ""));
+			sfRem1.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_REMINDER1 + "/" + id, ""));
+			sfRem2.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_REMINDER2 + "/" + id, ""));
+			sfRem3.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_REMINDER3 + "/" + id, ""));
+			ifh1.setStringValue(localCfg.get(PreferenceConstants.AVAILABLE_SPACE_1 + "/" + id, ""));
+			if2nd.setStringValue(localCfg.get(PreferenceConstants.AVAILABLE_SPACE_2 + "/" + id, ""));	
+			kfBank.set(Kontakt.load(globalCfg.get(PreferenceConstants.cfgBank + "/" + id, "")));
+			sfQRIban.setStringValue(globalCfg.get(PreferenceConstants.QRIBAN + "/" + id, ""));
+			sfKunde.setStringValue(globalCfg.get(PreferenceConstants.bankClient + "/" + id, ""));
 		}
 	}
 	
@@ -162,7 +163,8 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		if (selected != null) {
 			flush(selected);
 		}
-		CoreHub.localCfg.flush();
+		localCfg.flush();
+		globalCfg.flush();
 		return true;
 	}
 	
