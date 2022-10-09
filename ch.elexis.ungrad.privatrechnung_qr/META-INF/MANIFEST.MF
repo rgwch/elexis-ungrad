@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Privatrechnung_qr
 Bundle-SymbolicName: ch.elexis.ungrad.privatrechnung_qr;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.1.qualifier
 Automatic-Module-Name: ch.elexis.ungrad.privatrechnung_qr
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: ch.rgw.utility;bundle-version="3.7.0",

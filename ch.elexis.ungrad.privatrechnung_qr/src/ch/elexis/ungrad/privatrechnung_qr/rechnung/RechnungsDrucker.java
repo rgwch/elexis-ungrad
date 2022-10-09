@@ -31,6 +31,7 @@ import ch.elexis.core.data.interfaces.IVerrechenbar;
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.core.data.util.ResultAdapter;
 import ch.elexis.core.model.IPersistentObject;
+import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.*;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.privatrechnung_qr.data.PreferenceConstants;
@@ -90,7 +91,6 @@ public class RechnungsDrucker implements IRnOutputter {
 		final Result<Rechnung> result = new Result<Rechnung>();
 		
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-		final Result<Rechnung> res = new Result<Rechnung>();
 		try {
 			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(),
 				new IRunnableWithProgress() {
@@ -100,7 +100,7 @@ public class RechnungsDrucker implements IRnOutputter {
 						monitor.beginTask("Drucke Rechnungen", rnn.size() * 3);
 						for (Rechnung rn : rnn) {
 							try {
-								res.add(doPrint(rn, monitor, type));
+								result.add(doPrint(rn, monitor, type));
 								int status_vorher = rn.getStatus();
 								if ((status_vorher == RnStatus.OFFEN)
 									|| (status_vorher == RnStatus.MAHNUNG_1)
@@ -118,7 +118,7 @@ public class RechnungsDrucker implements IRnOutputter {
 								}
 							} catch (Exception ex) {
 								ExHandler.handle(ex);
-								res.add(SEVERITY.WARNING, 5, "Output error", rn, true);
+								result.add(SEVERITY.WARNING, 5, "Output error", rn, true);
 							}
 						}
 						monitor.done();
@@ -127,13 +127,18 @@ public class RechnungsDrucker implements IRnOutputter {
 			
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
-			res.add(Result.SEVERITY.ERROR, 2, ex.getMessage(), null, true);
+			result.add(Result.SEVERITY.ERROR, 1, ex.getMessage(), null, true);
 			ErrorDialog.openError(null, "Exception", "Exception",
-				ResultAdapter.getResultAsStatus(res));
-			return res;
+				ResultAdapter.getResultAsStatus(result));
+			return result;
 		}
-		if (!result.isOK()) {
-			ResultAdapter.displayResult(result, "Fehler beim Rechnungsdruck");
+		if (result.isOK()) {
+			SWTHelper.showInfo("Ausgabe beendet",
+				rnn.size() + " QR-Rechnung(en) wurde(n) ausgegeben");
+		} else {
+			SWTHelper.showError("QR-Output", "Fehler bei der Rechnungsausgabe", result.toString()
+				+ "\nSie können die fehlerhaften Rechnungen mit Status fehlerhaft in der Rechnungsliste anzeigen und korrigieren");
+			
 		}
 		return result;
 	}
@@ -205,10 +210,13 @@ public class RechnungsDrucker implements IRnOutputter {
 				Money mLine = new Money(mSingle);
 				mLine.multiply(v.getZahl());
 				sum.addMoney(mLine);
-				sb.append("<tr><td>").append(datum).append("</td><td style=\"padding-left:5mm;padding-right:5mm;\">").append(v.getLabel())
-					.append("</td><td class=\"amount\">").append(mSingle.getAmountAsString())
-					.append("</td><td style=\"text-align:center\">").append(v.getZahl()).append("</td><td class=\"amount\">")
-					.append(mLine.getAmountAsString()).append("</td></tr>");
+				sb.append("<tr><td>").append(datum)
+					.append("</td><td style=\"padding-left:5mm;padding-right:5mm;\">")
+					.append(v.getLabel()).append("</td><td class=\"amount\">")
+					.append(mSingle.getAmountAsString())
+					.append("</td><td style=\"text-align:center\">").append(v.getZahl())
+					.append("</td><td class=\"amount\">").append(mLine.getAmountAsString())
+					.append("</td></tr>");
 				
 				IVerrechenbar iv = v.getVerrechenbar();
 				if (iv != null) {
@@ -222,7 +230,8 @@ public class RechnungsDrucker implements IRnOutputter {
 				}
 			}
 		}
-		sb.append("<tr><td  style=\"padding-top:3mm;\" colspan=\"4\">Total</td><td class=\"amount\">")
+		sb.append(
+			"<tr><td  style=\"padding-top:3mm;\" colspan=\"4\">Total</td><td class=\"amount\">")
 			.append(sum.getAmountAsString()).append("</td></tr>");
 		
 		bill.amountDue = sum;

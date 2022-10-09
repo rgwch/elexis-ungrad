@@ -122,7 +122,7 @@ public class Importer extends ImporterPage {
 	 */
 	@Override
 	public String getTitle(){
-		return "Privatleistungen Berchtold";
+		return "Privatrechnung QR";
 	}
 	
 	private Result<String> importExcel(final String file, final IProgressMonitor mon){

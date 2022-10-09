@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="ch.elexis.ungrad.privatrechnung_qr.feature"
-      label="Feature"
-      version="1.0.0.qualifier">
+      label="Privatrechnung mit QR-Code"
+      version="1.0.0.qualifier"
+      provider-name="elecis.ch">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
@@ -15,6 +16,11 @@
    <license url="http://www.example.com/license">
       [Enter License Description here.]
    </license>
+
+   <requires>
+      <import feature="ch.berchtold.privatrechnung.feature" version="3.0.100.qualifier"/>
+      <import plugin="ch.elexis.ungrad.qrbills"/>
+   </requires>
 
    <plugin
          id="ch.elexis.ungrad.privatrechnung_qr"

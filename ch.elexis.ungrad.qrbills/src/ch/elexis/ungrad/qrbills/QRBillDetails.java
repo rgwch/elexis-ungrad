@@ -72,7 +72,7 @@ public class QRBillDetails {
 	
 	public String combinedAddress(Kontakt k){
 		StringBuilder sb = new StringBuilder();
-		sb.append(k.get(Kontakt.FLD_NAME1) + " " + k.get(Kontakt.FLD_NAME2)).append("<br />")
+		sb.append(k.get(Kontakt.FLD_NAME2) + " " + k.get(Kontakt.FLD_NAME1)).append("<br />")
 			.append(k.get(Kontakt.FLD_STREET)).append("<br />")
 			.append(k.get(Kontakt.FLD_ZIP) + " " + k.get(Kontakt.FLD_PLACE));
 		return sb.toString();
