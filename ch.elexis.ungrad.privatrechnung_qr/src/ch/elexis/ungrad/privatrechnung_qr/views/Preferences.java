@@ -37,7 +37,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	Settings cfg;
 	List<Mandant> lMandanten;
 	ComboFieldEditor cfe;
-	StringFieldEditor sfQR, sf1st, sf2nd, sfQRIban, sfKunde;
+	StringFieldEditor sfBill, sfRem1, sfRem2, sfRem3, sfSecond, sfQRIban, sfKunde;
 	IntegerFieldEditor ifh1, if2nd;
 	KontaktFieldEditor kfBank;
 	Mandant selected;
@@ -58,15 +58,19 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		}
 		cfe = new ComboFieldEditor(PreferenceConstants.cfgBase, "Mandant", fields,
 			getFieldEditorParent());
-		sfQR = new StringFieldEditor(PreferenceConstants.cfgTemplateQR, "Vorlage mit QR",
+		sfBill = new StringFieldEditor(PreferenceConstants.TEMPLATE_BILL, "Vorlage für Rechnung",
 			getFieldEditorParent());
-		sf1st = new StringFieldEditor(PreferenceConstants.cfgTemplateBill, "Erste Folgeseite",
+		sfRem1 = new StringFieldEditor(PreferenceConstants.TEMPLATE_REMINDER1, "Erste Mahnung",
 			getFieldEditorParent());
-		ifh1 = new IntegerFieldEditor(PreferenceConstants.cfgTemplateBillHeight,
+		sfRem2 = new StringFieldEditor(PreferenceConstants.TEMPLATE_REMINDER2, "Zweite Mahnung",
+			getFieldEditorParent());
+		sfRem3 = new StringFieldEditor(PreferenceConstants.TEMPLATE_REMINDER3, "Dritte Mahnung",
+			getFieldEditorParent());
+		sfSecond = new StringFieldEditor(PreferenceConstants.TEMPLATE_PAGE2, "Folgeseiten",
+			getFieldEditorParent());
+		ifh1 = new IntegerFieldEditor(PreferenceConstants.AVAILABLE_SPACE_1,
 			"Verfügbare Höhe erste Seite (cm)", getFieldEditorParent());
-		sf2nd = new StringFieldEditor(PreferenceConstants.cfgTemplateBill2,
-			"Vorlage weitere Seiten", getFieldEditorParent());
-		if2nd = new IntegerFieldEditor(PreferenceConstants.cfgTemplateBill2Height,
+		if2nd = new IntegerFieldEditor(PreferenceConstants.AVAILABLE_SPACE_2,
 			"Verfügbare Höhe Folgeseiten (cm)", getFieldEditorParent());
 		kfBank = new KontaktFieldEditor(CoreHub.localCfg, PreferenceConstants.cfgBank, "Bank",
 			getFieldEditorParent());
@@ -75,10 +79,11 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		sfKunde = new StringFieldEditor(PreferenceConstants.bankClient, "Bank-Kundennummer",
 			getFieldEditorParent());
 		addField(cfe);
-		addField(sfQR);
-		addField(sf1st);
+		addField(sfBill);
+		addField(sfRem1);
+		addField(sfRem2);
+		addField(sfRem2);
 		addField(ifh1);
-		addField(sf2nd);
 		addField(if2nd);
 		addField(kfBank);
 		addField(sfQRIban);
@@ -106,11 +111,12 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	public void flush(Mandant m){
 		if (m != null) {
 			String id = m.getId();
-			cfg.set(PreferenceConstants.cfgTemplateQR + "/" + id, sfQR.getStringValue());
-			cfg.set(PreferenceConstants.cfgTemplateBill + "/" + id, sf1st.getStringValue());
-			cfg.set(PreferenceConstants.cfgTemplateBillHeight + "/" + id, ifh1.getStringValue());
-			cfg.set(PreferenceConstants.cfgTemplateBill2 + "/" + id, sf2nd.getStringValue());
-			cfg.set(PreferenceConstants.cfgTemplateBill2Height + "/" + id, if2nd.getStringValue());
+			cfg.set(PreferenceConstants.TEMPLATE_BILL + "/" + id, sfBill.getStringValue());
+			cfg.set(PreferenceConstants.TEMPLATE_REMINDER1 + "/" + id, sfRem1.getStringValue());
+			cfg.set(PreferenceConstants.TEMPLATE_REMINDER2 + "/" + id, sfRem2.getStringValue());
+			cfg.set(PreferenceConstants.TEMPLATE_REMINDER3 + "/" + id, sfRem3.getStringValue());
+			cfg.set(PreferenceConstants.AVAILABLE_SPACE_1 + "/" + id, ifh1.getStringValue());
+			cfg.set(PreferenceConstants.AVAILABLE_SPACE_2 + "/" + id, if2nd.getStringValue());
 			Kontakt kBank = kfBank.getValue();
 			if (kBank != null) {
 				cfg.set(PreferenceConstants.cfgBank + "/" + id, kfBank.getValue().getId());
@@ -125,12 +131,12 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		if (m != null) {
 			String id = m.getId();
 			
-			sfQR.setStringValue(cfg.get(PreferenceConstants.cfgTemplateQR + "/" + id, ""));
-			sf1st.setStringValue(cfg.get(PreferenceConstants.cfgTemplateBill + "/" + id, ""));
-			ifh1.setStringValue(cfg.get(PreferenceConstants.cfgTemplateBillHeight + "/" + id, ""));
-			sf2nd.setStringValue(cfg.get(PreferenceConstants.cfgTemplateBill2 + "/" + id, ""));
-			if2nd
-				.setStringValue(cfg.get(PreferenceConstants.cfgTemplateBill2Height + "/" + id, ""));
+			sfBill.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_BILL + "/" + id, ""));
+			sfRem1.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_REMINDER1 + "/" + id, ""));
+			sfRem2.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_REMINDER2 + "/" + id, ""));
+			sfRem3.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_REMINDER3 + "/" + id, ""));
+			ifh1.setStringValue(cfg.get(PreferenceConstants.AVAILABLE_SPACE_1 + "/" + id, ""));
+			if2nd.setStringValue(cfg.get(PreferenceConstants.AVAILABLE_SPACE_2 + "/" + id, ""));	
 			kfBank.set(Kontakt.load(cfg.get(PreferenceConstants.cfgBank + "/" + id, "")));
 			sfQRIban.setStringValue(cfg.get(PreferenceConstants.QRIBAN + "/" + id, ""));
 			sfKunde.setStringValue(cfg.get(PreferenceConstants.bankClient + "/" + id, ""));

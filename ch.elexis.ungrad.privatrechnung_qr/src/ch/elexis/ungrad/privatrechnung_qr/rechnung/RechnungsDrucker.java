@@ -12,8 +12,9 @@
 
 package ch.elexis.ungrad.privatrechnung_qr.rechnung;
 
-import java.util.Collection;
-import java.util.Properties;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -24,20 +25,30 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
 
+import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.interfaces.IRnOutputter;
+import ch.elexis.core.data.interfaces.IVerrechenbar;
+import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.core.data.util.ResultAdapter;
-import ch.elexis.data.Fall;
-import ch.elexis.data.Rechnung;
-import ch.elexis.data.RnStatus;
+import ch.elexis.core.model.IPersistentObject;
+import ch.elexis.data.*;
+import ch.elexis.ungrad.Resolver;
+import ch.elexis.ungrad.privatrechnung_qr.data.PreferenceConstants;
 import ch.elexis.ungrad.qrbills.PDF_Printer;
 import ch.elexis.ungrad.qrbills.QR_Encoder;
+import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
+import ch.rgw.tools.Money;
 import ch.rgw.tools.Result;
+import ch.rgw.tools.Result.SEVERITY;
+import ch.rgw.tools.TimeTool;
 
 public class RechnungsDrucker implements IRnOutputter {
 	private QR_SettingsControl qrs;
 	private QR_Encoder qr = new QR_Encoder();
 	private PDF_Printer printer = new PDF_Printer();
+	private Map<String, IPersistentObject> replacer = new HashMap<>();
 	
 	public String getDescription(){
 		return "Privatrechnung QR PDF";
@@ -88,21 +99,26 @@ public class RechnungsDrucker implements IRnOutputter {
 					public void run(final IProgressMonitor monitor){
 						monitor.beginTask("Drucke Rechnungen", rnn.size() * 3);
 						for (Rechnung rn : rnn) {
-							doPrint(rn, monitor, type, res);
-							int status_vorher = rn.getStatus();
-							if ((status_vorher == RnStatus.OFFEN)
-								|| (status_vorher == RnStatus.MAHNUNG_1)
-								|| (status_vorher == RnStatus.MAHNUNG_2)
-								|| (status_vorher == RnStatus.MAHNUNG_3)) {
-								rn.setStatus(status_vorher + 1);
-							}
-							rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
-								+ RnStatus.getStatusText(rn.getStatus()));
-							monitor.worked(1);
 							try {
-								TimeUnit.MILLISECONDS.sleep(100);
-							} catch (InterruptedException e) {
-								break;
+								res.add(doPrint(rn, monitor, type));
+								int status_vorher = rn.getStatus();
+								if ((status_vorher == RnStatus.OFFEN)
+									|| (status_vorher == RnStatus.MAHNUNG_1)
+									|| (status_vorher == RnStatus.MAHNUNG_2)
+									|| (status_vorher == RnStatus.MAHNUNG_3)) {
+									rn.setStatus(status_vorher + 1);
+								}
+								rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
+									+ RnStatus.getStatusText(rn.getStatus()));
+								monitor.worked(1);
+								try {
+									TimeUnit.MILLISECONDS.sleep(100);
+								} catch (InterruptedException e) {
+									break;
+								}
+							} catch (Exception ex) {
+								ExHandler.handle(ex);
+								res.add(SEVERITY.WARNING, 5, "Output error", rn, true);
 							}
 						}
 						monitor.done();
@@ -122,7 +138,84 @@ public class RechnungsDrucker implements IRnOutputter {
 		return result;
 	}
 	
-	private void doPrint(final Rechnung rn, final IProgressMonitor monitor, TYPE type, Result<Rechnung> res){
+	private Result<Rechnung> doPrint(final Rechnung rn, final IProgressMonitor monitor, TYPE type)
+		throws IOException{
+		String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills")
+			+ File.separator + "rsc" + File.separator + "qrbill_template_p1.html";
+		String fname = "";
+		switch (rn.getStatus()) {
+		case RnStatus.OFFEN:
+		case RnStatus.OFFEN_UND_GEDRUCKT:
+			fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL, "");
+			break;
+		case RnStatus.MAHNUNG_1:
+		case RnStatus.MAHNUNG_1_GEDRUCKT:
+			fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1, "");
+			break;
+		case RnStatus.MAHNUNG_2:
+		case RnStatus.MAHNUNG_2_GEDRUCKT:
+			fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2, "");
+			break;
+		case RnStatus.MAHNUNG_3:
+		case RnStatus.MAHNUNG_3_GEDRUCKT:
+			fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3, "");
+			break;
+		default:
+			fname = default_template;
+		}
+		File template = new File(fname);
+		if (!template.exists()) {
+			template = new File(default_template);
+		}
+		String rawHTML = FileTool.readTextFile(template);
 		
+		Result<Rechnung> ret = new Result<Rechnung>();
+		Fall fall = rn.getFall();
+		Kontakt biller = rn.getMandant();
+		ElexisEventDispatcher.fireSelectionEvent(fall);
+		Kontakt adressat = fall.getGarant();
+		if (!adressat.isValid()) {
+			adressat = fall.getPatient();
+		}
+		replacer.put("Adressat", adressat);
+		replacer.put("Mandant", biller);
+		replacer.put("Rechnung", rn);
+		Resolver resolver = new Resolver(replacer, true);
+		
+		List<Konsultation> kons = rn.getKonsultationen();
+		Collections.sort(kons, new Comparator<Konsultation>() {
+			TimeTool t0 = new TimeTool();
+			TimeTool t1 = new TimeTool();
+			
+			public int compare(final Konsultation arg0, final Konsultation arg1){
+				t0.set(arg0.getDatum());
+				t1.set(arg1.getDatum());
+				return t0.compareTo(t1);
+			}
+			
+		});
+		// Leistungen und Artikel gruppieren
+		Money sum = new Money();
+		HashMap<String, List<Verrechnet>> groups = new HashMap<String, List<Verrechnet>>();
+		for (Konsultation k : kons) {
+			List<Verrechnet> vv = k.getLeistungen();
+			for (Verrechnet v : vv) {
+				Money netto = v.getNettoPreis();
+				netto.multiply(v.getZahl());
+				sum.addMoney(netto);
+				IVerrechenbar iv = v.getVerrechenbar();
+				if (iv != null) {
+					String csName = iv.getCodeSystemName();
+					List<Verrechnet> gl = groups.get(csName);
+					if (gl == null) {
+						gl = new ArrayList<Verrechnet>();
+						groups.put(csName, gl);
+					}
+					gl.add(v);
+				}
+			}
+		}
+		
+		return ret;
 	}
 }
