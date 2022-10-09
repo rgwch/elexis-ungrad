@@ -24,3 +24,4 @@ Bundle-ClassPath: lib/qrinvoice-core-1.13.jar,
  lib/core-3.4.1.jar,
  lib/javase-3.4.1.jar
 Import-Package: ch.fd.invoice440.request
+Export-Package: ch.elexis.ungrad.qrbills

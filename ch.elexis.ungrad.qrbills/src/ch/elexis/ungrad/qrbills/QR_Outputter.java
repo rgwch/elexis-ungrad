@@ -74,7 +74,7 @@ public class QR_Outputter implements IRnOutputter {
 	
 	@Override
 	public String getDescription(){
-		return "Rechnung mit QR Code";
+		return "Tarmedrechnung mit QR Code";
 	}
 	
 	@Override

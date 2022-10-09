@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="ch.elexis.core.ui.Verrechnungscode">
+      <Leistung
+            CodeDetailDisplay="ch.elexis.ungrad.privatrechnung_qr.views.Leistungsdetail"
+            CodeSelectorFactory="ch.elexis.ungrad.privatrechnung_qr.views.Leistungsselektor"
+            ElementFactory="ch.elexis.ungrad.privatrechnung_qr.data.LeistungsFactory"
+            ImporterClass="ch.elexis.ungrad.privatrechnung_qr.data.Importer"
+            name="ch.elexis.ungrad.privatrechnung_qr.Leistung1">
+      </Leistung>
+   </extension>
+   <extension
+         point="ch.elexis.core.data.RechnungsManager">
+      <Rechnung
+            name="Privatrechnung QR"
+            outputter="ch.elexis.ungrad.privatrechnung_qr.rechnung.RechnungsDrucker">
+      </Rechnung>
+   </extension>
+   <extension
+         point="ch.elexis.core.data.PersistentReference">
+      <Factory
+            Class="ch.elexis.ungrad.privatrechnung_qr.data.LeistungsFactory"
+            name="Privatrechnung QR">
+      </Factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+          <page
+            category="ch.elexis.Leistungscodes"
+            class="ch.elexis.ungrad.privatrechnung_qr.views.Preferences"
+            id="ch.elexis.ungrad.privatrechung_qr"
+            name="Privatrechnung QR">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+          <view
+            class="ch.elexis.ungrad.privatrechnung_qr.rechnung.RnPrintView"
+            id="ch.elexis.ungrad.privatrechnung_qr.view"
+            name="Rechnung QR"
+            restorable="true">
+      </view>
+   </extension>
+
+</plugin>
