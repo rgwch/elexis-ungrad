@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="ch.elexis.ungrad.qrbills.feature"
-      label="ISO 20022 conformant bills"
-      version="1.0.1.qualifier"
+      label="Tarmed Bills with QR"
+      version="1.0.2.qualifier"
       provider-name="weirich@elexis.ch">
 
    <description url="http://www.example.com/description">

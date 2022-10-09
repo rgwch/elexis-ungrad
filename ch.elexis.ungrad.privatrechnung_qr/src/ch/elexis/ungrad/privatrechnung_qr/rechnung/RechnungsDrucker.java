@@ -118,7 +118,7 @@ public class RechnungsDrucker implements IRnOutputter {
 								}
 							} catch (Exception ex) {
 								ExHandler.handle(ex);
-								result.add(SEVERITY.WARNING, 5, "Output error", rn, true);
+								result.add(SEVERITY.WARNING, 5, "Output error: "+ex.getMessage(), rn, true);
 							}
 						}
 						monitor.done();

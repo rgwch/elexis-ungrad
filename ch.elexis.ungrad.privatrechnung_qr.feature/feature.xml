@@ -2,8 +2,8 @@
 <feature
       id="ch.elexis.ungrad.privatrechnung_qr.feature"
       label="Privatrechnung mit QR-Code"
-      version="1.0.0.qualifier"
-      provider-name="elecis.ch">
+      version="1.0.1.qualifier"
+      provider-name="weirich@elexis.ch">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
