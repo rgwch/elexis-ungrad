@@ -139,7 +139,7 @@ public class RechnungsDrucker implements IRnOutputter {
 	}
 	
 	private Result<Rechnung> doPrint(final Rechnung rn, final IProgressMonitor monitor, TYPE type)
-		throws IOException{
+		throws Exception{
 		String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills")
 			+ File.separator + "rsc" + File.separator + "qrbill_template_p1.html";
 		String fname = "";
@@ -181,7 +181,7 @@ public class RechnungsDrucker implements IRnOutputter {
 		replacer.put("Mandant", biller);
 		replacer.put("Rechnung", rn);
 		Resolver resolver = new Resolver(replacer, true);
-		
+		String cookedHtml=resolver.resolve(rawHTML);
 		List<Konsultation> kons = rn.getKonsultationen();
 		Collections.sort(kons, new Comparator<Konsultation>() {
 			TimeTool t0 = new TimeTool();

@@ -89,7 +89,7 @@ public class Tarmedprinter {
 
 	private TimeTool tTime;
 	private double sideTotal;
-	private BillDetails billDetails;
+	private TarmedBillDetails billDetails;
 	private Map<String, IPersistentObject> replacer;
 
 	private static DecimalFormat df = new DecimalFormat(StringConstants.DOUBLE_ZERO);
@@ -137,7 +137,7 @@ public class Tarmedprinter {
 		return FileTool.readTextFile(templatefile);
 	}
 
-	public File print(BillDetails bill) throws Exception {
+	public File print(TarmedBillDetails bill) throws Exception {
 
 		File outfile = new File(bill.outputDirPDF, bill.rn.getNr() + "_rf.html");
 
@@ -156,11 +156,11 @@ public class Tarmedprinter {
 		String gesetzDatum = "Falldatum";
 		String gesetzNummer = "Fall-Nr.";
 		String gesetzZSRNIF = "AHV-Nr.";
-		if (bill.fallType == BillDetails.FALL_UVG) {
+		if (bill.fallType == TarmedBillDetails.FALL_UVG) {
 			gesetzDatum = "Unfalldatum";
 			gesetzNummer = "Unfall-Nr.";
 		}
-		if (bill.fallType == BillDetails.FALL_IVG) {
+		if (bill.fallType == TarmedBillDetails.FALL_IVG) {
 			gesetzDatum = "Verfügungsdatum";
 			gesetzNummer = "Verfügungs-Nr.";
 			gesetzZSRNIF = "NIF-Nr.(P)";
@@ -274,14 +274,14 @@ public class Tarmedprinter {
 		return page;
 	}
 
-	private String processHeaders(String page, final BillDetails billDetails, final int pagenumber) {
+	private String processHeaders(String page, final TarmedBillDetails billDetails, final int pagenumber) {
 		if (billDetails.paymentMode == XMLExporter.TIERS_GARANT) {
 			page = page.replace("[Titel]", "Rückforderungsbeleg");
 		} else {
 			page = page.replace("[Titel]", "TP-Rechnung");
 		}
 		page = page.replace("[DocID]", billDetails.documentId).replace("[pagenr]", Integer.toString(pagenumber));
-		if (billDetails.fallType == BillDetails.FALL_IVG) {
+		if (billDetails.fallType == TarmedBillDetails.FALL_IVG) {
 			page = page.replace("[NIF]", TarmedRequirements.getNIF(billDetails.mandator)); //$NON-NLS-1$
 			String ahv = TarmedRequirements.getAHV(billDetails.patient);
 			if (StringTool.isNothing(ahv)) {
@@ -295,15 +295,15 @@ public class Tarmedprinter {
 		return page.replaceAll("\\?\\?\\??[a-zA-Z0-9 \\.]+\\?\\?\\??", "");
 	}
 
-	private String addFallSpecificLines(BillDetails b, String page) {
+	private String addFallSpecificLines(TarmedBillDetails b, String page) {
 		String gesetzDatum = "Falldatum";
 		String gesetzNummer = "Fall-Nr.";
 		String gesetzZSRNIF = "ZSR-Nr.(P)";
-		if (b.fallType == BillDetails.FALL_UVG) {
+		if (b.fallType == TarmedBillDetails.FALL_UVG) {
 			gesetzDatum = "Unfalldatum";
 			gesetzNummer = "Unfall-Nr.";
 		}
-		if (b.fallType == BillDetails.FALL_IVG) {
+		if (b.fallType == TarmedBillDetails.FALL_IVG) {
 			gesetzDatum = "Verfügungsdatum";
 			gesetzNummer = "Verfügungs-Nr.";
 			gesetzZSRNIF = "NIF-Nr.(P)";
@@ -330,7 +330,7 @@ public class Tarmedprinter {
 		return page;
 	}
 
-	private void addESRCodeLine(BillDetails bill, String tcCode) {
+	private void addESRCodeLine(TarmedBillDetails bill, String tcCode) {
 		String offenRp = bill.amountDue.getCentsAsString();
 		if (tcCode != null) {
 			ESR esr = new ESR(bill.biller.getInfoString(TarmedACL.getInstance().ESRNUMBER),
@@ -504,7 +504,7 @@ public class Tarmedprinter {
 	/*
 	 * Create the final balance. Amount due is the amount of the bill minus prepayments plus charges for reminders.
 	 */
-	private String createBalance(String page, BillDetails bill) {
+	private String createBalance(String page, TarmedBillDetails bill) {
 		VatType vat = bill.balance.getVat();
 		String vatNumber = vat.getVatNumber();
 		if (vatNumber == null || vatNumber.equals(" ")) {

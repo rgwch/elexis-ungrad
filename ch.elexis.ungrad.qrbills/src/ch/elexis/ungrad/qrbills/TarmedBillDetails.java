@@ -40,7 +40,7 @@ import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
-public class BillDetails {
+public class TarmedBillDetails extends QRBillDetails{
 	public static int FALL_UVG = 1;
 	public static int FALL_IVG = 2;
 	public static int FALL_KVG = 3;
@@ -53,9 +53,8 @@ public class BillDetails {
 	Rechnung rn;
 	Fall fall;
 	Mandant mandator;
-	Rechnungssteller biller;
+
 	String biller_address;
-	Kontakt adressat;
 	String addressee;
 	Kontakt guarantor;
 	Kontakt zuweiser;
@@ -63,11 +62,8 @@ public class BillDetails {
 
 	int fallType = FALL_KVG;
 	Patient patient;
-	Money amountTarmed, amountDrug, amountLab, amountMigel, amountPhysio, amountUnclassified, 
-	amountDue, //original amount before charges and payments 
-	amountPaid,
-	amountCharges,
-	amountTotalWithCharges;  // end amount with charges and minus payments
+	Money amountTarmed, amountDrug, amountLab, amountMigel, amountPhysio, amountUnclassified; 
+	
 	List<Zahlung> charges = new ArrayList<Zahlung>(); // all charges
 	TreatmentType treatments;
 	ReminderType reminders;
@@ -88,7 +84,7 @@ public class BillDetails {
 	ServicesType services;
 	BalanceType balance;
 
-	private static Logger logger = LoggerFactory.getLogger(BillDetails.class);
+	private static Logger logger = LoggerFactory.getLogger(TarmedBillDetails.class);
 
 	public String combinedAddress(Kontakt k) {
 		StringBuilder sb = new StringBuilder();
@@ -98,7 +94,7 @@ public class BillDetails {
 		return sb.toString();
 	}
 
-	public BillDetails(Rechnung rn, TYPE type, boolean bStrict) throws Exception {
+	public TarmedBillDetails(Rechnung rn, TYPE type, boolean bStrict) throws Exception {
 		this.rn = (Rechnung) checkNull(rn, "Rechnung");
 		fall = (Fall) checkNull(rn.getFall(), "Fall");
 		this.type = type;

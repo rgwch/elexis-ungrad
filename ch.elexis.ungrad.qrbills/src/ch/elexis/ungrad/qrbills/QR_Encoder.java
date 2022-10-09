@@ -1,15 +1,26 @@
+/*******************************************************************************
+ * Copyright (c) 2018-2022 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
 package ch.elexis.ungrad.qrbills;
-
-import ch.codeblock.qrinvoice.model.QrInvoice;
-import ch.codeblock.qrinvoice.model.builder.QrInvoiceBuilder;
 
 import java.io.UnsupportedEncodingException;
 
 import ch.codeblock.qrinvoice.OutputFormat;
 import ch.codeblock.qrinvoice.QrInvoiceCodeCreator;
+import ch.codeblock.qrinvoice.model.QrInvoice;
+import ch.codeblock.qrinvoice.model.builder.QrInvoiceBuilder;
 import ch.codeblock.qrinvoice.output.QrCode;
 import ch.elexis.data.Kontakt;
-import ch.elexis.data.Rechnung;
 import ch.rgw.crypt.BadParameterException;
 
 /**
@@ -19,7 +30,7 @@ import ch.rgw.crypt.BadParameterException;
  *
  */
 public class QR_Encoder {
-	public byte[] generate(BillDetails bill)
+	public byte[] generate(QRBillDetails bill)
 			throws BadParameterException, UnsupportedEncodingException {
 		final QrInvoice qr = QrInvoiceBuilder.create().creditorIBAN(bill.qrIBAN)
 				.paymentAmountInformation(p -> p.chf(bill.amountTotalWithCharges.getAmount()))

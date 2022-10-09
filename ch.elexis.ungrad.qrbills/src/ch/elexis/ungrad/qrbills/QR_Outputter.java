@@ -158,7 +158,7 @@ public class QR_Outputter implements IRnOutputter {
 		Result<Rechnung> res){
 		try {
 			monitor.subTask(rn.getNr() + " wird ausgegeben");
-			BillDetails bill = new BillDetails(rn, type,
+			TarmedBillDetails bill = new TarmedBillDetails(rn, type,
 				CoreHub.localCfg.get(PreferenceConstants.MISSING_DATA, true));
 			if (CoreHub.localCfg.get(PreferenceConstants.FACE_DOWN, false)) {
 				printQRPage(bill);
@@ -178,7 +178,7 @@ public class QR_Outputter implements IRnOutputter {
 		}
 	}
 	
-	private void printQRPage(final BillDetails bill)
+	private void printQRPage(final TarmedBillDetails bill)
 		throws IOException, Exception, BadParameterException, UnsupportedEncodingException,
 		FileNotFoundException, PrinterException{
 		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_QR, true)) {
@@ -303,7 +303,7 @@ public class QR_Outputter implements IRnOutputter {
 		}
 	}
 	
-	private void printDetails(final BillDetails bill)
+	private void printDetails(final TarmedBillDetails bill)
 		throws Exception, FileNotFoundException, IOException, PrinterException{
 		Tarmedprinter tp = new Tarmedprinter();
 		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true)) {
