@@ -34,8 +34,8 @@ import ch.elexis.core.model.IPersistentObject;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.*;
 import ch.elexis.ungrad.Resolver;
+import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.privatrechnung_qr.data.PreferenceConstants;
-import ch.elexis.ungrad.qrbills.PDF_Printer;
 import ch.elexis.ungrad.qrbills.QRBillDetails;
 import ch.elexis.ungrad.qrbills.QR_Encoder;
 import ch.rgw.io.FileTool;
@@ -48,7 +48,7 @@ import ch.rgw.tools.TimeTool;
 public class RechnungsDrucker implements IRnOutputter {
 	private QR_SettingsControl qrs;
 	private QR_Encoder qr = new QR_Encoder();
-	private PDF_Printer printer = new PDF_Printer();
+	private Manager pdfManager = new Manager();
 	private Map<String, IPersistentObject> replacer = new HashMap<>();
 
 	public String getDescription() {
@@ -242,13 +242,13 @@ public class RechnungsDrucker implements IRnOutputter {
 		File pdfFile = new File(pdfDir, bill.rn.getNr() + "_qr.pdf");
 		FileTool.writeTextFile(htmlFile, finished);
 		FileOutputStream fout = new FileOutputStream(pdfFile);
-		bill.writePDF(htmlFile, pdfFile);
+		pdfManager.createPDF(htmlFile, pdfFile);
 		if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
 			String defaultPrinter = null;
 			if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
 				defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
 			}
-			if (printer.print(pdfFile, defaultPrinter)) {
+			if (pdfManager.printFromPDF(pdfFile, defaultPrinter)) {
 				if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
 					pdfFile.delete();
 				}
