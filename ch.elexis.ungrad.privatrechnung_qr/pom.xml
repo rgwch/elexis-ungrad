@@ -10,6 +10,6 @@
     <artifactId>ch.elexis.ungrad.privatrechnung_qr</artifactId>
     <packaging>eclipse-plugin</packaging>
     <groupId>ch.rgw</groupId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 
 </project>

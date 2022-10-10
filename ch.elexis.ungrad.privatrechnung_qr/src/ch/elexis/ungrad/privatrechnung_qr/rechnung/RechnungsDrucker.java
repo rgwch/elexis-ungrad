@@ -50,120 +50,115 @@ public class RechnungsDrucker implements IRnOutputter {
 	private QR_Encoder qr = new QR_Encoder();
 	private PDF_Printer printer = new PDF_Printer();
 	private Map<String, IPersistentObject> replacer = new HashMap<>();
-	
-	public String getDescription(){
+
+	public String getDescription() {
 		return "Privatrechnung QR PDF";
 	}
-	
+
 	/**
 	 * We'll take all sorts of bills
 	 */
-	public boolean canBill(final Fall fall){
+	public boolean canBill(final Fall fall) {
 		return true;
 	}
-	
+
 	/**
 	 * We never storno
 	 */
-	public boolean canStorno(final Rechnung rn){
+	public boolean canStorno(final Rechnung rn) {
 		return false;
 	}
-	
+
 	/**
-	 * Create the Control that will be presented to the user before selecting the bill output
-	 * target. Here we simply chose a template to use for the bill. In fact we need two templates: a
-	 * template for the page with summary and giro and a template for the other pages
+	 * Create the Control that will be presented to the user before selecting the
+	 * bill output target. Here we simply chose a template to use for the bill. In
+	 * fact we need two templates: a template for the page with summary and giro and
+	 * a template for the other pages
 	 */
-	public Object createSettingsControl(Object parent){
+	public Object createSettingsControl(Object parent) {
 		qrs = new QR_SettingsControl((Composite) parent);
 		return qrs;
 	}
-	
-	public void saveComposite(){
+
+	public void saveComposite() {
 		qrs.doSave();
 	}
-	
+
 	/**
 	 * Print the bill(s)
 	 */
-	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn,
-		final Properties props){
+	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, final Properties props) {
 		final Result<Rechnung> result = new Result<Rechnung>();
-		
+
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 		try {
-			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(),
-				new IRunnableWithProgress() {
-					
-					@Override
-					public void run(final IProgressMonitor monitor){
-						monitor.beginTask("Drucke Rechnungen", rnn.size() * 3);
-						for (Rechnung rn : rnn) {
-							try {
-								result.add(doPrint(rn, monitor, type));
-								int status_vorher = rn.getStatus();
-								if ((status_vorher == RnStatus.OFFEN)
-									|| (status_vorher == RnStatus.MAHNUNG_1)
-									|| (status_vorher == RnStatus.MAHNUNG_2)
-									|| (status_vorher == RnStatus.MAHNUNG_3)) {
-									rn.setStatus(status_vorher + 1);
-								}
-								rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
-									+ RnStatus.getStatusText(rn.getStatus()));
-								monitor.worked(1);
-								try {
-									TimeUnit.MILLISECONDS.sleep(100);
-								} catch (InterruptedException e) {
-									break;
-								}
-							} catch (Exception ex) {
-								ExHandler.handle(ex);
-								result.add(SEVERITY.WARNING, 5, "Output error: "+ex.getMessage(), rn, true);
+			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {
+
+				@Override
+				public void run(final IProgressMonitor monitor) {
+					monitor.beginTask("Drucke Rechnungen", rnn.size() * 3);
+					for (Rechnung rn : rnn) {
+						try {
+							result.add(doPrint(rn, monitor, type));
+							int status_vorher = rn.getStatus();
+							if ((status_vorher == RnStatus.OFFEN) || (status_vorher == RnStatus.MAHNUNG_1)
+									|| (status_vorher == RnStatus.MAHNUNG_2) || (status_vorher == RnStatus.MAHNUNG_3)) {
+								rn.setStatus(status_vorher + 1);
 							}
+							rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
+									+ RnStatus.getStatusText(rn.getStatus()));
+							monitor.worked(1);
+							try {
+								TimeUnit.MILLISECONDS.sleep(100);
+							} catch (InterruptedException e) {
+								break;
+							}
+						} catch (Exception ex) {
+							ExHandler.handle(ex);
+							result.add(SEVERITY.WARNING, 5, "Output error: " + ex.getMessage(), rn, true);
 						}
-						monitor.done();
 					}
-				}, null);
-			
+					monitor.done();
+				}
+			}, null);
+
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
 			result.add(Result.SEVERITY.ERROR, 1, ex.getMessage(), null, true);
-			ErrorDialog.openError(null, "Exception", "Exception",
-				ResultAdapter.getResultAsStatus(result));
+			ErrorDialog.openError(null, "Exception", "Exception", ResultAdapter.getResultAsStatus(result));
 			return result;
 		}
 		if (result.isOK()) {
-			SWTHelper.showInfo("Ausgabe beendet",
-				rnn.size() + " QR-Rechnung(en) wurde(n) ausgegeben");
+			SWTHelper.showInfo("Ausgabe beendet", rnn.size() + " QR-Rechnung(en) wurde(n) ausgegeben");
 		} else {
 			SWTHelper.showError("QR-Output", "Fehler bei der Rechnungsausgabe", result.toString()
-				+ "\nSie können die fehlerhaften Rechnungen mit Status fehlerhaft in der Rechnungsliste anzeigen und korrigieren");
-			
+					+ "\nSie können die fehlerhaften Rechnungen mit Status fehlerhaft in der Rechnungsliste anzeigen und korrigieren");
+
 		}
 		return result;
 	}
-	
-	private Result<Rechnung> doPrint(final Rechnung rn, final IProgressMonitor monitor, TYPE type)
-		throws Exception{
-		String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.privatrechnung_qr")
-			+ File.separator + "rsc" + File.separator + "qrbill_template_p1.html";
+
+	private Result<Rechnung> doPrint(final Rechnung rn, final IProgressMonitor monitor, TYPE type) throws Exception {
+		String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.privatrechnung_qr") + File.separator
+				+ "rsc" + File.separator + "qrbill_template_p1.html";
 		String fname = "";
+		String mid = "/" + rn.getMandant().getId();
 		switch (rn.getStatus()) {
 		case RnStatus.OFFEN:
 		case RnStatus.OFFEN_UND_GEDRUCKT:
-			fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL, "");
+			fname = CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_BILL + mid, "");
 			break;
 		case RnStatus.MAHNUNG_1:
 		case RnStatus.MAHNUNG_1_GEDRUCKT:
-			fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1, "");
+			fname = CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_REMINDER1 + mid, "");
 			break;
 		case RnStatus.MAHNUNG_2:
 		case RnStatus.MAHNUNG_2_GEDRUCKT:
-			fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2, "");
+			fname = CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_REMINDER2 + mid, "");
 			break;
 		case RnStatus.MAHNUNG_3:
 		case RnStatus.MAHNUNG_3_GEDRUCKT:
-			fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3, "");
+			fname = CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_REMINDER3 + mid, "");
 			break;
 		default:
 			fname = default_template;
@@ -173,13 +168,12 @@ public class RechnungsDrucker implements IRnOutputter {
 			template = new File(default_template);
 		}
 		String rawHTML = FileTool.readTextFile(template);
-		
+
 		Result<Rechnung> ret = new Result<Rechnung>();
 		QRBillDetails bill = new QRBillDetails(rn);
-		bill.qrIBAN =
-			CoreHub.globalCfg.get(PreferenceConstants.QRIBAN + "/" + rn.getMandant().getId(), "0");
-		bill.qrReference = bill.createQRReference(CoreHub.globalCfg
-			.get(PreferenceConstants.bankClient + "/" + rn.getMandant().getId(), "0"));
+		bill.qrIBAN = CoreHub.globalCfg.get(PreferenceConstants.QRIBAN + "/" + rn.getMandant().getId(), "0");
+		bill.qrReference = bill.createQRReference(
+				CoreHub.globalCfg.get(PreferenceConstants.bankClient + "/" + rn.getMandant().getId(), "0"));
 		ElexisEventDispatcher.fireSelectionEvent(bill.fall);
 		replacer.put("Adressat", bill.adressat);
 		replacer.put("Mandant", bill.biller);
@@ -190,13 +184,13 @@ public class RechnungsDrucker implements IRnOutputter {
 		Collections.sort(kons, new Comparator<Konsultation>() {
 			TimeTool t0 = new TimeTool();
 			TimeTool t1 = new TimeTool();
-			
-			public int compare(final Konsultation arg0, final Konsultation arg1){
+
+			public int compare(final Konsultation arg0, final Konsultation arg1) {
 				t0.set(arg0.getDatum());
 				t1.set(arg1.getDatum());
 				return t0.compareTo(t1);
 			}
-			
+
 		});
 		// Leistungen und Artikel gruppieren
 		Money sum = new Money();
@@ -210,14 +204,11 @@ public class RechnungsDrucker implements IRnOutputter {
 				Money mLine = new Money(mSingle);
 				mLine.multiply(v.getZahl());
 				sum.addMoney(mLine);
-				sb.append("<tr><td>").append(datum)
-					.append("</td><td style=\"padding-left:5mm;padding-right:5mm;\">")
-					.append(v.getLabel()).append("</td><td class=\"amount\">")
-					.append(mSingle.getAmountAsString())
-					.append("</td><td style=\"text-align:center\">").append(v.getZahl())
-					.append("</td><td class=\"amount\">").append(mLine.getAmountAsString())
-					.append("</td></tr>");
-				
+				sb.append("<tr><td>").append(datum).append("</td><td style=\"padding-left:5mm;padding-right:5mm;\">")
+						.append(v.getLabel()).append("</td><td class=\"amount\">").append(mSingle.getAmountAsString())
+						.append("</td><td style=\"text-align:center\">").append(v.getZahl())
+						.append("</td><td class=\"amount\">").append(mLine.getAmountAsString()).append("</td></tr>");
+
 				IVerrechenbar iv = v.getVerrechenbar();
 				if (iv != null) {
 					String csName = iv.getCodeSystemName();
@@ -230,25 +221,23 @@ public class RechnungsDrucker implements IRnOutputter {
 				}
 			}
 		}
-		sb.append(
-			"<tr><td  style=\"padding-top:3mm;\" colspan=\"4\">Total</td><td class=\"amount\">")
-			.append(sum.getAmountAsString()).append("</td></tr>");
-		
+		sb.append("<tr><td  style=\"padding-top:3mm;\" colspan=\"4\">Total</td><td class=\"amount\">")
+				.append(sum.getAmountAsString()).append("</td></tr>");
+
 		bill.amountDue = sum;
 		bill.addCharges();
 		byte[] png = qr.generate(bill);
 		File pdfDir = new File(CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF, ""));
 		File imgFile = new File(pdfDir, rn.getNr() + ".png");
 		FileTool.writeFile(imgFile, png);
-		String finished = cookedHtml.replace("[QRIMG]", bill.rn.getNr() + ".png")
-			.replace("[LEISTUNGEN]", sb.toString()).replace("[CURRENCY]", bill.currency)
-			.replace("[AMOUNT]", bill.amountTotalWithCharges.getAmountAsString())
-			.replace("[IBAN]", bill.getFormatted(bill.qrIBAN))
-			.replace("[BILLER]", bill.combinedAddress(bill.biller))
-			.replace("[ESRLINE]", bill.getFormatted(bill.qrReference))
-			.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat))
-			.replace("[DUE]", bill.dateDue);
-		
+		String finished = cookedHtml.replace("[QRIMG]", bill.rn.getNr() + ".png").replace("[LEISTUNGEN]", sb.toString())
+				.replace("[CURRENCY]", bill.currency)
+				.replace("[AMOUNT]", bill.amountTotalWithCharges.getAmountAsString())
+				.replace("[IBAN]", bill.getFormatted(bill.qrIBAN))
+				.replace("[BILLER]", bill.combinedAddress(bill.biller))
+				.replace("[ESRLINE]", bill.getFormatted(bill.qrReference))
+				.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);
+
 		File htmlFile = new File(pdfDir, bill.rn.getNr() + ".html");
 		File pdfFile = new File(pdfDir, bill.rn.getNr() + "_qr.pdf");
 		FileTool.writeTextFile(htmlFile, finished);
@@ -269,7 +258,7 @@ public class RechnungsDrucker implements IRnOutputter {
 		if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
 			htmlFile.delete();
 		}
-		
+
 		return ret;
 	}
 }

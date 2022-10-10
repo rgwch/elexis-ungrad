@@ -25,12 +25,10 @@ import ch.rgw.tools.StringTool;
 
 public class QR_SettingsControl extends Composite {
 	String outputDirPDF;
-	String outputDirXML;
 	Combo cbPrinters;
 	PrintService[] printers;
 	Button cbDoPrint, cbDirectPrint, cbDoDelete, cbDebug;
 	Text tOutdirPDF;
-	Text tOutdirXML;
 	private Button cbFaceDown;
 
 	public QR_SettingsControl(Composite parent) {
@@ -58,25 +56,6 @@ public class QR_SettingsControl extends Composite {
 		outputDirPDF = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF,
 				CorePreferenceInitializer.getDefaultDBPath());
 		tOutdirPDF.setText(outputDirPDF);
-
-		Label lx = new Label(this, SWT.NONE);
-		lx.setText("Zielverzeichnis für XMLs");
-		lx.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		tOutdirXML = new Text(this, SWT.READ_ONLY | SWT.BORDER);
-		tOutdirXML.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		Button bx = new Button(this, SWT.PUSH);
-		bx.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				outputDirXML = new DirectoryDialog(parent.getShell(), SWT.OPEN).open();
-				CoreHub.localCfg.set(PreferenceConstants.RNN_DIR_XML, outputDirXML);
-				tOutdirXML.setText(outputDirXML);
-			}
-		});
-		bx.setText("Ändern");
-		outputDirXML = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_XML,
-				CorePreferenceInitializer.getDefaultDBPath());
-		tOutdirXML.setText(outputDirXML);
 
 		Label sep = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL);
 		sep.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
@@ -118,7 +97,6 @@ public class QR_SettingsControl extends Composite {
 	public void doSave() {
 
 		CoreHub.localCfg.set(PreferenceConstants.RNN_DIR_PDF, tOutdirPDF.getText());
-		CoreHub.localCfg.set(PreferenceConstants.RNN_DIR_XML, tOutdirXML.getText());
 		CoreHub.localCfg.set(PreferenceConstants.DO_PRINT, cbDoPrint.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DIRECT_PRINT, cbDirectPrint.getSelection());
 		CoreHub.localCfg.set(PreferenceConstants.DELETE_AFTER_PRINT, cbDoDelete.getSelection());

@@ -15,6 +15,7 @@ package ch.elexis.ungrad.privatrechnung_qr.views;
 import java.util.List;
 
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -59,15 +60,15 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		}
 		cfe = new ComboFieldEditor(PreferenceConstants.cfgBase, "Mandant", fields,
 			getFieldEditorParent());
-		sfBill = new StringFieldEditor(PreferenceConstants.TEMPLATE_BILL, "Vorlage für Rechnung",
+		sfBill = new FileFieldEditor(PreferenceConstants.TEMPLATE_BILL, "Vorlage für Rechnung",
 			getFieldEditorParent());
-		sfRem1 = new StringFieldEditor(PreferenceConstants.TEMPLATE_REMINDER1, "Erste Mahnung",
+		sfRem1 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER1, "Erste Mahnung",
 			getFieldEditorParent());
-		sfRem2 = new StringFieldEditor(PreferenceConstants.TEMPLATE_REMINDER2, "Zweite Mahnung",
+		sfRem2 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER2, "Zweite Mahnung",
 			getFieldEditorParent());
-		sfRem3 = new StringFieldEditor(PreferenceConstants.TEMPLATE_REMINDER3, "Dritte Mahnung",
+		sfRem3 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER3, "Dritte Mahnung",
 			getFieldEditorParent());
-		sfSecond = new StringFieldEditor(PreferenceConstants.TEMPLATE_PAGE2, "Folgeseiten",
+		sfSecond = new FileFieldEditor(PreferenceConstants.TEMPLATE_PAGE2, "Folgeseiten",
 			getFieldEditorParent());
 		ifh1 = new IntegerFieldEditor(PreferenceConstants.AVAILABLE_SPACE_1,
 			"Verfügbare Höhe erste Seite (cm)", getFieldEditorParent());
