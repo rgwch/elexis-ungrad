@@ -9,6 +9,9 @@ import ch.rgw.io.FileTool;
 
 public class HtmlDoc {
 
+	String orig;
+	String processed;
+	
 	public String load(String filename) throws Exception {
 		File ret = new File(CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, ""), filename);
 		if (!ret.exists()) {
@@ -17,7 +20,16 @@ public class HtmlDoc {
 				throw new Exception("Could not read " + ret.getAbsolutePath());
 			}
 		}
-		String html = FileTool.readTextFile(ret);
-		return html;
+		orig = FileTool.readTextFile(ret);
+		return orig;
+	}
+
+	public String load(byte[] src) throws Exception {
+		orig = new String(src, "utf-8");
+		return orig;
+	}
+	
+	public void setProcessed(String proc) {
+		processed=proc;
 	}
 }

@@ -1,6 +1,10 @@
 package ch.elexis.ungrad.textplugin;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -8,12 +12,16 @@ import org.eclipse.swt.widgets.Composite;
 
 import ch.elexis.core.data.interfaces.text.ReplaceCallback;
 import ch.elexis.core.ui.text.ITextPlugin;
+import ch.elexis.core.ui.text.TextContainer;
+import ch.elexis.ungrad.pdf.Manager;
+import ch.rgw.tools.ExHandler;
 
-public class TextPlugin implements ITextPlugin {
+public class TextPluginImpl implements ITextPlugin {
 
-	private PageFormat format=PageFormat.A4;
+	private PageFormat format = PageFormat.A4;
 	private Parameter param;
-	
+	private HtmlDoc doc = new HtmlDoc();
+
 	@Override
 	public PageFormat getFormat() {
 		return format;
@@ -21,12 +29,12 @@ public class TextPlugin implements ITextPlugin {
 
 	@Override
 	public void setFormat(PageFormat f) {
-		format=f;
+		format = f;
 	}
 
 	@Override
 	public void setParameter(Parameter parameter) {
-		param=parameter;
+		param = parameter;
 	}
 
 	@Override
@@ -61,25 +69,54 @@ public class TextPlugin implements ITextPlugin {
 
 	@Override
 	public boolean createEmptyDocument() {
-		
-		return false;
+		try {
+			doc.load("frame.html");
+			return true;
+		} catch (Exception e) {
+			ExHandler.handle(e);
+			return false;
+		}
 	}
 
 	@Override
 	public boolean loadFromByteArray(byte[] bs, boolean asTemplate) {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			doc.load(bs);
+			return true;
+		} catch (Exception e) {
+			ExHandler.handle(e);
+			return false;
+		}
 	}
 
 	@Override
 	public boolean loadFromStream(InputStream is, boolean asTemplate) {
-		// TODO Auto-generated method stub
-		return false;
+		byte[] daten = null;
+		try {
+			daten = new byte[is.available()];
+			is.read(daten);
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+		}
+		return loadFromByteArray(daten, asTemplate);
 	}
 
 	@Override
 	public boolean findOrReplace(String pattern, ReplaceCallback cb) {
-		// TODO Auto-generated method stub
+		Pattern pat = Pattern.compile(TextContainer.MATCH_TEMPLATE);
+		StringBuffer sb = new StringBuffer();
+		Matcher matcher = pat.matcher(doc.orig);
+		while (matcher.find()) {
+			String found = matcher.group();
+			String replacement = (String) cb.replace(found);
+			if (!replacement.startsWith("**ERROR")) {
+				matcher.appendReplacement(sb, replacement);
+			} else {
+				matcher.appendReplacement(sb, " ");
+			}
+		}
+		matcher.appendTail(sb);
+		doc.setProcessed(sb.toString());
 		return false;
 	}
 
@@ -133,7 +170,8 @@ public class TextPlugin implements ITextPlugin {
 
 	@Override
 	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished) {
-		// TODO Auto-generated method stub
+		Manager pdfManager=new Manager();
+		
 		return false;
 	}
 
@@ -164,7 +202,7 @@ public class TextPlugin implements ITextPlugin {
 	@Override
 	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2) throws CoreException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

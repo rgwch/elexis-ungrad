@@ -68,4 +68,8 @@ public class Manager {
 		return printed;
 
 	}
+	
+	public boolean printFromHTML(File htmlFle, String printer, boolean bKeepHtml, boolean bKeepPdf) {
+		return false;
+	}
 }

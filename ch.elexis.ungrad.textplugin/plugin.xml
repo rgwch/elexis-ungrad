@@ -13,7 +13,7 @@
  <extension
          point="ch.elexis.core.ui.Text">
       <Texterweiterung
-            Klasse="ch.elexis.ungrad.textplugin.TextPlugin"
+            Klasse="ch.elexis.ungrad.textplugin.TextPluginImpl"
             name="Ungrad HTML Processor">
       </Texterweiterung>
    </extension>

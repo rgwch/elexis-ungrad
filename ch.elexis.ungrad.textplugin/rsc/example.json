@@ -1,0 +1,12 @@
+{
+	"template": "name_of_template",
+	"actors": {
+		"patient": "id",
+		"mandant": "id"
+	},
+	"data":{
+		"PROBLEM":"string",	
+		"DIAGNOSEN":"string"
+	}
+}
+
