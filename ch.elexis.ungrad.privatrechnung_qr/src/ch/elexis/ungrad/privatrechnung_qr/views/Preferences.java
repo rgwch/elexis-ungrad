@@ -38,7 +38,8 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	Settings localCfg, globalCfg;
 	List<Mandant> lMandanten;
 	ComboFieldEditor cfe;
-	StringFieldEditor sfBill, sfRem1, sfRem2, sfRem3, sfSecond, sfQRIban, sfKunde;
+	FileFieldEditor ffBill, ffRem1, ffRem2, ffRem3, ffSecond;
+	StringFieldEditor   sfQRIban, sfKunde;
 	IntegerFieldEditor ifh1, if2nd;
 	KontaktFieldEditor kfBank;
 	Mandant selected;
@@ -60,15 +61,15 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		}
 		cfe = new ComboFieldEditor(PreferenceConstants.cfgBase, "Mandant", fields,
 			getFieldEditorParent());
-		sfBill = new FileFieldEditor(PreferenceConstants.TEMPLATE_BILL, "Vorlage für Rechnung",
+		ffBill = new FileFieldEditor(PreferenceConstants.TEMPLATE_BILL, "Vorlage für Rechnung",
 			getFieldEditorParent());
-		sfRem1 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER1, "Erste Mahnung",
+		ffRem1 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER1, "Erste Mahnung",
 			getFieldEditorParent());
-		sfRem2 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER2, "Zweite Mahnung",
+		ffRem2 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER2, "Zweite Mahnung",
 			getFieldEditorParent());
-		sfRem3 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER3, "Dritte Mahnung",
+		ffRem3 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER3, "Dritte Mahnung",
 			getFieldEditorParent());
-		sfSecond = new FileFieldEditor(PreferenceConstants.TEMPLATE_PAGE2, "Folgeseiten",
+		ffSecond = new FileFieldEditor(PreferenceConstants.TEMPLATE_PAGE2, "Folgeseiten",
 			getFieldEditorParent());
 		ifh1 = new IntegerFieldEditor(PreferenceConstants.AVAILABLE_SPACE_1,
 			"Verfügbare Höhe erste Seite (cm)", getFieldEditorParent());
@@ -81,10 +82,10 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		sfKunde = new IntegerFieldEditor(PreferenceConstants.bankClient, "Bank-Kundennummer",
 			getFieldEditorParent());
 		addField(cfe);
-		addField(sfBill);
-		addField(sfRem1);
-		addField(sfRem2);
-		addField(sfRem2);
+		addField(ffBill);
+		addField(ffRem1);
+		addField(ffRem2);
+		addField(ffRem2);
 		addField(ifh1);
 		addField(if2nd);
 		addField(kfBank);
@@ -113,10 +114,10 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	public void flush(Mandant m){
 		if (m != null) {
 			String id = m.getId();
-			localCfg.set(PreferenceConstants.TEMPLATE_BILL + "/" + id, sfBill.getStringValue());
-			localCfg.set(PreferenceConstants.TEMPLATE_REMINDER1 + "/" + id, sfRem1.getStringValue());
-			localCfg.set(PreferenceConstants.TEMPLATE_REMINDER2 + "/" + id, sfRem2.getStringValue());
-			localCfg.set(PreferenceConstants.TEMPLATE_REMINDER3 + "/" + id, sfRem3.getStringValue());
+			localCfg.set(PreferenceConstants.TEMPLATE_BILL + "/" + id, ffBill.getStringValue());
+			localCfg.set(PreferenceConstants.TEMPLATE_REMINDER1 + "/" + id, ffRem1.getStringValue());
+			localCfg.set(PreferenceConstants.TEMPLATE_REMINDER2 + "/" + id, ffRem2.getStringValue());
+			localCfg.set(PreferenceConstants.TEMPLATE_REMINDER3 + "/" + id, ffRem3.getStringValue());
 			localCfg.set(PreferenceConstants.AVAILABLE_SPACE_1 + "/" + id, ifh1.getStringValue());
 			localCfg.set(PreferenceConstants.AVAILABLE_SPACE_2 + "/" + id, if2nd.getStringValue());
 			Kontakt kBank = kfBank.getValue();
@@ -133,10 +134,10 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		if (m != null) {
 			String id = m.getId();
 			
-			sfBill.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_BILL + "/" + id, ""));
-			sfRem1.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_REMINDER1 + "/" + id, ""));
-			sfRem2.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_REMINDER2 + "/" + id, ""));
-			sfRem3.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_REMINDER3 + "/" + id, ""));
+			ffBill.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_BILL + "/" + id, ""));
+			ffRem1.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_REMINDER1 + "/" + id, ""));
+			ffRem2.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_REMINDER2 + "/" + id, ""));
+			ffRem3.setStringValue(localCfg.get(PreferenceConstants.TEMPLATE_REMINDER3 + "/" + id, ""));
 			ifh1.setStringValue(localCfg.get(PreferenceConstants.AVAILABLE_SPACE_1 + "/" + id, ""));
 			if2nd.setStringValue(localCfg.get(PreferenceConstants.AVAILABLE_SPACE_2 + "/" + id, ""));	
 			kfBank.set(Kontakt.load(globalCfg.get(PreferenceConstants.cfgBank + "/" + id, "")));

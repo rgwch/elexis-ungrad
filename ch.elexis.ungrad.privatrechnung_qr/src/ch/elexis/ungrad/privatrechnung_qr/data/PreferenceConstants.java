@@ -13,9 +13,8 @@
 package ch.elexis.ungrad.privatrechnung_qr.data;
 
 public class PreferenceConstants {
-	public static final String PLUGIN_ID = "ch.berchtold.emanuel.privatrechnung";
+	public static final String PLUGIN_ID = "ch.elexis.ungrad.privatrechnung_qr";
 	
-	// for different incarantations of private billing systems change the following two lines
 	public static final String BillingSystemName = "PRIVATRQR";
 	public static final String cfgBase = "privatrechnung_qr";
 	

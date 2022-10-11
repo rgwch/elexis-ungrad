@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+          <page
+            category="ch.elexis.preferences.Texterstellung"
+            class="ch.elexis.ungrad.textplugin.preferences.PreferencePage"
+            id="ch.elexis.ungrad.textplugin.Preferences"
+            name="Ungrad HTML Processor">
+      </page>
+   </extension>
+ <extension
+         point="ch.elexis.core.ui.Text">
+      <Texterweiterung
+            Klasse="ch.elexis.ungrad.textplugin.TextPlugin"
+            name="Ungrad HTML Processor">
+      </Texterweiterung>
+   </extension>
+</plugin>
