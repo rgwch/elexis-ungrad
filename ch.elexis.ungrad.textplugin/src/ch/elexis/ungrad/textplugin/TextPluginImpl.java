@@ -1,7 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2022 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad.textplugin;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,7 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.swt.widgets.Composite;
 
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.text.ReplaceCallback;
 import ch.elexis.core.ui.text.ITextPlugin;
 import ch.elexis.core.ui.text.TextContainer;
@@ -112,6 +123,7 @@ public class TextPluginImpl implements ITextPlugin {
 			String replacement = (String) cb.replace(found);
 			if (!replacement.startsWith("**ERROR")) {
 				matcher.appendReplacement(sb, replacement);
+				doc.addField(found, replacement);
 			} else {
 				matcher.appendReplacement(sb, " ");
 			}

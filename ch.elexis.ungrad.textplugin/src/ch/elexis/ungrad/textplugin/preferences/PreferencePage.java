@@ -1,3 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2022 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad.textplugin.preferences;
 
 import org.eclipse.jface.preference.DirectoryFieldEditor;
@@ -11,7 +25,6 @@ import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 
 public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	IPreferenceStore store;
-	DirectoryFieldEditor dfTemplateBase;
 	
 	public PreferencePage() {
 		super(GRID);
@@ -23,8 +36,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
 	@Override
 	protected void createFieldEditors() {
-		dfTemplateBase=new DirectoryFieldEditor(PreferenceConstants.TEMPLATE_DIR, "Vorlagenverzeichnis", getFieldEditorParent());
-		addField(dfTemplateBase);
+		addField(new DirectoryFieldEditor(PreferenceConstants.TEMPLATE_DIR, "Vorlagenverzeichnis", getFieldEditorParent()));
+		addField(new DirectoryFieldEditor(PreferenceConstants.DOCUMENT_BASE,"Dokumentenverzeichnis", getFieldEditorParent()));
 	
 	}
 	
