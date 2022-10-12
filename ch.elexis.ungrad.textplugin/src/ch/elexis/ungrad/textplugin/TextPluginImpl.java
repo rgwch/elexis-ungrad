@@ -33,6 +33,7 @@ public class TextPluginImpl implements ITextPlugin {
 	private PageFormat format = PageFormat.A4;
 	private Parameter param;
 	private HtmlDoc doc = new HtmlDoc();
+	private HtmlProcessorDisplay display;
 
 	@Override
 	public PageFormat getFormat() {
@@ -208,8 +209,8 @@ public class TextPluginImpl implements ITextPlugin {
 
 	@Override
 	public Composite createContainer(Composite parent, ICallback handler) {
-		// TODO Auto-generated method stub
-		return null;
+		display=new HtmlProcessorDisplay(parent, doc);
+		return display;
 	}
 
 	@Override
