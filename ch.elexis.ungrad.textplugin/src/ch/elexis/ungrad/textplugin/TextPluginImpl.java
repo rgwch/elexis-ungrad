@@ -15,6 +15,7 @@
 package ch.elexis.ungrad.textplugin;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,7 +84,7 @@ public class TextPluginImpl implements ITextPlugin {
 	@Override
 	public boolean createEmptyDocument() {
 		try {
-			doc.load("frame.html");
+			doc.load("frame.html","");
 			return true;
 		} catch (Exception e) {
 			ExHandler.handle(e);
@@ -136,10 +137,19 @@ public class TextPluginImpl implements ITextPlugin {
 
 	@Override
 	public byte[] storeToByteArray() {
-		// TODO Auto-generated method stub
-		return null;
+		String json=storeToJson();
+		try {
+			return json.getBytes("utf-8");
+		} catch (UnsupportedEncodingException e) {
+			// never mind
+			e.printStackTrace();
+			return null;
+		}
 	}
 
+	public String storeToJson() {
+		return "";
+	}
 	@Override
 	public boolean insertTable(String place, int properties, String[][] contents, int[] columnSizes) {
 		// TODO Auto-generated method stub

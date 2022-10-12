@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 
 public class HtmlProcessorDisplay extends Composite {
 	private HtmlDoc doc;
+	 
 	
 	public HtmlProcessorDisplay(Composite parent, HtmlDoc document) {
 		super(parent,SWT.NONE);

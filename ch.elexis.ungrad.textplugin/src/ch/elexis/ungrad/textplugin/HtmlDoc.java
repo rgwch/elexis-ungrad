@@ -18,34 +18,75 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.ungrad.textplugin.preferences.PreferenceConstants;
 import ch.rgw.io.FileTool;
+import ch.rgw.tools.ExHandler;
+import ch.rgw.tools.StringTool;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.*;
+
 
 public class HtmlDoc {
 
 	String orig;
 	String processed;
 	Map<String,String> fields=new HashMap();
+	private String template;
+	private Document jDoc;
 	
-	public String load(String filename) throws Exception {
-		File ret = new File(CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, ""), filename);
+	public String load(String filename, String basePath) throws Exception {
+		if(StringTool.isNothing(basePath)) {
+			basePath=CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, "");
+		}
+		File ret = new File(basePath, filename);
 		if (!ret.exists()) {
-			ret = new File(PlatformHelper.getBasePath(PreferenceConstants.PLUGIN_ID) + "rsc", filename);
+			ret = new File(PlatformHelper.getBasePath(PreferenceConstants.PLUGIN_ID) + "/rsc", filename);
 			if (!ret.exists() || !ret.canRead()) {
 				throw new Exception("Could not read " + ret.getAbsolutePath());
 			}
 		}
 		orig = FileTool.readTextFile(ret);
+		template=filename;
+		jDoc=Jsoup.parse(ret);
+		for(Element el:jDoc.getAllElements()) {
+			String text=el.ownText();
+			if(text.matches("\\[\\w+\\]")) {
+				fields.put(text,"");
+			}
+		}
 		return orig;
 	}
 
+	public byte[] storeToByteArray() {
+		ObjectMapper mapper=new ObjectMapper();
+		try {
+			return mapper.writeValueAsBytes(fields);
+		}catch(Exception ex) {
+			ExHandler.handle(ex);
+			return null;
+		}
+	}
+	
 	public void addField(String name, String value) {
 		fields.put(name, value);
 	}
 	public String load(byte[] src) throws Exception {
-		orig = new String(src, "utf-8");
+		ObjectMapper mapper=new ObjectMapper();
+		try {
+			fields=mapper.readValue(src,new TypeReference<Map<String, Object>>() {} );
+		}catch(Exception ex) {
+			ExHandler.handle(ex);
+			return null;
+		}
+		String template=fields.get("template");
+		
 		return orig;
 	}
 	
