@@ -13,4 +13,7 @@ Require-Bundle: ch.elexis.core.ui;bundle-version="3.2.0",
  ch.rgw.utility;bundle-version="3.7.0",
  ch.elexis.ungrad.pdf;bundle-version="1.0.0",
  com.fasterxml.jackson.core.jackson-core;bundle-version="2.7.4",
- com.fasterxml.jackson.core.jackson-databind;bundle-version="2.7.4"
+ com.fasterxml.jackson.core.jackson-databind;bundle-version="2.7.4",
+ org.eclipse.ui.forms
+Bundle-ClassPath: lib/jsoup-1.15.3.jar,
+ .

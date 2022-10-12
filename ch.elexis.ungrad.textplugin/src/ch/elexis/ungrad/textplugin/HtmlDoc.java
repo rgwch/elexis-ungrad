@@ -17,12 +17,15 @@ package ch.elexis.ungrad.textplugin;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.data.interfaces.text.ReplaceCallback;
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.ungrad.textplugin.preferences.PreferenceConstants;
 import ch.rgw.io.FileTool;
@@ -35,13 +38,11 @@ import com.fasterxml.jackson.databind.*;
 
 public class HtmlDoc {
 
-	String orig;
-	String processed;
+	private String orig;
 	Map<String,String> fields=new HashMap();
-	private String template;
 	private Document jDoc;
 	
-	public String load(String filename, String basePath) throws Exception {
+	public void loadTemplate(String filename, String basePath) throws Exception {
 		if(StringTool.isNothing(basePath)) {
 			basePath=CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, "");
 		}
@@ -53,17 +54,34 @@ public class HtmlDoc {
 			}
 		}
 		orig = FileTool.readTextFile(ret);
-		template=filename;
 		jDoc=Jsoup.parse(ret);
 		for(Element el:jDoc.getAllElements()) {
 			String text=el.ownText();
 			if(text.matches("\\[\\w+\\]")) {
 				fields.put(text,"");
+				el.attr("data-placeholder", text);
 			}
 		}
-		return orig;
+		fields.put("template", filename);
 	}
 
+	public void applyMatcher(String pattern, ReplaceCallback rcb) {
+		for(String k:fields.keySet()) {
+			if(k.matches(pattern)) {
+				fields.put(k, (String) rcb.replace(k));
+			}
+		}
+	}
+	
+	public String compile() {
+		Document jProc=jDoc;
+		for(Entry<String, String> e:fields.entrySet()) {
+			for(Element el:jProc.getElementsByAttributeValue("data-placeholder", e.getKey())){
+				el.text(e.getValue());
+			}
+		}
+		return jProc.html();
+	}
 	public byte[] storeToByteArray() {
 		ObjectMapper mapper=new ObjectMapper();
 		try {
@@ -90,7 +108,4 @@ public class HtmlDoc {
 		return orig;
 	}
 	
-	public void setProcessed(String proc) {
-		processed=proc;
-	}
 }
