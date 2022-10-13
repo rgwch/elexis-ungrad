@@ -18,27 +18,30 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.text.ReplaceCallback;
 import ch.elexis.core.data.util.PlatformHelper;
+import ch.elexis.core.ui.text.TextContainer;
 import ch.elexis.ungrad.textplugin.preferences.PreferenceConstants;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.*;
-
 
 public class HtmlDoc {
 
 	private String orig;
+	public String processed;
 	Map<String,String> fields=new HashMap();
 	private Document jDoc;
 	
@@ -54,33 +57,33 @@ public class HtmlDoc {
 			}
 		}
 		orig = FileTool.readTextFile(ret);
-		jDoc=Jsoup.parse(ret);
-		for(Element el:jDoc.getAllElements()) {
-			String text=el.ownText();
-			if(text.matches("\\[\\w+\\]")) {
-				fields.put(text,"");
-				el.attr("data-placeholder", text);
-			}
-		}
 		fields.put("template", filename);
 	}
 
 	public void applyMatcher(String pattern, ReplaceCallback rcb) {
-		for(String k:fields.keySet()) {
-			if(k.matches(pattern)) {
-				fields.put(k, (String) rcb.replace(k));
+			Pattern pat = Pattern.compile(pattern);
+			StringBuffer sb = new StringBuffer();
+			Matcher matcher = pat.matcher(orig);
+			while (matcher.find()) {
+				String found = matcher.group();
+				String replacement = (String) rcb.replace(found);
+				if (!replacement.startsWith("**ERROR")) {
+					fields.put(found, replacement);
+					matcher.appendReplacement(sb, replacement);
+				} else {
+					matcher.appendReplacement(sb, " ");
+				}
 			}
-		}
+			matcher.appendTail(sb);
+			processed=sb.toString();
+	}
+	
+	public Map<String,String> getFields(){
+		return fields;
 	}
 	
 	public String compile() {
-		Document jProc=jDoc;
-		for(Entry<String, String> e:fields.entrySet()) {
-			for(Element el:jProc.getElementsByAttributeValue("data-placeholder", e.getKey())){
-				el.text(e.getValue());
-			}
-		}
-		return jProc.html();
+		return processed;
 	}
 	public byte[] storeToByteArray() {
 		ObjectMapper mapper=new ObjectMapper();

@@ -13,7 +13,7 @@ public class HtmlDocTest {
 		for(Entry<String, String> e: hDoc.fields.entrySet()) {
 			System.out.println(e.getKey()+"-> "+e.getValue());
 		}
-		hDoc.applyMatcher("\\[\\w+\\]", t->{
+		hDoc.applyMatcher("\\[[\\w-\\s\\.]+\\]", t->{
 			return t.substring(1,t.length()-1);
 		});
 		for(Entry<String, String> e: hDoc.fields.entrySet()) {

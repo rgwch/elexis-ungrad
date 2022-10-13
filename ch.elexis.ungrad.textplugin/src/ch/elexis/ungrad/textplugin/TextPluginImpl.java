@@ -116,24 +116,8 @@ public class TextPluginImpl implements ITextPlugin {
 	@Override
 	public boolean findOrReplace(String pattern, ReplaceCallback cb){
 		doc.applyMatcher(pattern, cb);
+		display.setDocument(doc);
 		return true;
-		/*
-		Pattern pat = Pattern.compile(pattern);
-		StringBuffer sb = new StringBuffer();
-		Matcher matcher = pat.matcher(doc.orig);
-		while (matcher.find()) {
-			String found = matcher.group();
-			String replacement = (String) cb.replace(found);
-			if (!replacement.startsWith("**ERROR")) {
-				matcher.appendReplacement(sb, replacement);
-				doc.addField(found, replacement);
-			} else {
-				matcher.appendReplacement(sb, " ");
-			}
-		}
-		matcher.appendTail(sb);
-		return false;
-		*/
 	}
 	
 	@Override
