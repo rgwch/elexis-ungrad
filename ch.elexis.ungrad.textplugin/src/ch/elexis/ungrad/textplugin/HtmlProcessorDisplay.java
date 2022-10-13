@@ -41,9 +41,8 @@ public class HtmlProcessorDisplay extends Composite {
 	FocusSaver fs = new FocusSaver();
 
 	
-	public HtmlProcessorDisplay(Composite parent, HtmlDoc document, ICallback handler) {
+	public HtmlProcessorDisplay(Composite parent, ICallback handler) {
 		super(parent, SWT.NONE);
-		doc = document;
 		if (parent.getLayout() instanceof GridLayout) {
 			setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 		}
@@ -52,20 +51,15 @@ public class HtmlProcessorDisplay extends Composite {
 		saveHandler = handler;
 		Composite body = form.getBody();
 		body.setLayout(new GridLayout());
+		tTemplate=new Text(body,SWT.READ_ONLY);
+		tTemplate.setLayoutData(SWTHelper.getFillGridData(1,true,1,false));
 		cFields = new Composite(body, SWT.NONE);
 		cFields.setLayoutData(SWTHelper.getFillGridData());
 		cFields.setLayout(new GridLayout(2, false));
-		for (Entry<String, String> e : doc.fields.entrySet()) {
-			Label l = new Label(body, SWT.NONE);
-			l.setText(e.getKey());
-			l.setLayoutData(SWTHelper.getFillGridData());
-			Text t = new Text(body, SWT.NONE);
-			l.setText(e.getValue());
-			l.setLayoutData(SWTHelper.getFillGridData());
-		}
 	}
 
 	public void setDocument(HtmlDoc doc) {
+		this.doc=doc;
 		for (Control c : cFields.getChildren()) {
 			c.removeFocusListener(fs);
 			c.dispose();

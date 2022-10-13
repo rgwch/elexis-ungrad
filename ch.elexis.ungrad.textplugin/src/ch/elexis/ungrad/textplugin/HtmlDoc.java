@@ -37,17 +37,16 @@ import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 
-
 public class HtmlDoc {
 
 	private String orig;
 	public String processed;
-	Map<String,String> fields=new HashMap();
+	Map<String, String> fields = new HashMap();
 	private Document jDoc;
-	
+
 	public void loadTemplate(String filename, String basePath) throws Exception {
-		if(StringTool.isNothing(basePath)) {
-			basePath=CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, "");
+		if (StringTool.isNothing(basePath)) {
+			basePath = CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, "");
 		}
 		File ret = new File(basePath, filename);
 		if (!ret.exists()) {
@@ -61,54 +60,64 @@ public class HtmlDoc {
 	}
 
 	public void applyMatcher(String pattern, ReplaceCallback rcb) {
-			Pattern pat = Pattern.compile(pattern);
-			StringBuffer sb = new StringBuffer();
-			Matcher matcher = pat.matcher(orig);
-			while (matcher.find()) {
-				String found = matcher.group();
-				String replacement = (String) rcb.replace(found);
-				if (!replacement.startsWith("**ERROR")) {
-					fields.put(found, replacement);
-					matcher.appendReplacement(sb, replacement);
-				} else {
-					matcher.appendReplacement(sb, " ");
-				}
+		Pattern pat = Pattern.compile(pattern);
+		StringBuffer sb = new StringBuffer();
+		Matcher matcher = pat.matcher(orig);
+		while (matcher.find()) {
+			String found = matcher.group();
+			String replacement = (String) rcb.replace(found);
+			if (!replacement.startsWith("**ERROR")) {
+				fields.put(found, replacement);
+				matcher.appendReplacement(sb, replacement);
+			} else {
+				matcher.appendReplacement(sb, " ");
 			}
-			matcher.appendTail(sb);
-			processed=sb.toString();
+		}
+		matcher.appendTail(sb);
+		processed = sb.toString();
 	}
-	
-	public Map<String,String> getFields(){
+
+	public Map<String, String> getFields() {
 		return fields;
 	}
-	
+
 	public String compile() {
 		return processed;
 	}
+
 	public byte[] storeToByteArray() {
-		ObjectMapper mapper=new ObjectMapper();
+		ObjectMapper mapper = new ObjectMapper();
 		try {
 			return mapper.writeValueAsBytes(fields);
-		}catch(Exception ex) {
+		} catch (Exception ex) {
 			ExHandler.handle(ex);
 			return null;
 		}
 	}
-	
+
 	public void addField(String name, String value) {
 		fields.put(name, value);
 	}
-	public String load(byte[] src) throws Exception {
-		ObjectMapper mapper=new ObjectMapper();
-		try {
-			fields=mapper.readValue(src,new TypeReference<Map<String, Object>>() {} );
-		}catch(Exception ex) {
-			ExHandler.handle(ex);
-			return null;
+
+	public boolean load(byte[] src) throws Exception {
+		if (src[0] == '{') {
+
+			ObjectMapper mapper = new ObjectMapper();
+			try {
+				fields = mapper.readValue(src, new TypeReference<Map<String, Object>>() {
+				});
+			} catch (Exception ex) {
+				ExHandler.handle(ex);
+				return false;
+			}
+			String template = fields.get("template");
+			return true;
+		} else {
+			// it's a freshly imported template
+			orig = new String(src, "utf-8");
+			fields.put("template", "imported");
+			return true;
 		}
-		String template=fields.get("template");
-		
-		return orig;
 	}
-	
+
 }

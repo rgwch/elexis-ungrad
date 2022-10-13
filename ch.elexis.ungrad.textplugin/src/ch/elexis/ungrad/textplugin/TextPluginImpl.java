@@ -94,6 +94,7 @@ public class TextPluginImpl implements ITextPlugin {
 	public boolean loadFromByteArray(byte[] bs, boolean asTemplate){
 		try {
 			doc.load(bs);
+			display.setDocument(doc);
 			return true;
 		} catch (Exception e) {
 			ExHandler.handle(e);
@@ -177,8 +178,7 @@ public class TextPluginImpl implements ITextPlugin {
 	
 	@Override
 	public String getMimeType(){
-		// TODO Auto-generated method stub
-		return null;
+		return "text/html";
 	}
 	
 	@Override
@@ -195,7 +195,7 @@ public class TextPluginImpl implements ITextPlugin {
 	
 	@Override
 	public Composite createContainer(Composite parent, ICallback handler){
-		display = new HtmlProcessorDisplay(parent, doc, handler);
+		display = new HtmlProcessorDisplay(parent, handler);
 		return display;
 	}
 	
