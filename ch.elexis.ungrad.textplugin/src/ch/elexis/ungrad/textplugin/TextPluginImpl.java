@@ -172,6 +172,7 @@ public class TextPluginImpl implements ITextPlugin {
 	@Override
 	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished){
 		Manager pdfManager = new Manager();
+		//pdfManager.createPDF(inputHtml, outputFile);
 		
 		return false;
 	}
