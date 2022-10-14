@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Basic template for the html-based Ungrad Textplugin
+	(c) 2022 by G. Weirich
+  You may use and modify this template freely, but there is no warranty of any kind that is is 
+  correct and that the output will be accepted by authorities. YMMV.
+-->
+
+<html lang="de">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>QR-Rechnung</title>
+	<style>
+		@page {
+			size: A4 portrait;
+			margin-top: 5mm;
+			margin-left: 5mm;
+			margin-bottom: 5mm;
+			margin-right: 5mm;
+		}
+
+		#container {
+			box-sizing: border-box;
+			position: absolute;
+			font-size: 11pt;
+			left: 5mm;
+			top: 0;
+			width: 200mm;
+			height: 287mm;
+		}
+
+		/* Datum rechts oben */
+		#date {
+			position: absolute;
+			right: 20mm;
+			top: 24mm;
+			width: 50mm;
+		}
+
+		/* Seitenkopf mit ggf. Praxislogo */
+		#header {
+			color: green;
+			text-align: center;
+			margin-top: 0mm;
+			padding-bottom: 0;
+			padding-top: 0;
+		}
+
+		/* Hauptüberschrift */
+		h1 {
+			font-size: 14pt;
+			margin-bottom: 0;
+			padding-bottom: 0;
+		}
+
+		/* Tabellen kompakter machen */
+		table,
+		tr,
+		td {
+			padding-bottom: 0;
+			padding-top: 0;
+			margin-bottom: 0;
+			margin-top: 0;
+		}
+
+		/* Absenderfeld links oben */
+		#sender {
+			position: absolute;
+			left: 10mm;
+			top: 24mm;
+			margin-right: 20px;
+			width: 70mm;
+		}
+
+		/* Absenderzeile im Sichtfenster über der Adresse */
+		.absender {
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 6pt;
+			font-weight: normal;
+			margin-bottom: 3mm;
+		}
+
+		/* Adresse. Bite anpassen, wenn das Sichtfenster anders liegt */
+		#address {
+			position: absolute;
+			right: 20mm;
+			top: 45mm;
+			width: 60mm;
+		}
+
+		/* Zusammenfassung der Rechnung */
+		#bill_summary {
+			position: absolute;
+			background-color: gainsboro;
+			left: 10mm;
+			top: 70mm;
+			width: 80mm;
+			padding: 5px;
+		}
+
+		#maintext {
+			position: absolute;
+			left: 10mm;
+			top: 110mm;
+		}
+
+
+	</style>
+</head>
+
+<body>
+	<div id="container">
+		<div id="header">
+			<h1>Praxis [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</h1>
+			<span>[Mandant.Strasse] [Mandant.Plz] [Mandant.Ort] Tel.:
+				[Mandant.Telefon1] e-mail: [Mandant.E-Mail]</span>
+			<hr />
+
+		</div>
+		<div id="date">[Mandant.Ort], [Datum.heute]</div>
+
+		<div id="sender">
+			[Mandant.Titel] [Mandant.Vorname] [Mandant.Name] <br /> Facharzt für
+			[Mandant.TarmedSpezialität] <br /> ZSR-Nr. [Mandant.KSK]
+		</div>
+
+		<div id="address">
+			<p class="absender">[Mandant.Vorname] [Mandant.Name], [Mandant.Strasse] [Mandant.Plz] [Mandant.Ort]</p>
+			[Adressat.Anschrift] <br />
+		</div>
+
+		<div id="maintext">
+		</div>
+
+
+</body>
+
+</html>

@@ -74,7 +74,7 @@ public class HtmlDoc {
 			}
 		}
 		matcher.appendTail(sb);
-		processed = sb.toString();
+		orig = sb.toString();
 	}
 
 	public Map<String, String> getFields() {
