@@ -105,13 +105,14 @@
 			position: absolute;
 			left: 10mm;
 			top: 110mm;
+			width: 100%;
 		}
-
-
 	</style>
 </head>
 
 <body>
+	<div data-type="filename" style="display:none">[Datum.heute]_[Adressat.Name]_[Adressat.Vorname]</div>
+	<div data-type="dirname" style="display:none">[Patient.Name]_[Patient.Vorname]_[Patient.Geburtsdatum]</div>
 	<div id="container">
 		<div id="header">
 			<h1>Praxis [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</h1>
@@ -133,8 +134,12 @@
 		</div>
 
 		<div id="maintext">
+			<p>[Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]<br />
+				[Patient.Strasse], [Patient.Plz] [Patient.Ort]<br />
+				Tel: [Patient.Telefon1] [Patient.Natel] [Patient.Telefon2]
+			</p>
 		</div>
-
+	</div>
 
 </body>
 

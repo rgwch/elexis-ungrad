@@ -93,7 +93,7 @@ public class TextPluginImpl implements ITextPlugin {
 	@Override
 	public boolean loadFromByteArray(byte[] bs, boolean asTemplate){
 		try {
-			doc.load(bs);
+			doc.load(bs, asTemplate);
 			display.setDocument(doc);
 			return true;
 		} catch (Exception e) {
@@ -171,9 +171,13 @@ public class TextPluginImpl implements ITextPlugin {
 	
 	@Override
 	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished){
-		Manager pdfManager = new Manager();
-		//pdfManager.createPDF(inputHtml, outputFile);
-		
+		try {
+			doc.doOutput(toPrinter);
+			return true;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 		return false;
 	}
 	

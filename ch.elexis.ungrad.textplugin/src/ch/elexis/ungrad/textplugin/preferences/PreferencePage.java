@@ -29,6 +29,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	public PreferencePage() {
 		super(GRID);
 		store=new SettingsPreferenceStore(CoreHub.localCfg);
+		setPreferenceStore(store);
 	}
 	@Override
 	public void init(IWorkbench arg0) {

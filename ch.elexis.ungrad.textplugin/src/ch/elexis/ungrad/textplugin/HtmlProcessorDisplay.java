@@ -82,11 +82,7 @@ public class HtmlProcessorDisplay extends Composite {
 			lbl.setText(e.getKey());
 			text.setText(e.getValue());
 		}
-		
-		String templ = doc.fields.get("template");
-		tTemplate.setText(templ == null ? "unbekannt" : templ);
 		cFields.layout();
-	
 	}
 	
 	private void makeActions(){
@@ -99,7 +95,12 @@ public class HtmlProcessorDisplay extends Composite {
 			@Override
 			public void run(){
 				save();
-				
+				try {
+					doc.doOutput("");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		};
 	}
