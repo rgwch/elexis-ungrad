@@ -82,7 +82,7 @@ public class TextPluginImpl implements ITextPlugin {
 	@Override
 	public boolean createEmptyDocument(){
 		try {
-			doc.loadTemplate("frame.html", "");
+			// doc.loadTemplate("frame.html", "");
 			return true;
 		} catch (Exception e) {
 			ExHandler.handle(e);

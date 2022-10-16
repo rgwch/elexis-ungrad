@@ -48,19 +48,18 @@ public class HtmlProcessorDisplay extends Composite {
 	Composite cFields;
 	Composite cAdditional;
 	Text tTemplate;
-	boolean bSaveOnFocusLost=true;
+	boolean bSaveOnFocusLost = true;
 	FocusSaver fs = new FocusSaver();
 	private IAction printAction, directOutputAction;
 	private ExpandableComposite ecDefaults;
 	private ListViewer lvDefaults;
 
-	
 	public HtmlProcessorDisplay(Composite parent, ICallback handler) {
 		super(parent, SWT.NONE);
 		if (parent.getLayout() instanceof GridLayout) {
 			setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 		}
-		FormToolkit tk=UiDesk.getToolkit();
+		FormToolkit tk = UiDesk.getToolkit();
 		setLayout(new FillLayout());
 		form = tk.createScrolledForm(this);
 		saveHandler = handler;
@@ -70,12 +69,12 @@ public class HtmlProcessorDisplay extends Composite {
 		ToolBarManager tbm = new ToolBarManager(SWT.HORIZONTAL);
 		tbm.add(printAction);
 		tbm.createControl(body);
-		tTemplate=new Text(body,SWT.READ_ONLY);
-		tTemplate.setLayoutData(SWTHelper.getFillGridData(1,true,1,false));
-		ecDefaults=new ExpandableComposite(body, SWT.NONE);
+		tTemplate = new Text(body, SWT.READ_ONLY);
+		tTemplate.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		ecDefaults = new ExpandableComposite(body, SWT.NONE);
 		ecDefaults.setText("Vorgabefelder");
 		ecDefaults.addExpansionListener(new ExpansionAdapter() {
-			public void expansionStateChanged(ExpansionEvent e){
+			public void expansionStateChanged(ExpansionEvent e) {
 				form.reflow(true);
 			}
 		});
@@ -83,21 +82,22 @@ public class HtmlProcessorDisplay extends Composite {
 		cFields.setLayoutData(SWTHelper.getFillGridData());
 		cFields.setLayout(new GridLayout(2, false));
 		ecDefaults.setClient(cFields);
-		cAdditional=new Composite(body, SWT.NONE);
+		cAdditional = new Composite(body, SWT.NONE);
 		cAdditional.setLayoutData(SWTHelper.getFillGridData());
-		cAdditional.setLayout(new GridLayout(2,false));
+		cAdditional.setLayout(new GridLayout(2, false));
 	}
 
 	public void setDocument(HtmlDoc doc) {
-		this.doc=doc;
+		this.doc = doc;
 		for (Control c : cFields.getChildren()) {
 			c.removeFocusListener(fs);
 			c.dispose();
 		}
-		for(Control c: cAdditional.getChildren()) {
+		for (Control c : cAdditional.getChildren()) {
+			c.removeFocusListener(fs);
 			c.dispose();
 		}
-		for (Entry<String, String> e: doc.getPrefilled().entrySet()) {
+		for (Entry<String, String> e : doc.getPrefilled().entrySet()) {
 			Label lbl = new Label(cFields, SWT.NONE);
 			lbl.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 			Text text = new Text(cFields, SWT.BORDER);
@@ -105,27 +105,45 @@ public class HtmlProcessorDisplay extends Composite {
 			text.addFocusListener(fs);
 			lbl.setText(e.getKey());
 			text.setText(e.getValue());
+			text.setData("field", e.getKey());
 		}
-		for(String key:doc.getPostfilled().keySet()) {
-			Label lbl=new Label(cAdditional,SWT.NONE);
+		for (String key : doc.getPostfilled().keySet()) {
+			Label lbl = new Label(cAdditional, SWT.NONE);
 			lbl.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-			lbl.setText(key);
-			Text text=new Text(cAdditional,SWT.MULTI|SWT.BORDER);
-			text.setLayoutData(SWTHelper.getFillGridData(2,true,2,true));
+			lbl.setText(key.substring(1, key.length() - 1) + ":");
+			Text text = new Text(cAdditional, SWT.MULTI | SWT.BORDER);
+			text.setLayoutData(SWTHelper.getFillGridData(2, true, 2, true));
+			text.addFocusListener(fs);
+			text.setData("field", key);
 		}
 		cFields.layout();
-		
+
 	}
-	
-	private void makeActions(){
+
+	private void collect() {
+		for (Control c : cFields.getChildren()) {
+			Object field = c.getData("field");
+			if (field != null) {
+				doc.setPrefilled((String) field, ((Text) c).getText());
+			}
+		}
+		for (Control c : cAdditional.getChildren()) {
+			Object field = c.getData("field");
+			if (field != null) {
+				doc.setPostfilled((String) field, ((Text) c).getText());
+			}
+		}
+	}
+
+	private void makeActions() {
 		printAction = new Action("Ausgeben") {
 			{
 				setImageDescriptor(Images.IMG_PRINTER.getImageDescriptor());
 				setToolTipText("Gibt dieses Dokument mit dem konfigurierten Ausgabeprogramm aus");
 			}
-			
+
 			@Override
-			public void run(){
+			public void run() {
 				save();
 				try {
 					doc.doOutput("");
@@ -136,22 +154,21 @@ public class HtmlProcessorDisplay extends Composite {
 			}
 		};
 	}
-	
-	
-	public void save(){
-		//collect();
+
+	public void save() {
+		collect();
 		saveHandler.save();
 	}
 
 	class FocusSaver extends FocusAdapter {
 		@Override
-		public void focusLost(FocusEvent e){
+		public void focusLost(FocusEvent e) {
 			if (bSaveOnFocusLost) {
 				// proc.getProcessor().doOutput(proc);
 				save();
 			}
 		}
-		
+
 	}
 
 }

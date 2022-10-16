@@ -21,47 +21,52 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.text.ReplaceCallback;
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.textplugin.preferences.PreferenceConstants;
 import ch.rgw.io.FileTool;
+import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 public class HtmlDoc {
 
+	private String template;
 	private String text;
-	Map<String, String> prefilled = new HashMap<String, String>();
-	Map<String, String> postfilled = new HashMap<String, String>();
+	private Map<String, String> prefilled = new HashMap<String, String>();
+	private Map<String, String> postfilled = new HashMap<String, String>();
 
-	public void loadTemplate(String filename, String basePath) throws Exception {
-		if (StringTool.isNothing(basePath)) {
-			basePath = CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, "");
-		}
-		File ret = new File(basePath, filename);
-		if (!ret.exists()) {
-			ret = new File(PlatformHelper.getBasePath(PreferenceConstants.PLUGIN_ID) + "/rsc", filename);
-			if (!ret.exists() || !ret.canRead()) {
-				throw new Exception("Could not read " + ret.getAbsolutePath());
-			}
-		}
-		text = FileTool.readTextFile(ret);
-		Pattern post = Pattern.compile("\\[\\w+\\]");
-		Matcher matcher = post.matcher(text);
-		while (matcher.find()) {
-			String found = matcher.group();
-			postfilled.put(found, "");
-		}
-	}
-
+	/*
+	 * public void loadTemplate(String filename, String basePath) throws Exception {
+	 * if (StringTool.isNothing(basePath)) { basePath =
+	 * CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, ""); } File ret = new
+	 * File(basePath, filename); if (!ret.exists()) { ret = new
+	 * File(PlatformHelper.getBasePath(PreferenceConstants.PLUGIN_ID) + "/rsc",
+	 * filename); if (!ret.exists() || !ret.canRead()) { throw new
+	 * Exception("Could not read " + ret.getAbsolutePath()); } } text =
+	 * FileTool.readTextFile(ret); Pattern post = Pattern.compile("\\[\\w+\\]");
+	 * Matcher matcher = post.matcher(text); while (matcher.find()) { String found =
+	 * matcher.group(); postfilled.put(found, ""); } }
+	 */
 	public Map<String, String> getPrefilled() {
 		return prefilled;
 	}
 
 	public Map<String, String> getPostfilled() {
 		return postfilled;
+	}
+
+	public void setPrefilled(String key, String value) {
+		prefilled.put(key, value);
+	}
+
+	public void setPostfilled(String key, String value) {
+		postfilled.put(key, value);
 	}
 
 	public void applyMatcher(String pattern, ReplaceCallback rcb) {
@@ -116,31 +121,42 @@ public class HtmlDoc {
 
 	public byte[] storeToByteArray() {
 		try {
-			return text.getBytes("utf-8");
-		} catch (UnsupportedEncodingException e) {
-			// Will not happen
-			e.printStackTrace();
+			Map<String, Object> out = new HashMap<String, Object>();
+			out.put("template", template);
+			out.put("prefilled", prefilled);
+			out.put("postfilled", postfilled);
+			ObjectMapper mapper = new ObjectMapper();
+			return mapper.writeValueAsBytes(out);
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
 			return null;
 		}
-		/*
-		 * 
-		 * ObjectMapper mapper = new ObjectMapper(); try { return
-		 * mapper.writeValueAsBytes(fields); } catch (Exception ex) {
-		 * ExHandler.handle(ex); return null; }
-		 */
 	}
 
 	public boolean load(byte[] src, boolean asTemplate) throws Exception {
-		text = new String(src, "utf-8");
-		if (asTemplate) {
-			Pattern post = Pattern.compile("\\[\\w+\\]");
-			Matcher matcher = post.matcher(text);
-			while (matcher.find()) {
-				String found = matcher.group();
-				postfilled.put(found, "");
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			Map<String, Object> res = mapper.readValue(src, new TypeReference<Map<String, Object>>() {
+			});
+
+			text = (String) res.get(template);
+			template = text;
+			prefilled = (Map<String, String>) res.get("prefilled");
+			postfilled = (Map<String, String>) res.get("postfilled");
+			if (asTemplate) {
+				Pattern post = Pattern.compile("\\[\\w+\\]");
+				Matcher matcher = post.matcher(text);
+				while (matcher.find()) {
+					String found = matcher.group();
+					postfilled.put(found, "");
+				}
 			}
+			return true;
+
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+			return false;
 		}
-		return true;
 	}
 
 }
