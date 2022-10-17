@@ -107,14 +107,15 @@ public class HtmlProcessorDisplay extends Composite {
 			text.setText(e.getValue());
 			text.setData("field", e.getKey());
 		}
-		for (String key : doc.getPostfilled().keySet()) {
+		for (Entry<String, String> e : doc.getPostfilled().entrySet()) {
 			Label lbl = new Label(cAdditional, SWT.NONE);
 			lbl.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-			lbl.setText(key.substring(1, key.length() - 1) + ":");
+			lbl.setText(e.getKey().substring(1, e.getKey().length() - 1) + ":");
 			Text text = new Text(cAdditional, SWT.MULTI | SWT.BORDER);
 			text.setLayoutData(SWTHelper.getFillGridData(2, true, 2, true));
 			text.addFocusListener(fs);
-			text.setData("field", key);
+			text.setData("field", e.getKey());
+			text.setText(e.getValue());
 		}
 		cFields.layout();
 

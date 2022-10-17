@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Basic template for the html-based Ungrad Textplugin
+	ElexisHtmlTemplate
+  Basic template for the html-based Ungrad Textplugin  
 	(c) 2022 by G. Weirich
   You may use and modify this template freely, but there is no warranty of any kind that is is 
   correct and that the output will be accepted by authorities. YMMV.
@@ -107,6 +108,12 @@
 			top: 90mm;
 			width: 100%;
 		}
+		#footer{
+			position: absolute;
+			left:10mm;
+			top: 200mm;
+			width: 100%;
+		}
 	</style>
 </head>
 
@@ -139,10 +146,12 @@
 				Tel: [Patient.Telefon1] [Patient.Natel] [Patient.Telefon2]
 			</p>
 			<p>Liebe[Adressat:mw:r/ ] [Adressat.Vorname]</p>
-			<p>[Text]</p>
+			<h2>Problem</h2>
+			<p>[Problem]</p>
+			<h2>Weitere Diagnosen</h2>
+			<p>[Diagnosen]</p>
 		</div>
 		<div id="footer">
-			<p>[Zusatz]</p>
 			<p>Vielen Dank und freundliche Grüsse</p>
 			<p>[Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</p>
 		</div>

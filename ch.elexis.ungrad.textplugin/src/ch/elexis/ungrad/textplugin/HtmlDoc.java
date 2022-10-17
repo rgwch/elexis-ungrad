@@ -35,7 +35,7 @@ import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 public class HtmlDoc {
-
+	final static String VERSION="1.0.0";
 	private String template;
 	private String text;
 	private Map<String, String> prefilled = new HashMap<String, String>();
@@ -112,6 +112,19 @@ public class HtmlDoc {
 		sb.setLength(0);
 		sb.append(File.separator).append(filename);
 		String basename = sb.toString();
+		applyMatcher("\\[\\w+\\]", new ReplaceCallback() {
+
+			@Override
+			public Object replace(String in) {
+				String rep = postfilled.get(in);
+				if (StringTool.isNothing(rep)) {
+					return "";
+				} else {
+					return rep;
+				}
+			}
+		});
+		// text=text.replaceAll("[<>]", "");
 		File htmlFile = new File(dir, basename + ".html");
 		FileTool.writeTextFile(htmlFile, text);
 		File pdfFile = new File(dir, basename + ".pdf");
@@ -125,6 +138,7 @@ public class HtmlDoc {
 			out.put("template", template);
 			out.put("prefilled", prefilled);
 			out.put("postfilled", postfilled);
+			out.put("HtmlTemplatorVersion", VERSION);
 			ObjectMapper mapper = new ObjectMapper();
 			return mapper.writeValueAsBytes(out);
 		} catch (Exception ex) {
@@ -134,28 +148,48 @@ public class HtmlDoc {
 	}
 
 	public boolean load(byte[] src, boolean asTemplate) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			Map<String, Object> res = mapper.readValue(src, new TypeReference<Map<String, Object>>() {
-			});
+		if (src[0] == '{') {
+			ObjectMapper mapper = new ObjectMapper();
+			try {
+				Map<String, Object> res = mapper.readValue(src, new TypeReference<Map<String, Object>>() {
+				});
 
-			text = (String) res.get(template);
-			template = text;
-			prefilled = (Map<String, String>) res.get("prefilled");
-			postfilled = (Map<String, String>) res.get("postfilled");
-			if (asTemplate) {
-				Pattern post = Pattern.compile("\\[\\w+\\]");
-				Matcher matcher = post.matcher(text);
-				while (matcher.find()) {
-					String found = matcher.group();
-					postfilled.put(found, "");
+				text = (String) res.get("template");
+				template = text;
+				prefilled = (Map<String, String>) res.get("prefilled");
+				postfilled = (Map<String, String>) res.get("postfilled");
+				String version=(String) res.get("HtmlTemplatorVersion");
+				if(StringTool.isNothing(version)){
+					throw new Exception("Bad file format");
 				}
+						
+				if (asTemplate) {
+					Pattern post = Pattern.compile("\\[\\w+\\]");
+					Matcher matcher = post.matcher(text);
+					while (matcher.find()) {
+						String found = matcher.group();
+						postfilled.put(found, "");
+					}
+				}
+				return true;
+
+			} catch (Exception ex) {
+				ExHandler.handle(ex);
+				return false;
+			}
+		} else {
+			text = new String(src, "utf-8");
+			template = text;
+			if(!text.contains("ElexisHtmlTemplate")){
+				throw new Exception("Bad file format");
+			}
+			Pattern post = Pattern.compile("\\[\\w+\\]");
+			Matcher matcher = post.matcher(text);
+			while (matcher.find()) {
+				String found = matcher.group();
+				postfilled.put(found, "");
 			}
 			return true;
-
-		} catch (Exception ex) {
-			ExHandler.handle(ex);
-			return false;
 		}
 	}
 
