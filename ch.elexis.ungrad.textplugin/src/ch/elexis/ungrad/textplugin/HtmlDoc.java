@@ -35,7 +35,7 @@ import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 public class HtmlDoc {
-	final static String VERSION="1.0.0";
+	final static String VERSION = "1.0.0";
 	private String template;
 	private String text;
 	private Map<String, String> prefilled = new HashMap<String, String>();
@@ -93,8 +93,20 @@ public class HtmlDoc {
 
 	public boolean doOutput(String printer) throws Exception {
 		Manager pdf = new Manager();
-		String filename = prefilled.get("[Datum.heute]") + "_" + prefilled.get("[Adressat.Name]") + "_"
-				+ prefilled.get("[Adressat.Vorname]");
+		String filename = new TimeTool().toString(TimeTool.FULL_ISO);
+		String prefix = (new TimeTool(prefilled.get("[Datum.heute]"))).toString(TimeTool.DATE_ISO) + "_";
+		if (prefilled.containsKey("[Adressat.Name]")) {
+			filename = prefix + prefilled.get("[Adressat.Name]") + "_" + prefilled.get("[Adressat.Vorname]");
+		} else {
+			String name = "_Ausgang_";
+			Pattern pat = Pattern.compile("<title>(.+)</title>");
+			Matcher m = pat.matcher(text);
+			if (m.find()) {
+				String fn=m.group(1);
+				name = "_" + fn;
+			}
+			filename = prefix + name;
+		}
 		String dirname = prefilled.get("[Patient.Name]") + "_" + prefilled.get("[Patient.Vorname]") + "_"
 				+ prefilled.get("[Patient.Geburtsdatum]");
 
@@ -158,11 +170,11 @@ public class HtmlDoc {
 				template = text;
 				prefilled = (Map<String, String>) res.get("prefilled");
 				postfilled = (Map<String, String>) res.get("postfilled");
-				String version=(String) res.get("HtmlTemplatorVersion");
-				if(StringTool.isNothing(version)){
+				String version = (String) res.get("HtmlTemplatorVersion");
+				if (StringTool.isNothing(version)) {
 					throw new Exception("Bad file format");
 				}
-						
+
 				if (asTemplate) {
 					Pattern post = Pattern.compile("\\[\\w+\\]");
 					Matcher matcher = post.matcher(text);
@@ -180,7 +192,7 @@ public class HtmlDoc {
 		} else {
 			text = new String(src, "utf-8");
 			template = text;
-			if(!text.contains("ElexisHtmlTemplate")){
+			if (!text.contains("ElexisHtmlTemplate")) {
 				throw new Exception("Bad file format");
 			}
 			Pattern post = Pattern.compile("\\[\\w+\\]");
