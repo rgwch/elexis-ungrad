@@ -24,6 +24,6 @@ public class HtmlDocTest {
 		for (Entry<String, String> e : hDoc.getPrefilled().entrySet()) {
 			System.out.println(e.getKey() + "-> " + e.getValue());
 		}
-		System.out.println(hDoc.compile());
+		System.out.println(hDoc.text);
 	}
 }

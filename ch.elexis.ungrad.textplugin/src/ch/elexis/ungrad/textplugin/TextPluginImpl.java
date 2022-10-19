@@ -129,8 +129,7 @@ public class TextPluginImpl implements ITextPlugin {
 	@Override
 	public boolean insertTable(String place, int properties, String[][] contents,
 		int[] columnSizes){
-		// TODO Auto-generated method stub
-		return false;
+		return doc.insertTable(place, contents, columnSizes);
 	}
 	
 	@Override

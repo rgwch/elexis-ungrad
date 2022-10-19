@@ -37,7 +37,7 @@ import ch.rgw.tools.TimeTool;
 public class HtmlDoc {
 	final static String VERSION = "1.0.0";
 	private String template;
-	private String text;
+	String text;
 	private Map<String, String> prefilled = new HashMap<String, String>();
 	private Map<String, String> postfilled = new HashMap<String, String>();
 
@@ -87,8 +87,29 @@ public class HtmlDoc {
 		text = sb.toString();
 	}
 
-	public String compile() {
-		return text;
+	public boolean insertTable(String where, String[][] lines, int[] colSizes) {
+		String table = createTable(lines,colSizes);
+		text = text.replace(where, table);
+		return true;
+	}
+
+	private String createTable(String[][] contents, int[] colSizes) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<table>");
+		for (int i = 0; i < contents.length; i++) {
+			sb.append("<tr>");
+			for (int j = 0; j < contents[i].length; j++) {
+				if (colSizes != null && colSizes.length == contents[i].length) {
+					sb.append("<td style=\"width:" + colSizes[j] + "%\">").append(contents[i][j]).append("</td>");
+
+				} else {
+					sb.append("<td>").append(contents[i][j]).append("</td>");
+				}
+			}
+			sb.append("</tr>");
+		}
+		sb.append("</table>");
+		return sb.toString();
 	}
 
 	public boolean doOutput(String printer) throws Exception {
@@ -102,7 +123,7 @@ public class HtmlDoc {
 			Pattern pat = Pattern.compile("<title>(.+)</title>");
 			Matcher m = pat.matcher(text);
 			if (m.find()) {
-				String fn=m.group(1);
+				String fn = m.group(1);
 				name = "_" + fn;
 			}
 			filename = prefix + name;
