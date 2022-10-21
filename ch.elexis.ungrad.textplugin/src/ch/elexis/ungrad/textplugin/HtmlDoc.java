@@ -16,10 +16,16 @@ package ch.elexis.ungrad.textplugin;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -112,6 +118,18 @@ public class HtmlDoc {
 		return sb.toString();
 	}
 
+	public boolean insertTextAt(int x, int y, int w, int h, String text, int adjust) {
+		StringBuffer sb=new StringBuffer();
+		Formatter fmt=new Formatter(sb);
+		sb.append("<div style=\"position:absolute;left:");
+		fmt.format("%d;top:%d;height:%d;width:%d;\">", x,y,w,h);
+		sb.append(text).append("</div>");
+		Document parsed=Jsoup.parse(text);
+		Element body=parsed.body();
+		body.append(sb.toString());
+		text=parsed.outerHtml();
+		return true;
+	}
 	public boolean doOutput(String printer) throws Exception {
 		Manager pdf = new Manager();
 		String filename = new TimeTool().toString(TimeTool.FULL_ISO);
