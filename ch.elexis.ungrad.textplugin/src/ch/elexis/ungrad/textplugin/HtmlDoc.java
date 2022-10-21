@@ -118,17 +118,27 @@ public class HtmlDoc {
 		return sb.toString();
 	}
 
-	public boolean insertTextAt(int x, int y, int w, int h, String text, int adjust) {
+	public Object insertTextAt(int x, int y, int w, int h, String text, int adjust) {
 		StringBuffer sb=new StringBuffer();
 		Formatter fmt=new Formatter(sb);
+		String marker=StringTool.unique("textmarker");
 		sb.append("<div style=\"position:absolute;left:");
-		fmt.format("%d;top:%d;height:%d;width:%d;\">", x,y,w,h);
+		fmt.format("%d;top:%d;height:%d;width:%d;\" data-marker=\"%s\">", x,y,w,h,marker);
 		sb.append(text).append("</div>");
 		Document parsed=Jsoup.parse(text);
 		Element body=parsed.body();
 		body.append(sb.toString());
+		
 		text=parsed.outerHtml();
-		return true;
+		return marker;
+	}
+	
+	public Object insertTextAt(Object marker,String text, int adjust) {
+		Document parsed=Jsoup.parse(text);
+		Elements el=parsed.getElementsByAttributeValue("data-marker", (String)marker);
+		el.first().after(text);
+		return null;
+		// todo
 	}
 	public boolean doOutput(String printer) throws Exception {
 		Manager pdf = new Manager();

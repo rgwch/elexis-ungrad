@@ -159,8 +159,7 @@ public class TextPluginImpl implements ITextPlugin {
 
 	@Override
 	public Object insertText(Object pos, String text, int adjust) {
-		// TODO Auto-generated method stub
-		return null;
+		return doc.insertTextAt(pos, text, adjust);
 	}
 
 	@Override
