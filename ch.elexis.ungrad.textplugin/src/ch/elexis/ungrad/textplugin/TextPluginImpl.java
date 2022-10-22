@@ -125,12 +125,16 @@ public class TextPluginImpl implements ITextPlugin {
 
 	@Override
 	public boolean insertTable(String place, int properties, String[][] contents, int[] columnSizes) {
-		return doc.insertTable(place, contents, columnSizes);
+		boolean result = doc.insertTable(place, contents, columnSizes);
+		display.setDocument(doc);
+		return result;
 	}
 
 	@Override
 	public Object insertTextAt(int x, int y, int w, int h, String text, int adjust) {
-		return doc.insertTextAt(x, y, w, h, text, adjust);
+		Object result = doc.insertTextAt(x, y, w, h, text, adjust);
+		display.setDocument(doc);
+		return result;
 	}
 
 	@Override
@@ -154,13 +158,17 @@ public class TextPluginImpl implements ITextPlugin {
 				return text;
 			}
 		});
+		display.setDocument(doc);
+		;
 		return text;
 	}
 
 	@Override
 	public Object insertText(Object pos, String text, int adjust) {
-		return doc.insertTextAt(pos, text, adjust);
-	}
+		Object result = doc.insertTextAt(pos, text, adjust);
+		display.setDocument(doc);
+		return result;
+	}	
 
 	@Override
 	public boolean clear() {
