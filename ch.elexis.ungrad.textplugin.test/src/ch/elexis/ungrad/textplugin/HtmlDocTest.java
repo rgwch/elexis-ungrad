@@ -3,6 +3,7 @@ package ch.elexis.ungrad.textplugin;
 import java.io.File;
 import java.util.Map.Entry;
 
+import org.eclipse.swt.SWT;
 import org.junit.Test;
 
 import ch.rgw.io.FileTool;
@@ -25,5 +26,16 @@ public class HtmlDocTest {
 			System.out.println(e.getKey() + "-> " + e.getValue());
 		}
 		System.out.println(hDoc.text);
+	}
+	
+	@Test
+	public void insert() throws Exception{
+		HtmlDoc hDoc = new HtmlDoc();
+		File test = new File("rsc", "test.html");
+		String html = FileTool.readTextFile(test);
+		hDoc.load(html.getBytes("utf-8"), true);
+		Object txm=hDoc.insertTextAt(10, 15, 20, 30, "Inserted", SWT.LEFT);
+		Object txm2=hDoc.insertTextAt(txm, "Inserted after", SWT.RIGHT);
+		FileTool.writeTextFile(new File("rsc","modified.html"), hDoc.text);
 	}
 }

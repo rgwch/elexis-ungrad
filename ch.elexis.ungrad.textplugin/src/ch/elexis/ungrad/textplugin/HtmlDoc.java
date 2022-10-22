@@ -94,7 +94,7 @@ public class HtmlDoc {
 	}
 
 	public boolean insertTable(String where, String[][] lines, int[] colSizes) {
-		String table = createTable(lines,colSizes);
+		String table = createTable(lines, colSizes);
 		text = text.replace(where, table);
 		return true;
 	}
@@ -118,28 +118,33 @@ public class HtmlDoc {
 		return sb.toString();
 	}
 
-	public Object insertTextAt(int x, int y, int w, int h, String text, int adjust) {
-		StringBuffer sb=new StringBuffer();
-		Formatter fmt=new Formatter(sb);
-		String marker=StringTool.unique("textmarker");
+	public Object insertTextAt(int x, int y, int w, int h, String toInsert, int adjust) {
+		StringBuffer sb = new StringBuffer();
+		Formatter fmt = new Formatter(sb);
+		String marker = StringTool.unique("textmarker");
 		sb.append("<div style=\"position:absolute;left:");
-		fmt.format("%d;top:%d;height:%d;width:%d;\" data-marker=\"%s\">", x,y,w,h,marker);
-		sb.append(text).append("</div>");
-		Document parsed=Jsoup.parse(text);
-		Element body=parsed.body();
+		fmt.format("%dmm;top:%dmm;height:%dmm;width:%dmm;\" data-marker=\"%s\">", x, y, w, h, marker);
+		sb.append(toInsert).append("</div>");
+		Document parsed = Jsoup.parse(this.text);
+		Element body = parsed.body();
 		body.append(sb.toString());
-		
-		text=parsed.outerHtml();
+		this.text = parsed.outerHtml();
 		return marker;
 	}
-	
-	public Object insertTextAt(Object marker,String text, int adjust) {
-		Document parsed=Jsoup.parse(text);
-		Elements el=parsed.getElementsByAttributeValue("data-marker", (String)marker);
-		el.first().after(text);
+
+	public Object insertTextAt(Object marker, String toInsert, int adjust) {
+		Document parsed = Jsoup.parse(this.text);
+		Elements els = parsed.getElementsByAttributeValue("data-marker", (String) marker);
+		Element el = els.first();
+		if (el != null) {
+			String newMarker = StringTool.unique("textmarker");
+			el.append("<div data-marker=\"" + newMarker + "\">" + toInsert + "</div");
+			this.text = parsed.outerHtml();
+			return newMarker;
+		}
 		return null;
-		// todo
 	}
+
 	public boolean doOutput(String printer) throws Exception {
 		Manager pdf = new Manager();
 		String filename = new TimeTool().toString(TimeTool.FULL_ISO);
