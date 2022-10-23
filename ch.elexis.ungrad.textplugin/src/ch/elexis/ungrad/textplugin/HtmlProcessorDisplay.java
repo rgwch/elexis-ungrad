@@ -25,21 +25,22 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
+import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.text.ITextPlugin.ICallback;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.WidgetFactory;
+import ch.rgw.io.FileTool;
+import ch.rgw.tools.ExHandler;
 
 public class HtmlProcessorDisplay extends Composite {
 	private HtmlDoc doc;
@@ -89,6 +90,9 @@ public class HtmlProcessorDisplay extends Composite {
 
 	public void setDocument(HtmlDoc doc) {
 		this.doc = doc;
+		if(doc.getFilename()!=null) {
+			asyncRunViewer(doc.getFilename());
+		}
 		for (Control c : cFields.getChildren()) {
 			c.removeFocusListener(fs);
 			c.dispose();
@@ -115,12 +119,24 @@ public class HtmlProcessorDisplay extends Composite {
 			text.setLayoutData(SWTHelper.getFillGridData(2, true, 2, true));
 			text.addFocusListener(fs);
 			text.setData("field", e.getKey());
-			text.setText(e.getValue());
+			text.setText(createDisplay(e.getValue()));
 		}
 		cFields.layout();
 
 	}
-
+	
+	private String createDisplay(String in) {
+		if(in.startsWith("<table>")) {
+			String out=in.replaceAll("</tr>","\\r")
+					.replaceAll("</td><td>", StringConstants.SPACE)
+					.replaceAll("<br />", "\\r")
+					.replaceAll("<.+?>", "");
+			return out;
+		}else {
+			return in;
+		}
+	}
+	
 	private void collect() {
 		for (Control c : cFields.getChildren()) {
 			Object field = c.getData("field");
@@ -147,7 +163,10 @@ public class HtmlProcessorDisplay extends Composite {
 			public void run() {
 				save();
 				try {
-					doc.doOutput("");
+					String outfile=doc.doOutput("");
+					if(outfile!=null) {
+						asyncRunViewer(outfile);
+					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -156,6 +175,32 @@ public class HtmlProcessorDisplay extends Composite {
 		};
 	}
 
+	private void asyncRunViewer(String filepath){
+		Display.getDefault().asyncExec(new Runnable() {
+			
+			@Override
+			public void run(){
+				try {
+					String ext = FileTool.getExtension(filepath); // $NON-NLS-1$
+					
+					Program proggie = Program.findProgram(ext);
+					if (proggie != null) {
+						proggie.execute(filepath);
+					} else {
+						if (Program.launch(filepath) == false) {
+							Runtime.getRuntime().exec(filepath);
+						}
+					}
+					
+				} catch (Exception ex) {
+					ExHandler.handle(ex);
+					SWTHelper.showError("Could not create or show file", ex.getMessage());
+				}
+			}
+			
+		});
+		
+	}
 	public void save() {
 		collect();
 		saveHandler.save();

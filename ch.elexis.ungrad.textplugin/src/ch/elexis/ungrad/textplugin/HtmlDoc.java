@@ -30,6 +30,7 @@ import org.jsoup.select.Elements;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.text.ReplaceCallback;
 import ch.elexis.core.data.util.PlatformHelper;
@@ -43,39 +44,32 @@ import ch.rgw.tools.TimeTool;
 public class HtmlDoc {
 	final static String VERSION = "1.0.0";
 	private String template;
+	private String outputFile;
 	String text;
 	private Map<String, String> prefilled = new HashMap<String, String>();
 	private Map<String, String> postfilled = new HashMap<String, String>();
-
-	/*
-	 * public void loadTemplate(String filename, String basePath) throws Exception {
-	 * if (StringTool.isNothing(basePath)) { basePath =
-	 * CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, ""); } File ret = new
-	 * File(basePath, filename); if (!ret.exists()) { ret = new
-	 * File(PlatformHelper.getBasePath(PreferenceConstants.PLUGIN_ID) + "/rsc",
-	 * filename); if (!ret.exists() || !ret.canRead()) { throw new
-	 * Exception("Could not read " + ret.getAbsolutePath()); } } text =
-	 * FileTool.readTextFile(ret); Pattern post = Pattern.compile("\\[\\w+\\]");
-	 * Matcher matcher = post.matcher(text); while (matcher.find()) { String found =
-	 * matcher.group(); postfilled.put(found, ""); } }
-	 */
-	public Map<String, String> getPrefilled() {
+	
+	public Map<String, String> getPrefilled(){
 		return prefilled;
 	}
-
-	public Map<String, String> getPostfilled() {
+	
+	public Map<String, String> getPostfilled(){
 		return postfilled;
 	}
-
-	public void setPrefilled(String key, String value) {
+	
+	public void setPrefilled(String key, String value){
 		prefilled.put(key, value);
 	}
-
-	public void setPostfilled(String key, String value) {
+	
+	public void setPostfilled(String key, String value){
 		postfilled.put(key, value);
 	}
-
-	public void applyMatcher(String pattern, ReplaceCallback rcb) {
+	
+	public String getFilename(){
+		return outputFile;
+	}
+	
+	public void applyMatcher(String pattern, ReplaceCallback rcb){
 		Pattern pat = Pattern.compile(pattern);
 		StringBuffer sb = new StringBuffer();
 		Matcher matcher = pat.matcher(text);
@@ -92,24 +86,27 @@ public class HtmlDoc {
 		matcher.appendTail(sb);
 		text = sb.toString();
 	}
-
-	public boolean insertTable(String where, String[][] lines, int[] colSizes) {
+	
+	public boolean insertTable(String where, String[][] lines, int[] colSizes){
 		String table = createTable(lines, colSizes);
 		text = text.replace(where, table);
+		postfilled.put(where, table);
 		return true;
 	}
-
-	private String createTable(String[][] contents, int[] colSizes) {
+	
+	private String createTable(String[][] contents, int[] colSizes){
 		StringBuilder sb = new StringBuilder();
 		sb.append("<table>");
 		for (int i = 0; i < contents.length; i++) {
 			sb.append("<tr>");
 			for (int j = 0; j < contents[i].length; j++) {
+				String processed = contents[i][j].replaceAll("[\\n\\r]", "<br />");
 				if (colSizes != null && colSizes.length == contents[i].length) {
-					sb.append("<td style=\"width:" + colSizes[j] + "%\">").append(contents[i][j]).append("</td>");
-
+					sb.append("<td style=\"width:" + colSizes[j] + "%\">").append(processed)
+						.append("</td>");
+					
 				} else {
-					sb.append("<td>").append(contents[i][j]).append("</td>");
+					sb.append("<td>").append(processed).append("</td>");
 				}
 			}
 			sb.append("</tr>");
@@ -117,22 +114,24 @@ public class HtmlDoc {
 		sb.append("</table>");
 		return sb.toString();
 	}
-
-	public Object insertTextAt(int x, int y, int w, int h, String toInsert, int adjust) {
+	
+	public Object insertTextAt(int x, int y, int w, int h, String toInsert, int adjust){
 		StringBuffer sb = new StringBuffer();
 		Formatter fmt = new Formatter(sb);
 		String marker = StringTool.unique("textmarker");
 		sb.append("<div style=\"position:absolute;left:");
-		fmt.format("%dmm;top:%dmm;height:%dmm;width:%dmm;\" data-marker=\"%s\">", x, y, w, h, marker);
+		fmt.format("%dmm;top:%dmm;height:%dmm;width:%dmm;\" data-marker=\"%s\">", x, y, w, h,
+			marker);
 		sb.append(toInsert).append("</div>");
 		Document parsed = Jsoup.parse(this.text);
 		Element body = parsed.body();
 		body.append(sb.toString());
 		this.text = parsed.outerHtml();
+		postfilled.put(marker, toInsert);
 		return marker;
 	}
-
-	public Object insertTextAt(Object marker, String toInsert, int adjust) {
+	
+	public Object insertTextAt(Object marker, String toInsert, int adjust){
 		Document parsed = Jsoup.parse(this.text);
 		Elements els = parsed.getElementsByAttributeValue("data-marker", (String) marker);
 		Element el = els.first();
@@ -144,13 +143,15 @@ public class HtmlDoc {
 		}
 		return null;
 	}
-
-	public boolean doOutput(String printer) throws Exception {
+	
+	public String doOutput(String printer) throws Exception{
 		Manager pdf = new Manager();
 		String filename = new TimeTool().toString(TimeTool.FULL_ISO);
-		String prefix = (new TimeTool(prefilled.get("[Datum.heute]"))).toString(TimeTool.DATE_ISO) + "_";
+		String prefix =
+			(new TimeTool(prefilled.get("[Datum.heute]"))).toString(TimeTool.DATE_ISO) + "_";
 		if (prefilled.containsKey("[Adressat.Name]")) {
-			filename = prefix + prefilled.get("[Adressat.Name]") + "_" + prefilled.get("[Adressat.Vorname]");
+			filename = prefix + prefilled.get("[Adressat.Name]") + "_"
+				+ prefilled.get("[Adressat.Vorname]");
 		} else {
 			String name = "Ausgang_";
 			Pattern pat = Pattern.compile("<title>(.+)</title>");
@@ -161,27 +162,28 @@ public class HtmlDoc {
 			}
 			filename = prefix + name;
 		}
-		String dirname = prefilled.get("[Patient.Name]") + "_" + prefilled.get("[Patient.Vorname]") + "_"
-				+ prefilled.get("[Patient.Geburtsdatum]");
-
+		String dirname = prefilled.get("[Patient.Name]") + "_" + prefilled.get("[Patient.Vorname]")
+			+ "_" + prefilled.get("[Patient.Geburtsdatum]");
+		
 		StringBuilder sb = new StringBuilder();
-		sb.append(CoreHub.localCfg.get(PreferenceConstants.DOCUMENT_BASE, "")).append(File.separator)
-				.append(dirname.substring(0, 1)).append(File.separator).append(dirname);
-
+		sb.append(CoreHub.localCfg.get(PreferenceConstants.DOCUMENT_BASE, ""))
+			.append(File.separator).append(dirname.substring(0, 1)).append(File.separator)
+			.append(dirname);
+		
 		File dir = new File(sb.toString());
 		if (!dir.exists()) {
 			if (!dir.mkdirs()) {
 				throw new Exception("Could not create directory " + dir.getAbsolutePath());
 			}
 		}
-
+		
 		sb.setLength(0);
 		sb.append(File.separator).append(filename);
 		String basename = sb.toString();
 		applyMatcher("\\[\\w+\\]", new ReplaceCallback() {
-
+			
 			@Override
-			public Object replace(String in) {
+			public Object replace(String in){
 				String rep = postfilled.get(in);
 				if (StringTool.isNothing(rep)) {
 					return "";
@@ -195,16 +197,20 @@ public class HtmlDoc {
 		FileTool.writeTextFile(htmlFile, text);
 		File pdfFile = new File(dir, basename + ".pdf");
 		pdf.createPDF(htmlFile, pdfFile);
-		return true;
+		outputFile = pdfFile.getAbsolutePath();
+		return outputFile;
 	}
-
-	public byte[] storeToByteArray() {
+	
+	public byte[] storeToByteArray(){
 		try {
 			Map<String, Object> out = new HashMap<String, Object>();
 			out.put("template", template);
 			out.put("prefilled", prefilled);
 			out.put("postfilled", postfilled);
 			out.put("HtmlTemplatorVersion", VERSION);
+			if (!StringTool.isNothing(outputFile)) {
+				out.put("filename", outputFile);
+			}
 			ObjectMapper mapper = new ObjectMapper();
 			return mapper.writeValueAsBytes(out);
 		} catch (Exception ex) {
@@ -212,23 +218,25 @@ public class HtmlDoc {
 			return null;
 		}
 	}
-
-	public boolean load(byte[] src, boolean asTemplate) throws Exception {
+	
+	public boolean load(byte[] src, boolean asTemplate) throws Exception{
 		if (src[0] == '{') {
+			// It's an internal (processed) template or an existing document
 			ObjectMapper mapper = new ObjectMapper();
 			try {
-				Map<String, Object> res = mapper.readValue(src, new TypeReference<Map<String, Object>>() {
-				});
-
+				Map<String, Object> res =
+					mapper.readValue(src, new TypeReference<Map<String, Object>>() {});
+				
 				text = (String) res.get("template");
 				template = text;
 				prefilled = (Map<String, String>) res.get("prefilled");
 				postfilled = (Map<String, String>) res.get("postfilled");
+				outputFile = (String) res.get("filename");
 				String version = (String) res.get("HtmlTemplatorVersion");
 				if (StringTool.isNothing(version)) {
 					throw new Exception("Bad file format");
 				}
-
+				/*
 				if (asTemplate) {
 					Pattern post = Pattern.compile("\\[\\w+\\]");
 					Matcher matcher = post.matcher(text);
@@ -237,13 +245,15 @@ public class HtmlDoc {
 						postfilled.put(found, "");
 					}
 				}
+				*/
 				return true;
-
+				
 			} catch (Exception ex) {
 				ExHandler.handle(ex);
 				return false;
 			}
 		} else {
+			// it's a newly imported HTML template file to process or a foreign file.
 			text = new String(src, "utf-8");
 			template = text;
 			if (!text.contains("ElexisHtmlTemplate")) {
@@ -258,5 +268,5 @@ public class HtmlDoc {
 			return true;
 		}
 	}
-
+	
 }
