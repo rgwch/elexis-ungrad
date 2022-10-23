@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
 <!--
-  Basic template for the html-based Ungrad Textplugin  
+  Basic A5 template for the html-based Ungrad Textplugin  
 	(c) 2022 by G. Weirich
   You may use and modify this template freely. It is recommended to copy this as a basis for different templates.
   
@@ -11,148 +11,203 @@
 
 <head>
 	<meta charset="UTF-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Elexis HTML Briefvorlage</title>
+	<title>Elexis HTML Vorlage A5</title>
 	<style>
 		@page {
 			size: A5 portrait;
-			margin-top: 5mm;
-			margin-left: 5mm;
-			margin-bottom: 5mm;
-			margin-right: 5mm;
+			/* 148x210mm */
+			margin: 10mm;
 		}
 
-		#container {
-			box-sizing: border-box;
-			position: absolute;
-			font-size: 11pt;
-			left: 5mm;
-			top: 0;
-			height: 200mm;
-			width: 143mm;
-		}
+		body {
+      /* Definition der Schriftart und -grösse für den ganzen Text */
+      font-family: Helvetica, Sans-Serif;
+      font-style: normal;
+      font-size: 14px;
+      text-align: left;
+      width: 128mm;
+      height: 190mm;
+      margin-left: 10mm;
+      margin-right: 0mm;
+      /* border: solid blue 1px;  */
+      position: absolute;
+    }
 
-		/* Datum rechts oben */
-		#date {
-			position: absolute;
-			right: 20mm;
-			top: 24mm;
-			width: 50mm;
-		}
+    .heading {
+      /* Stil für Seitenkopf */
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      font-style: oblique;
+      font-size: 18px;
+      font-weight: bolder;
+      text-align: center;
+      background-color: lightskyblue;
+      color: black;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      height: 2em;
+    }
 
-		/* Seitenkopf mit ggf. Praxislogo */
-		#header {
-			color: green;
-			text-align: center;
-			margin-top: 0mm;
-			padding-bottom: 0;
-			padding-top: 0;
-		}
+    span.topleft {
+      position: absolute;
+      left: 1em;
+      top: 4px;
+    }
 
-		/* Hauptüberschrift */
-		h1 {
-			font-size: 14pt;
-			margin-bottom: 0;
-			padding-bottom: 0;
-		}
-		h2{
-			font-size: 12pt;
-			margin-bottom: 1px;
-			padding-bottom:0;
-			font-weight: bold:
-			}
+    span.topright {
+      position: absolute;
+      right: 1em;
+      top: 4px;
+    }
 
-		/* Tabellen kompakter machen */
-		table,
-		tr,
-		td {
-			padding-bottom: 0;
-			padding-top: 0;
-			margin-bottom: 0;
-			margin-top: 0;
-		}
+    .leftrow {
+      position: absolute;
+      top: 4em;
+      left: 5px;
+      width: 74mm;
+      height: 45mm;
+      overflow: hidden;
+      text-align: left;
+    }
 
-		/* Absenderfeld links oben */
-		#sender {
-			position: absolute;
-			left: 10mm;
-			top: 24mm;
-			margin-right: 20px;
-			width: 70mm;
-		}
+    .rightrow {
+      position: absolute;
+      top: 4em;
+      right: 5px;
+      width: 50mm;
+      overflow: hidden;
+      text-align: left;
+    }
 
-		/* Absenderzeile im Sichtfenster über der Adresse */
-		.absender {
-			font-family: Arial, Helvetica, sans-serif;
-			font-size: 6pt;
-			font-weight: normal;
-			margin-bottom: 3mm;
-		}
+    .concern {
+      font-weight: bold;
+      font-size: 16px;
+      text-align: left;
+      position: absolute;
+      top: 1em;
+      right: 1em;
+    }
 
-		/* Adresse. Bite anpassen, wenn das Sichtfenster anders liegt */
-		#address {
-			position: absolute;
-			right: 20mm;
-			top: 45mm;
-			width: 60mm;
-		}
+    .concernleft {
+      font-weight: bold;
+      font-size: 16px;
+      text-align: left;
+      position: absolute;
+      top: 2em;
+      left: 0em;
+    }
 
-		#maintext {
-			position: absolute;
-			left: 10mm;
-			top: 90mm;
-			width: 100%;
-		}
-		#footer{
-			position: absolute;
-			left:10mm;
-			top: 200mm;
-			width: 100%;
-		}
+    .payload {
+      position: absolute;
+      top: 40mm;
+      bottom: 5mm;
+      width: 100%;
+      border-top: solid black 1px;
+      padding-top: 5px;
+      /* border: solid black 1px; */
+
+    }
+
+    .contents {
+      position: absolute;
+      top: 5em;
+      left: 0em;
+      right: 2em;
+      overflow: hidden;
+    }
+
+    table.header {
+      border: 0;
+      text-align: left;
+      padding: 0;
+    }
+
+    table.header tr {
+      border: 0;
+      padding: 0;
+    }
+
+    table.header td {
+      border: 0;
+      padding: 0;
+    }
+
+    table {
+      /* Stil für tabellarische Daten */
+      border-collapse: collapse;
+      padding: 8px;
+      width: 100%;
+    }
+
+    table,
+    th,
+    td {
+      /* Gemeinsame Formatierung aller Tabellenzellen, kann ev, weiter unten modifiziert werden */
+      border: 1px solid black;
+      text-align: left;
+    }
+
+    .rowheader {
+      /* Die erste Spalte */
+
+      text-align: left;
+      font-weight: normal;
+      background-color: #e6f7ff;
+
+    }
+
+    th.group {
+      /* Zeilen mit Gruppennamen */
+      background-color: #e6e6e6;
+      page-break-after: avoid;
+      /* Kein Seitenumbruch direkt nach dem Gruppentitel */
+    }
+
+    td {
+      /* Tabellenzellen, alle gemeinsam */
+      padding: 4px;
+      margin: 2px;
+    }
 	</style>
 </head>
 
 <body>
 	<div data-type="filename" style="display:none">[Datum.heute]_[Adressat.Name]_[Adressat.Vorname]</div>
 	<div data-type="dirname" style="display:none">[Patient.Name]_[Patient.Vorname]_[Patient.Geburtsdatum]</div>
-	<div id="container">
-		<div id="header">
-			<h1>Praxis [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</h1>
-			<span>[Mandant.Strasse] [Mandant.Plz] [Mandant.Ort] Tel.:
-				[Mandant.Telefon1] e-mail: [Mandant.E-Mail]</span>
-			<hr />
-
-		</div>
-		<div id="date">[Mandant.Ort], [Datum.heute]</div>
-
-		<div id="sender">
-			[Mandant.Titel] [Mandant.Vorname] [Mandant.Name] <br /> Facharzt für
-			[Mandant.TarmedSpezialität] <br /> ZSR-Nr. [Mandant.KSK]
-		</div>
-
-		<div id="address">
-			<p class="absender">[Mandant.Vorname] [Mandant.Name], [Mandant.Strasse] [Mandant.Plz] [Mandant.Ort]</p>
-			[Adressat.Anschrift] <br />
-		</div>
-
-		<div id="maintext">
-			<p>[Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]<br />
-				[Patient.Strasse], [Patient.Plz] [Patient.Ort]<br />
-				Tel: [Patient.Telefon1] [Patient.Natel] [Patient.Telefon2]
-			</p>
-			<p>Liebe[Adressat:mw:r/ ] [Adressat.Vorname]</p>
-			<h2>Problem</h2>
-			<p>[Problem]</p>
-			<h2>Weitere Diagnosen</h2>
-			<p>[Diagnosen]</p>
-		</div>
-		<div id="footer">
-			<p>Vielen Dank und freundliche Grüsse</p>
-			<p>[Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</p>
-		</div>
+	<heading class="heading"><span class="topleft">[Header]</span><span class="topright"></span><span
+		class="topright">[Datum.heute]</span>
+</heading>
+<main>
+	<div class="leftrow"><span style="font-size:16px;font-weight:bold;">[Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</span><br />
+		<span>[Mandant.TarmedSpezialität]</span><br />
+			<span>[Mandant.Strasse]</span><br /><span>[Mandant.Plz] [Mandant.Ort]</span></div>
+	<div class="rightrow">
+		<table class="header">
+			<tr>
+				<td>Tel.:</td>
+				<td>[Mandant.Telefon1]</td>
+			</tr>
+			<tr>
+				<td>E-Mail:</td>
+				<td>[Mandant.E-Mail]</td>
+			</tr>
+			<tr>
+				<td>ZSR:</td>
+				<td>[Mandant.KSK]</td>
+			</tr>
+			<tr>
+				<td>GLN:</td>
+				<td>[Mandant.EAN]</td>
+			</tr>
+		</table>
 	</div>
-
+	<div class="payload">
+		<div class="concernleft"> [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]</div>
+		<div class="contents">[Text]</div>
+	</div>
+</main>
 </body>
 
 </html>

@@ -152,12 +152,12 @@ public class HtmlDoc {
 		if (prefilled.containsKey("[Adressat.Name]")) {
 			filename = prefix + prefilled.get("[Adressat.Name]") + "_" + prefilled.get("[Adressat.Vorname]");
 		} else {
-			String name = "_Ausgang_";
+			String name = "Ausgang_";
 			Pattern pat = Pattern.compile("<title>(.+)</title>");
 			Matcher m = pat.matcher(text);
 			if (m.find()) {
 				String fn = m.group(1);
-				name = "_" + fn;
+				name = fn;
 			}
 			filename = prefix + name;
 		}

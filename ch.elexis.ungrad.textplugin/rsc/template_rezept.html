@@ -8,6 +8,7 @@
     /* ElexisHtmlTemplate */
     @page {
       size: A5 portrait;
+      /* 148x210mm */
       margin: 10mm;
     }
 
@@ -18,7 +19,8 @@
       font-size: 14px;
       text-align: left;
       width: 128mm;
-      height: 190mm;
+      height: 180mm;
+      margin-top: 0;
       margin-left: 0mm;
       margin-right: 0mm;
       /* border: solid blue 1px;  */
@@ -94,7 +96,6 @@
     .payload {
       position: absolute;
       top: 40mm;
-      bottom: 5mm;
       width: 100%;
       border-top: solid black 1px;
       padding-top: 5px;
@@ -170,9 +171,11 @@
       class="topright">[Datum.heute]</span>
   </heading>
   <main>
-    <div class="leftrow"><span style="font-size:16px;font-weight:bold;">[Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</span><br />
+    <div class="leftrow"><span style="font-size:16px;font-weight:bold;">[Mandant.Titel] [Mandant.Vorname]
+        [Mandant.Name]</span><br />
       <span>[Mandant.TarmedSpezialität]</span><br />
-        <span>[Mandant.Strasse]</span><br /><span>[Mandant.Plz] [Mandant.Ort]</span></div>
+      <span>[Mandant.Strasse]</span><br /><span>[Mandant.Plz] [Mandant.Ort]</span>
+    </div>
     <div class="rightrow">
       <table class="header">
         <tr>
