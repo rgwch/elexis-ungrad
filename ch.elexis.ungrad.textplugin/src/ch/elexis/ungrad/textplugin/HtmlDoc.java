@@ -40,6 +40,7 @@ import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
+import de.neuland.pug4j.Pug4J;
 
 public class HtmlDoc {
 	final static String VERSION = "1.0.0";
@@ -255,6 +256,9 @@ public class HtmlDoc {
 		} else {
 			// it's a newly imported HTML template file to process or a foreign file.
 			text = new String(src, "utf-8");
+			if(text.startsWith("doctype") || text.startsWith("extends")) {
+				String html=Pug4J.render(text, new HashMap());
+			}
 			template = text;
 			if (!text.contains("ElexisHtmlTemplate")) {
 				throw new Exception("Bad file format");
