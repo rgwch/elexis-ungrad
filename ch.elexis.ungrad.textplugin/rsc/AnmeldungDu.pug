@@ -1,0 +1,23 @@
+extends a4 
+
+block content
+  #maintext 
+    p [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
+      <br />
+      . 
+        [Patient.Strasse], [Patient.Plz] [Patient.Ort]
+      <br />
+      . 
+        Tel: [Patient.Telefon1] [Patient.Natel] [Patient.Telefon2]
+    p Liebe[Adressat:mw:r/ ] [Adressat.Vorname]
+    p Ich bitte dich um direktes Aufgebot [Patient:mw:des oben genannten Patienten/der open genannten Patientin] zur fachärztlichen Untersucung.
+
+    h2 Problem 
+    p [Problem]
+
+    h2 Weitere Diagnosen 
+    p [Diagnosen]
+
+  #footer 
+    p Vielen Dank und freundliche Grüsse 
+    p [Mandant.Vorname]  

@@ -1,0 +1,157 @@
+@page {
+    size: A5 portrait;
+    /* 148x210mm */
+    margin: 10mm;
+}
+
+body {
+/* Definition der Schriftart und -grösse für den ganzen Text */
+font-family: Helvetica, Sans-Serif;
+font-style: normal;
+font-size: 14px;
+text-align: left;
+width: 128mm;
+height: 190mm;
+margin-left: 10mm;
+margin-right: 0mm;
+/* border: solid blue 1px;  */
+position: absolute;
+}
+
+.heading {
+/* Stil für Seitenkopf */
+-webkit-print-color-adjust: exact;
+print-color-adjust: exact;
+font-style: oblique;
+font-size: 18px;
+font-weight: bolder;
+text-align: center;
+background-color: lightskyblue;
+color: black;
+position: absolute;
+top: 0px;
+left: 0px;
+width: 100%;
+height: 2em;
+}
+
+span.topleft {
+position: absolute;
+left: 1em;
+top: 4px;
+}
+
+span.topright {
+position: absolute;
+right: 1em;
+top: 4px;
+}
+
+.leftrow {
+position: absolute;
+top: 4em;
+left: 5px;
+width: 74mm;
+height: 45mm;
+overflow: hidden;
+text-align: left;
+}
+
+.rightrow {
+position: absolute;
+top: 4em;
+right: 5px;
+width: 50mm;
+overflow: hidden;
+text-align: left;
+}
+
+.concern {
+font-weight: bold;
+font-size: 16px;
+text-align: left;
+position: absolute;
+top: 1em;
+right: 1em;
+}
+
+.concernleft {
+font-weight: bold;
+font-size: 16px;
+text-align: left;
+position: absolute;
+top: 2em;
+left: 0em;
+}
+
+.payload {
+position: absolute;
+top: 40mm;
+bottom: 5mm;
+width: 100%;
+border-top: solid black 1px;
+padding-top: 5px;
+/* border: solid black 1px; */
+
+}
+
+.contents {
+position: absolute;
+top: 5em;
+left: 0em;
+right: 2em;
+overflow: hidden;
+}
+
+table.header {
+border: 0;
+text-align: left;
+padding: 0;
+}
+
+table.header tr {
+border: 0;
+padding: 0;
+}
+
+table.header td {
+border: 0;
+padding: 0;
+}
+
+table {
+/* Stil für tabellarische Daten */
+border-collapse: collapse;
+padding: 8px;
+width: 100%;
+}
+
+table,
+th,
+td {
+/* Gemeinsame Formatierung aller Tabellenzellen, kann ev, weiter unten modifiziert werden */
+border: 1px solid black;
+text-align: left;
+}
+
+.rowheader {
+/* Die erste Spalte */
+
+text-align: left;
+font-weight: normal;
+background-color: #e6f7ff;
+
+}
+
+th.group {
+/* Zeilen mit Gruppennamen */
+background-color: #e6e6e6;
+page-break-after: avoid;
+/* Kein Seitenumbruch direkt nach dem Gruppentitel */
+}
+
+td {
+/* Tabellenzellen, alle gemeinsam */
+padding: 4px;
+margin: 2px;
+}

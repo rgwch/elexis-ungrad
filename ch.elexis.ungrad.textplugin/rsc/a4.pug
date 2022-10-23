@@ -1,0 +1,29 @@
+doctype html
+html(lang="de")
+  head
+    meta(charset="utf-8")
+    title Elexis Pug Briefvorlage
+    link(rel="stylesheet" href="styles_a4.css")
+  body
+    #container
+      div#header
+      h1 Praxis [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]
+      span [Mandant.Strasse] [Mandant.Plz] [Mandant.Ort] Tel.:[Mandant.Telefon1] e-mail: [Mandant.E-Mail]
+      hr
+      #date [Mandant.Ort], [Datum.heute]
+      #sender [Mandant.Titel] [Mandant.Vorname] [Mandant.Name] 
+        br
+        . 
+          Facharzt für [Mandant.TarmedSpezialität] 
+        br
+        . 
+          ZSR-Nr. [Mandant.KSK]
+      #address 
+        p.absender [Mandant.Vorname] [Mandant.Name], [Mandant.Strasse] [Mandant.Plz] [Mandant.Ort]
+        . 
+          [Adressat.Anschrift]
+        br  
+      block content
+      div(data-type="filename" style="display:none") [Datum.heute]_[Adressat.Name]_[Adressat.Vorname]
+      div(data-type="dirname" style="display:none") [Patient.Name]_[Patient.Vorname]_[Patient.Geburtsdatum]
+
