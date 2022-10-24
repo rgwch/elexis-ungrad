@@ -21,12 +21,17 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -38,7 +43,6 @@ import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.text.ITextPlugin.ICallback;
 import ch.elexis.core.ui.util.SWTHelper;
-import ch.elexis.core.ui.util.WidgetFactory;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 
@@ -54,15 +58,24 @@ public class HtmlProcessorDisplay extends Composite {
 	private IAction printAction, directOutputAction;
 	private ExpandableComposite ecDefaults;
 	private ListViewer lvDefaults;
+	private StackLayout stackLayout=new StackLayout();
+			
+	private Composite cFieldDisplay, cStructureDisplay, cInfoDisplay;
 
+	
 	public HtmlProcessorDisplay(Composite parent, ICallback handler) {
 		super(parent, SWT.NONE);
 		if (parent.getLayout() instanceof GridLayout) {
 			setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 		}
 		FormToolkit tk = UiDesk.getToolkit();
-		setLayout(new FillLayout());
-		form = tk.createScrolledForm(this);
+		setLayout(stackLayout);
+		cFieldDisplay=new Composite(this,SWT.NONE);
+		cStructureDisplay=new Composite(this,SWT.NONE);
+		cInfoDisplay=new Composite(this,SWT.NONE);
+		stackLayout.topControl=cFieldDisplay;
+		cFieldDisplay.setLayout(new FillLayout());
+		form = tk.createScrolledForm(cFieldDisplay);
 		saveHandler = handler;
 		Composite body = form.getBody();
 		body.setLayout(new GridLayout());
