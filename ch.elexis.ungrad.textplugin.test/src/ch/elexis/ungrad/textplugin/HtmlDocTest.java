@@ -38,4 +38,13 @@ public class HtmlDocTest {
 		Object txm2=hDoc.insertTextAt(txm, "Inserted after", SWT.RIGHT);
 		FileTool.writeTextFile(new File("rsc","modified.html"), hDoc.text);
 	}
+	
+	@Test
+	public void convertPug() throws Exception{
+		File test=new File("rsc","a5.pug");
+		HtmlDoc doc=new HtmlDoc();
+		String pug=FileTool.readTextFile(test);
+		String html=doc.convertPug(pug);
+		FileTool.writeTextFile(new File("rsc","pug.html"), html);
+	}
 }

@@ -14,8 +14,7 @@
 
 package ch.elexis.ungrad.textplugin;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +39,6 @@ import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
-import de.neuland.pug4j.Pug4J;
 
 public class HtmlDoc {
 	final static String VERSION = "1.0.0";
@@ -220,6 +218,18 @@ public class HtmlDoc {
 		}
 	}
 	
+	private void setTemplate(String e) throws Exception{
+		template = e;
+		if (e.startsWith("doctype") || e.startsWith("extends")) {
+			text = convertPug(e);
+		} else {
+			text = e;
+		}
+		if (!text.contains("ElexisHtmlTemplate")) {
+			throw new Exception("Bad file format: ElexisHtmlTemplate not found");
+		}
+	}
+	
 	public boolean load(byte[] src, boolean asTemplate) throws Exception{
 		if (src[0] == '{') {
 			// It's an internal (processed) template or an existing document
@@ -228,8 +238,7 @@ public class HtmlDoc {
 				Map<String, Object> res =
 					mapper.readValue(src, new TypeReference<Map<String, Object>>() {});
 				
-				text = (String) res.get("template");
-				template = text;
+				setTemplate((String) res.get("template"));
 				prefilled = (Map<String, String>) res.get("prefilled");
 				postfilled = (Map<String, String>) res.get("postfilled");
 				outputFile = (String) res.get("filename");
@@ -237,16 +246,6 @@ public class HtmlDoc {
 				if (StringTool.isNothing(version)) {
 					throw new Exception("Bad file format");
 				}
-				/*
-				if (asTemplate) {
-					Pattern post = Pattern.compile("\\[\\w+\\]");
-					Matcher matcher = post.matcher(text);
-					while (matcher.find()) {
-						String found = matcher.group();
-						postfilled.put(found, "");
-					}
-				}
-				*/
 				return true;
 				
 			} catch (Exception ex) {
@@ -255,14 +254,7 @@ public class HtmlDoc {
 			}
 		} else {
 			// it's a newly imported HTML template file to process or a foreign file.
-			text = new String(src, "utf-8");
-			if(text.startsWith("doctype") || text.startsWith("extends")) {
-				String html=Pug4J.render(text, new HashMap());
-			}
-			template = text;
-			if (!text.contains("ElexisHtmlTemplate")) {
-				throw new Exception("Bad file format");
-			}
+			setTemplate(new String(src, "utf-8"));
 			Pattern post = Pattern.compile("\\[\\w+\\]");
 			Matcher matcher = post.matcher(text);
 			while (matcher.find()) {
@@ -271,6 +263,39 @@ public class HtmlDoc {
 			}
 			return true;
 		}
+	}
+	
+	// 
+	public String convertPug(String pug) throws Exception{
+		String dir = CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, ".")+File.separator+"x";
+		Process process = new ProcessBuilder("pug", "-p", dir).start();
+		InputStreamReader err = new InputStreamReader(process.getErrorStream());
+		BufferedReader burr = new BufferedReader(err);
+		InputStreamReader ir = new InputStreamReader(process.getInputStream());
+		BufferedReader br = new BufferedReader(ir);
+		OutputStreamWriter ow = new OutputStreamWriter(process.getOutputStream());
+		ow.write(pug);
+		ow.flush();
+		ow.close();
+		String line;
+		StringBuilder sb = new StringBuilder();
+		StringBuilder serr = new StringBuilder();
+		while ((line = br.readLine()) != null) {
+			sb.append(line);
+		}
+		while ((line = burr.readLine()) != null) {
+			serr.append(line);
+		}
+		String errmsg = serr.toString();
+		if (StringTool.isNothing(errmsg)) {
+			return sb.toString();
+		} else {
+			throw new Error(errmsg);
+		}
+	}
+	
+	public String getTemplate(){
+		return template;
 	}
 	
 }
