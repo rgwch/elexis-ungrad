@@ -25,7 +25,7 @@ public class HtmlDocTest {
 		for (Entry<String, String> e : hDoc.getPrefilled().entrySet()) {
 			System.out.println(e.getKey() + "-> " + e.getValue());
 		}
-		System.out.println(hDoc.text);
+		System.out.println(hDoc.template);
 	}
 	
 	@Test
@@ -36,7 +36,7 @@ public class HtmlDocTest {
 		hDoc.load(html.getBytes("utf-8"), true);
 		Object txm=hDoc.insertTextAt(10, 15, 20, 30, "Inserted", SWT.LEFT);
 		Object txm2=hDoc.insertTextAt(txm, "Inserted after", SWT.RIGHT);
-		FileTool.writeTextFile(new File("rsc","modified.html"), hDoc.text);
+		FileTool.writeTextFile(new File("rsc","modified.html"), hDoc.template);
 	}
 	
 	@Test

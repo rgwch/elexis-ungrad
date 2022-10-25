@@ -172,7 +172,7 @@ public class TextPluginImpl implements ITextPlugin {
 
 	@Override
 	public boolean clear() {
-		doc.text = "";
+		doc.template = "";
 		return true;
 	}
 

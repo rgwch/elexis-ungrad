@@ -14,26 +14,23 @@
 
 package ch.elexis.ungrad.textplugin;
 
-import java.io.*;
-import java.util.Formatter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.text.ReplaceCallback;
-import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.textplugin.preferences.PreferenceConstants;
 import ch.rgw.io.FileTool;
@@ -43,14 +40,13 @@ import ch.rgw.tools.TimeTool;
 
 public class HtmlDoc {
 	final static String VERSION = "1.0.0";
-	private String template;
+	String template;
 	private String outputFile;
-	String text;
 	private Map<String, String> prefilled = new HashMap<String, String>();
 	private Map<String, Object> postfilled = new HashMap<String, Object>();
 
 	@JsonAutoDetect(fieldVisibility = Visibility.ANY)
-	class Table{
+	class Table {
 		Table(String[][] f, int[] c) {
 			this.fields = f;
 			this.sizes = c;
@@ -58,6 +54,35 @@ public class HtmlDoc {
 
 		String[][] fields;
 		int[] sizes;
+	}
+
+	@JsonAutoDetect(fieldVisibility = Visibility.ANY)
+	class PositionedText {
+		public PositionedText(int x, int y, int w, int h, String text, int adjust) {
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+			this.text = text;
+			this.adjust = adjust;
+		}
+
+		int x, y, w, h;
+		String text;
+		int adjust;
+	}
+
+	@JsonAutoDetect(fieldVisibility = Visibility.ANY)
+	class DynPositionedText {
+		DynPositionedText(Object pos, String text, int adjust) {
+			this.pos = (String) pos;
+			this.text = text;
+			this.adjust = adjust;
+		}
+
+		String pos;
+		String text;
+		int adjust;
 	}
 
 	public Map<String, String> getPrefilled() {
@@ -93,28 +118,19 @@ public class HtmlDoc {
 	}
 
 	public void applyMatcher(String pattern, ReplaceCallback rcb) {
+		String text = template;
 		Pattern pat = Pattern.compile(pattern);
-		StringBuffer sb = new StringBuffer();
 		Matcher matcher = pat.matcher(text);
 		while (matcher.find()) {
 			String found = matcher.group();
 			String replacement = ((String) rcb.replace(found)).replaceAll("\\n", "<br />");
 			prefilled.put(found, replacement);
-			if (!replacement.startsWith("**ERROR")) {
-				matcher.appendReplacement(sb, replacement);
-			} else {
-				matcher.appendReplacement(sb, " ");
-			}
 		}
-		matcher.appendTail(sb);
-		text = sb.toString();
 	}
 
 	public boolean insertTable(String where, String[][] lines, int[] colSizes) {
 		Table table = new Table(lines, colSizes);
 		postfilled.put(where, table);
-		String html = createHtmlTable(table);
-		text = text.replace(where, html);
 		return true;
 	}
 
@@ -139,31 +155,34 @@ public class HtmlDoc {
 	}
 
 	public Object insertTextAt(int x, int y, int w, int h, String toInsert, int adjust) {
-		StringBuffer sb = new StringBuffer();
-		Formatter fmt = new Formatter(sb);
+		PositionedText fld = new PositionedText(x, y, w, h, toInsert, adjust);
 		String marker = StringTool.unique("textmarker");
-		sb.append("<div style=\"position:absolute;left:");
-		fmt.format("%dmm;top:%dmm;height:%dmm;width:%dmm;\" data-marker=\"%s\">", x, y, w, h, marker);
-		sb.append(toInsert).append("</div>");
-		Document parsed = Jsoup.parse(this.text);
-		Element body = parsed.body();
-		body.append(sb.toString());
-		this.text = parsed.outerHtml();
-		postfilled.put(marker, toInsert);
+		postfilled.put(marker, fld);
+		/*
+		 * StringBuffer sb = new StringBuffer(); Formatter fmt = new Formatter(sb);
+		 * sb.append("<div style=\"position:absolute;left:");
+		 * fmt.format("%dmm;top:%dmm;height:%dmm;width:%dmm;\" data-marker=\"%s\">", x,
+		 * y, w, h, marker); sb.append(toInsert).append("</div>"); Document parsed =
+		 * Jsoup.parse(this.text); Element body = parsed.body();
+		 * body.append(sb.toString()); this.text = parsed.outerHtml();
+		 */
 		return marker;
 	}
 
 	public Object insertTextAt(Object marker, String toInsert, int adjust) {
-		Document parsed = Jsoup.parse(this.text);
-		Elements els = parsed.getElementsByAttributeValue("data-marker", (String) marker);
-		Element el = els.first();
-		if (el != null) {
-			String newMarker = StringTool.unique("textmarker");
-			el.append("<div data-marker=\"" + newMarker + "\">" + toInsert + "</div");
-			this.text = parsed.outerHtml();
-			return newMarker;
-		}
-		return null;
+		DynPositionedText dpt = new DynPositionedText(marker, toInsert, adjust);
+		String newMarker = StringTool.unique("textmarker");
+		postfilled.put(newMarker, dpt);
+		return newMarker;
+
+		/*
+		 * Document parsed = Jsoup.parse(this.text); Elements els =
+		 * parsed.getElementsByAttributeValue("data-marker", (String) marker); Element
+		 * el = els.first(); if (el != null) { String newMarker =
+		 * StringTool.unique("textmarker"); el.append("<div data-marker=\"" + newMarker
+		 * + "\">" + toInsert + "</div"); this.text = parsed.outerHtml(); return
+		 * newMarker; } return null;
+		 */
 	}
 
 	/**
@@ -184,7 +203,7 @@ public class HtmlDoc {
 		} else {
 			String name = "Ausgang_";
 			Pattern pat = Pattern.compile("<title>(.+)</title>");
-			Matcher m = pat.matcher(text);
+			Matcher m = pat.matcher(template);
 			if (m.find()) {
 				String fn = m.group(1);
 				name = fn;
@@ -204,21 +223,20 @@ public class HtmlDoc {
 				throw new Exception("Could not create directory " + dir.getAbsolutePath());
 			}
 		}
+		String text = template;
+		if (text.startsWith("doctype") || text.startsWith("extends")) {
+			text = convertPug(template);
+		}
 
-		sb.setLength(0);
-		sb.append(File.separator).append(filename);
-		String basename = sb.toString();
-		applyMatcher("\\[\\w+\\]", new ReplaceCallback() {
-
-			@Override
-			public Object replace(String in) {
-				return getPostfilledFieldValue(in);
-			}
-		});
-		// text=text.replaceAll("[<>]", "");
-		File htmlFile = new File(dir, basename + ".html");
+		for (Entry<String, String> e : prefilled.entrySet()) {
+			text = text.replaceAll(e.getKey(), e.getValue());
+		}
+		for (Entry<String, Object> e : postfilled.entrySet()) {
+			text = text.replaceAll(e.getKey(), getPostfilledFieldValue(e.getKey()));
+		}
+		File htmlFile = new File(dir, filename + ".html");
 		FileTool.writeTextFile(htmlFile, text);
-		File pdfFile = new File(dir, basename + ".pdf");
+		File pdfFile = new File(dir, filename + ".pdf");
 		pdf.createPDF(htmlFile, pdfFile);
 		outputFile = pdfFile.getAbsolutePath();
 		return outputFile;
@@ -242,18 +260,6 @@ public class HtmlDoc {
 		}
 	}
 
-	private void setTemplate(String e) throws Exception {
-		template = e;
-		if (e.startsWith("doctype") || e.startsWith("extends")) {
-			text = convertPug(e);
-		} else {
-			text = e;
-		}
-		if (!text.contains("ElexisHtmlTemplate")) {
-			throw new Exception("Bad file format: ElexisHtmlTemplate not found");
-		}
-	}
-
 	public boolean load(byte[] src, boolean asTemplate) throws Exception {
 		if (src[0] == '{') {
 			// It's an internal (processed) template or an existing document
@@ -262,7 +268,11 @@ public class HtmlDoc {
 				Map<String, Object> res = mapper.readValue(src, new TypeReference<Map<String, Object>>() {
 				});
 
-				setTemplate((String) res.get("template"));
+				template = (String) res.get("template");
+				if (!template.contains("ElexisHtmlTemplate")) {
+					throw new Exception("Bad file format: ElexisHtmlTemplate not found");
+				}
+
 				prefilled = (Map<String, String>) res.get("prefilled");
 				postfilled = (Map<String, Object>) res.get("postfilled");
 				outputFile = (String) res.get("filename");
@@ -278,9 +288,9 @@ public class HtmlDoc {
 			}
 		} else {
 			// it's a newly imported HTML template file to process or a foreign file.
-			setTemplate(new String(src, "utf-8"));
+			template = (new String(src, "utf-8"));
 			Pattern post = Pattern.compile("\\[\\w+\\]");
-			Matcher matcher = post.matcher(text);
+			Matcher matcher = post.matcher(template);
 			while (matcher.find()) {
 				String found = matcher.group();
 				postfilled.put(found, "");
