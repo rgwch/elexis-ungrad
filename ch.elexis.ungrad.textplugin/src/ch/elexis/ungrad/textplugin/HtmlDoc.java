@@ -25,7 +25,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -46,29 +47,52 @@ public class HtmlDoc {
 	private String outputFile;
 	String text;
 	private Map<String, String> prefilled = new HashMap<String, String>();
-	private Map<String, String> postfilled = new HashMap<String, String>();
-	
-	public Map<String, String> getPrefilled(){
+	private Map<String, Object> postfilled = new HashMap<String, Object>();
+
+	@JsonAutoDetect(fieldVisibility = Visibility.ANY)
+	class Table{
+		Table(String[][] f, int[] c) {
+			this.fields = f;
+			this.sizes = c;
+		}
+
+		String[][] fields;
+		int[] sizes;
+	}
+
+	public Map<String, String> getPrefilled() {
 		return prefilled;
 	}
-	
-	public Map<String, String> getPostfilled(){
+
+	public Map<String, Object> getPostfilled() {
 		return postfilled;
 	}
-	
-	public void setPrefilled(String key, String value){
+
+	public void setPrefilled(String key, String value) {
 		prefilled.put(key, value);
 	}
-	
-	public void setPostfilled(String key, String value){
+
+	public void setPostfilled(String key, String value) {
 		postfilled.put(key, value);
 	}
-	
-	public String getFilename(){
+
+	public String getFilename() {
 		return outputFile;
 	}
-	
-	public void applyMatcher(String pattern, ReplaceCallback rcb){
+
+	private String getPostfilledFieldValue(String key) {
+		Object el = postfilled.get(key);
+		if (el != null) {
+			if (el instanceof Table) {
+				return createHtmlTable((Table) el);
+			} else if (el instanceof String) {
+				return (String) el;
+			}
+		}
+		return "";
+	}
+
+	public void applyMatcher(String pattern, ReplaceCallback rcb) {
 		Pattern pat = Pattern.compile(pattern);
 		StringBuffer sb = new StringBuffer();
 		Matcher matcher = pat.matcher(text);
@@ -85,25 +109,25 @@ public class HtmlDoc {
 		matcher.appendTail(sb);
 		text = sb.toString();
 	}
-	
-	public boolean insertTable(String where, String[][] lines, int[] colSizes){
-		String table = createTable(lines, colSizes);
-		text = text.replace(where, table);
+
+	public boolean insertTable(String where, String[][] lines, int[] colSizes) {
+		Table table = new Table(lines, colSizes);
 		postfilled.put(where, table);
+		String html = createHtmlTable(table);
+		text = text.replace(where, html);
 		return true;
 	}
-	
-	private String createTable(String[][] contents, int[] colSizes){
+
+	private String createHtmlTable(Table table) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<table>");
-		for (int i = 0; i < contents.length; i++) {
+		for (int i = 0; i < table.fields.length; i++) {
 			sb.append("<tr>");
-			for (int j = 0; j < contents[i].length; j++) {
-				String processed = contents[i][j].replaceAll("[\\n\\r]", "<br />");
-				if (colSizes != null && colSizes.length == contents[i].length) {
-					sb.append("<td style=\"width:" + colSizes[j] + "%\">").append(processed)
-						.append("</td>");
-					
+			for (int j = 0; j < table.fields[i].length; j++) {
+				String processed = table.fields[i][j].replaceAll("[\\n\\r]", "<br />");
+				if (table.sizes != null && table.sizes.length == table.fields[i].length) {
+					sb.append("<td style=\"width:" + table.sizes[j] + "%\">").append(processed).append("</td>");
+
 				} else {
 					sb.append("<td>").append(processed).append("</td>");
 				}
@@ -113,14 +137,13 @@ public class HtmlDoc {
 		sb.append("</table>");
 		return sb.toString();
 	}
-	
-	public Object insertTextAt(int x, int y, int w, int h, String toInsert, int adjust){
+
+	public Object insertTextAt(int x, int y, int w, int h, String toInsert, int adjust) {
 		StringBuffer sb = new StringBuffer();
 		Formatter fmt = new Formatter(sb);
 		String marker = StringTool.unique("textmarker");
 		sb.append("<div style=\"position:absolute;left:");
-		fmt.format("%dmm;top:%dmm;height:%dmm;width:%dmm;\" data-marker=\"%s\">", x, y, w, h,
-			marker);
+		fmt.format("%dmm;top:%dmm;height:%dmm;width:%dmm;\" data-marker=\"%s\">", x, y, w, h, marker);
 		sb.append(toInsert).append("</div>");
 		Document parsed = Jsoup.parse(this.text);
 		Element body = parsed.body();
@@ -129,8 +152,8 @@ public class HtmlDoc {
 		postfilled.put(marker, toInsert);
 		return marker;
 	}
-	
-	public Object insertTextAt(Object marker, String toInsert, int adjust){
+
+	public Object insertTextAt(Object marker, String toInsert, int adjust) {
 		Document parsed = Jsoup.parse(this.text);
 		Elements els = parsed.getElementsByAttributeValue("data-marker", (String) marker);
 		Element el = els.first();
@@ -142,15 +165,22 @@ public class HtmlDoc {
 		}
 		return null;
 	}
-	
-	public String doOutput(String printer) throws Exception{
+
+	/**
+	 * Create a snapshot of the current state and create an (unmodifiable)
+	 * pdf-output file based on that snapshot
+	 * 
+	 * @param printer The printer to output the document. If none is given or it
+	 *                doesn't exist: just create pdf
+	 * @return the fullpathname of the created pdf
+	 * @throws Exception
+	 */
+	public String doOutput(String printer) throws Exception {
 		Manager pdf = new Manager();
 		String filename = new TimeTool().toString(TimeTool.FULL_ISO);
-		String prefix =
-			(new TimeTool(prefilled.get("[Datum.heute]"))).toString(TimeTool.DATE_ISO) + "_";
+		String prefix = (new TimeTool(prefilled.get("[Datum.heute]"))).toString(TimeTool.DATE_ISO) + "_";
 		if (prefilled.containsKey("[Adressat.Name]")) {
-			filename = prefix + prefilled.get("[Adressat.Name]") + "_"
-				+ prefilled.get("[Adressat.Vorname]");
+			filename = prefix + prefilled.get("[Adressat.Name]") + "_" + prefilled.get("[Adressat.Vorname]");
 		} else {
 			String name = "Ausgang_";
 			Pattern pat = Pattern.compile("<title>(.+)</title>");
@@ -161,34 +191,28 @@ public class HtmlDoc {
 			}
 			filename = prefix + name;
 		}
-		String dirname = prefilled.get("[Patient.Name]") + "_" + prefilled.get("[Patient.Vorname]")
-			+ "_" + prefilled.get("[Patient.Geburtsdatum]");
-		
+		String dirname = prefilled.get("[Patient.Name]") + "_" + prefilled.get("[Patient.Vorname]") + "_"
+				+ prefilled.get("[Patient.Geburtsdatum]");
+
 		StringBuilder sb = new StringBuilder();
-		sb.append(CoreHub.localCfg.get(PreferenceConstants.DOCUMENT_BASE, ""))
-			.append(File.separator).append(dirname.substring(0, 1)).append(File.separator)
-			.append(dirname);
-		
+		sb.append(CoreHub.localCfg.get(PreferenceConstants.DOCUMENT_BASE, "")).append(File.separator)
+				.append(dirname.substring(0, 1)).append(File.separator).append(dirname);
+
 		File dir = new File(sb.toString());
 		if (!dir.exists()) {
 			if (!dir.mkdirs()) {
 				throw new Exception("Could not create directory " + dir.getAbsolutePath());
 			}
 		}
-		
+
 		sb.setLength(0);
 		sb.append(File.separator).append(filename);
 		String basename = sb.toString();
 		applyMatcher("\\[\\w+\\]", new ReplaceCallback() {
-			
+
 			@Override
-			public Object replace(String in){
-				String rep = postfilled.get(in);
-				if (StringTool.isNothing(rep)) {
-					return "";
-				} else {
-					return rep;
-				}
+			public Object replace(String in) {
+				return getPostfilledFieldValue(in);
 			}
 		});
 		// text=text.replaceAll("[<>]", "");
@@ -199,8 +223,8 @@ public class HtmlDoc {
 		outputFile = pdfFile.getAbsolutePath();
 		return outputFile;
 	}
-	
-	public byte[] storeToByteArray(){
+
+	public byte[] storeToByteArray() {
 		try {
 			Map<String, Object> out = new HashMap<String, Object>();
 			out.put("template", template);
@@ -217,8 +241,8 @@ public class HtmlDoc {
 			return null;
 		}
 	}
-	
-	private void setTemplate(String e) throws Exception{
+
+	private void setTemplate(String e) throws Exception {
 		template = e;
 		if (e.startsWith("doctype") || e.startsWith("extends")) {
 			text = convertPug(e);
@@ -229,25 +253,25 @@ public class HtmlDoc {
 			throw new Exception("Bad file format: ElexisHtmlTemplate not found");
 		}
 	}
-	
-	public boolean load(byte[] src, boolean asTemplate) throws Exception{
+
+	public boolean load(byte[] src, boolean asTemplate) throws Exception {
 		if (src[0] == '{') {
 			// It's an internal (processed) template or an existing document
 			ObjectMapper mapper = new ObjectMapper();
 			try {
-				Map<String, Object> res =
-					mapper.readValue(src, new TypeReference<Map<String, Object>>() {});
-				
+				Map<String, Object> res = mapper.readValue(src, new TypeReference<Map<String, Object>>() {
+				});
+
 				setTemplate((String) res.get("template"));
 				prefilled = (Map<String, String>) res.get("prefilled");
-				postfilled = (Map<String, String>) res.get("postfilled");
+				postfilled = (Map<String, Object>) res.get("postfilled");
 				outputFile = (String) res.get("filename");
 				String version = (String) res.get("HtmlTemplatorVersion");
 				if (StringTool.isNothing(version)) {
 					throw new Exception("Bad file format");
 				}
 				return true;
-				
+
 			} catch (Exception ex) {
 				ExHandler.handle(ex);
 				return false;
@@ -264,10 +288,10 @@ public class HtmlDoc {
 			return true;
 		}
 	}
-	
-	// 
-	public String convertPug(String pug) throws Exception{
-		String dir = CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, ".")+File.separator+"x";
+
+	//
+	public String convertPug(String pug) throws Exception {
+		String dir = CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, ".") + File.separator + "x";
 		Process process = new ProcessBuilder("pug", "-p", dir).start();
 		InputStreamReader err = new InputStreamReader(process.getErrorStream());
 		BufferedReader burr = new BufferedReader(err);
@@ -293,9 +317,9 @@ public class HtmlDoc {
 			throw new Error(errmsg);
 		}
 	}
-	
-	public String getTemplate(){
+
+	public String getTemplate() {
 		return template;
 	}
-	
+
 }

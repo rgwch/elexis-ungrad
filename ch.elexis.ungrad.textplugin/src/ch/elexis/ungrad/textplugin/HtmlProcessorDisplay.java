@@ -43,6 +43,7 @@ import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.text.ITextPlugin.ICallback;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.textplugin.HtmlDoc.Table;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 
@@ -55,15 +56,14 @@ public class HtmlProcessorDisplay extends Composite {
 	Text tTemplate, tStructure, tInfo;
 	boolean bSaveOnFocusLost = true;
 	FocusSaver fs = new FocusSaver();
-	private IAction printAction, directOutputAction, fieldDisplayAction, structureDisplayAction,
-			infoDisplayAction;
+	private IAction printAction, directOutputAction, fieldDisplayAction, structureDisplayAction, infoDisplayAction;
 	private ExpandableComposite ecDefaults;
 	private ListViewer lvDefaults;
 	private StackLayout stackLayout = new StackLayout();
-	
+
 	private Composite cFrame, cFieldDisplay, cStructureDisplay, cInfoDisplay;
-	
-	public HtmlProcessorDisplay(Composite parent, ICallback handler){
+
+	public HtmlProcessorDisplay(Composite parent, ICallback handler) {
 		super(parent, SWT.NONE);
 		if (parent.getLayout() instanceof GridLayout) {
 			setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
@@ -83,10 +83,10 @@ public class HtmlProcessorDisplay extends Composite {
 		cFieldDisplay = new Composite(cFrame, SWT.NONE);
 		cStructureDisplay = new Composite(cFrame, SWT.NONE);
 		cStructureDisplay.setLayout(new FillLayout());
-		tStructure=new Text(cStructureDisplay,SWT.MULTI);
+		tStructure = new Text(cStructureDisplay, SWT.MULTI);
 		cInfoDisplay = new Composite(cFrame, SWT.NONE);
 		cInfoDisplay.setLayout(new FillLayout());
-		tInfo= new Text(cInfoDisplay,SWT.MULTI);
+		tInfo = new Text(cInfoDisplay, SWT.MULTI);
 		stackLayout.topControl = cFieldDisplay;
 		cFieldDisplay.setLayout(new FillLayout());
 		form = tk.createScrolledForm(cFieldDisplay);
@@ -98,7 +98,7 @@ public class HtmlProcessorDisplay extends Composite {
 		ecDefaults = new ExpandableComposite(body, SWT.NONE);
 		ecDefaults.setText("Vorgabefelder");
 		ecDefaults.addExpansionListener(new ExpansionAdapter() {
-			public void expansionStateChanged(ExpansionEvent e){
+			public void expansionStateChanged(ExpansionEvent e) {
 				form.reflow(true);
 			}
 		});
@@ -109,10 +109,10 @@ public class HtmlProcessorDisplay extends Composite {
 		cAdditional = new Composite(body, SWT.NONE);
 		cAdditional.setLayoutData(SWTHelper.getFillGridData());
 		cAdditional.setLayout(new GridLayout(2, false));
-		
+
 	}
-	
-	public void setDocument(HtmlDoc doc){
+
+	public void setDocument(HtmlDoc doc) {
 		this.doc = doc;
 		if (doc.getFilename() != null) {
 			asyncRunViewer(doc.getFilename());
@@ -135,7 +135,7 @@ public class HtmlProcessorDisplay extends Composite {
 			text.setText(e.getValue());
 			text.setData("field", e.getKey());
 		}
-		for (Entry<String, String> e : doc.getPostfilled().entrySet()) {
+		for (Entry<String, Object> e : doc.getPostfilled().entrySet()) {
 			Label lbl = new Label(cAdditional, SWT.NONE);
 			lbl.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 			lbl.setText(e.getKey().substring(1, e.getKey().length() - 1) + ":");
@@ -143,24 +143,31 @@ public class HtmlProcessorDisplay extends Composite {
 			text.setLayoutData(SWTHelper.getFillGridData(2, true, 2, true));
 			text.addFocusListener(fs);
 			text.setData("field", e.getKey());
-			text.setText(createDisplay(e.getValue()));
+			text.setText(createStringValue(e.getValue()));
 		}
 		cFields.layout();
 		tStructure.setText(doc.getTemplate());
 	}
-	
-	private String createDisplay(String in){
+
+	private String createStringValue(Object in) {
+		if (in instanceof Table) {
+			return "TABLE";
+		} else {
+			return (String) in;
+		}
+	}
+
+	private String createDisplay(String in) {
 		if (in.startsWith("<table>")) {
-			String out =
-				in.replaceAll("</tr>", "\\r").replaceAll("</td><td>", StringConstants.SPACE)
+			String out = in.replaceAll("</tr>", "\\r").replaceAll("</td><td>", StringConstants.SPACE)
 					.replaceAll("<br />", "\\r").replaceAll("<.+?>", "");
 			return out;
 		} else {
 			return in;
 		}
 	}
-	
-	private void collect(){
+
+	private void collect() {
 		for (Control c : cFields.getChildren()) {
 			Object field = c.getData("field");
 			if (field != null) {
@@ -170,11 +177,14 @@ public class HtmlProcessorDisplay extends Composite {
 		for (Control c : cAdditional.getChildren()) {
 			Object field = c.getData("field");
 			if (field != null) {
-				doc.setPostfilled((String) field, ((Text) c).getText());
+				Object previous = doc.getPostfilled().get(field);
+				if (previous instanceof String) {
+					doc.setPostfilled((String) field, ((Text) c).getText());
+				} // TODO; else if instanceof Table
 			}
 		}
 	}
-	
+
 	private void makeActions() {
 		printAction = new Action("Ausgeben") {
 			{
@@ -186,8 +196,8 @@ public class HtmlProcessorDisplay extends Composite {
 			public void run() {
 				save();
 				try {
-					String outfile=doc.doOutput("");
-					if(outfile!=null) {
+					String outfile = doc.doOutput("");
+					if (outfile != null) {
 						asyncRunViewer(outfile);
 					}
 				} catch (Exception e) {
@@ -196,50 +206,53 @@ public class HtmlProcessorDisplay extends Composite {
 				}
 			}
 		};
-		fieldDisplayAction=new Action("Feldanzeige") {
+		fieldDisplayAction = new Action("Feldanzeige") {
 			{
 				// setImageDescriptor(Images.IMG_CARDS.getImageDescriptor());
 				setText("F");
 			}
+
 			@Override
 			public void run() {
-				stackLayout.topControl=cFieldDisplay;
+				stackLayout.topControl = cFieldDisplay;
 				cFrame.layout();
 			}
 		};
-		structureDisplayAction=new Action("Struktur") {
+		structureDisplayAction = new Action("Struktur") {
 			{
 				// setImageDescriptor(Images.IMG_CARDS.getImageDescriptor());
 				setText("S");
 			}
+
 			@Override
 			public void run() {
-				stackLayout.topControl=cStructureDisplay;
+				stackLayout.topControl = cStructureDisplay;
 				cFrame.layout();
 			}
 		};
-		infoDisplayAction=new Action("Informationen") {
+		infoDisplayAction = new Action("Informationen") {
 			{
 				// setImageDescriptor(Images.IMG_CARDS.getImageDescriptor());
 				setText("I");
 			}
+
 			@Override
 			public void run() {
-				stackLayout.topControl=cInfoDisplay;
+				stackLayout.topControl = cInfoDisplay;
 				cFrame.layout();
-				
+
 			}
 		};
 	}
-	
-	private void asyncRunViewer(String filepath){
+
+	private void asyncRunViewer(String filepath) {
 		Display.getDefault().asyncExec(new Runnable() {
-			
+
 			@Override
-			public void run(){
+			public void run() {
 				try {
 					String ext = FileTool.getExtension(filepath); // $NON-NLS-1$
-					
+
 					Program proggie = Program.findProgram(ext);
 					if (proggie != null) {
 						proggie.execute(filepath);
@@ -248,31 +261,31 @@ public class HtmlProcessorDisplay extends Composite {
 							Runtime.getRuntime().exec(filepath);
 						}
 					}
-					
+
 				} catch (Exception ex) {
 					ExHandler.handle(ex);
 					SWTHelper.showError("Could not create or show file", ex.getMessage());
 				}
 			}
-			
+
 		});
-		
+
 	}
-	
-	public void save(){
+
+	public void save() {
 		collect();
 		saveHandler.save();
 	}
-	
+
 	class FocusSaver extends FocusAdapter {
 		@Override
-		public void focusLost(FocusEvent e){
+		public void focusLost(FocusEvent e) {
 			if (bSaveOnFocusLost) {
 				// proc.getProcessor().doOutput(proc);
 				save();
 			}
 		}
-		
+
 	}
-	
+
 }

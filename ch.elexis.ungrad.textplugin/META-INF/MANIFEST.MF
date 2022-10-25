@@ -18,3 +18,4 @@ Require-Bundle: ch.elexis.core.ui;bundle-version="3.2.0",
  ch.elexis.core.ui.icons;bundle-version="3.3.0"
 Bundle-ClassPath: lib/jsoup-1.15.3.jar,
  .
+Import-Package: com.fasterxml.jackson.annotation
