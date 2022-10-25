@@ -124,7 +124,9 @@ public class HtmlDoc {
 		while (matcher.find()) {
 			String found = matcher.group();
 			String replacement = ((String) rcb.replace(found)).replaceAll("\\n", "<br />");
-			prefilled.put(found, replacement);
+			if (!replacement.startsWith("??")) {
+				prefilled.put(found, replacement);
+			}
 		}
 	}
 
@@ -196,6 +198,11 @@ public class HtmlDoc {
 	 */
 	public String doOutput(String printer) throws Exception {
 		Manager pdf = new Manager();
+		String text = template;
+		if (text.startsWith("doctype") || text.startsWith("extends")) {
+			text = convertPug(template);
+		}
+
 		String filename = new TimeTool().toString(TimeTool.FULL_ISO);
 		String prefix = (new TimeTool(prefilled.get("[Datum.heute]"))).toString(TimeTool.DATE_ISO) + "_";
 		if (prefilled.containsKey("[Adressat.Name]")) {
@@ -203,7 +210,7 @@ public class HtmlDoc {
 		} else {
 			String name = "Ausgang_";
 			Pattern pat = Pattern.compile("<title>(.+)</title>");
-			Matcher m = pat.matcher(template);
+			Matcher m = pat.matcher(text);
 			if (m.find()) {
 				String fn = m.group(1);
 				name = fn;
@@ -223,16 +230,11 @@ public class HtmlDoc {
 				throw new Exception("Could not create directory " + dir.getAbsolutePath());
 			}
 		}
-		String text = template;
-		if (text.startsWith("doctype") || text.startsWith("extends")) {
-			text = convertPug(template);
-		}
-
 		for (Entry<String, String> e : prefilled.entrySet()) {
-			text = text.replaceAll(e.getKey(), e.getValue());
+			text = text.replace(e.getKey(), e.getValue());
 		}
 		for (Entry<String, Object> e : postfilled.entrySet()) {
-			text = text.replaceAll(e.getKey(), getPostfilledFieldValue(e.getKey()));
+			text = text.replace(e.getKey(), getPostfilledFieldValue(e.getKey()));
 		}
 		File htmlFile = new File(dir, filename + ".html");
 		FileTool.writeTextFile(htmlFile, text);
@@ -260,6 +262,17 @@ public class HtmlDoc {
 		}
 	}
 
+	private String checkTemplate(String e) throws Exception{
+		String ret=e;
+		if (e.startsWith("doctype") || e.startsWith("extends")) {
+			ret = convertPug(e);
+		}
+		if (!ret.contains("ElexisHtmlTemplate")) {
+			throw new Exception("Bad file format: ElexisHtmlTemplate not found");
+		}
+		return ret;
+	}
+	
 	public boolean load(byte[] src, boolean asTemplate) throws Exception {
 		if (src[0] == '{') {
 			// It's an internal (processed) template or an existing document
@@ -269,10 +282,7 @@ public class HtmlDoc {
 				});
 
 				template = (String) res.get("template");
-				if (!template.contains("ElexisHtmlTemplate")) {
-					throw new Exception("Bad file format: ElexisHtmlTemplate not found");
-				}
-
+			
 				prefilled = (Map<String, String>) res.get("prefilled");
 				postfilled = (Map<String, Object>) res.get("postfilled");
 				outputFile = (String) res.get("filename");
@@ -289,8 +299,9 @@ public class HtmlDoc {
 		} else {
 			// it's a newly imported HTML template file to process or a foreign file.
 			template = (new String(src, "utf-8"));
+			String text=checkTemplate(template);
 			Pattern post = Pattern.compile("\\[\\w+\\]");
-			Matcher matcher = post.matcher(template);
+			Matcher matcher = post.matcher(text);
 			while (matcher.find()) {
 				String found = matcher.group();
 				postfilled.put(found, "");
