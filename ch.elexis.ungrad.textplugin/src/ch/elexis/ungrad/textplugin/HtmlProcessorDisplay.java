@@ -248,6 +248,10 @@ public class HtmlProcessorDisplay extends Composite {
 		};
 	}
 
+	public void openUnknown(String filepath) {
+		asyncRunViewer(filepath);
+	}
+	
 	private void asyncRunViewer(String filepath) {
 		Display.getDefault().asyncExec(new Runnable() {
 

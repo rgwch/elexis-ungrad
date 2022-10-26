@@ -14,6 +14,7 @@
 
 package ch.elexis.ungrad.textplugin;
 
+import java.io.File;
 import java.io.InputStream;
 
 import org.eclipse.core.runtime.CoreException;
@@ -25,59 +26,59 @@ import ch.elexis.core.ui.text.ITextPlugin;
 import ch.rgw.tools.ExHandler;
 
 public class TextPluginImpl implements ITextPlugin {
-
+	
 	private PageFormat format = PageFormat.A4;
 	private Parameter param;
 	private HtmlDoc doc = new HtmlDoc();
 	private HtmlProcessorDisplay display;
-
+	
 	@Override
-	public PageFormat getFormat() {
+	public PageFormat getFormat(){
 		return format;
 	}
-
+	
 	@Override
-	public void setFormat(PageFormat f) {
+	public void setFormat(PageFormat f){
 		format = f;
 	}
-
+	
 	@Override
-	public void setParameter(Parameter parameter) {
+	public void setParameter(Parameter parameter){
 		param = parameter;
 	}
-
+	
 	@Override
-	public void setFocus() {
+	public void setFocus(){
 		// TODO Auto-generated method stub
-
+		
 	}
-
+	
 	@Override
-	public void dispose() {
+	public void dispose(){
 		// TODO Auto-generated method stub
-
+		
 	}
-
+	
 	@Override
-	public void showMenu(boolean b) {
+	public void showMenu(boolean b){
 		// TODO Auto-generated method stub
-
+		
 	}
-
+	
 	@Override
-	public void showToolbar(boolean b) {
+	public void showToolbar(boolean b){
 		// TODO Auto-generated method stub
-
+		
 	}
-
+	
 	@Override
-	public void setSaveOnFocusLost(boolean bSave) {
+	public void setSaveOnFocusLost(boolean bSave){
 		// TODO Auto-generated method stub
-
+		
 	}
-
+	
 	@Override
-	public boolean createEmptyDocument() {
+	public boolean createEmptyDocument(){
 		try {
 			// doc.loadTemplate("frame.html", "");
 			return true;
@@ -86,21 +87,28 @@ public class TextPluginImpl implements ITextPlugin {
 			return false;
 		}
 	}
-
+	
 	@Override
-	public boolean loadFromByteArray(byte[] bs, boolean asTemplate) {
+	public boolean loadFromByteArray(byte[] bs, boolean asTemplate){
 		try {
 			doc.load(bs, asTemplate);
 			display.setDocument(doc);
 			return true;
 		} catch (Exception e) {
 			ExHandler.handle(e);
+			try {
+				File file = File.createTempFile("elx", "html");
+				file.deleteOnExit();
+				display.openUnknown(file.getAbsolutePath());
+			} catch (Exception ex) {
+				ExHandler.handle(ex);
+			}
 			return false;
 		}
 	}
-
+	
 	@Override
-	public boolean loadFromStream(InputStream is, boolean asTemplate) {
+	public boolean loadFromStream(InputStream is, boolean asTemplate){
 		byte[] daten = null;
 		try {
 			daten = new byte[is.available()];
@@ -110,51 +118,52 @@ public class TextPluginImpl implements ITextPlugin {
 		}
 		return loadFromByteArray(daten, asTemplate);
 	}
-
+	
 	@Override
-	public boolean findOrReplace(String pattern, ReplaceCallback cb) {
+	public boolean findOrReplace(String pattern, ReplaceCallback cb){
 		doc.applyMatcher(pattern, cb);
 		display.setDocument(doc);
 		return true;
 	}
-
+	
 	@Override
-	public byte[] storeToByteArray() {
+	public byte[] storeToByteArray(){
 		return doc.storeToByteArray();
 	}
-
+	
 	@Override
-	public boolean insertTable(String place, int properties, String[][] contents, int[] columnSizes) {
+	public boolean insertTable(String place, int properties, String[][] contents,
+		int[] columnSizes){
 		boolean result = doc.insertTable(place, contents, columnSizes);
 		display.setDocument(doc);
 		return result;
 	}
-
+	
 	@Override
-	public Object insertTextAt(int x, int y, int w, int h, String text, int adjust) {
+	public Object insertTextAt(int x, int y, int w, int h, String text, int adjust){
 		Object result = doc.insertTextAt(x, y, w, h, text, adjust);
 		display.setDocument(doc);
 		return result;
 	}
-
+	
 	@Override
-	public boolean setFont(String name, int style, float size) {
+	public boolean setFont(String name, int style, float size){
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
 	@Override
-	public boolean setStyle(int style) {
+	public boolean setStyle(int style){
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
 	@Override
-	public Object insertText(String marke, String text, int adjust) {
+	public Object insertText(String marke, String text, int adjust){
 		doc.applyMatcher(marke, new ReplaceCallback() {
-
+			
 			@Override
-			public Object replace(String in) {
+			public Object replace(String in){
 				return text;
 			}
 		});
@@ -162,23 +171,23 @@ public class TextPluginImpl implements ITextPlugin {
 		;
 		return text;
 	}
-
+	
 	@Override
-	public Object insertText(Object pos, String text, int adjust) {
+	public Object insertText(Object pos, String text, int adjust){
 		Object result = doc.insertTextAt(pos, text, adjust);
 		display.setDocument(doc);
 		return result;
-	}	
-
+	}
+	
 	@Override
-	public boolean clear() {
+	public boolean clear(){
 		display.clear();
 		doc.clear();
 		return true;
 	}
-
+	
 	@Override
-	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished) {
+	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished){
 		try {
 			doc.doOutput(toPrinter);
 			return true;
@@ -188,34 +197,35 @@ public class TextPluginImpl implements ITextPlugin {
 		}
 		return false;
 	}
-
+	
 	@Override
-	public String getMimeType() {
+	public String getMimeType(){
 		return "text/html";
 	}
-
+	
 	@Override
-	public boolean isDirectOutput() {
+	public boolean isDirectOutput(){
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
 	@Override
-	public void initTemplatePrintSettings(String template) {
+	public void initTemplatePrintSettings(String template){
 		// TODO Auto-generated method stub
-
+		
 	}
-
+	
 	@Override
-	public Composite createContainer(Composite parent, ICallback handler) {
+	public Composite createContainer(Composite parent, ICallback handler){
 		display = new HtmlProcessorDisplay(parent, handler);
 		return display;
 	}
-
+	
 	@Override
-	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2) throws CoreException {
+	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2)
+		throws CoreException{
 		// TODO Auto-generated method stub
-
+		
 	}
-
+	
 }
