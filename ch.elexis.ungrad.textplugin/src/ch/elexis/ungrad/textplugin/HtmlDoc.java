@@ -39,7 +39,7 @@ import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 public class HtmlDoc {
-	final static String VERSION = "1.0.0";
+	final static String VERSION = "1.0.1";
 	String template;
 	private String outputFile;
 	private Map<String, String> prefilled = new HashMap<String, String>();
@@ -198,10 +198,7 @@ public class HtmlDoc {
 	 */
 	public String doOutput(String printer) throws Exception {
 		Manager pdf = new Manager();
-		String text = template;
-		if (text.startsWith("doctype") || text.startsWith("extends")) {
-			text = convertPug(template);
-		}
+		String text = checkTemplate(template);
 
 		String filename = new TimeTool().toString(TimeTool.FULL_ISO);
 		String prefix = (new TimeTool(prefilled.get("[Datum.heute]"))).toString(TimeTool.DATE_ISO) + "_";
