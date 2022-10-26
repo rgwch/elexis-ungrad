@@ -81,7 +81,7 @@ public class HtmlProcessorDisplay extends Composite {
 		cFrame.setLayoutData(SWTHelper.getFillGridData());
 		cFrame.setLayout(stackLayout);
 		cFieldDisplay = new Composite(cFrame, SWT.NONE);
-		cStructureDisplay = new Composite(cFrame, SWT.NONE);
+		cStructureDisplay = new Composite(cFrame, SWT.V_SCROLL);
 		cStructureDisplay.setLayout(new FillLayout());
 		tStructure = new Text(cStructureDisplay, SWT.MULTI);
 		cInfoDisplay = new Composite(cFrame, SWT.NONE);
