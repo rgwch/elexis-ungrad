@@ -2,11 +2,11 @@ extends a5
 block content
   .leftrow 
     span(style="font-size:16px;font-weight:bold;") [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]
-    br
+    br/
     span [Mandant.TarmedSpezialität]
-    br
+    br/
     span [Mandant.Strasse]
-    br
+    br/
     span [Mandant.Plz] [Mandant.Ort]
   .rightrow 
     table.header 
@@ -22,7 +22,7 @@ block content
       tr 
         td GLN: 
         td [Mandant.EAN] 
-  .payload 
+  .payload(data-doctype="Rezept")
     span Rp.
     .concern [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]         
     .contents [Rezeptzeilen][zusatz]

@@ -111,12 +111,7 @@ public class HtmlProcessorDisplay extends Composite {
 		cAdditional.setLayout(new GridLayout(2, false));
 
 	}
-
-	public void setDocument(HtmlDoc doc) {
-		this.doc = doc;
-		if (doc.getFilename() != null) {
-			asyncRunViewer(doc.getFilename());
-		}
+	public void clear() {
 		for (Control c : cFields.getChildren()) {
 			c.removeFocusListener(fs);
 			c.dispose();
@@ -125,6 +120,14 @@ public class HtmlProcessorDisplay extends Composite {
 			c.removeFocusListener(fs);
 			c.dispose();
 		}
+	}
+
+	public void setDocument(HtmlDoc doc) {
+		this.doc = doc;
+		if (doc.getFilename() != null) {
+			asyncRunViewer(doc.getFilename());
+		}
+		clear();
 		for (Entry<String, String> e : doc.getPrefilled().entrySet()) {
 			Label lbl = new Label(cFields, SWT.NONE);
 			lbl.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));

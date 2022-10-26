@@ -24,6 +24,11 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -44,21 +49,21 @@ public class HtmlDoc {
 	private String outputFile;
 	private Map<String, String> prefilled = new HashMap<String, String>();
 	private Map<String, Object> postfilled = new HashMap<String, Object>();
-
+	
 	@JsonAutoDetect(fieldVisibility = Visibility.ANY)
 	class Table {
-		Table(String[][] f, int[] c) {
+		Table(String[][] f, int[] c){
 			this.fields = f;
 			this.sizes = c;
 		}
-
+		
 		String[][] fields;
 		int[] sizes;
 	}
-
+	
 	@JsonAutoDetect(fieldVisibility = Visibility.ANY)
 	class PositionedText {
-		public PositionedText(int x, int y, int w, int h, String text, int adjust) {
+		public PositionedText(int x, int y, int w, int h, String text, int adjust){
 			this.x = x;
 			this.y = y;
 			this.w = w;
@@ -66,46 +71,52 @@ public class HtmlDoc {
 			this.text = text;
 			this.adjust = adjust;
 		}
-
+		
 		int x, y, w, h;
 		String text;
 		int adjust;
 	}
-
+	
 	@JsonAutoDetect(fieldVisibility = Visibility.ANY)
 	class DynPositionedText {
-		DynPositionedText(Object pos, String text, int adjust) {
+		DynPositionedText(Object pos, String text, int adjust){
 			this.pos = (String) pos;
 			this.text = text;
 			this.adjust = adjust;
 		}
-
+		
 		String pos;
 		String text;
 		int adjust;
 	}
-
-	public Map<String, String> getPrefilled() {
+	
+	public Map<String, String> getPrefilled(){
 		return prefilled;
 	}
-
-	public Map<String, Object> getPostfilled() {
+	
+	public Map<String, Object> getPostfilled(){
 		return postfilled;
 	}
-
-	public void setPrefilled(String key, String value) {
+	
+	public void setPrefilled(String key, String value){
 		prefilled.put(key, value);
 	}
-
-	public void setPostfilled(String key, String value) {
+	
+	public void setPostfilled(String key, String value){
 		postfilled.put(key, value);
 	}
-
-	public String getFilename() {
+	
+	public String getFilename(){
 		return outputFile;
 	}
-
-	private String getPostfilledFieldValue(String key) {
+	
+	public void clear() {
+		template="";
+		prefilled.clear();
+		postfilled.clear();
+		outputFile=null;
+	}
+	private String getPostfilledFieldValue(String key){
 		Object el = postfilled.get(key);
 		if (el != null) {
 			if (el instanceof Table) {
@@ -116,8 +127,8 @@ public class HtmlDoc {
 		}
 		return "";
 	}
-
-	public void applyMatcher(String pattern, ReplaceCallback rcb) {
+	
+	public void applyMatcher(String pattern, ReplaceCallback rcb){
 		String text = template;
 		Pattern pat = Pattern.compile(pattern);
 		Matcher matcher = pat.matcher(text);
@@ -129,14 +140,14 @@ public class HtmlDoc {
 			}
 		}
 	}
-
-	public boolean insertTable(String where, String[][] lines, int[] colSizes) {
+	
+	public boolean insertTable(String where, String[][] lines, int[] colSizes){
 		Table table = new Table(lines, colSizes);
 		postfilled.put(where, table);
 		return true;
 	}
-
-	private String createHtmlTable(Table table) {
+	
+	private String createHtmlTable(Table table){
 		StringBuilder sb = new StringBuilder();
 		sb.append("<table>");
 		for (int i = 0; i < table.fields.length; i++) {
@@ -144,8 +155,9 @@ public class HtmlDoc {
 			for (int j = 0; j < table.fields[i].length; j++) {
 				String processed = table.fields[i][j].replaceAll("[\\n\\r]", "<br />");
 				if (table.sizes != null && table.sizes.length == table.fields[i].length) {
-					sb.append("<td style=\"width:" + table.sizes[j] + "%\">").append(processed).append("</td>");
-
+					sb.append("<td style=\"width:" + table.sizes[j] + "%\">").append(processed)
+						.append("</td>");
+					
 				} else {
 					sb.append("<td>").append(processed).append("</td>");
 				}
@@ -155,8 +167,8 @@ public class HtmlDoc {
 		sb.append("</table>");
 		return sb.toString();
 	}
-
-	public Object insertTextAt(int x, int y, int w, int h, String toInsert, int adjust) {
+	
+	public Object insertTextAt(int x, int y, int w, int h, String toInsert, int adjust){
 		PositionedText fld = new PositionedText(x, y, w, h, toInsert, adjust);
 		String marker = StringTool.unique("textmarker");
 		postfilled.put(marker, fld);
@@ -170,13 +182,13 @@ public class HtmlDoc {
 		 */
 		return marker;
 	}
-
-	public Object insertTextAt(Object marker, String toInsert, int adjust) {
+	
+	public Object insertTextAt(Object marker, String toInsert, int adjust){
 		DynPositionedText dpt = new DynPositionedText(marker, toInsert, adjust);
 		String newMarker = StringTool.unique("textmarker");
 		postfilled.put(newMarker, dpt);
 		return newMarker;
-
+		
 		/*
 		 * Document parsed = Jsoup.parse(this.text); Elements els =
 		 * parsed.getElementsByAttributeValue("data-marker", (String) marker); Element
@@ -186,24 +198,37 @@ public class HtmlDoc {
 		 * newMarker; } return null;
 		 */
 	}
-
+	
 	/**
-	 * Create a snapshot of the current state and create an (unmodifiable)
-	 * pdf-output file based on that snapshot
+	 * Create a snapshot of the current state and create an (unmodifiable) pdf-output file based on
+	 * that snapshot
 	 * 
-	 * @param printer The printer to output the document. If none is given or it
-	 *                doesn't exist: just create pdf
+	 * @param printer
+	 *            The printer to output the document. If none is given or it doesn't exist: just
+	 *            create pdf
 	 * @return the fullpathname of the created pdf
 	 * @throws Exception
 	 */
-	public String doOutput(String printer) throws Exception {
+	public String doOutput(String printer) throws Exception{
 		Manager pdf = new Manager();
-		String text = checkTemplate(template);
-
+		String text = template;
+		Document jDoc = Jsoup.parse(text);
+		Elements els = jDoc.getElementsByAttribute("data-doctype");
+		Element payload = els.first();
+		if (payload != null) {
+			String doctype = payload.attr("data-doctype");
+			if (!StringTool.isNothing(doctype)) {
+				text = text.replace("Doctype", doctype);
+				text = text.replace("Doctitle", doctype);
+			}
+		}
+		
 		String filename = new TimeTool().toString(TimeTool.FULL_ISO);
-		String prefix = (new TimeTool(prefilled.get("[Datum.heute]"))).toString(TimeTool.DATE_ISO) + "_";
+		String prefix =
+			(new TimeTool(prefilled.get("[Datum.heute]"))).toString(TimeTool.DATE_ISO) + "_";
 		if (prefilled.containsKey("[Adressat.Name]")) {
-			filename = prefix + prefilled.get("[Adressat.Name]") + "_" + prefilled.get("[Adressat.Vorname]");
+			filename = prefix + prefilled.get("[Adressat.Name]") + "_"
+				+ prefilled.get("[Adressat.Vorname]");
 		} else {
 			String name = "Ausgang_";
 			Pattern pat = Pattern.compile("<title>(.+)</title>");
@@ -214,13 +239,14 @@ public class HtmlDoc {
 			}
 			filename = prefix + name;
 		}
-		String dirname = prefilled.get("[Patient.Name]") + "_" + prefilled.get("[Patient.Vorname]") + "_"
-				+ prefilled.get("[Patient.Geburtsdatum]");
-
+		String dirname = prefilled.get("[Patient.Name]") + "_" + prefilled.get("[Patient.Vorname]")
+			+ "_" + prefilled.get("[Patient.Geburtsdatum]");
+		
 		StringBuilder sb = new StringBuilder();
-		sb.append(CoreHub.localCfg.get(PreferenceConstants.DOCUMENT_BASE, "")).append(File.separator)
-				.append(dirname.substring(0, 1)).append(File.separator).append(dirname);
-
+		sb.append(CoreHub.localCfg.get(PreferenceConstants.DOCUMENT_BASE, ""))
+			.append(File.separator).append(dirname.substring(0, 1)).append(File.separator)
+			.append(dirname);
+		
 		File dir = new File(sb.toString());
 		if (!dir.exists()) {
 			if (!dir.mkdirs()) {
@@ -240,8 +266,8 @@ public class HtmlDoc {
 		outputFile = pdfFile.getAbsolutePath();
 		return outputFile;
 	}
-
-	public byte[] storeToByteArray() {
+	
+	public byte[] storeToByteArray(){
 		try {
 			Map<String, Object> out = new HashMap<String, Object>();
 			out.put("template", template);
@@ -258,9 +284,9 @@ public class HtmlDoc {
 			return null;
 		}
 	}
-
+	
 	private String checkTemplate(String e) throws Exception{
-		String ret=e;
+		String ret = e;
 		if (e.startsWith("doctype") || e.startsWith("extends")) {
 			ret = convertPug(e);
 		}
@@ -270,16 +296,17 @@ public class HtmlDoc {
 		return ret;
 	}
 	
-	public boolean load(byte[] src, boolean asTemplate) throws Exception {
+	public boolean load(byte[] src, boolean asTemplate) throws Exception{
+		clear();
 		if (src[0] == '{') {
 			// It's an internal (processed) template or an existing document
 			ObjectMapper mapper = new ObjectMapper();
 			try {
-				Map<String, Object> res = mapper.readValue(src, new TypeReference<Map<String, Object>>() {
-				});
-
+				Map<String, Object> res =
+					mapper.readValue(src, new TypeReference<Map<String, Object>>() {});
+				
 				template = (String) res.get("template");
-			
+				
 				prefilled = (Map<String, String>) res.get("prefilled");
 				postfilled = (Map<String, Object>) res.get("postfilled");
 				outputFile = (String) res.get("filename");
@@ -288,17 +315,16 @@ public class HtmlDoc {
 					throw new Exception("Bad file format");
 				}
 				return true;
-
+				
 			} catch (Exception ex) {
 				ExHandler.handle(ex);
 				return false;
 			}
 		} else {
 			// it's a newly imported HTML template file to process or a foreign file.
-			template = (new String(src, "utf-8"));
-			String text=checkTemplate(template);
+			template = checkTemplate(new String(src, "utf-8"));
 			Pattern post = Pattern.compile("\\[\\w+\\]");
-			Matcher matcher = post.matcher(text);
+			Matcher matcher = post.matcher(template);
 			while (matcher.find()) {
 				String found = matcher.group();
 				postfilled.put(found, "");
@@ -306,10 +332,11 @@ public class HtmlDoc {
 			return true;
 		}
 	}
-
+	
 	//
-	public String convertPug(String pug) throws Exception {
-		String dir = CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, ".") + File.separator + "x";
+	public String convertPug(String pug) throws Exception{
+		String dir =
+			CoreHub.localCfg.get(PreferenceConstants.TEMPLATE_DIR, ".") + File.separator + "x";
 		Process process = new ProcessBuilder("pug", "-p", dir).start();
 		InputStreamReader err = new InputStreamReader(process.getErrorStream());
 		BufferedReader burr = new BufferedReader(err);
@@ -335,9 +362,9 @@ public class HtmlDoc {
 			throw new Error(errmsg);
 		}
 	}
-
-	public String getTemplate() {
+	
+	public String getTemplate(){
 		return template;
 	}
-
+	
 }

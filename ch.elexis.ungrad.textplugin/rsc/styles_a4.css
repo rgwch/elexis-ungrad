@@ -40,6 +40,10 @@ h1 {
     padding-bottom: 0;
 }
 
+h2{
+	font-size: 11pt;
+	font-weight: bolder;
+}
 /* Tabellen kompakter machen */
 table,
 tr,

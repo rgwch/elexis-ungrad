@@ -172,7 +172,8 @@ public class TextPluginImpl implements ITextPlugin {
 
 	@Override
 	public boolean clear() {
-		doc.template = "";
+		display.clear();
+		doc.clear();
 		return true;
 	}
 
