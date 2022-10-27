@@ -3,6 +3,7 @@
  */
 package ch.elexis.ungrad.forms;
 
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -18,13 +19,15 @@ import ch.elexis.data.Patient;
  */
 public class View extends ViewPart implements IActivationListener{
 	private Controller controller;
+	private TableViewer tv;
 	
 	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
 			ElexisEvent.EVENT_SELECTED) {
 
 		@Override
 		public void runInUi(ElexisEvent ev) {
-			controller.changePatient((Patient) ev.getObject());
+			// controller.changePatient((Patient) ev.getObject());
+			tv.setInput(ev.getObject());
 		}
 
 	};
@@ -33,9 +36,11 @@ public class View extends ViewPart implements IActivationListener{
 		controller=new Controller();
 	}
 	@Override
-	public void createPartControl(Composite arg0) {
-		// TODO Auto-generated method stub
-
+	public void createPartControl(Composite parent) {
+		tv=new TableViewer(parent);
+		tv.setContentProvider(controller);
+		tv.setLabelProvider(controller);
+		tv.setInput(ElexisEventDispatcher.getSelectedPatient());
 	}
 
 	@Override

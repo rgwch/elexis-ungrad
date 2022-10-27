@@ -1,0 +1,21 @@
+extends a4 
+
+block content
+  #maintext(data-doctype="AnmeldungDu")
+    p [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
+      br/
+      span [Patient.Strasse], [Patient.Plz] [Patient.Ort]
+      br/
+      span Tel: [Patient.Telefon1] [Patient.Natel] [Patient.Telefon2]
+    p Sehr geehrte[Adressat:mw:r Herr/ Frau] [Adressat.Titel] [Adressat.Name]
+    p Ich bitte Sie um direktes Aufgebot [Patient:mw:des oben genannten Patienten/der oben genannten Patientin] zur fachärztlichen Untersuchung.
+
+    h2 Problem 
+    p [Problem]
+
+    h2 Weitere Diagnosen 
+    p [Diagnosen]
+
+  #footer 
+    p Vielen Dank und freundliche Grüsse 
+    p [Mandant.Vorname]  

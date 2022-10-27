@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ungrad Forms
-Bundle-SymbolicName: ch.elexis.ungrad.forms
+Bundle-SymbolicName: ch.elexis.ungrad.forms;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: ch.elexis
 Automatic-Module-Name: ch.elexis.ungrad.forms

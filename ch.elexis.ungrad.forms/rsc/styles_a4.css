@@ -1,0 +1,93 @@
+@page {
+    size: A4 portrait;
+    margin-top: 5mm;
+    margin-left: 5mm;
+    margin-bottom: 5mm;
+    margin-right: 5mm;
+}
+
+#container {
+    box-sizing: border-box;
+    position: absolute;
+    font-size: 11pt;
+    left: 5mm;
+    top: 0;
+    width: 200mm;
+    height: 287mm;
+}
+
+/* Datum rechts oben */
+#date {
+    position: absolute;
+    right: 20mm;
+    top: 24mm;
+    width: 50mm;
+}
+
+/* Seitenkopf mit ggf. Praxislogo */
+#header {
+    color: green;
+    text-align: center;
+    margin-top: 0mm;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+/* Hauptüberschrift */
+h1 {
+    font-size: 14pt;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+h2{
+	font-size: 11pt;
+	font-weight: bolder;
+}
+/* Tabellen kompakter machen */
+table,
+tr,
+td {
+    padding-bottom: 0;
+    padding-top: 0;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+/* Absenderfeld links oben */
+#sender {
+    position: absolute;
+    left: 10mm;
+    top: 24mm;
+    margin-right: 20px;
+    width: 70mm;
+}
+
+/* Absenderzeile im Sichtfenster über der Adresse */
+.absender {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 6pt;
+    font-weight: normal;
+    margin-bottom: 3mm;
+}
+
+/* Adresse. Bite anpassen, wenn das Sichtfenster anders liegt */
+#address {
+    position: absolute;
+    right: 20mm;
+    top: 45mm;
+    width: 60mm;
+}
+
+#maintext {
+    position: absolute;
+    left: 10mm;
+    top: 90mm;
+    width: 100%;
+}
+#footer{
+    position: absolute;
+    left:10mm;
+    top: 200mm;
+    width: 100%;
+}

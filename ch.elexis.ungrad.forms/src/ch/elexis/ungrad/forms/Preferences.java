@@ -3,6 +3,7 @@
  */
 package ch.elexis.ungrad.forms;
 
+import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -23,14 +24,18 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	}
 	@Override
 	public void init(IWorkbench arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	protected void createFieldEditors() {
-		// TODO Auto-generated method stub
-
+		addField(new DirectoryFieldEditor(PreferenceConstants.TEMPLATES, "Vorlagenverzeichnis", getFieldEditorParent()));
+		addField(new DirectoryFieldEditor(PreferenceConstants.OUTPUT,"Dokumentenverzeichnis", getFieldEditorParent()));
+	
 	}
+	protected void performApply() {
+		CoreHub.localCfg.flush();
+	}
+
 
 }
