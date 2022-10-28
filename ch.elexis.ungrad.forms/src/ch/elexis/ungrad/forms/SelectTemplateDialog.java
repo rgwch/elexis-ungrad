@@ -4,6 +4,7 @@
 package ch.elexis.ungrad.forms;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -19,6 +20,7 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.DefaultLabelProvider;
 import ch.elexis.data.Brief;
+import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
 
 /**
@@ -29,7 +31,7 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 
 	TableViewer tv;
 	String result;
-	
+
 	public SelectTemplateDialog(Shell parentShell) {
 		super(parentShell);
 		// TODO Auto-generated constructor stub
@@ -44,9 +46,20 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 		tv.setContentProvider(new IStructuredContentProvider() {
 
 			@Override
-			public Object[] getElements(Object type) {
-				File dir = new File(CoreHub.localCfg.get(PreferenceConstants.TEMPLATES, ""));
-				String[] templates = dir.list();
+			public Object[] getElements(Object dir) {
+				String[] templates = ((File) dir).list(new FilenameFilter() {
+
+					@Override
+					public boolean accept(File dir, String name) {
+						String ext = FileTool.getExtension(name).toLowerCase();
+						if (ext.equals("pug") || ext.equals("html") || ext.equals("pdf")) {
+							return true;
+						} else {
+							return false;
+						}
+
+					}
+				});
 				if (templates == null) {
 					return new String[0];
 				} else {
@@ -56,6 +69,7 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 		});
 		tv.setLabelProvider(new DefaultLabelProvider());
 		tv.getControl().setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
+		tv.setInput(new File(CoreHub.localCfg.get(PreferenceConstants.TEMPLATES, "")));
 		return ret;
 	}
 
@@ -64,15 +78,14 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 		super.create();
 		setTitle("Formular auswählen");
 	}
-	
+
 	@Override
-	protected void okPressed(){
+	protected void okPressed() {
 		IStructuredSelection sel = (IStructuredSelection) tv.getSelection();
 		if ((sel != null) && (!sel.isEmpty())) {
 			result = (String) sel.getFirstElement();
 		}
 		super.okPressed();
 	}
-	
 
 }
