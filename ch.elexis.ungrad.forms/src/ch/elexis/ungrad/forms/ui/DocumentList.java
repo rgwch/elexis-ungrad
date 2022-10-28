@@ -1,4 +1,4 @@
-package ch.elexis.ungrad.forms;
+package ch.elexis.ungrad.forms.ui;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -11,6 +11,7 @@ import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.forms.model.Controller;
 
 public class DocumentList extends Composite {
 	private TableViewer tv;

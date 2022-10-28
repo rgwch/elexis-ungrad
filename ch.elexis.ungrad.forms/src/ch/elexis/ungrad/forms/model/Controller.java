@@ -1,4 +1,4 @@
-package ch.elexis.ungrad.forms;
+package ch.elexis.ungrad.forms.model;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -54,10 +54,9 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return (String) element;
 	}
 
-	public String createDocumentFrom(String template, Kontakt adressat) throws Exception {
-		File tmpl = new File(template);
-		String html = FileTool.readTextFile(tmpl);
-		if (template.endsWith("pug")) {
+	public Template createDocumentFrom(File template, Kontakt adressat) throws Exception {
+		String html = FileTool.readTextFile(template);
+		if (template.getName().endsWith("pug")) {
 			html = convertPug(html);
 		}
 		Map<String, IPersistentObject> replacer = new HashMap<>();
@@ -69,12 +68,14 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		}
 		Resolver resolver = new Resolver(replacer, true);
 		String processed = resolver.resolve(html);
-		return processed;
+		return new Template(processed);
 	}
 
 	public String convertPug(String pug) throws Exception {
 		String dir = CoreHub.localCfg.get(PreferenceConstants.TEMPLATES, ".") + File.separator + "x";
-		Process process = new ProcessBuilder("pug", "-p", dir).start();
+		String pugbin = CoreHub.localCfg.get(PreferenceConstants.PUG, "pug");
+
+		Process process = new ProcessBuilder(pugbin, "-p", dir).start();
 		InputStreamReader err = new InputStreamReader(process.getErrorStream());
 		BufferedReader burr = new BufferedReader(err);
 		InputStreamReader ir = new InputStreamReader(process.getInputStream());

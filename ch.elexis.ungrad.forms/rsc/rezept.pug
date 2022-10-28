@@ -22,8 +22,9 @@ block content
       tr 
         td GLN: 
         td [Mandant.EAN] 
-  .payload(data-doctype="Rezept")
+  .payload(data-doctype="Rezept" data-doctitle="Rezept")
     span Rp.
     .concern [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]         
-    .contents [Rezeptzeilen][zusatz]
+    .contents [Rezeptzeilen]
+    div(data-input="Zusatz") Etwas
     

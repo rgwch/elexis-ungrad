@@ -5,7 +5,7 @@
          point="org.eclipse.ui.preferencePages">
          <page
             category="ch.elexis.preferences.transporters"
-            class="ch.elexis.ungrad.forms.Preferences"
+            class="ch.elexis.ungrad.forms.ui.Preferences"
             id="ch.rgw.elexis.ungrad.forms.prefs"
             name="Forms">
       </page>
@@ -13,8 +13,8 @@
 <extension
          point="org.eclipse.ui.views">
       <view
-            class="ch.elexis.ungrad.forms.View"
-            id="ch.rgw.elexis.ungrad.forms.View"
+            class="ch.elexis.ungrad.forms.ui.View"
+            id="ch.rgw.elexis.ungrad.forms.ui.View"
             name="Forms View"
             restorable="true">
       </view>

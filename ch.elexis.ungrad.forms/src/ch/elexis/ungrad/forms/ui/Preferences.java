@@ -1,15 +1,18 @@
 /**
  * 
  */
-package ch.elexis.ungrad.forms;
+package ch.elexis.ungrad.forms.ui;
 
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.ui.actions.AddStringEntryAction;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
+import ch.elexis.ungrad.forms.model.PreferenceConstants;
 
 /**
  * @author gerry
@@ -31,7 +34,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	protected void createFieldEditors() {
 		addField(new DirectoryFieldEditor(PreferenceConstants.TEMPLATES, "Vorlagenverzeichnis", getFieldEditorParent()));
 		addField(new DirectoryFieldEditor(PreferenceConstants.OUTPUT,"Dokumentenverzeichnis", getFieldEditorParent()));
-	
+		addField(new FileFieldEditor(PreferenceConstants.PUG, "Pug-Compiler", getFieldEditorParent()));
 	}
 	protected void performApply() {
 		CoreHub.localCfg.flush();

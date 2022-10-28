@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ch.elexis.ungrad.forms;
+package ch.elexis.ungrad.forms.ui;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -20,6 +20,7 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.DefaultLabelProvider;
 import ch.elexis.data.Brief;
+import ch.elexis.ungrad.forms.model.PreferenceConstants;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
 
@@ -30,11 +31,12 @@ import ch.rgw.tools.StringTool;
 public class SelectTemplateDialog extends TitleAreaDialog {
 
 	TableViewer tv;
-	String result;
+	File result;
+	String templateDir;
 
 	public SelectTemplateDialog(Shell parentShell) {
 		super(parentShell);
-		// TODO Auto-generated constructor stub
+		templateDir = CoreHub.localCfg.get(PreferenceConstants.TEMPLATES, "");
 	}
 
 	@Override
@@ -69,7 +71,7 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 		});
 		tv.setLabelProvider(new DefaultLabelProvider());
 		tv.getControl().setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
-		tv.setInput(new File(CoreHub.localCfg.get(PreferenceConstants.TEMPLATES, "")));
+		tv.setInput(new File(templateDir));
 		return ret;
 	}
 
@@ -83,7 +85,7 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 	protected void okPressed() {
 		IStructuredSelection sel = (IStructuredSelection) tv.getSelection();
 		if ((sel != null) && (!sel.isEmpty())) {
-			result = (String) sel.getFirstElement();
+			result = new File(templateDir, (String) sel.getFirstElement());
 		}
 		super.okPressed();
 	}

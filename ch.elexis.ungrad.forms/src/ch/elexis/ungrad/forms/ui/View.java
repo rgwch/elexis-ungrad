@@ -1,7 +1,9 @@
 /**
  * 
  */
-package ch.elexis.ungrad.forms;
+package ch.elexis.ungrad.forms.ui;
+
+import java.io.File;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -23,6 +25,9 @@ import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.forms.model.Controller;
+import ch.elexis.ungrad.forms.model.Template;
+import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 
 /**
@@ -90,9 +95,9 @@ public class View extends ViewPart implements IActivationListener {
 			public void run() {
 				SelectTemplateDialog std = new SelectTemplateDialog(getViewSite().getShell());
 				if (std.open() == Dialog.OK) {
-					String template = std.result;
+					File template = std.result;
 					try {
-						String prefilled = controller.createDocumentFrom(template, null);
+						Template prefilled = controller.createDocumentFrom(template, null);
 						detail.show(prefilled);
 						stack.topControl = detail;
 						container.layout();
