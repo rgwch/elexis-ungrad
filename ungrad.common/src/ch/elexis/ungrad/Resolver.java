@@ -34,7 +34,7 @@ import ch.rgw.tools.TimeTool;
  */
 public class Resolver {
 	Map<String, IPersistentObject> replmap;
-	boolean html = false;
+	boolean bAsHtml = false;
 
 	/**
 	 * Create a Resolver with some additional information how to resolve
@@ -46,7 +46,7 @@ public class Resolver {
 	 */
 	public Resolver(Map<String, IPersistentObject> fld, boolean asHTML) {
 		replmap = fld;
-		html = asHTML;
+		bAsHtml = asHTML;
 	}
 
 	public Resolver() {
@@ -54,7 +54,7 @@ public class Resolver {
 	}
 
 	public void asHTML(boolean html) {
-		this.html = html;
+		this.bAsHtml = html;
 	}
 
 	/**
@@ -99,8 +99,8 @@ public class Resolver {
 				}
 				String r = po.get(rooted[1]);
 				String replacement = StringTool.unNull(r);
-				if (html) {
-					replacement = replacement.replaceAll("\\n", "<br />");
+				if (bAsHtml) {
+					replacement = replacement.replaceAll("\\R", "<br />");
 				}
 				return replacement;
 			}

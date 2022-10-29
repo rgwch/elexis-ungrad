@@ -47,7 +47,7 @@ public class DetailDisplay extends Composite {
 			label.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 			Text text=new Text(inlay,SWT.MULTI|SWT.BORDER);
 			text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
-			text.setText(e.getValue());
+			text.setText(e.getValue().replace("<br />", "X"));
 		}
 		inlay.layout();
 	}

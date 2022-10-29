@@ -21,9 +21,11 @@ import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
+import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.forms.model.Controller;
 import ch.elexis.ungrad.forms.model.Template;
@@ -97,8 +99,23 @@ public class View extends ViewPart implements IActivationListener {
 				if (std.open() == Dialog.OK) {
 					File template = std.result;
 					try {
-						Template prefilled = controller.createDocumentFrom(template, null);
-						detail.show(prefilled);
+						Kontakt adressat = null;
+						String html = FileTool.readTextFile(template);
+						if (template.getName().endsWith("pug")) {
+							String dir = template.getParent();
+							html = controller.convertPug(html, dir);
+						}
+						if (html.contains("[Adressat")) {
+							KontaktSelektor ksd = new KontaktSelektor(getSite().getShell(), Kontakt.class, "Adressat",
+									"Bitte Adressat auswählen", new String[] { "Bezeichnung1", "Bezeichnung2" });
+							if (ksd.open() != Dialog.OK) {
+								return;
+							} else {
+								adressat = (Kontakt) ksd.getSelection();
+							}
+						}
+						Template processed = new Template(html, adressat);
+						detail.show(processed);
 						stack.topControl = detail;
 						container.layout();
 
@@ -108,27 +125,29 @@ public class View extends ViewPart implements IActivationListener {
 				}
 			}
 		};
-		showListAction=new Action("Dokumentenliste") {
+		showListAction = new Action("Dokumentenliste") {
 			{
 				setText("Dokumente");
 				setImageDescriptor(Images.IMG_DOCUMENT_STACK.getImageDescriptor());
 				setToolTipText("Zeige Liste der Dokumente");
 			}
+
 			@Override
 			public void run() {
-				stack.topControl=docList;
+				stack.topControl = docList;
 				container.layout();
 			}
 		};
-		showDetailAction=new Action("Formular") {
+		showDetailAction = new Action("Formular") {
 			{
 				setText("Ausfüllen");
 				setImageDescriptor(Images.IMG_DOCUMENT_PDF.getImageDescriptor());
 				setToolTipText("Zeige aktuelles Formular");
 			}
+
 			@Override
 			public void run() {
-				stack.topControl=detail;
+				stack.topControl = detail;
 				container.layout();
 			}
 		};

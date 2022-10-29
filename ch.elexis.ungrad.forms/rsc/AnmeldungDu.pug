@@ -1,7 +1,7 @@
 extends a4 
 
 block content
-  #maintext(data-doctype="AnmeldungDu")
+  #maintext(data-doctype="AnmeldungDu" data-doctitle="Anmeldung Du")
     p [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
       br/
       span [Patient.Strasse], [Patient.Plz] [Patient.Ort]
@@ -11,10 +11,10 @@ block content
     p Ich bitte dich um direktes Aufgebot [Patient:mw:des oben genannten Patienten/der oben genannten Patientin] zur fachärztlichen Untersuchung.
 
     h2 Problem 
-    p [Problem]
+    p(data-input="Problem")
 
     h2 Weitere Diagnosen 
-    p [Diagnosen]
+    p(data-input="Diagnosen") [Patient.Diagnosen]
 
   #footer 
     p Vielen Dank und freundliche Grüsse 

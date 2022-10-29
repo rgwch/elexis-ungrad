@@ -9,6 +9,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.model.IPersistentObject;
+import ch.elexis.data.Fall;
+import ch.elexis.data.Kontakt;
+import ch.elexis.ungrad.Resolver;
 import ch.rgw.tools.StringTool;
 
 public class Template {
@@ -17,10 +22,17 @@ public class Template {
 	String title = "";
 	String heading = "";
 	String doctype = "";
-	Map<String,String>inputs=new HashMap<String, String>();
+	Map<String, String> inputs = new HashMap<String, String>();
 
-	Template(String html) {
-		this.html = html;
+	
+	public Template(String rawhtml, Kontakt adressat) throws Exception {
+		Map<String, IPersistentObject> replacer = new HashMap<>();
+		if (adressat != null) {
+			replacer.put("Adressat", adressat);
+		}
+		Resolver resolver = new Resolver(replacer, true);
+		this.html = resolver.resolve(rawhtml);
+		
 		doc = Jsoup.parse(html);
 		Elements els = doc.getElementsByTag("title");
 		Element eTitle = els.first();
@@ -48,10 +60,10 @@ public class Template {
 		if (StringTool.isNothing(title)) {
 			title = doctype;
 		}
-		els=doc.getElementsByAttribute("data-input");
-		Iterator<Element> it=els.iterator();
-		while(it.hasNext()) {
-			Element input=it.next();
+		els = doc.getElementsByAttribute("data-input");
+		Iterator<Element> it = els.iterator();
+		while (it.hasNext()) {
+			Element input = it.next();
 			inputs.put(input.attr("data-input"), input.text());
 		}
 	}
@@ -59,7 +71,8 @@ public class Template {
 	public String getTitle() {
 		return title;
 	}
-	public Map<String,String> getInputs() {
+
+	public Map<String, String> getInputs() {
 		return inputs;
 	}
 }

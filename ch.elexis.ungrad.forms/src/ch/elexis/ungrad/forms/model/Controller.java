@@ -54,25 +54,8 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return (String) element;
 	}
 
-	public Template createDocumentFrom(File template, Kontakt adressat) throws Exception {
-		String html = FileTool.readTextFile(template);
-		if (template.getName().endsWith("pug")) {
-			html = convertPug(html);
-		}
-		Map<String, IPersistentObject> replacer = new HashMap<>();
-		replacer.put("Patient", ElexisEventDispatcher.getSelectedPatient());
-		replacer.put("mandant", ElexisEventDispatcher.getSelectedMandator());
-		replacer.put("fall", ElexisEventDispatcher.getSelected(Fall.class));
-		if (adressat != null) {
-			replacer.put("adressat", adressat);
-		}
-		Resolver resolver = new Resolver(replacer, true);
-		String processed = resolver.resolve(html);
-		return new Template(processed);
-	}
-
-	public String convertPug(String pug) throws Exception {
-		String dir = CoreHub.localCfg.get(PreferenceConstants.TEMPLATES, ".") + File.separator + "x";
+	public String convertPug(String pug, String dir) throws Exception {
+		dir += File.separator + "x";
 		String pugbin = CoreHub.localCfg.get(PreferenceConstants.PUG, "pug");
 
 		Process process = new ProcessBuilder(pugbin, "-p", dir).start();
@@ -100,4 +83,6 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			throw new Error(errmsg);
 		}
 	}
+
+	
 }
