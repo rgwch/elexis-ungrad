@@ -22,6 +22,8 @@
     </properties>
     <packaging>pom</packaging>
     <modules>
+        <module>ungrad-branding</module>
+        <module>ungrad-branding-feature</module>
         <module>ungrad-kassenbuch</module>
         <module>ungrad-kassenbuch-feature</module>
         <module>ungrad.common</module>
@@ -32,21 +34,21 @@
         <module>ungrad-docmgr-lucinda-kons</module>
         <module>ungrad-labview</module>
         <module>ungrad-labview-feature</module>
-        <module>ungrad-branding</module>
-        <module>ungrad-branding-feature</module>
         <module>com.jsigle.noatext_jsl</module>
         <module>com.jsigle.noatext_jsl.feature</module>
         <module>ungrad-labenter</module>
         <module>ungrad-labenter-feature</module>
-        <module>ch.elexis.ungrad.pdf</module>
-        <module>ch.elexis.ungrad.qrbills</module>
-        <module>ch.elexis.ungrad.qrbills.feature</module>
-        <module>ch.elexis.ungrad.privatrechnung_qr</module>
-        <module>ch.elexis.ungrad.privatrechnung_qr.feature</module>
         <module>ch.elexis.laborimport_risch</module>
         <module>ch.elexis.laborimport_risch.feature</module>
         <module>ch.elexis.laborimport.sftp</module>
         <module>ch.elexis.laborimport.sftp.feature</module>
+        <module>ch.elexis.ungrad.forms</module>
+        <module>ch.elexis.ungrad.forms.feature</module>
+        <module>ch.elexis.ungrad.pdf</module>
+        <module>ch.elexis.ungrad.privatrechnung_qr</module>
+        <module>ch.elexis.ungrad.privatrechnung_qr.feature</module>
+        <module>ch.elexis.ungrad.qrbills</module>
+        <module>ch.elexis.ungrad.qrbills.feature</module>
         <module>ch.elexis.ungrad.textplugin</module>
         <module>ch.elexis.ungrad.textplugin.feature</module>
         <module>ungrad-artikelstamm</module>
@@ -207,8 +209,8 @@
                     <version>${tycho-version}</version>
                     <configuration>
                         <compilerArguments>
-                            <inlineJSR/>
-                            <enableJavadoc/>
+                            <inlineJSR />
+                            <enableJavadoc />
                             <!-- Removed due to bug #2105 <encoding>ISO-8859-1</encoding> -->
                         </compilerArguments>
                     </configuration>
