@@ -18,10 +18,17 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.model.IPersistentObject;
+import ch.elexis.core.ui.text.Messages;
 import ch.elexis.core.ui.text.TextContainer;
+import ch.elexis.data.Brief;
+import ch.elexis.data.Kontakt;
 import ch.elexis.data.PersistentObject;
+import ch.elexis.data.Person;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
@@ -33,6 +40,8 @@ import ch.rgw.tools.TimeTool;
  *
  */
 public class Resolver {
+	private static Logger log = LoggerFactory.getLogger(Resolver.class);
+
 	Map<String, IPersistentObject> replmap;
 	boolean bAsHtml = false;
 
@@ -65,7 +74,14 @@ public class Resolver {
 	 * @throws Exception If a Var references a class that could not be found in the
 	 *                   running Elexis installation.
 	 */
+
 	public String resolve(String raw) throws Exception {
+		String level1 = resolveSimple(raw);
+		String level2 = resolveGenderized(level1);
+		return level2;
+	}
+
+	public String resolveSimple(String raw) throws Exception {
 		Pattern pat = Pattern.compile(TextContainer.MATCH_TEMPLATE);
 		StringBuffer sb = new StringBuffer();
 		Matcher matcher = pat.matcher(raw);
@@ -82,20 +98,39 @@ public class Resolver {
 		return sb.toString();
 	}
 
+	public String resolveGenderized(String raw) throws Exception {
+		Pattern pat = Pattern.compile(TextContainer.MATCH_GENDERIZE);
+		StringBuffer sb = new StringBuffer();
+		Matcher matcher = pat.matcher(raw);
+		while (matcher.find()) {
+			String found = matcher.group();
+			String replacement = genderize(found);
+			if (!replacement.startsWith("**ERROR")) {
+				matcher.appendReplacement(sb, replacement);
+			} else {
+				matcher.appendReplacement(sb, " ");
+			}
+		}
+		matcher.appendTail(sb);
+		return sb.toString();
+	}
+
+	/**
+	 * Replace Template Fields like [Patient.Name]
+	 * 
+	 * @param tmpl
+	 * @return
+	 * @throws ClassNotFoundException
+	 */
 	private String replaceTemplate(String tmpl) throws ClassNotFoundException {
 		String[] rooted = tmpl.substring(1, tmpl.length() - 1).split("\\.");
 		if (rooted.length == 2) {
 			if (rooted[0].equals("Datum")) {
 				return new TimeTool().toString(TimeTool.DATE_GER);
 			} else {
-				IPersistentObject po = replmap.get(rooted[0]);
+				IPersistentObject po = resolveObject(rooted[0]);
 				if (po == null) {
-					String fqname = "ch.elexis.data." + rooted[0]; //$NON-NLS-1$
-					try {
-						po = ElexisEventDispatcher.getSelected(Class.forName(fqname));
-					} catch (ClassNotFoundException cfe) {
-						return "";
-					}
+					return "";
 				}
 				String r = po.get(rooted[1]);
 				String replacement = StringTool.unNull(r);
@@ -108,4 +143,84 @@ public class Resolver {
 			return tmpl;
 		}
 	}
+
+	private IPersistentObject resolveObject(String name) {
+		IPersistentObject po = replmap.get(name);
+		if (po == null) {
+			String fqname = "ch.elexis.data." + name; //$NON-NLS-1$
+			try {
+				po = ElexisEventDispatcher.getSelected(Class.forName(fqname));
+			} catch (ClassNotFoundException cfe) {
+				return null;
+			}
+		}
+		return po;
+	}
+
+	/**
+	 * Format für Genderize: [Feld:mw:formulierung Mann/formulierung Frau] oder
+	 * [Feld:mwn:mann/frau/neutral]
+	 */
+	private String genderize(final String in) {
+		String inl = in.substring(1,in.length()-1);
+		boolean showErrors = true;
+		if (inl.substring(0, 1).equalsIgnoreCase(TextContainer.DONT_SHOW_REPLACEMENT_ERRORS)) {
+			inl = inl.substring(1);
+			showErrors = false;
+		}
+		String[] q = inl.split(":"); //$NON-NLS-1$
+		IPersistentObject o = resolveObject(q[0]);
+		if (o == null) {
+			if (showErrors) {
+				return "???";
+			} else {
+				return "";
+			}
+		}
+		if (q.length != 3) {
+			log.error("falsches genderize Format " + inl); //$NON-NLS-1$
+			return null;
+		}
+		if (!(o instanceof Kontakt)) {
+			if (showErrors) {
+				return Messages.TextContainer_FieldTypeForContactsOnly;
+			} else {
+				return "";
+			}
+		}
+		Kontakt k = (Kontakt) o;
+		String[] g = q[2].split("/"); //$NON-NLS-1$
+		if (g.length < 2) {
+			if (showErrors) {
+				return Messages.TextContainer_BadFieldDefinition;
+			} else {
+				return "";
+			}
+		}
+		if (k.istPerson()) {
+			Person p = Person.load(k.getId());
+
+			if (p.get(Person.SEX).equals(Person.MALE)) {
+				if (q[1].startsWith("m")) { //$NON-NLS-1$
+					return g[0];
+				}
+				return g[1];
+			} else {
+				if (q[1].startsWith("w")) { //$NON-NLS-1$
+					return g[0];
+				}
+				return g[1];
+			}
+		} else {
+			if (g.length < 3) {
+				if (showErrors) {
+					return Messages.TextContainer_FieldTypeForPersonsOnly;
+				} else {
+					return "";
+				}
+			}
+			return g[2];
+		}
+	}
+
 }
