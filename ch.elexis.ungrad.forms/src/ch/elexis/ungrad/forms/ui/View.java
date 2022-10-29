@@ -38,7 +38,7 @@ import ch.rgw.tools.ExHandler;
  */
 public class View extends ViewPart implements IActivationListener {
 	private Controller controller;
-	private Action createNewAction, showListAction, showDetailAction;
+	private Action createNewAction, showListAction, showDetailAction, printAction;
 	private DocumentList docList;
 	private DetailDisplay detail;
 	private Composite container;
@@ -81,6 +81,7 @@ public class View extends ViewPart implements IActivationListener {
 		toolbar.add(createNewAction);
 		toolbar.add(showListAction);
 		toolbar.add(showDetailAction);
+		toolbar.add(printAction);
 		// menu.add();
 
 	}
@@ -149,6 +150,18 @@ public class View extends ViewPart implements IActivationListener {
 			public void run() {
 				stack.topControl = detail;
 				container.layout();
+			}
+		};
+		printAction = new Action("Ausgabe") {
+			{
+				setText("Ausgeben");
+				setImageDescriptor(Images.IMG_PRINTER.getImageDescriptor());
+				setToolTipText("Aktuelles Formular erstellen und ausgeben");
+			}
+
+			@Override
+			public void run() {
+				detail.output();
 			}
 		};
 	}

@@ -20,6 +20,8 @@ public class DetailDisplay extends Composite {
 
 	ScrolledForm form;
 	Composite inlay;
+	Template template;
+	
 	public DetailDisplay(Composite parent, Controller controller) {
 		super(parent, SWT.NONE);
 		setLayoutData(SWTHelper.getFillGridData());
@@ -36,6 +38,7 @@ public class DetailDisplay extends Composite {
 	}
 
 	void show(Template template) {
+		this.template=template;
 		form.setText(template.getTitle());
 		for(Control c:inlay.getChildren()) {
 			c.dispose();
@@ -50,5 +53,9 @@ public class DetailDisplay extends Composite {
 			text.setText(e.getValue().replace("<br />", "X"));
 		}
 		inlay.layout();
+	}
+	
+	public void output() {
+		
 	}
 }
