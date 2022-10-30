@@ -57,7 +57,9 @@ public class DetailDisplay extends Composite {
 			label.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 			Text text = new Text(inlay, SWT.MULTI | SWT.BORDER);
 			text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
-			text.setText(e.getValue().replace("<br />", "XX"));
+			String val=e.getValue();
+			val=val.replace("<br />", "\n");
+			text.setText(val);
 			text.setData("input", e.getKey());
 		}
 		inlay.layout();
@@ -67,7 +69,7 @@ public class DetailDisplay extends Composite {
 		for (Control c : inlay.getChildren()) {
 			Object k = c.getData("input");
 			if (k instanceof String) {
-				String val = ((Text) c).getText().replaceAll("XX", "<br />");
+				String val = ((Text) c).getText().replaceAll("\n", "<br />");
 				template.setInput((String) k, val);
 			}
 		}

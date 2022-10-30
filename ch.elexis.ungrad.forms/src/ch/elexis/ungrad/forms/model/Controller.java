@@ -13,6 +13,8 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
+import ch.elexis.data.Brief;
+import ch.elexis.data.Konsultation;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.pdf.Manager;
@@ -68,13 +70,13 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 
 		String filename = new TimeTool().toString(TimeTool.FULL_ISO);
 		String prefix = new TimeTool().toString(TimeTool.DATE_ISO) + "_";
+		if (!StringTool.isNothing(tmpl.getTitle())) {
+			prefix += tmpl.getTitle() + "_";
+		}
 		if (tmpl.adressat != null) {
 			filename = prefix + tmpl.adressat.get(Kontakt.FLD_NAME1) + "_" + tmpl.adressat.get(Kontakt.FLD_NAME2);
 		} else {
-			String name = "Ausgang_";
-			if (!StringTool.isNothing(tmpl.getTitle())) {
-				name = tmpl.getTitle();
-			}
+			String name = "Ausgang";
 			filename = prefix + name;
 		}
 		Patient pat = ElexisEventDispatcher.getSelectedPatient();
@@ -91,10 +93,14 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			}
 		}
 		File htmlFile = new File(dir, filename + ".html");
-		FileTool.writeTextFile(htmlFile, tmpl.getXml());
+		String content=tmpl.getXml();
+		FileTool.writeTextFile(htmlFile, content);
 		File pdfFile = new File(dir, filename + ".pdf");
 		pdf.createPDF(htmlFile, pdfFile);
 		String outputFile = pdfFile.getAbsolutePath();
+		Konsultation current = (Konsultation) ElexisEventDispatcher.getInstance().getSelected(Konsultation.class);
+		Brief metadata = new Brief(filename, new TimeTool(), CoreHub.actUser, tmpl.adressat, current, "Formular");
+		metadata.save(content);
 		return outputFile;
 	}
 

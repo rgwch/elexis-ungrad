@@ -12,6 +12,7 @@ import org.jsoup.select.Elements;
 
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.model.IPersistentObject;
+import ch.elexis.core.types.DocumentStatus;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Kontakt;
 import ch.elexis.ungrad.Resolver;
@@ -33,10 +34,13 @@ public class Template {
 			this.adressat = adressat;
 			replacer.put("Adressat", adressat);
 		}
-		Resolver resolver = new Resolver(replacer, true);
+		Resolver resolver = new Resolver(replacer, false);
 		this.html = resolver.resolve(rawhtml);
 
 		doc = Jsoup.parse(html);
+		Document.OutputSettings outs=doc.outputSettings();
+		outs.prettyPrint(false);
+		outs.syntax(Document.OutputSettings.Syntax.xml);
 		Elements els = doc.getElementsByTag("title");
 		Element eTitle = els.first();
 		if (eTitle != null) {
@@ -67,7 +71,8 @@ public class Template {
 		Iterator<Element> it = els.iterator();
 		while (it.hasNext()) {
 			Element input = it.next();
-			inputs.put(input.attr("data-input"), input.text());
+			
+			inputs.put(input.attr("data-input"), input.html());
 		}
 	}
 
