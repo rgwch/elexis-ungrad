@@ -9,8 +9,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -24,7 +22,6 @@ import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
-import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.forms.model.Controller;
@@ -161,7 +158,11 @@ public class View extends ViewPart implements IActivationListener {
 
 			@Override
 			public void run() {
-				detail.output();
+				if (stack.topControl.equals(detail)) {
+					detail.output();
+				}else if(stack.topControl.equals(docList)) {
+					docList.output();
+				}
 			}
 		};
 	}

@@ -2,9 +2,14 @@ package ch.elexis.ungrad.forms.model;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +34,10 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		currentPatient = pat;
 	}
 
-	File getOutputDirFor(Patient p) {
+	public File getOutputDirFor(Patient p) {
+		if(p==null) {
+			p=ElexisEventDispatcher.getSelectedPatient();
+		}
 		String name = p.getName();
 		String fname = p.getVorname();
 		String birthdate = p.getGeburtsdatum();
@@ -39,18 +47,31 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return dir;
 	}
 
+	/* CoontentProvider */
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Patient pat = (Patient) inputElement;
 		File dir = getOutputDirFor(pat);
-		String[] files = dir.list();
+		String[] files = dir.list(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				String ext=FileTool.getExtension(name);
+				return ext.equalsIgnoreCase("pdf") || ext.equalsIgnoreCase("html");
+			}
+		});
 		if (files == null) {
 			return new String[0];
 		} else {
-			return files;
+			Set<String> deduplicated=new LinkedHashSet<String>();
+			for(String file:files) {
+				deduplicated.add(FileTool.getNakedFilename(file));
+			}
+			String[] ret=deduplicated.toArray(new String[0]);
+			return ret;
 		}
 	}
 
+	/* LabelProvider */
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		return (String) element;
