@@ -4,7 +4,9 @@ import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -13,6 +15,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.ISelectionListener;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
@@ -49,6 +52,22 @@ public class DocumentList extends Composite {
 
 	}
 
+	public void addSelectionListener(ISelectionChangedListener listener) {
+		tv.addSelectionChangedListener(listener);
+	}
+	
+	public void addDoubleclickListener(IDoubleClickListener listener) {
+		tv.addDoubleClickListener(listener);
+	}
+	
+	public String getSelection() {
+		IStructuredSelection sel=tv.getStructuredSelection();
+		if(sel.isEmpty()) {
+			return null;
+		}else {
+			return (String)sel.getFirstElement();
+		}
+	}
 	public void output() {
 		IStructuredSelection sel = tv.getStructuredSelection();
 		if (!sel.isEmpty()) {

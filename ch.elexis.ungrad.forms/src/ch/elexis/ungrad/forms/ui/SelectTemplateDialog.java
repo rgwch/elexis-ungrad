@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -71,6 +73,13 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 		});
 		tv.setLabelProvider(new DefaultLabelProvider());
 		tv.getControl().setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
+		tv.addDoubleClickListener(new IDoubleClickListener() {
+			
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				okPressed();
+			}
+		});
 		tv.setInput(new File(templateDir));
 		return ret;
 	}

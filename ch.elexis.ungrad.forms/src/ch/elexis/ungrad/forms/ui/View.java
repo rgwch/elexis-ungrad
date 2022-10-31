@@ -4,11 +4,17 @@
 package ch.elexis.ungrad.forms.ui;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -22,6 +28,7 @@ import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
+import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.forms.model.Controller;
@@ -79,6 +86,26 @@ public class View extends ViewPart implements IActivationListener {
 		toolbar.add(showListAction);
 		toolbar.add(showDetailAction);
 		toolbar.add(printAction);
+		printAction.setEnabled(false);
+		showDetailAction.setEnabled(false);
+		docList.addSelectionListener(new ISelectionChangedListener() {
+
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				IStructuredSelection sel = event.getStructuredSelection();
+				boolean bHasSelection = !sel.isEmpty();
+				printAction.setEnabled(bHasSelection);
+				showDetailAction.setEnabled(bHasSelection);
+
+			}
+		});
+		docList.addDoubleclickListener(new IDoubleClickListener() {
+
+			@Override
+			public void doubleClick(DoubleClickEvent arg0) {
+				showDetailAction.run();
+			}
+		});
 		// menu.add();
 
 	}
@@ -114,6 +141,7 @@ public class View extends ViewPart implements IActivationListener {
 						}
 						Template processed = new Template(html, adressat);
 						detail.show(processed);
+						printAction.setEnabled(true);
 						stack.topControl = detail;
 						container.layout();
 
@@ -133,6 +161,9 @@ public class View extends ViewPart implements IActivationListener {
 			@Override
 			public void run() {
 				stack.topControl = docList;
+				if (docList.getSelection() == null) {
+					printAction.setEnabled(false);
+				}
 				container.layout();
 			}
 		};
@@ -146,6 +177,16 @@ public class View extends ViewPart implements IActivationListener {
 			@Override
 			public void run() {
 				stack.topControl = detail;
+				File dir = controller.getOutputDirFor(null);
+				File document = new File(dir, docList.getSelection() + ".html");
+				if (document.exists()) {
+					try {
+						String html = FileTool.readTextFile(document);
+						detail.show(new Template(html, null));
+					} catch (Exception e) {
+						SWTHelper.showError("Fehler bei Verarbeitung", e.getMessage());
+					}
+				}
 				container.layout();
 			}
 		};
@@ -160,7 +201,7 @@ public class View extends ViewPart implements IActivationListener {
 			public void run() {
 				if (stack.topControl.equals(detail)) {
 					detail.output();
-				}else if(stack.topControl.equals(docList)) {
+				} else if (stack.topControl.equals(docList)) {
 					docList.output();
 				}
 			}
