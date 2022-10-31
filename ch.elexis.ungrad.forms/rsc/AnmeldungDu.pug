@@ -7,7 +7,7 @@ block content
       span [Patient.Strasse], [Patient.Plz] [Patient.Ort]
       br/
       span Tel: [Patient.Telefon1] [Patient.Natel] [Patient.Telefon2]
-    p Liebe[Adressat:mw:r/ ] [Adressat.Vorname]
+    p(data-anrede="true") Liebe[Adressat:mw:r/ ] [Adressat.Vorname]
     p Ich bitte dich um direktes Aufgebot [Patient:mw:des oben genannten Patienten/der oben genannten Patientin] zur fachärztlichen Untersuchung.
 
     h2 Problem 
@@ -15,6 +15,9 @@ block content
 
     h2 Weitere Diagnosen 
     p(data-input="Diagnosen") [Patient.Diagnosen]
+
+    h2 Medikation
+    p(data-input="Medikation") [Patient.Medikation]
 
   #footer 
     p Vielen Dank und freundliche Grüsse 

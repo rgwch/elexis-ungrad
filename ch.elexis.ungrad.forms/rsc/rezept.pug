@@ -25,6 +25,7 @@ block content
   .payload(data-doctype="Rezept" data-doctitle="Rezept")
     span Rp.
     .concern [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]         
-    .contents [Rezeptzeilen]
-    div(data-input="Zusatz") Etwas
+    .contents
+      div(data-input="Rezept") [Rezeptzeilen]
+      div(data-input="Zusatz") Etwas
     
