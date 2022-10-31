@@ -1,5 +1,6 @@
 package ch.elexis.ungrad.forms.model;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,6 +26,7 @@ public class Template {
 	String title = "";
 	String heading = "";
 	String doctype = "";
+	String filename;
 	Kontakt adressat = null;
 	Map<String, String> inputs = new HashMap<String, String>();
 
@@ -34,7 +36,7 @@ public class Template {
 			this.adressat = adressat;
 			replacer.put("Adressat", adressat);
 		}
-		Resolver resolver = new Resolver(replacer, false);
+		Resolver resolver = new Resolver(replacer, true);
 		this.html = resolver.resolve(rawhtml);
 
 		doc = Jsoup.parse(html);
@@ -104,5 +106,13 @@ public class Template {
 
 	public Map<String, String> getInputs() {
 		return inputs;
+	}
+
+	public void setFilename(String absoluteFile) {
+		this.filename= absoluteFile;
+	}
+	
+	public String getFilename() {
+		return this.filename;
 	}
 }

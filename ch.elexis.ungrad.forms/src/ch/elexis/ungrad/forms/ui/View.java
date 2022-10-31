@@ -182,7 +182,9 @@ public class View extends ViewPart implements IActivationListener {
 				if (document.exists()) {
 					try {
 						String html = FileTool.readTextFile(document);
-						detail.show(new Template(html, null));
+						Template template=new Template(html,null);
+						template.setFilename(document.getAbsolutePath());
+						detail.show(template);
 					} catch (Exception e) {
 						SWTHelper.showError("Fehler bei Verarbeitung", e.getMessage());
 					}

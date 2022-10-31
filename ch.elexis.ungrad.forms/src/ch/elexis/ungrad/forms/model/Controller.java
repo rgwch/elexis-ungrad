@@ -35,8 +35,8 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	}
 
 	public File getOutputDirFor(Patient p) {
-		if(p==null) {
-			p=ElexisEventDispatcher.getSelectedPatient();
+		if (p == null) {
+			p = ElexisEventDispatcher.getSelectedPatient();
 		}
 		String name = p.getName();
 		String fname = p.getVorname();
@@ -55,18 +55,22 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		String[] files = dir.list(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				String ext=FileTool.getExtension(name);
-				return ext.equalsIgnoreCase("pdf") || ext.equalsIgnoreCase("html");
+				if (name.startsWith("A_")) {
+					String ext = FileTool.getExtension(name);
+					return ext.equalsIgnoreCase("pdf") || ext.equalsIgnoreCase("html");
+				} else {
+					return false;
+				}
 			}
 		});
 		if (files == null) {
 			return new String[0];
 		} else {
-			Set<String> deduplicated=new LinkedHashSet<String>();
-			for(String file:files) {
+			Set<String> deduplicated = new LinkedHashSet<String>();
+			for (String file : files) {
 				deduplicated.add(FileTool.getNakedFilename(file));
 			}
-			String[] ret=deduplicated.toArray(new String[0]);
+			String[] ret = deduplicated.toArray(new String[0]);
 			return ret;
 		}
 	}
@@ -80,48 +84,55 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	public String createPDF(Template tmpl, String printer) throws Exception {
 
 		Manager pdf = new Manager();
-		String doctype = tmpl.getDoctype();
-		if (!StringTool.isNothing(doctype)) {
-			tmpl.replace("Doctype", doctype);
-		}
-		String doctitle = tmpl.getTitle();
-		if (!StringTool.isNothing(doctitle)) {
-			tmpl.replace("Doctitle", doctitle);
-		}
-
-		String filename = new TimeTool().toString(TimeTool.FULL_ISO);
-		String prefix = new TimeTool().toString(TimeTool.DATE_ISO) + "_";
-		if (!StringTool.isNothing(tmpl.getTitle())) {
-			prefix += tmpl.getTitle() + "_";
-		}
-		if (tmpl.adressat != null) {
-			filename = prefix + tmpl.adressat.get(Kontakt.FLD_NAME1) + "_" + tmpl.adressat.get(Kontakt.FLD_NAME2);
-		} else {
-			String name = "Ausgang";
-			filename = prefix + name;
-		}
-		Patient pat = ElexisEventDispatcher.getSelectedPatient();
-		String dirname = pat.getName() + "_" + pat.getVorname() + "_" + pat.getGeburtsdatum();
-
-		StringBuilder sb = new StringBuilder();
-		sb.append(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, "")).append(File.separator)
-				.append(dirname.substring(0, 1).toLowerCase()).append(File.separator).append(dirname);
-
-		File dir = new File(sb.toString());
-		if (!dir.exists()) {
-			if (!dir.mkdirs()) {
-				throw new Exception("Could not create directory " + dir.getAbsolutePath());
+		String filename = tmpl.getFilename();
+		File htmlFile, pdfFile;
+		if (StringTool.isNothing(filename)) {
+			String doctype = tmpl.getDoctype();
+			if (!StringTool.isNothing(doctype)) {
+				tmpl.replace("Doctype", doctype);
 			}
+			String doctitle = tmpl.getTitle();
+			if (!StringTool.isNothing(doctitle)) {
+				tmpl.replace("Doctitle", doctitle);
+			}
+
+			filename = new TimeTool().toString(TimeTool.FULL_ISO);
+			String prefix = "A_" + new TimeTool().toString(TimeTool.DATE_ISO) + "_";
+			if (!StringTool.isNothing(tmpl.getTitle())) {
+				prefix += tmpl.getTitle() + "_";
+			}
+			if (tmpl.adressat != null) {
+				filename = prefix + tmpl.adressat.get(Kontakt.FLD_NAME1) + "_" + tmpl.adressat.get(Kontakt.FLD_NAME2);
+			} else {
+				String name = "Ausgang";
+				filename = prefix + name;
+			}
+			Patient pat = ElexisEventDispatcher.getSelectedPatient();
+			String dirname = pat.getName() + "_" + pat.getVorname() + "_" + pat.getGeburtsdatum();
+
+			StringBuilder sb = new StringBuilder();
+			sb.append(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, "")).append(File.separator)
+					.append(dirname.substring(0, 1).toLowerCase()).append(File.separator).append(dirname);
+
+			File dir = new File(sb.toString());
+			if (!dir.exists()) {
+				if (!dir.mkdirs()) {
+					throw new Exception("Could not create directory " + dir.getAbsolutePath());
+				}
+			}
+			htmlFile = new File(dir, filename + ".html");
+			pdfFile = new File(dir, filename + ".pdf");
+		} else {
+			htmlFile = new File(filename);
+			pdfFile = new File(FileTool.getFilepath(filename), FileTool.getNakedFilename(filename)+".pdf");
 		}
-		File htmlFile = new File(dir, filename + ".html");
-		String content=tmpl.getXml();
+		String content = tmpl.getXml();
 		FileTool.writeTextFile(htmlFile, content);
-		File pdfFile = new File(dir, filename + ".pdf");
 		pdf.createPDF(htmlFile, pdfFile);
 		String outputFile = pdfFile.getAbsolutePath();
 		Konsultation current = (Konsultation) ElexisEventDispatcher.getInstance().getSelected(Konsultation.class);
-		Brief metadata = new Brief(filename, new TimeTool(), CoreHub.actUser, tmpl.adressat, current, "Formular");
-		metadata.save(content);
+		// Brief metadata = new Brief(filename, new TimeTool(), CoreHub.actUser, tmpl.adressat, current, "Formular");
+		// metadata.save(content);
 		return outputFile;
 	}
 
