@@ -20,6 +20,8 @@ Beispiel:
 
 würde ein Eingabefeld mit dem Titel "Bemerkungen" erstellen, und das, was dort eingegeben wird, in der Ausgabedatei an diese Stelle eintragen.
 
+### Dateititel und Name der Ausgabedatei
+
 Der Dateititel wird entweder dem <title></title>-Tag, oder dem <h1></h1>-Tag entnommen, oder einem beliebigen Tag mit dem Attribut data-doctitle.
 
 Beispiel:
@@ -30,6 +32,8 @@ Beispiel:
 
 
 Würde dem Dokument den Titel "blahblah" geben (da data-doctitle eine höhere Präferenz hat, als h1)
+
+Der Titel wird Teil des Dateinamens beim speichern. Beispiel: `2022-10-31_Dateititel_AdressatName_Andressat_Vorname.pdf`
 
 ### Anrede
 
