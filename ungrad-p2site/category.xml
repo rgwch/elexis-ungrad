@@ -36,6 +36,12 @@
    <feature id="ch.elexis.ungrad.privatrechnung_qr.feature">
       <category name="ch.elexis.ungrad.financial"/>
    </feature>
+   <feature id="ch.elexis.ungrad.forms.feature">
+      <category name="ch.elexis.ungrad.docmgr"/>
+   </feature>
+   <feature id="ch.elexis.ungrad.pdf.feature">
+      <category name="ch.elexis.ungrad.common"/>
+   </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>

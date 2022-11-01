@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -79,6 +80,7 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 			}
 		});
 		tv.setLabelProvider(new DefaultLabelProvider());
+		tv.setComparator(new ViewerComparator());
 		tv.getControl().setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 		tv.addDoubleClickListener(new IDoubleClickListener() {
 

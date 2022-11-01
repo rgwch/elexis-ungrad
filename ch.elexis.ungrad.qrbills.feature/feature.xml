@@ -28,6 +28,7 @@
       <import plugin="org.eclipse.ui.forms" version="3.7.1" match="greaterOrEqual"/>
       <import plugin="ch.elexis.base.ch.ebanking" version="3.2.0" match="greaterOrEqual"/>
       <import feature="ch.elexis.ungrad.branding.feature" version="1.0.0.qualifier"/>
+      <import plugin="ch.elexis.ungrad.pdf"/>
    </requires>
 
    <plugin
