@@ -1,6 +1,15 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2022, G. Weirich and Elexis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    G. Weirich - initial implementation
+ *    
+ *******************************************************************************/
+
 package ch.elexis.ungrad.forms.ui;
 
 import java.io.File;
@@ -21,10 +30,8 @@ import org.eclipse.swt.widgets.Shell;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.DefaultLabelProvider;
-import ch.elexis.data.Brief;
 import ch.elexis.ungrad.forms.model.PreferenceConstants;
 import ch.rgw.io.FileTool;
-import ch.rgw.tools.StringTool;
 
 /**
  * @author gerry
@@ -74,7 +81,7 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 		tv.setLabelProvider(new DefaultLabelProvider());
 		tv.getControl().setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 		tv.addDoubleClickListener(new IDoubleClickListener() {
-			
+
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				okPressed();

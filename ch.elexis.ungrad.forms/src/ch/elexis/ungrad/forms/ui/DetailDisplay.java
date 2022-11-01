@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2022, G. Weirich and Elexis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    G. Weirich - initial implementation
+ *    
+ *******************************************************************************/
+
 package ch.elexis.ungrad.forms.ui;
 
 import java.util.Map.Entry;
@@ -57,8 +69,8 @@ public class DetailDisplay extends Composite {
 			label.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 			Text text = new Text(inlay, SWT.MULTI | SWT.BORDER);
 			text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
-			String val=e.getValue();
-			val=val.replace("<br />", "\n");
+			String val = e.getValue();
+			val = val.replace("<br />", "\n");
 			text.setText(val);
 			text.setData("input", e.getKey());
 		}

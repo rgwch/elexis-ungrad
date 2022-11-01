@@ -1,6 +1,15 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2022, G. Weirich and Elexis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    G. Weirich - initial implementation
+ *    
+ *******************************************************************************/
+
 package ch.elexis.ungrad.forms.ui;
 
 import org.eclipse.jface.preference.DirectoryFieldEditor;
@@ -10,7 +19,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.ui.actions.AddStringEntryAction;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.ungrad.forms.model.PreferenceConstants;
 
@@ -25,6 +33,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
 		setDescription("Ungrad Forms");
 	}
+
 	@Override
 	public void init(IWorkbench arg0) {
 
@@ -32,13 +41,14 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 
 	@Override
 	protected void createFieldEditors() {
-		addField(new DirectoryFieldEditor(PreferenceConstants.TEMPLATES, "Vorlagenverzeichnis", getFieldEditorParent()));
-		addField(new DirectoryFieldEditor(PreferenceConstants.OUTPUT,"Dokumentenverzeichnis", getFieldEditorParent()));
+		addField(
+				new DirectoryFieldEditor(PreferenceConstants.TEMPLATES, "Vorlagenverzeichnis", getFieldEditorParent()));
+		addField(new DirectoryFieldEditor(PreferenceConstants.OUTPUT, "Dokumentenverzeichnis", getFieldEditorParent()));
 		addField(new FileFieldEditor(PreferenceConstants.PUG, "Pug-Compiler", getFieldEditorParent()));
 	}
+
 	protected void performApply() {
 		CoreHub.localCfg.flush();
 	}
-
 
 }

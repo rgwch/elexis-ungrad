@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2022, G. Weirich and Elexis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    G. Weirich - initial implementation
+ *    
+ *******************************************************************************/
+
 package ch.elexis.ungrad.forms.model;
 
 import java.io.BufferedReader;
@@ -5,20 +17,14 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
-import ch.elexis.data.Brief;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
@@ -124,14 +130,15 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			pdfFile = new File(dir, filename + ".pdf");
 		} else {
 			htmlFile = new File(filename);
-			pdfFile = new File(FileTool.getFilepath(filename), FileTool.getNakedFilename(filename)+".pdf");
+			pdfFile = new File(FileTool.getFilepath(filename), FileTool.getNakedFilename(filename) + ".pdf");
 		}
 		String content = tmpl.getXml();
 		FileTool.writeTextFile(htmlFile, content);
 		pdf.createPDF(htmlFile, pdfFile);
 		String outputFile = pdfFile.getAbsolutePath();
 		Konsultation current = (Konsultation) ElexisEventDispatcher.getInstance().getSelected(Konsultation.class);
-		// Brief metadata = new Brief(filename, new TimeTool(), CoreHub.actUser, tmpl.adressat, current, "Formular");
+		// Brief metadata = new Brief(filename, new TimeTool(), CoreHub.actUser,
+		// tmpl.adressat, current, "Formular");
 		// metadata.save(content);
 		return outputFile;
 	}

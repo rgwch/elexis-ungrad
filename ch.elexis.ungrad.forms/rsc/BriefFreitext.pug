@@ -1,0 +1,17 @@
+extends a4
+
+block content
+  #maintext(data-doctype="Brief" data-doctitle="Brief")
+    p [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
+      br/
+      span [Patient.Strasse], [Patient.Plz] [Patient.Ort]
+      br/
+      span Tel: [Patient.Telefon1] [Patient.Natel] [Patient.Telefon2]
+      br/
+	
+    div(data-input="Text")
+
+  #footer 
+    p Vielen Dank und freundliche Grüsse 
+    p [Mandant.Vorname] [Mandant.Name]  
+      

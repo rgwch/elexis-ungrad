@@ -1,10 +1,18 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2022, G. Weirich and Elexis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    G. Weirich - initial implementation
+ *    
+ *******************************************************************************/
+
 package ch.elexis.ungrad.forms.ui;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -182,7 +190,7 @@ public class View extends ViewPart implements IActivationListener {
 				if (document.exists()) {
 					try {
 						String html = FileTool.readTextFile(document);
-						Template template=new Template(html,null);
+						Template template = new Template(html, null);
 						template.setFilename(document.getAbsolutePath());
 						detail.show(template);
 					} catch (Exception e) {
