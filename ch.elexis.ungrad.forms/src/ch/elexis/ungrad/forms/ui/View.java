@@ -41,8 +41,10 @@ import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.forms.model.Controller;
 import ch.elexis.ungrad.forms.model.Template;
+import ch.elexis.ungrad.pdf.Medform;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
+import ch.rgw.tools.TimeTool;
 
 /**
  * @author gerry
@@ -132,26 +134,37 @@ public class View extends ViewPart implements IActivationListener {
 				if (std.open() == Dialog.OK) {
 					File template = std.result;
 					try {
-						Kontakt adressat = null;
-						String html = FileTool.readTextFile(template);
-						if (template.getName().endsWith("pug")) {
-							String dir = template.getParent();
-							html = controller.convertPug(html, dir);
-						}
-						if (html.contains("[Adressat")) {
-							KontaktSelektor ksd = new KontaktSelektor(getSite().getShell(), Kontakt.class, "Adressat",
-									"Bitte Adressat auswählen", new String[] { "Bezeichnung1", "Bezeichnung2" });
-							if (ksd.open() != Dialog.OK) {
-								return;
-							} else {
-								adressat = (Kontakt) ksd.getSelection();
+						if (template.getName().endsWith("pdf")) {
+							Patient currentPat=ElexisEventDispatcher.getSelectedPatient();
+							File outDir=controller.getOutputDirFor(currentPat);
+							String basename="A_"+new TimeTool().toString(TimeTool.DATE_ISO)+"_"+template.getName();
+							File outFile=new File(outDir,basename);
+							Medform medform=new Medform(template.getAbsolutePath());
+							medform.create(outFile.getAbsolutePath(), currentPat);
+							detail.asyncRunViewer(outFile.getAbsolutePath());
+						} else {
+							Kontakt adressat = null;
+							String html = FileTool.readTextFile(template);
+							if (template.getName().endsWith("pug")) {
+								String dir = template.getParent();
+								html = controller.convertPug(html, dir);
 							}
+							if (html.contains("[Adressat")) {
+								KontaktSelektor ksd = new KontaktSelektor(getSite().getShell(), Kontakt.class,
+										"Adressat", "Bitte Adressat auswählen",
+										new String[] { "Bezeichnung1", "Bezeichnung2" });
+								if (ksd.open() != Dialog.OK) {
+									return;
+								} else {
+									adressat = (Kontakt) ksd.getSelection();
+								}
+							}
+							Template processed = new Template(html, adressat);
+							detail.show(processed);
+							printAction.setEnabled(true);
+							stack.topControl = detail;
+							container.layout();
 						}
-						Template processed = new Template(html, adressat);
-						detail.show(processed);
-						printAction.setEnabled(true);
-						stack.topControl = detail;
-						container.layout();
 
 					} catch (Exception e) {
 						ExHandler.handle(e);

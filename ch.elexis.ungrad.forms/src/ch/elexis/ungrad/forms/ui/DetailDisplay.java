@@ -94,7 +94,7 @@ public class DetailDisplay extends Composite {
 		}
 	}
 
-	private void asyncRunViewer(String filepath) {
+	void asyncRunViewer(String filepath) {
 		Display.getDefault().asyncExec(new Runnable() {
 
 			@Override

@@ -46,3 +46,9 @@ p(data-anrede="true") Liebe[Adressat:mw:r/ ] [Adressat.Vorname]
 ```
 
 Wenn obige Zeichenfolge in "Bemerkungen" des Adressaten "Hans Elexikus" gefunden wird, wird "Hallo Altes Haus" geschrieben, ansonsten "Lieber Hans".
+
+
+## Medforms
+
+Das Plugin kann auch [Medforms](http://medforms.ch)-Formulare mit den Daten des aktuell ausgewählten Patienten befüllen und zum Weiterbearbeiten anzeigen. 
+PDF-Formulare im Schablonen-Order werden zusammen mit den HTML-Schalblonen zur Auswahl angeboten und automatisch als Medforms-Formulare behandelt.
