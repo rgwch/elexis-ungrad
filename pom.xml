@@ -45,6 +45,7 @@
         <module>ch.elexis.ungrad.forms</module>
         <module>ch.elexis.ungrad.forms.feature</module>
         <module>ch.elexis.ungrad.pdf</module>
+        <module>ch.elexis.ungrad.pdf.feature</module>
         <module>ch.elexis.ungrad.privatrechnung_qr</module>
         <module>ch.elexis.ungrad.privatrechnung_qr.feature</module>
         <module>ch.elexis.ungrad.qrbills</module>
