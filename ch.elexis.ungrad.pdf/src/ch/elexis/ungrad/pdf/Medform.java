@@ -70,7 +70,7 @@ public class Medform {
     }
     Mandant mand=ElexisEventDispatcher.getSelectedMandator();
     if(mand!=null) {
-      m.put(get("mandatorAddress"), mand.getPostAnschrift());
+      m.put(get("mandatorAddress"), mand.getPostAnschrift(true));
       m.put(get("mandatorNameLine"), mand.get("Bezeichnung1")+" "+mand.get("Bezeichnung2"));
       m.put(get("mandatorEAN"), mand.get("EAN"));
       m.put(get("mandatorZSR"),mand.get("KSK"));
