@@ -26,16 +26,28 @@ Gehen Sie auf Datei-Einstellungen-Datenaustausch-Forms und geben Sie die Verzeic
 
 ![Auswahl](choose.png)
 
-Doppelklick auf die gewünschte Vorlage öffnet die Formular-Sicht (In diesem Beispiel ergibt AnmeldungDu.hml und AnmeldungDu.pug exakt dasselbe Formular; sie brauchen nur eine davon):
+Doppelklick auf die gewünschte Vorlage öffnet die Formular-Sicht (In diesem Beispiel ergibt AnmeldungDu.hml und AnmeldungDu.pug exakt dasselbe Formular; Sie brauchen nur eine davon):
 
 ![Formular](formview.png)
 
-Zum Abschluss klicken Sie auf das Druckersymbol, um die PDF-Sicht zum Ausdrucken oder Mailen zu erhalten:
+Zum Abschluss klicken Sie auf das Druckersymbol rechts oben, um die PDF-Sicht zum Ausdrucken oder Mailen zu erhalten:
 
 ![PDF-Version](pdf.png)
+
+Zusammenfassung: Sie brauchen:
+
+_Entweder:_ AnmeldungDu.pug _und_ a4.pug _und_ styles_a4.css (alle in Ihrem Vorlagen-Verzeichnis)
+
+_Oder:_ AnmeldungDu.html (die alles obige enthält)
+
+Diese Vorlage enthält Felder, die in der Formularsicht gefüllt werden. Klick auf das Druckersymbol führt dann Formular und Inhalt zusammen und erstellt eine HTNL- und eine PDF- Datei. Mehr über den Aufbau der Formulare und die Definition der Felder können Sie [hier](../rsc/whatisit.md) nachlesen.
+
+Wenn Sie in der Listenansicht auf eine existierende Datei doppelklicken, wird sie wieder in der Formularansicht geöffnet und kann geändert werden. Ein so erstelltes PDF überschreibt das früher erstellte Dokument.
 
 ## Verwendung: Medforms Formulare
 
 Das Plugin verarbeitet auch [Medforms](https://www.medforms.ch/) Formulare. Das sind PDF Dateien mit Standardkonformen Formularfeldern. Ungrad Forms kann die Felder, die den aktuelll ausgewählten Patienten betreffen, vorab abfüllen. In diesem Fall wird nicht die Formularsicht in der Forms-View geöffnet, sondern direkt der PDF-Viewer mit dem Vorabgefüllten Formular:
 
 ![Medforms](physio.png)
+
+Da es allerdings kein frei zugängliches API für Medforms-Dateien gibt, beruht dieses Ausfüllen auf einfachen Analysen einiger Formulare. Geben Sie doch eine Rückmeldung, falls Ihre Formulare nicht funktionieren.

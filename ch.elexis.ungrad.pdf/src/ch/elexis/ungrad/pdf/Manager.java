@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -29,35 +28,45 @@ import javax.print.PrintServiceLookup;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.MediaSizeName;
+import javax.swing.text.PlainDocument;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.printing.PDFPrintable;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
-import org.apache.pdfbox.pdmodel.interactive.form.PDNonTerminalField;
+import org.apache.pdfbox.printing.PDFPrintable;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
+import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 
 public class Manager {
 
   public String fillForm(String formpath, String outputPath, Map<String, String> fields) throws Exception {
-    try (InputStream resource = new FileInputStream(formpath)) {
-      PDDocument pdfDocument = PDDocument.load(resource);
+    PDDocument pdfDocument;
+    try{
+      InputStream resource = new FileInputStream(formpath);
+      pdfDocument = PDDocument.load(resource);
       PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
       PDAcroForm acroForm = docCatalog.getAcroForm();
       for (Entry<String, String> e : fields.entrySet()) {
         PDField pdField = acroForm.getField(e.getKey());
         if (pdField != null) {
-          pdField.setValue(e.getValue());
+          try {
+            String val = e.getValue();
+            pdField.setValue(val);
+          } catch (Exception ex) {
+            ex.printStackTrace();
+          }
         }
       }
       pdfDocument.save(outputPath);
       pdfDocument.close();
       return outputPath;
+    }catch(Exception ex){
+      ExHandler.handle(ex);
+      return "";
     }
   }
 
