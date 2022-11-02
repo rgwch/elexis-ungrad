@@ -17,8 +17,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.data.Kontakt;
+import ch.elexis.data.Mandant;
 import ch.elexis.data.Patient;
+import ch.rgw.tools.TimeTool;
 
 public class Medform {
 
@@ -33,7 +36,19 @@ public class Medform {
       { "street", "topmostSubform[0].page1[0].patientS1Address[0].street[0]" },
       { "zip", "topmostSubform[0].page1[0].patientS1Address[0].zip[0]" },
       { "city", "topmostSubform[0].page1[0].patientS1Address[0].city[0]" },
-      { "phone", "topmostSubform[0].page1[0].patientS1Address[0].phone[0]" }
+      { "phone", "topmostSubform[0].page1[0].patientS1Address[0].phone[0]" },
+      { "mail", "topmostSubform[0].page1[0].patientS1Address[0].email[0]" },
+      { "date", "topmostSubform[0].page1[0].formS1Struct[0].modificationDate[0]" },
+      { "mandatorPhone", "topmostSubform[0].page1[0].providerS1Address[0].phone[0]" },
+      { "mandatorFax", "topmostSubform[0].page1[0].providerS1Address[0].fax[0]" },
+      { "mandatorEAN", "topmostSubform[0].page1[0].providerS1Address[0].ean[0]" },
+      { "mandatorZSR", "topmostSubform[0].page1[0].providerS1Address[0].zsr[0]" },
+      { "mandatorNameLine", "topmostSubform[0].page2[0].providerS1Address[0].condensedName[0]" },
+      { "mandatorStreet", "topmostSubform[0].page2[0].providerS1Address[0].street[0]" },
+      { "mandatorZip", "topmostSubform[0].page2[0].providerS1Address[0].zip[0]" },
+      { "mandatorCity", "topmostSubform[0].page2[0].providerS1Address[0].city[0]" },
+      { "mandatorAddress", "topmostSubform[0].page1[0].providerS1Address[0].blockAddress[0]" }
+
   }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
   public Medform(String formpath) {
@@ -42,14 +57,28 @@ public class Medform {
 
   public String create(String outPath, Patient pat) throws Exception {
     Map<String, String> m = new HashMap<String, String>();
-    m.put(get("firstname"), pat.getVorname());
-    m.put(get("lastname"), pat.getName());
-    m.put(get("birthdate"), pat.getGeburtsdatum());
-    m.put(get("sex"), pat.getGeschlecht());
-    m.put(get("street"), pat.get(Kontakt.FLD_STREET));
-    m.put(get("zip"), pat.get(Kontakt.FLD_ZIP));
-    m.put(get("city"), pat.get(Kontakt.FLD_PLACE));
-    m.put(get("phone"), pat.get(Kontakt.FLD_PHONE1));
+    if (pat != null) {
+      m.put(get("firstname"), pat.getVorname());
+      m.put(get("lastname"), pat.getName());
+      m.put(get("birthdate"), pat.getGeburtsdatum());
+      m.put(get("sex"), pat.getGeschlecht());
+      m.put(get("street"), pat.get(Kontakt.FLD_STREET));
+      m.put(get("zip"), pat.get(Kontakt.FLD_ZIP));
+      m.put(get("city"), pat.get(Kontakt.FLD_PLACE));
+      m.put(get("phone"), pat.get(Kontakt.FLD_PHONE1));
+      m.put(get("date"), new TimeTool().toString(TimeTool.DATE_GER));
+    }
+    Mandant mand=ElexisEventDispatcher.getSelectedMandator();
+    if(mand!=null) {
+      m.put(get("mandatorAddress"), mand.getPostAnschrift());
+      m.put(get("mandatorNameLine"), mand.get("Bezeichnung1")+" "+mand.get("Bezeichnung2"));
+      m.put(get("mandatorEAN"), mand.get("EAN"));
+      m.put(get("mandatorZSR"),mand.get("KSK"));
+      m.put(get("mandatorStreet"), mand.get("Strasse"));
+      m.put(get("mandatorZIP"), mand.get("Plz"));
+      m.put(get("mandatorCity"),mand.get("Ort"));
+           
+    }
     return mgr.fillForm(form, outPath, m);
   }
 
@@ -119,7 +148,7 @@ public class Medform {
  * topmostSubform[0].page1[0].diagnosisS1Struct[0].input[0]
  * topmostSubform[0].page1[0].formDescription[0]
  * topmostSubform[0].page1[0].pad_medforms_form_id[0]
- * topmostSubform[0].page1[0].calcP1Pad_medforms_form_id[0]
+ * topmostSubform[0].page1[0].calcP1Pad_medfor)ms_form_id[0]
  * topmostSubform[0].page2[0].endDate[0]
  * topmostSubform[0].page2[0].numWeeks[0]
  * topmostSubform[0].page2[0].therapyStruct[0].ask4Hospitalization[0]
@@ -183,4 +212,11 @@ public class Medform {
  * topmostSubform[0].page3[0].formDescription[0]
  * topmostSubform[0].page3[0].calcP3Pad_medforms_form_id[0]
  * topmostSubform[0].page3[0].addendum[0]
+ * 
+ * topmostSubform[0].page1[0].providerS1Address[0].blockAddress[0]->Eisenbeiss
+ * topmostSubform[0].page1[0].providerS1Address[0].phone[0]->123
+ * topmostSubform[0].page1[0].providerS1Address[0].fax[0]->456
+ * topmostSubform[0].page1[0].providerS1Address[0].ean[0]->789
+ * topmostSubform[0].page1[0].providerS1Address[0].zsr[0]->012
+ * topmostSubform[0].page1[0].providerS1Address[0].input[0]->
  */
