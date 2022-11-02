@@ -21,75 +21,146 @@ import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Mandant;
 import ch.elexis.data.Patient;
+import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 public class Medform {
-
-  String form;
-  Manager mgr = new Manager();
-
-  Map<String, String> mapping = Stream.of(new String[][] {
-      { "firstname", "topmostSubform[0].page1[0].patientS1Address[0].firstName[0]" },
-      { "lastname", "topmostSubform[0].page1[0].patientS1Address[0].lastName[0]" },
-      { "birthdate", "topmostSubform[0].page1[0].patientS1Address[0].birthDate[0]" },
-      { "sex", "topmostSubform[0].page1[0].patientS1Address[0].sex[0]" },
-      { "street", "topmostSubform[0].page1[0].patientS1Address[0].street[0]" },
-      { "zip", "topmostSubform[0].page1[0].patientS1Address[0].zip[0]" },
-      { "city", "topmostSubform[0].page1[0].patientS1Address[0].city[0]" },
-      { "phone", "topmostSubform[0].page1[0].patientS1Address[0].phone[0]" },
-      { "mail", "topmostSubform[0].page1[0].patientS1Address[0].email[0]" },
-      { "date", "topmostSubform[0].page1[0].formS1Struct[0].modificationDate[0]" },
-      { "mandatorPhone", "topmostSubform[0].page1[0].providerS1Address[0].phone[0]" },
-      { "mandatorFax", "topmostSubform[0].page1[0].providerS1Address[0].fax[0]" },
-      { "mandatorEAN", "topmostSubform[0].page1[0].providerS1Address[0].ean[0]" },
-      { "mandatorZSR", "topmostSubform[0].page1[0].providerS1Address[0].zsr[0]" },
-      { "mandatorNameLine", "topmostSubform[0].page2[0].providerS1Address[0].condensedName[0]" },
-      { "mandatorStreet", "topmostSubform[0].page2[0].providerS1Address[0].street[0]" },
-      { "mandatorZip", "topmostSubform[0].page2[0].providerS1Address[0].zip[0]" },
-      { "mandatorCity", "topmostSubform[0].page2[0].providerS1Address[0].city[0]" },
-      { "mandatorAddress", "topmostSubform[0].page1[0].providerS1Address[0].blockAddress[0]" }
-
-  }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
-
-  public Medform(String formpath) {
-    this.form = formpath;
-  }
-
-  public String create(String outPath, Patient pat) throws Exception {
-    Map<String, String> m = new HashMap<String, String>();
-    if (pat != null) {
-      m.put(get("firstname"), pat.getVorname());
-      m.put(get("lastname"), pat.getName());
-      m.put(get("birthdate"), pat.getGeburtsdatum());
-      m.put(get("sex"), pat.getGeschlecht());
-      m.put(get("street"), pat.get(Kontakt.FLD_STREET));
-      m.put(get("zip"), pat.get(Kontakt.FLD_ZIP));
-      m.put(get("city"), pat.get(Kontakt.FLD_PLACE));
-      m.put(get("phone"), pat.get(Kontakt.FLD_PHONE1));
-      m.put(get("date"), new TimeTool().toString(TimeTool.DATE_GER));
-    }
-    Mandant mand=ElexisEventDispatcher.getSelectedMandator();
-    if(mand!=null) {
-      m.put(get("mandatorAddress"), mand.getPostAnschrift(true));
-      m.put(get("mandatorNameLine"), mand.get("Bezeichnung1")+" "+mand.get("Bezeichnung2"));
-      m.put(get("mandatorEAN"), mand.get("EAN"));
-      m.put(get("mandatorZSR"),mand.get("KSK"));
-      m.put(get("mandatorStreet"), mand.get("Strasse"));
-      m.put(get("mandatorZIP"), mand.get("Plz"));
-      m.put(get("mandatorCity"),mand.get("Ort"));
-           
-    }
-    return mgr.fillForm(form, outPath, m);
-  }
-
-  public String get(String field) {
-    String ret = mapping.get(field);
-    if (ret == null) {
-      return "";
-    } else {
-      return ret;
-    }
-  }
+	
+	String form;
+	Manager mgr = new Manager();
+	
+	Map<String, String> mapping = Stream.of(new String[][] {
+		{
+			"patAddress", "topmostSubform[0].page1[0].patientS1Address[0].blockAddress[0]"
+		}, {
+			"patNameLine", "topmostSubform[0].page1[0].patientS1Address[0].condensedName[0]"
+		}, {
+			"patFirstname", "topmostSubform[0].page1[0].patientS1Address[0].firstName[0]"
+		}, {
+			"patLastname", "topmostSubform[0].page1[0].patientS1Address[0].lastName[0]"
+		}, {
+			"patBirthdate", "topmostSubform[0].page1[0].patientS1Address[0].birthDate[0]"
+		}, {
+			"patSex", "topmostSubform[0].page1[0].patientS1Address[0].sex[0]"
+		}, {
+			"patStreet", "topmostSubform[0].page1[0].patientS1Address[0].street[0]"
+		}, {
+			"patZip", "topmostSubform[0].page1[0].patientS1Address[0].zip[0]"
+		}, {
+			"patCity", "topmostSubform[0].page1[0].patientS1Address[0].city[0]"
+		}, {
+			"patPhone1", "topmostSubform[0].page1[0].patientS1Address[0].phone[0]"
+		}, {
+			"patPhone2", "topmostSubform[0].page1[0].patientS1Address[0].phone[1]"
+		}, {
+			"patMail", "topmostSubform[0].page1[0].patientS1Address[0].email[0]"
+		}, {
+			"docDate", "topmostSubform[0].page1[0].formS1Struct[0].modificationDate[0]"
+		}, {
+			"mandatorPhone1", "topmostSubform[0].page1[0].providerS1Address[0].phone[0]"
+		}, {
+			"mandatorMail", "topmostSubform[0].page1[0].providerS1Address[0].email[0]"
+		}, {
+			"mandatorFax", "topmostSubform[0].page1[0].providerS1Address[0].fax[0]"
+		}, {
+			"mandatorEAN", "topmostSubform[0].page1[0].providerS1Address[0].ean[0]"
+		}, {
+			"mandatorZSR", "topmostSubform[0].page1[0].providerS1Address[0].zsr[0]"
+		}, {
+			"mandatorNameLine", "topmostSubform[0].page2[0].providerS1Address[0].condensedName[0]"
+		}, {
+			"mandatorStreet", "topmostSubform[0].page2[0].providerS1Address[0].street[0]"
+		}, {
+			"mandatorZip", "topmostSubform[0].page2[0].providerS1Address[0].zip[0]"
+		}, {
+			"mandatorCity", "topmostSubform[0].page2[0].providerS1Address[0].city[0]"
+		}, {
+			"mandatorAddress", "topmostSubform[0].page1[0].providerS1Address[0].blockAddress[0]"
+		}
+		
+	}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+	
+	public Medform(String formpath){
+		this.form = formpath;
+	}
+	
+	public String create(String outPath, Patient pat) throws Exception{
+		Map<String, String> m = new HashMap<String, String>();
+		if (pat != null) {
+			String[] phones = getPhones(pat);
+			m.put(get("patAddress"), pat.getPostAnschrift(true));
+			m.put(get("patFirstname"), pat.getVorname());
+			m.put(get("patLastname"), pat.getName());
+			m.put(get("patBirthdate"), pat.getGeburtsdatum());
+			m.put(get("patSex"), pat.getGeschlecht());
+			m.put(get("patStreet"), pat.get(Kontakt.FLD_STREET));
+			m.put(get("patZip"), pat.get(Kontakt.FLD_ZIP));
+			m.put(get("patCity"), pat.get(Kontakt.FLD_PLACE));
+			m.put(get("patPhone1"), phones[0]);
+			m.put(get("patPhone2"), phones[1]);
+			m.put(get("patMail"), pat.get(Kontakt.FLD_E_MAIL));
+			m.put(get("docDate"), new TimeTool().toString(TimeTool.DATE_GER));
+		}
+		Mandant mand = ElexisEventDispatcher.getSelectedMandator();
+		if (mand != null) {
+			m.put(get("mandatorAddress"), mand.getPostAnschrift(true));
+			m.put(get("mandatorNameLine"),
+				mand.get("Bezeichnung1") + " " + mand.get("Bezeichnung2"));
+			m.put(get("mandatorEAN"), mand.get("EAN"));
+			m.put(get("mandatorZSR"), mand.get("KSK"));
+			m.put(get("mandatorStreet"), mand.get("Strasse"));
+			m.put(get("mandatorZIP"), mand.get("Plz"));
+			m.put(get("mandatorCity"), mand.get("Ort"));
+			m.put(get("mandatorPhone1"), mand.get(Kontakt.FLD_PHONE1));
+			m.put(get("mandatorMail"), mand.get(Kontakt.FLD_E_MAIL));
+		}
+		return mgr.fillForm(form, outPath, m);
+	}
+	
+	private String[] getPhones(Kontakt k){
+		String p1 = k.get(Kontakt.FLD_PHONE1);
+		String p2 = k.get(Kontakt.FLD_PHONE2);
+		String p3 = k.get(Kontakt.FLD_MOBILEPHONE);
+		String[] ret = new String[2];
+		if (!StringTool.isNothing(p3)) {
+			ret[0] = p3;
+			if (!StringTool.isNothing(p1) && !p1.equals(p3)) {
+				ret[1] = p1;
+			} else {
+				if (!StringTool.isNothing(p2) && !p2.equals(p3)) {
+					ret[1] = p2;
+				} else {
+					ret[1] = "";
+				}
+			}
+		} else {
+			if (!StringTool.isNothing(p1)) {
+				ret[0] = p1;
+				if (!StringTool.isNothing(p2) && !p1.equals(p2)) {
+					ret[1] = p2;
+				} else {
+					ret[1] = "";
+				}
+			} else {
+				ret[1] = "";
+				if (!StringTool.isNothing(p3)) {
+					ret[0] = p3;
+				} else {
+					ret[0] = "";
+				}
+			}
+		}
+		return ret;
+	}
+	
+	public String get(String field){
+		String ret = mapping.get(field);
+		if (ret == null) {
+			return "";
+		} else {
+			return ret;
+		}
+	}
 }
 /*
  * topmostSubform[0].#pageSet[0].page[0].footer[0].pageNumber[0]
