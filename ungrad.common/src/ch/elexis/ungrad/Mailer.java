@@ -32,7 +32,8 @@ public class Mailer {
 		this.smtpPort = smtpPort;
 	}
 
-	public void sendEmail(Session session, String toEmail, String subject, String body) throws Exception {
+	public void sendEmail(Session session, String toEmail, String subject, String body, String[] attachments)
+			throws Exception {
 		MimeMessage msg = new MimeMessage(session);
 		// set message headers
 		msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
@@ -43,7 +44,30 @@ public class Mailer {
 		msg.setReplyTo(msg.getFrom());
 
 		msg.setSubject(subject, "UTF-8");
-		msg.setText(body, "UTF-8");
+		if (attachments != null) {
+			BodyPart messageBodyPart = new MimeBodyPart();
+
+			// Fill the message
+			messageBodyPart.setText(body);
+
+			// Create a multipart message for attachment
+			Multipart multipart = new MimeMultipart();
+
+			// Set text message part
+			multipart.addBodyPart(messageBodyPart);
+
+			for (String filename : attachments) {
+				messageBodyPart = new MimeBodyPart();
+				DataSource source = new FileDataSource(filename);
+				messageBodyPart.setDataHandler(new DataHandler(source));
+				messageBodyPart.setFileName(filename);
+				multipart.addBodyPart(messageBodyPart);
+			}
+			// Send the complete message parts
+			msg.setContent(multipart);
+		} else {
+			msg.setText(body, "UTF-8");
+		}
 		msg.setSentDate(new Date());
 		msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
 		Transport.send(msg);
@@ -56,7 +80,7 @@ public class Mailer {
 		props.put("mail.transport.protocol", "smtp");
 		props.put("mail.smtp.port", smtpPort);
 		Session session = Session.getInstance(props, null);
-		sendEmail(session, to, subject, body);
+		sendEmail(session, to, subject, body, attachments);
 	}
 
 	public void tlsMail(String to, String subject, String body, String[] attachments) throws Exception {
@@ -76,7 +100,7 @@ public class Mailer {
 			}
 		};
 		Session session = Session.getInstance(props, auth);
-		sendEmail(session, to, subject, body);
+		sendEmail(session, to, subject, body, attachments);
 	}
 
 	public void sslMail(String to, String subject, String body, String[] attachments) throws Exception {
@@ -96,7 +120,7 @@ public class Mailer {
 
 		Session session = Session.getDefaultInstance(props, auth);
 		System.out.println("Session created");
-		sendEmail(session, to, subject, body);
+		sendEmail(session, to, subject, body, attachments);
 
 	}
 
