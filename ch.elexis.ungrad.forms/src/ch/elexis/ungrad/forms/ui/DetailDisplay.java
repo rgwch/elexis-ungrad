@@ -61,7 +61,6 @@ public class DetailDisplay extends Composite {
 			c.dispose();
 		}
 		form.setText("");
-		this.template=null;
 	}
 	
 	void show(Template template) {
