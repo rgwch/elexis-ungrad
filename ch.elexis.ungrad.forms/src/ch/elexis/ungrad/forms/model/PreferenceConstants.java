@@ -15,6 +15,11 @@ package ch.elexis.ungrad.forms.model;
 public class PreferenceConstants {
 	private static final String BASE = "ch.elexis.ungrad.forms/";
 	public static final String TEMPLATES = BASE + "templateDir";
-	public static final String OUTPUT = "outputDir";
-	public static final String PUG = "pugCompiler";
+	public static final String OUTPUT = BASE + "outputDir";
+	public static final String PUG = BASE + "pugCompiler";
+	public static final String SMTP_HOST = BASE + "smtpHost";
+	public static final String SMTP_PORT = BASE + "smtpPort";
+	public static final String SMTP_USER = BASE + "smtpUser";
+	public static final String SMTP_PWD = BASE + "smtpPwd";
+
 }

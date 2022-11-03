@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
@@ -41,6 +42,7 @@ import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.forms.model.Controller;
+import ch.elexis.ungrad.forms.model.PreferenceConstants;
 import ch.elexis.ungrad.forms.model.Template;
 import ch.elexis.ungrad.pdf.Medform;
 import ch.rgw.io.FileTool;
@@ -250,20 +252,10 @@ public class View extends ViewPart implements IActivationListener {
 
 			@Override
 			public void run() {
-				try {
-					sendMail();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				detail.sendMail();
 			}
 
 		};
-	}
-
-	public void sendMail() throws Exception {
-		Mailer mailer = new Mailer("erwineisenbart@hin.ch", "localhost", "doesntMatter", "5018");
-		mailer.simpleMail("some@one.ch", "Test", "Irgendwas", null);
 	}
 
 	@Override

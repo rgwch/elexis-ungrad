@@ -14,6 +14,7 @@ package ch.elexis.ungrad.forms.ui;
 
 import java.util.Map.Entry;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
@@ -27,11 +28,16 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.MailDialog;
+import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.forms.model.Controller;
+import ch.elexis.ungrad.forms.model.PreferenceConstants;
 import ch.elexis.ungrad.forms.model.Template;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
+import ch.rgw.tools.StringTool;
 
 public class DetailDisplay extends Composite {
 
@@ -62,7 +68,7 @@ public class DetailDisplay extends Composite {
 		}
 		form.setText("");
 	}
-	
+
 	void show(Template template) {
 		this.template = template;
 		form.setText(template.getTitle());
@@ -81,7 +87,7 @@ public class DetailDisplay extends Composite {
 		inlay.layout();
 	}
 
-	public void output() {
+	public String output() {
 		for (Control c : inlay.getChildren()) {
 			Object k = c.getData("input");
 			if (k instanceof String) {
@@ -92,9 +98,38 @@ public class DetailDisplay extends Composite {
 		try {
 			String pdffile = controller.createPDF(template, "");
 			asyncRunViewer(pdffile);
+			return pdffile;
 		} catch (Exception e) {
 			SWTHelper.showError("Fehler bei Ausgabe", e.getMessage());
 			ExHandler.handle(e);
+			return null;
+		}
+	}
+
+	public void sendMail() {
+		String pdf = output();
+		String sender = CoreHub.localCfg.get(PreferenceConstants.SMTP_USER, "");
+		String smtpserver = CoreHub.localCfg.get(PreferenceConstants.SMTP_HOST, "localhost");
+		String smtppwd = CoreHub.localCfg.get(PreferenceConstants.SMTP_PWD, "doesntMatter");
+		String smtpport = CoreHub.localCfg.get(PreferenceConstants.SMTP_PORT, "53");
+		Mailer mailer = new Mailer(sender, smtpserver, smtppwd, smtpport);
+		if(!StringTool.isNothing(template.getMailSender())) {
+			sender=template.getMailSender();
+		}
+		MailDialog mailDialog = new MailDialog(getShell(),template.getMailRecipient());
+		mailDialog.sender=sender;
+		mailDialog.body=template.getMailBody();
+		if (mailDialog.open() == Dialog.OK) {
+			sender = mailDialog.sender;
+			String subject = mailDialog.subject;
+			String body = mailDialog.body;
+
+			try {
+				mailer.simpleMail(template.getMailRecipient(), subject, body, new String[] { pdf });
+			} catch (Exception e) {
+				ExHandler.handle(e);
+				SWTHelper.showError("Fehler beim Senden der Mail", e.getMessage());
+			}
 		}
 	}
 

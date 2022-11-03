@@ -1,5 +1,4 @@
 doctype html
-// ElexisHtmlTemplate A4
 html(lang="de")
   head
     meta(charset="utf-8")/
@@ -24,6 +23,8 @@ html(lang="de")
           [Adressat.Anschrift]
         br/  
       block content
-      div(data-type="filename" style="display:none") [Datum.heute]_[Adressat.Name]_[Adressat.Vorname]
-      div(data-type="dirname" style="display:none") [Patient.Name]_[Patient.Vorname]_[Patient.Geburtsdatum]
-
+      div(data-mail="sender" style="display:none") praxis@eisenbart.hin
+      div(data-mail="subject" style="display:none") [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
+      div(data-mail="body" style="display:none")
+        p Anbei die Zuweisung meine[Patient:mw:s Patienten/r Patientin] [Patient.Name] [Patient.Vorname]  
+    

@@ -28,6 +28,7 @@ import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
@@ -172,5 +173,5 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			throw new Error(errmsg);
 		}
 	}
-
+	
 }

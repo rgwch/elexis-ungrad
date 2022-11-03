@@ -36,6 +36,9 @@ public class Template {
 	String title = "";
 	String heading = "";
 	String doctype = "";
+	String mailSender = "";
+	String mailBody = "";
+	String mailSubject = "";
 	String filename;
 	Kontakt adressat = null;
 	Map<String, String> inputs = new LinkedHashMap<String, String>();
@@ -62,6 +65,18 @@ public class Template {
 		Element eHeader = els.first();
 		if (eHeader != null) {
 			heading = eHeader.text();
+		}
+		Element body = doc.body();
+		Element eAdressat = body.getElementById("x-adressat");
+		if (eAdressat == null) {
+			if (adressat != null) {
+				body.append("<span id=\"x-adressat\" data-id=\"" + adressat.getId() + "\"></span>");
+			}
+		}else {
+			if(adressat==null) {
+				String id=eAdressat.attr("data-id");
+				adressat=Kontakt.load(id);
+			}
 		}
 		els = doc.getElementsByAttribute("data-anrede");
 		Element eAnrede = els.first();
@@ -97,6 +112,40 @@ public class Template {
 		while (it.hasNext()) {
 			Element input = it.next();
 			inputs.put(input.attr("data-input"), input.html());
+		}
+		els = doc.getElementsByAttribute("data-mail");
+		it = els.iterator();
+		while (it.hasNext()) {
+			Element mailpart = it.next();
+			String type = mailpart.attr("data-mail");
+			if (type.equals("sender")) {
+				mailSender = mailpart.text();
+			} else if (type.equals("body")) {
+				mailBody = mailpart.html();
+			} else if (type.equals("subject")) {
+				mailSubject = mailpart.text();
+			}
+		}
+	}
+
+	public String getMailSender() {
+		return mailSender;
+	}
+
+	public String getMailSubject() {
+		return mailSubject;
+	}
+
+	public String getMailBody() {
+		return mailBody;
+	}
+
+	public String getMailRecipient() {
+		if (adressat == null) {
+			return "";
+		} else {
+			String ret = adressat.get(Kontakt.FLD_E_MAIL);
+			return ret;
 		}
 	}
 
