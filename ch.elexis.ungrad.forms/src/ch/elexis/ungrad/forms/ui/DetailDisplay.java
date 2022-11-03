@@ -56,13 +56,18 @@ public class DetailDisplay extends Composite {
 		inlay.setLayout(new GridLayout());
 	}
 
-	void show(Template template) {
-		this.template = template;
-		form.setText(template.getTitle());
+	void clear() {
 		for (Control c : inlay.getChildren()) {
 			c.dispose();
 		}
-
+		form.setText("");
+		this.template=null;
+	}
+	
+	void show(Template template) {
+		this.template = template;
+		form.setText(template.getTitle());
+		clear();
 		for (Entry<String, String> e : template.getInputs().entrySet()) {
 			Label label = new Label(inlay, SWT.NONE);
 			label.setText(e.getKey());

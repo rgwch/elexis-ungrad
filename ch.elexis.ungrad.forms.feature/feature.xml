@@ -6,7 +6,7 @@
       provider-name="ch.elexis">
 
    <description url="http://www.example.com/description">
-      Create PDF files based on HTNL- PUG- or PDF forms
+      Create PDF files based on HTML- PUG- or PDF forms, or from MedForms
    </description>
 
    <copyright url="http://www.example.com/copyright">

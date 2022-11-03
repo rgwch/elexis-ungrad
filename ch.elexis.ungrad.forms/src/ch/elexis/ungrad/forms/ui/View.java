@@ -65,6 +65,9 @@ public class View extends ViewPart implements IActivationListener {
 		public void runInUi(ElexisEvent ev) {
 			// controller.changePatient((Patient) ev.getObject());
 			docList.setPatient((Patient) ev.getObject());
+			stack.topControl=docList;
+			detail.clear();
+			container.layout();
 		}
 
 	};
@@ -135,11 +138,17 @@ public class View extends ViewPart implements IActivationListener {
 					File template = std.result;
 					try {
 						if (template.getName().endsWith("pdf")) {
-							Patient currentPat=ElexisEventDispatcher.getSelectedPatient();
-							File outDir=controller.getOutputDirFor(currentPat);
-							String basename="A_"+new TimeTool().toString(TimeTool.DATE_ISO)+"_"+template.getName();
-							File outFile=new File(outDir,basename);
-							Medform medform=new Medform(template.getAbsolutePath());
+							Patient currentPat = ElexisEventDispatcher.getSelectedPatient();
+							File outDir = controller.getOutputDirFor(currentPat);
+							if (!outDir.exists()) {
+								if (!outDir.mkdirs()) {
+									throw new Error("Can't create output dir " + outDir.getAbsolutePath());
+								}
+							}
+							String basename = "A_" + new TimeTool().toString(TimeTool.DATE_ISO) + "_"
+									+ template.getName();
+							File outFile = new File(outDir, basename);
+							Medform medform = new Medform(template.getAbsolutePath());
 							medform.create(outFile.getAbsolutePath(), currentPat);
 							detail.asyncRunViewer(outFile.getAbsolutePath());
 						} else {
@@ -168,6 +177,7 @@ public class View extends ViewPart implements IActivationListener {
 
 					} catch (Exception e) {
 						ExHandler.handle(e);
+						SWTHelper.showError("Fehler bei Ausgabe", e.getMessage());
 					}
 				}
 			}
