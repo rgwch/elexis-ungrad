@@ -14,7 +14,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.13.0",
  ch.elexis.core.ui;bundle-version="3.2.0",
  ch.elexis.core.ui.icons;bundle-version="3.3.0",
  ch.elexis.ungrad.common;bundle-version="1.1.0",
- ch.elexis.ungrad.pdf;bundle-version="1.1.0"
+ ch.elexis.ungrad.pdf;bundle-version="1.1.0",
+ javax.mail.glassfish;bundle-version="1.4.1"
 Import-Package: ch.elexis.ungrad.pdf,
  org.eclipse.ui.forms.widgets
 Bundle-ClassPath: lib/jsoup-1.15.3.jar,

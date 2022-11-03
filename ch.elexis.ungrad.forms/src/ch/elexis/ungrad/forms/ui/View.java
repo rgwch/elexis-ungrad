@@ -39,6 +39,7 @@ import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.forms.model.Controller;
 import ch.elexis.ungrad.forms.model.Template;
 import ch.elexis.ungrad.pdf.Medform;
@@ -52,7 +53,7 @@ import ch.rgw.tools.TimeTool;
  */
 public class View extends ViewPart implements IActivationListener {
 	private Controller controller;
-	private Action createNewAction, showListAction, showDetailAction, printAction;
+	private Action createNewAction, showListAction, showDetailAction, printAction, mailAction;
 	private DocumentList docList;
 	private DetailDisplay detail;
 	private Composite container;
@@ -65,7 +66,7 @@ public class View extends ViewPart implements IActivationListener {
 		public void runInUi(ElexisEvent ev) {
 			// controller.changePatient((Patient) ev.getObject());
 			docList.setPatient((Patient) ev.getObject());
-			stack.topControl=docList;
+			stack.topControl = docList;
 			detail.clear();
 			container.layout();
 		}
@@ -99,6 +100,7 @@ public class View extends ViewPart implements IActivationListener {
 		toolbar.add(showListAction);
 		toolbar.add(showDetailAction);
 		toolbar.add(printAction);
+		toolbar.add(mailAction);
 		printAction.setEnabled(false);
 		showDetailAction.setEnabled(false);
 		docList.addSelectionListener(new ISelectionChangedListener() {
@@ -239,6 +241,29 @@ public class View extends ViewPart implements IActivationListener {
 				}
 			}
 		};
+		mailAction = new Action("Per Mail senden") {
+			{
+				setText("Senden");
+				setImageDescriptor(Images.IMG_MAIL_SEND.getImageDescriptor());
+				setToolTipText("Dokument als PDF per Mail versenden");
+			}
+
+			@Override
+			public void run() {
+				try {
+					sendMail();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		};
+	}
+
+	public void sendMail() throws Exception {
+		Mailer mailer = new Mailer("erwineisenbart@hin.ch", "localhost", "doesntMatter", "5018");
+		mailer.simpleMail("some@one.ch", "Test", "Irgendwas", null);
 	}
 
 	@Override
