@@ -17,7 +17,12 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMessage.RecipientType;
 import javax.mail.internet.MimeMultipart;
+
+import ch.elexis.core.ui.util.SWTHelper;
+import ch.rgw.io.FileTool;
+import ch.rgw.tools.StringTool;
 
 public class Mailer {
 	String from;
@@ -36,19 +41,24 @@ public class Mailer {
 			throws Exception {
 		MimeMessage msg = new MimeMessage(session);
 		// set message headers
-		msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
+		msg.addHeader("Content-type", "text/html; charset=UTF-8");
 		msg.addHeader("format", "flowed");
 		msg.addHeader("Content-Transfer-Encoding", "8bit");
 
 		msg.setFrom(new InternetAddress(from));
+		msg.addRecipient(RecipientType.BCC, msg.getFrom()[0]);
 		msg.setReplyTo(msg.getFrom());
-
+	
 		msg.setSubject(subject, "UTF-8");
 		if (attachments != null) {
 			BodyPart messageBodyPart = new MimeBodyPart();
 
 			// Fill the message
-			messageBodyPart.setText(body);
+			if (body.contains("<")) {
+				messageBodyPart.setContent(body, "text/html");
+			} else {
+				messageBodyPart.setText(body);
+			}
 
 			// Create a multipart message for attachment
 			Multipart multipart = new MimeMultipart();
@@ -60,7 +70,7 @@ public class Mailer {
 				messageBodyPart = new MimeBodyPart();
 				DataSource source = new FileDataSource(filename);
 				messageBodyPart.setDataHandler(new DataHandler(source));
-				messageBodyPart.setFileName(filename);
+				messageBodyPart.setFileName(Util.reduceCharset(FileTool.getFilename(filename)));
 				multipart.addBodyPart(messageBodyPart);
 			}
 			// Send the complete message parts
@@ -71,6 +81,7 @@ public class Mailer {
 		msg.setSentDate(new Date());
 		msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
 		Transport.send(msg);
+		SWTHelper.showInfo("Mail gesendet", "Die Mail wurde an " + toEmail + " gesendet.");
 	}
 
 	public void simpleMail(String to, String subject, String body, String[] attachments) throws Exception {

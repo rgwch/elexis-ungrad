@@ -18,58 +18,58 @@ public class MailDialog extends TitleAreaDialog {
 	Text tSubject;
 	Text tBody;
 	String mailTo;
-	
-	public String sender="";
-	public String subject="";
-	public String body="";
-	
+
+	public String sender = "";
+	public String subject = "";
+	public String body = "";
+
 	public MailDialog(Shell parentShell, String mailTo) {
 		super(parentShell);
-		this.mailTo=mailTo;
+		this.mailTo = mailTo;
 	}
+
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Composite ret=new Composite(parent, SWT.NONE);
+		Composite ret = new Composite(parent, SWT.NONE);
 		ret.setLayoutData(SWTHelper.getFillGridData());
 		ret.setLayout(new GridLayout(2, false));
-		Label lSender=new Label(ret,SWT.NONE);
+		Label lSender = new Label(ret, SWT.NONE);
 		lSender.setLayoutData(SWTHelper.getFillGridData(1, false, 1, false));
 		lSender.setText("Absender");
-		tSender=new Text(ret,SWT.BORDER);
+		tSender = new Text(ret, SWT.BORDER);
 		tSender.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		tSender.setText(sender);
-		
-		Label lSubject=new Label(ret,SWT.NONE);
+
+		Label lSubject = new Label(ret, SWT.NONE);
 		lSubject.setLayoutData(SWTHelper.getFillGridData(1, false, 1, false));
 		lSubject.setText("Betreff");
-		tSubject=new Text(ret,SWT.BORDER);
+		tSubject = new Text(ret, SWT.BORDER);
 		tSubject.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		tSubject.setText(subject);
-		
-		tBody=new Text(ret,SWT.BORDER|SWT.MULTI);
+
+		tBody = new Text(ret, SWT.BORDER | SWT.MULTI);
 		tBody.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
-		tBody.setText(body);
-		
+		String esc=body.replace("<br />", "\n");
+		tBody.setText(esc);
+
 		return ret;
 	}
-	
+
 	@Override
 	public void create() {
 		super.create();
 		setTitle("Dokument als Mailanhang versenden");
-		if(StringTool.isNothing(mailTo)) {
+		if (StringTool.isNothing(mailTo)) {
 			setErrorMessage("Es ist kein gültiger Addressat gesetzt");
 		}
 	}
+
 	@Override
 	protected void okPressed() {
-		sender=tSender.getText();
-		subject=tSubject.getText();
-		body=tBody.getText();
+		sender = tSender.getText();
+		subject = tSubject.getText();
+		body = tBody.getText().replace("\n", "<br />");
 		super.okPressed();
 	}
-	
-	
-	
 
 }
