@@ -66,16 +66,9 @@ public class Template {
 		if (eHeader != null) {
 			heading = eHeader.text();
 		}
-		Element body = doc.body();
-		Element eAdressat = body.getElementById("x-adressat");
-		if (eAdressat == null) {
-			if (adressat != null) {
-				body.append("<span id=\"x-adressat\" data-id=\"" + adressat.getId() + "\"></span>");
-			}
-		}else {
-			if(adressat==null) {
-				String id=eAdressat.attr("data-id");
-				adressat=Kontakt.load(id);
+		if (adressat == null) {
+			if (findAdressat() != null) {
+
 			}
 		}
 		els = doc.getElementsByAttribute("data-anrede");
@@ -128,6 +121,24 @@ public class Template {
 		}
 	}
 
+	private Kontakt findAdressat() {
+		Element body = doc.body();
+		Element eAdressat = body.getElementById("x-adressat");
+		if (eAdressat == null) {
+			if (adressat != null) {
+				body.append("<span id=\"x-adressat\" data-id=\"" + adressat.getId() + "\"></span>");
+			}
+		} else {
+			String id = eAdressat.attr("data-id");
+			Kontakt ka = Kontakt.load(id);
+			if (ka.isValid()) {
+				adressat = ka;
+			}
+		}
+		return adressat;
+
+	}
+
 	public String getMailSender() {
 		return mailSender;
 	}
@@ -141,6 +152,7 @@ public class Template {
 	}
 
 	public String getMailRecipient() {
+		adressat = findAdressat();
 		if (adressat == null) {
 			return "";
 		} else {

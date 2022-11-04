@@ -60,6 +60,7 @@ public class View extends ViewPart implements IActivationListener {
 	private DetailDisplay detail;
 	private Composite container;
 	private StackLayout stack;
+	private Template currentTemplate;
 
 	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
 			ElexisEvent.EVENT_SELECTED) {
@@ -139,9 +140,9 @@ public class View extends ViewPart implements IActivationListener {
 			public void run() {
 				SelectTemplateDialog std = new SelectTemplateDialog(getViewSite().getShell());
 				if (std.open() == Dialog.OK) {
-					File template = std.result;
+					File templateFile = std.result;
 					try {
-						if (template.getName().endsWith("pdf")) {
+						if (templateFile.getName().endsWith("pdf")) {
 							Patient currentPat = ElexisEventDispatcher.getSelectedPatient();
 							File outDir = controller.getOutputDirFor(currentPat);
 							if (!outDir.exists()) {
@@ -150,16 +151,16 @@ public class View extends ViewPart implements IActivationListener {
 								}
 							}
 							String basename = "A_" + new TimeTool().toString(TimeTool.DATE_ISO) + "_"
-									+ template.getName();
+									+ templateFile.getName();
 							File outFile = new File(outDir, basename);
-							Medform medform = new Medform(template.getAbsolutePath());
+							Medform medform = new Medform(templateFile.getAbsolutePath());
 							medform.create(outFile.getAbsolutePath(), currentPat);
 							detail.asyncRunViewer(outFile.getAbsolutePath());
 						} else {
 							Kontakt adressat = null;
-							String html = FileTool.readTextFile(template);
-							if (template.getName().endsWith("pug")) {
-								String dir = template.getParent();
+							String html = FileTool.readTextFile(templateFile);
+							if (templateFile.getName().endsWith("pug")) {
+								String dir = templateFile.getParent();
 								html = controller.convertPug(html, dir);
 							}
 							if (html.contains("[Adressat")) {
@@ -172,9 +173,10 @@ public class View extends ViewPart implements IActivationListener {
 									adressat = (Kontakt) ksd.getSelection();
 								}
 							}
-							Template processed = new Template(html, adressat);
-							detail.show(processed);
+							currentTemplate = new Template(html, adressat);
+							detail.show(currentTemplate);
 							printAction.setEnabled(true);
+							mailAction.setEnabled(true);
 							stack.topControl = detail;
 							container.layout();
 						}
@@ -198,6 +200,7 @@ public class View extends ViewPart implements IActivationListener {
 				stack.topControl = docList;
 				if (docList.getSelection() == null) {
 					printAction.setEnabled(false);
+					mailAction.setEnabled(false);
 				}
 				container.layout();
 			}
@@ -217,9 +220,9 @@ public class View extends ViewPart implements IActivationListener {
 				if (document.exists()) {
 					try {
 						String html = FileTool.readTextFile(document);
-						Template template = new Template(html, null);
-						template.setFilename(document.getAbsolutePath());
-						detail.show(template);
+						currentTemplate = new Template(html, null);
+						currentTemplate.setFilename(document.getAbsolutePath());
+						detail.show(currentTemplate);
 					} catch (Exception e) {
 						SWTHelper.showError("Fehler bei Verarbeitung", e.getMessage());
 					}
