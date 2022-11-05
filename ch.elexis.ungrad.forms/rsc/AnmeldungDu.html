@@ -1,149 +1,94 @@
-<!DOCTYPE html>
-<!-- Dies ist die compilierte Version von "AnmeldungDu.pug". Sie kann als Ausgangspunkt für eigene 
-     HTML-Formulare dienen, wenn man keinen pug-Compiler hat -->
-<html lang="de">
-<head>
-<meta charset="utf-8" />
-<title>Anmeldung</title>
-<style>
-@page {
-	size: A4 portrait;
-	margin-top: 5mm;
-	margin-left: 5mm;
-	margin-bottom: 5mm;
-	margin-right: 5mm;
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"/><title>Doctitle</title><style>@page {
+    size: A4 portrait;
+    margin-top: 5mm;
+    margin-left: 5mm;
+    margin-bottom: 5mm;
+    margin-right: 5mm;
 }
 
 #container {
-	box-sizing: border-box;
-	position: absolute;
-	font-size: 11pt;
-	left: 5mm;
-	top: 0;
-	width: 200mm;
-	height: 287mm;
+    box-sizing: border-box;
+    position: absolute;
+    font-size: 11pt;
+    left: 5mm;
+    top: 0;
+    width: 200mm;
+    height: 287mm;
 }
 
 /* Datum rechts oben */
 #date {
-	position: absolute;
-	right: 20mm;
-	top: 24mm;
-	width: 50mm;
+    position: absolute;
+    right: 20mm;
+    top: 24mm;
+    width: 50mm;
 }
 
 /* Seitenkopf mit ggf. Praxislogo */
 #header {
-	color: green;
-	text-align: center;
-	margin-top: 0mm;
-	padding-bottom: 0;
-	padding-top: 0;
+    color: green;
+    text-align: center;
+    margin-top: 0mm;
+    padding-bottom: 0;
+    padding-top: 0;
 }
 
 /* Hauptüberschrift */
 h1 {
-	font-size: 14pt;
-	margin-bottom: 0;
-	padding-bottom: 0;
+    font-size: 14pt;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
-h2 {
+h2{
 	font-size: 11pt;
 	font-weight: bolder;
 }
 /* Tabellen kompakter machen */
-table, tr, td {
-	padding-bottom: 0;
-	padding-top: 0;
-	margin-bottom: 0;
-	margin-top: 0;
+table,
+tr,
+td {
+    padding-bottom: 0;
+    padding-top: 0;
+    margin-bottom: 0;
+    margin-top: 0;
 }
 
 /* Absenderfeld links oben */
 #sender {
-	position: absolute;
-	left: 10mm;
-	top: 24mm;
-	margin-right: 20px;
-	width: 70mm;
+    position: absolute;
+    left: 10mm;
+    top: 24mm;
+    margin-right: 20px;
+    width: 70mm;
 }
 
 /* Absenderzeile im Sichtfenster über der Adresse */
 .absender {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 6pt;
-	font-weight: normal;
-	margin-bottom: 3mm;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 6pt;
+    font-weight: normal;
+    margin-bottom: 3mm;
 }
 
 /* Adresse. Bite anpassen, wenn das Sichtfenster anders liegt */
 #address {
-	position: absolute;
-	right: 20mm;
-	top: 45mm;
-	width: 60mm;
+    position: absolute;
+    right: 20mm;
+    top: 45mm;
+    width: 60mm;
 }
 
 #maintext {
-	position: absolute;
-	left: 10mm;
-	top: 90mm;
-	width: 100%;
+    position: absolute;
+    left: 10mm;
+    top: 90mm;
+    width: 100%;
 }
-
-#footer {
-	position: absolute;
-	left: 10mm;
-	top: 250mm;
-	width: 100%;
+#footer{
+    position: absolute;
+    left:10mm;
+    top: 250mm;
+    width: 100%;
 }
-</style>
-</head>
-<body>
-	<div id="container">
-		<div id="header">
-			<h1>Praxis [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</h1>
-			<span>[Mandant.Strasse] [Mandant.Plz] [Mandant.Ort]
-				Tel.:[Mandant.Telefon1] e-mail: [Mandant.E-Mail]</span>
-		</div>
-		<hr />
-		<div id="date">[Mandant.Ort], [Datum.heute]</div>
-		<div id="sender">
-			[Mandant.Titel] [Mandant.Vorname] [Mandant.Name] <br />
-			<span>Facharzt für [Mandant.TarmedSpezialität] </span><br />
-			<span>ZSR-Nr. [Mandant.KSK]</span>
-		</div>
-		<div id="address">
-			<p class="absender">[Mandant.Vorname] [Mandant.Name],
-				[Mandant.Strasse] [Mandant.Plz] [Mandant.Ort]</p>
-			[Adressat.Anschrift]<br />
-		</div>
-		<div id="maintext" data-doctype="AnmeldungDu"
-			data-doctitle="Anmeldung">
-			<p>
-				[Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]<br />
-				<span>[Patient.Strasse], [Patient.Plz] [Patient.Ort]</span><br />
-				<span>Tel: [Patient.Telefon1] [Patient.Natel]
-					[Patient.Telefon2]</span>
-			</p>
-			<p data-anrede="true">Liebe[Adressat:mw:r/ ] [Adressat.Vorname]</p>
-			<p>Ich bitte dich um direktes Aufgebot [Patient:mw:des oben
-				genannten Patienten/der oben genannten Patientin] zur fachärztlichen
-				Untersuchung.</p>
-			<h2>Problem</h2>
-			<p data-input="Problem"></p>
-			<h2>Weitere Diagnosen</h2>
-			<p data-input="Diagnosen">[Patient.Diagnosen]</p>
-			<h2>Medikation</h2>
-			<p data-input="Medikation">[Patient.Medikation]</p>
-		</div>
-		<div id="footer">
-			<p>Vielen Dank und freundliche Grüsse</p>
-			<p>[Mandant.Vorname]</p>
-		</div>
-		<div data-type="filename" style="display: none">[Datum.heute]_[Adressat.Name]_[Adressat.Vorname]</div>
-		<div data-type="dirname" style="display: none">[Patient.Name]_[Patient.Vorname]_[Patient.Geburtsdatum]</div>
-	</div>
-</body>
-</html>
+</style></head><body><div id="container"><div id="header"><h1>Praxis [Mandant.Titel] [Mandant.Vorname] [Mandant.Name]</h1><span>[Mandant.Strasse] [Mandant.Plz] [Mandant.Ort] Tel.:[Mandant.Telefon1] e-mail: [Mandant.E-Mail]</span></div><hr/><div id="date">[Mandant.Ort], [Datum.heute]</div><div id="sender">[Mandant.Titel] [Mandant.Vorname] [Mandant.Name] <br/><span>Facharzt für [Mandant.TarmedSpezialität] </span><br/><span>ZSR-Nr. [Mandant.KSK]</span></div><div id="address"> <p class="absender">[Mandant.Vorname] [Mandant.Name], [Mandant.Strasse] [Mandant.Plz] [Mandant.Ort]</p>[Adressat.Anschrift]<br/> </div><div id="maintext" data-doctype="AnmeldungDu" data-doctitle="Anmeldung"><p>[Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]<br/><span>[Patient.Strasse], [Patient.Plz] [Patient.Ort]</span><br/><span>Tel: [Patient.Telefon1] [Patient.Natel] [Patient.Telefon2]</span></p><p data-anrede="true">Liebe[Adressat:mw:r/ ] [Adressat.Vorname]</p><p>Ich bitte dich um direktes Aufgebot [Patient:mw:des oben genannten Patienten/der oben genannten Patientin] zur fachärztlichen Untersuchung.</p><h2>Problem </h2><p data-input="Problem"></p><h2>Weitere Diagnosen </h2><p data-input="Diagnosen">[Patient.Diagnosen]</p><h2>Medikation</h2><p data-input="Medikation">[Patient.Medikation]</p></div><div id="footer"> <p>Vielen Dank und freundliche Grüsse </p><p>[Mandant.Vorname]  </p></div><div data-mail="sender" style="display:none">praxis@eisenbart.hin</div><div data-mail="subject" style="display:none">[Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]</div><div data-mail="body" style="display:none">Anbei die Zuweisung meine[Patient:mw:s Patienten/r Patientin] [Patient.Name] [Patient.Vorname]\nVielen Dank und freundliche Grüsse  </div></div></body></html>
