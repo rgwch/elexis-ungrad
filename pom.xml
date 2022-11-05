@@ -50,8 +50,8 @@
         <module>ch.elexis.ungrad.privatrechnung_qr.feature</module>
         <module>ch.elexis.ungrad.qrbills</module>
         <module>ch.elexis.ungrad.qrbills.feature</module>
-        <module>ch.elexis.ungrad.textplugin</module>
-        <module>ch.elexis.ungrad.textplugin.feature</module>
+        <!-- module>ch.elexis.ungrad.textplugin</module>
+        <module>ch.elexis.ungrad.textplugin.feature</module -->
         <module>ungrad-artikelstamm</module>
         <module>ungrad-artikelstamm-feature</module>
         <!-- module>ch.berchtold.privatrechnung</module>
