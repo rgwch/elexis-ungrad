@@ -61,6 +61,8 @@ public class MailDialog extends TitleAreaDialog {
 		setTitle("Dokument als Mailanhang versenden");
 		if (StringTool.isNothing(mailTo)) {
 			setErrorMessage("Es ist kein gültiger Addressat gesetzt");
+		}else {
+			setMessage("Mail an: "+mailTo);
 		}
 	}
 
