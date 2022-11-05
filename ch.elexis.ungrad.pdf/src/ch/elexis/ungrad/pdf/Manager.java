@@ -45,10 +45,12 @@ public class Manager {
 
   public String fillForm(String formpath, String outputPath, Map<String, String> fields) throws Exception {
     PDDocument pdfDocument;
-    try{
+    try {
       InputStream resource = new FileInputStream(formpath);
       pdfDocument = PDDocument.load(resource);
       PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
+      pdfDocument.getDocumentInformation().setCreator("Elexis Ungrad");
+      pdfDocument.getDocumentInformation().setCustomMetadataValue("concern", "Forms");
       PDAcroForm acroForm = docCatalog.getAcroForm();
       for (Entry<String, String> e : fields.entrySet()) {
         PDField pdField = acroForm.getField(e.getKey());
@@ -64,7 +66,7 @@ public class Manager {
       pdfDocument.save(outputPath);
       pdfDocument.close();
       return outputPath;
-    }catch(Exception ex){
+    } catch (Exception ex) {
       ExHandler.handle(ex);
       return "";
     }
@@ -73,9 +75,8 @@ public class Manager {
   public void createPDF(File inputHtml, File outputFile)
       throws FileNotFoundException, IOException, PrinterException {
     FileOutputStream fout = new FileOutputStream(outputFile);
-    PdfRendererBuilder builder = new PdfRendererBuilder();
-    builder.useFastMode();
-    builder.withFile(inputHtml);
+    PdfRendererBuilder builder = new PdfRendererBuilder().useFastMode().withFile(inputHtml)
+        .withProducer("Elexis Ungrad");
     builder.toStream(fout);
     builder.run();
 

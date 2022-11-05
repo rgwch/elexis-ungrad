@@ -55,7 +55,7 @@ public class Mailer {
 
 			// Fill the message
 			if (body.contains("<")) {
-				messageBodyPart.setContent(body, "text/html");
+				messageBodyPart.setContent(body, "text/html; charset=UTF-8");
 			} else {
 				messageBodyPart.setText(body);
 			}
