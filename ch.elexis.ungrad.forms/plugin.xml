@@ -20,4 +20,11 @@
             restorable="true">
       </view>
    </extension>
+   <extension
+            point="ch.elexis.core.ui.KonsExtension">
+         <Link
+               KonsExtension="ch.elexis.ungrad.forms.ui.FormsExtension"
+               name="UngradForms">
+         </Link>
+      </extension>
 </plugin>

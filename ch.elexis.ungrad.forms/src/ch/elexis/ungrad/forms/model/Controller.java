@@ -20,9 +20,13 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.text.XRefExtensionConstants;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
+import ch.elexis.data.Brief;
+import ch.elexis.data.Konsultation;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
@@ -30,22 +34,25 @@ import ch.rgw.tools.TimeTool;
 
 /**
  * Handle forms
+ * 
  * @author gerry
  *
  */
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
 	private Patient currentPatient;
-
-	void changePatient(Patient pat) {
+	
+	void changePatient(Patient pat){
 		currentPatient = pat;
 	}
-
+	
 	/**
 	 * Find the configured output dir for a patient (highly opinionated filepath resolution)
-	 * @param p Patient whos output dir should be retrieved
+	 * 
+	 * @param p
+	 *            Patient whos output dir should be retrieved
 	 * @return The directory to store documents for that patient.
 	 */
-	public File getOutputDirFor(Patient p) {
+	public File getOutputDirFor(Patient p){
 		if (p == null) {
 			p = ElexisEventDispatcher.getSelectedPatient();
 		}
@@ -53,19 +60,19 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		String fname = p.getVorname();
 		String birthdate = p.getGeburtsdatum();
 		File superdir = new File(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, ""),
-				name.substring(0, 1).toLowerCase());
+			name.substring(0, 1).toLowerCase());
 		File dir = new File(superdir, name + "_" + fname + "_" + birthdate);
 		return dir;
 	}
-
+	
 	/* CoontentProvider */
 	@Override
-	public Object[] getElements(Object inputElement) {
+	public Object[] getElements(Object inputElement){
 		Patient pat = (Patient) inputElement;
 		File dir = getOutputDirFor(pat);
 		String[] files = dir.list(new FilenameFilter() {
 			@Override
-			public boolean accept(File dir, String name) {
+			public boolean accept(File dir, String name){
 				if (name.startsWith("A_")) {
 					String ext = FileTool.getExtension(name);
 					return ext.equalsIgnoreCase("pdf") || ext.equalsIgnoreCase("html");
@@ -85,24 +92,26 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			return ret;
 		}
 	}
-
+	
 	/* LabelProvider */
 	@Override
-	public String getColumnText(Object element, int columnIndex) {
+	public String getColumnText(Object element, int columnIndex){
 		return (String) element;
 	}
-
+	
 	/**
 	 * Create a PDF file from a template
+	 * 
 	 * @param tmpl
 	 * @param printer
 	 * @return
 	 * @throws Exception
 	 */
-	public String createPDF(Template tmpl, String printer) throws Exception {
-
+	public String createPDF(Template tmpl, String printer) throws Exception{
+		
 		Manager pdf = new Manager();
 		String filename = tmpl.getFilename();
+		String prefix="";
 		File htmlFile, pdfFile;
 		if (StringTool.isNothing(filename)) {
 			String doctype = tmpl.getDoctype();
@@ -113,25 +122,27 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			if (!StringTool.isNothing(doctitle)) {
 				tmpl.replace("Doctitle", doctitle);
 			}
-
+			
 			filename = new TimeTool().toString(TimeTool.FULL_ISO);
-			String prefix = "A_" + new TimeTool().toString(TimeTool.DATE_ISO) + "_";
+			prefix = "A_" + new TimeTool().toString(TimeTool.DATE_ISO) + "_";
 			if (!StringTool.isNothing(tmpl.getTitle())) {
 				prefix += tmpl.getTitle() + "_";
 			}
 			if (tmpl.adressat != null) {
-				filename = prefix + tmpl.adressat.get(Kontakt.FLD_NAME1) + "_" + tmpl.adressat.get(Kontakt.FLD_NAME2);
+				filename = prefix + tmpl.adressat.get(Kontakt.FLD_NAME1) + "_"
+					+ tmpl.adressat.get(Kontakt.FLD_NAME2);
 			} else {
 				String name = "Ausgang";
 				filename = prefix + name;
 			}
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
 			String dirname = pat.getName() + "_" + pat.getVorname() + "_" + pat.getGeburtsdatum();
-
+			
 			StringBuilder sb = new StringBuilder();
 			sb.append(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, "")).append(File.separator)
-					.append(dirname.substring(0, 1).toLowerCase()).append(File.separator).append(dirname);
-
+				.append(dirname.substring(0, 1).toLowerCase()).append(File.separator)
+				.append(dirname);
+			
 			File dir = new File(sb.toString());
 			if (!dir.exists()) {
 				if (!dir.mkdirs()) {
@@ -142,23 +153,40 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			pdfFile = new File(dir, filename + ".pdf");
 		} else {
 			htmlFile = new File(filename);
-			pdfFile = new File(FileTool.getFilepath(filename), FileTool.getNakedFilename(filename) + ".pdf");
+			pdfFile = new File(FileTool.getFilepath(filename),
+				FileTool.getNakedFilename(filename) + ".pdf");
 		}
 		String content = tmpl.getXml();
 		FileTool.writeTextFile(htmlFile, content);
 		pdf.createPDF(htmlFile, pdfFile);
 		String outputFile = pdfFile.getAbsolutePath();
-		// Konsultation current = (Konsultation) ElexisEventDispatcher.getInstance().getSelected(Konsultation.class);
-		// Brief metadata = new Brief(filename, new TimeTool(), CoreHub.actUser,
-		// tmpl.adressat, current, "Formular");
-		// metadata.save(content);
-		return outputFile;
+		String briefTitle=FileTool.getNakedFilename(filename);
+		if(briefTitle.matches("A_[0-9]{4,4}-[0-1][0-9]-[0-3][0-9]_.+")){
+			briefTitle=briefTitle.substring(13);
+		}
+		Konsultation current =
+			(Konsultation) ElexisEventDispatcher.getInstance().getSelected(Konsultation.class);
+		Brief metadata = new Brief(briefTitle, new TimeTool(), CoreHub.actUser, tmpl.adressat,
+			current, "Formular");
+		metadata.save(FileTool.readFile(new File(outputFile)), "pdf");
+		addFormToKons(metadata, current);
+		return outputFile;	
 	}
-
-	public String convertPug(String pug, String dir) throws Exception {
+	
+	private void addFormToKons(final Brief brief, final Konsultation kons){
+		if (kons != null) {
+			if (CoreHub.getLocalLockService().acquireLock(kons).isOk()) {
+				String label = "[ " + brief.getLabel().replace("_", " ") + " ]"; //$NON-NLS-1$ //$NON-NLS-2$
+				// kons.addXRef(XRefExtensionConstants.providerID, brief.getId(), -1, label);
+				kons.addXRef(Activator.KonsXRef, brief.getId(), -1, label);
+				CoreHub.getLocalLockService().releaseLock(kons);
+			}
+		}
+	}
+	public String convertPug(String pug, String dir) throws Exception{
 		dir += File.separator + "x";
 		String pugbin = CoreHub.localCfg.get(PreferenceConstants.PUG, "pug");
-
+		
 		Process process = new ProcessBuilder(pugbin, "-p", dir).start();
 		InputStreamReader err = new InputStreamReader(process.getErrorStream());
 		BufferedReader burr = new BufferedReader(err);
