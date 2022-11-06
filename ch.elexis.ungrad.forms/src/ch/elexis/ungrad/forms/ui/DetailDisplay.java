@@ -107,31 +107,10 @@ public class DetailDisplay extends Composite {
 	}
 
 	public void sendMail() {
-		String pdf = output();
-		String sender = CoreHub.localCfg.get(PreferenceConstants.SMTP_USER, "");
-		String smtpserver = CoreHub.localCfg.get(PreferenceConstants.SMTP_HOST, "localhost");
-		String smtppwd = CoreHub.localCfg.get(PreferenceConstants.SMTP_PWD, "doesntMatter");
-		String smtpport = CoreHub.localCfg.get(PreferenceConstants.SMTP_PORT, "53");
-		Mailer mailer = new Mailer(sender, smtpserver, smtppwd, smtpport);
-		if (!StringTool.isNothing(template.getMailSender())) {
-			sender = template.getMailSender();
-		}
-		MailDialog mailDialog = new MailDialog(getShell(), template.getMailRecipient());
-		mailDialog.sender = sender;
-		mailDialog.body = template.getMailBody();
-		mailDialog.subject = template.getMailSubject();
-		if (mailDialog.open() == Dialog.OK) {
-			sender = mailDialog.sender;
-			String subject = mailDialog.subject;
-			String body = mailDialog.body;
-
-			try {
-				mailer.simpleMail(template.getMailRecipient(), subject, body, new String[] { pdf });
-			} catch (Exception e) {
-				ExHandler.handle(e);
-				SWTHelper.showError("Fehler beim Senden der Mail", e.getMessage());
-			}
-		}
+		MailUI mailer = new MailUI(getShell());
+		String subject = template.getMailSubject();
+		String body = template.getMailBody();
+		mailer.sendMail(subject, body, template.getMailRecipient(), output());
 	}
 
 	void asyncRunViewer(String filepath) {

@@ -75,7 +75,17 @@ public class DocumentList extends Composite {
 		}
 	}
 
-	public void output() {
+	public void sendMail() {
+		IStructuredSelection sel = tv.getStructuredSelection();
+		if (!sel.isEmpty()) {
+			String selected = (String) sel.getFirstElement();
+			File dir = controller.getOutputDirFor(null);
+			File outfile = new File(dir, selected + ".pdf");
+			
+		}
+	}
+
+	public String output() {
 		IStructuredSelection sel = tv.getStructuredSelection();
 		if (!sel.isEmpty()) {
 			String selected = (String) sel.getFirstElement();
@@ -84,11 +94,13 @@ public class DocumentList extends Composite {
 			Manager m = new Manager();
 			try {
 				m.printFromPDF(outfile, "");
+				return outfile.getAbsolutePath();
 			} catch (IOException | PrinterException e) {
 				ExHandler.handle(e);
 				SWTHelper.showError("Fehler bei Ausgabe", e.getMessage());
 			}
 		}
+		return null;
 	}
 
 	void setPatient(Patient pat) {

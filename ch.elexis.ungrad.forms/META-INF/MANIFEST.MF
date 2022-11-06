@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ungrad Forms
 Bundle-SymbolicName: ch.elexis.ungrad.forms;singleton:=true
-Bundle-Version: 1.0.3.qualifier
+Bundle-Version: 1.0.4.qualifier
 Bundle-Vendor: ch.elexis
 Automatic-Module-Name: ch.elexis.ungrad.forms
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

@@ -137,7 +137,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		FileTool.writeTextFile(htmlFile, content);
 		pdf.createPDF(htmlFile, pdfFile);
 		String outputFile = pdfFile.getAbsolutePath();
-		Konsultation current = (Konsultation) ElexisEventDispatcher.getInstance().getSelected(Konsultation.class);
+		// Konsultation current = (Konsultation) ElexisEventDispatcher.getInstance().getSelected(Konsultation.class);
 		// Brief metadata = new Brief(filename, new TimeTool(), CoreHub.actUser,
 		// tmpl.adressat, current, "Formular");
 		// metadata.save(content);

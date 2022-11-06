@@ -15,7 +15,7 @@
       <view
             class="ch.elexis.ungrad.forms.ui.View"
             id="ch.rgw.elexis.ungrad.forms.ui.View"
-            name="Forms View"
+            name="Formulare"
             icon="icons/form.png"
             restorable="true">
       </view>

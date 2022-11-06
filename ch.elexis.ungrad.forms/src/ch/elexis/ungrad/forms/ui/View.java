@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
@@ -40,9 +39,7 @@ import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
-import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.forms.model.Controller;
-import ch.elexis.ungrad.forms.model.PreferenceConstants;
 import ch.elexis.ungrad.forms.model.Template;
 import ch.elexis.ungrad.pdf.Medform;
 import ch.rgw.io.FileTool;
@@ -255,7 +252,11 @@ public class View extends ViewPart implements IActivationListener {
 
 			@Override
 			public void run() {
-				detail.sendMail();
+				if (stack.topControl.equals(detail)) {
+					detail.sendMail();
+				}else if(stack.topControl.equals(docList)) {
+					docList.sendMail();
+				}
 			}
 
 		};
