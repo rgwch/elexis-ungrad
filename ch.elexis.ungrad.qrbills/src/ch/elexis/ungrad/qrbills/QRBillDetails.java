@@ -8,12 +8,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-
 import ch.elexis.TarmedRechnung.Messages;
 import ch.elexis.TarmedRechnung.TarmedACL;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.data.*;
+import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.rgw.crypt.BadParameterException;
 import ch.rgw.tools.Money;
@@ -34,7 +33,7 @@ public class QRBillDetails {
 	public Kontakt adressat;
 	public String addressee;
 	public List<Zahlung> charges = new ArrayList<Zahlung>(); // all charges
-	public String currency="CHF";
+	public String currency = "CHF";
 	public String dateDue;
 	
 	TarmedACL ta = TarmedACL.getInstance();
@@ -47,7 +46,7 @@ public class QRBillDetails {
 		biller = (Rechnungssteller) checkNull(mandator.getRechnungssteller(), "Rechnungssteller");
 		adressat = (Kontakt) checkNull(fall.getInvoiceRecipient(), "Adressat");
 		dateDue = rn.getRnDatumFrist();
-		amountPaid=new Money();
+		amountPaid = new Money();
 	}
 	
 	public String getFormatted(String orig){
@@ -103,12 +102,8 @@ public class QRBillDetails {
 	
 	public void writePDF(File inputHTML, File outputPDF)
 		throws FileNotFoundException, IOException, PrinterException{
-		FileOutputStream fout = new FileOutputStream(outputPDF);
-		PdfRendererBuilder builder = new PdfRendererBuilder();
-		builder.useFastMode();
-		builder.withFile(inputHTML);
-		builder.toStream(fout);
-		builder.run();
+		Manager pdfManager = new Manager();
+		pdfManager.createPDF(inputHTML, outputPDF);
 	}
 	
 }

@@ -16,7 +16,6 @@ package ch.elexis.ungrad.qrbills;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
@@ -32,10 +31,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
 
-import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-
-import ch.elexis.TarmedRechnung.TarmedACL;
-import ch.elexis.TarmedRechnung.XMLExporter;
 import ch.elexis.arzttarife_schweiz.Messages;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter;
@@ -47,6 +42,7 @@ import ch.elexis.data.Rechnung;
 import ch.elexis.data.RnStatus;
 import ch.elexis.data.Zahlung;
 import ch.elexis.ungrad.Resolver;
+import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.rgw.crypt.BadParameterException;
 import ch.rgw.io.FileTool;
@@ -67,7 +63,7 @@ public class QR_Outputter implements IRnOutputter {
 	private Map<String, IPersistentObject> replacer = new HashMap<>();
 	private QR_SettingsControl qrs;
 	private QR_Encoder qr;
-	private PDF_Printer printer;
+	private Manager pdfManager;
 	private boolean modifyInvoiceState;
 	
 	public QR_Outputter(){}
@@ -104,7 +100,7 @@ public class QR_Outputter implements IRnOutputter {
 		final Properties props){
 		Result<Rechnung> res = new Result<Rechnung>();
 		qr = new QR_Encoder();
-		printer = new PDF_Printer();
+		pdfManager = new Manager();
 		modifyInvoiceState = true;
 		
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
@@ -284,7 +280,7 @@ public class QR_Outputter implements IRnOutputter {
 				if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
 					defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
 				}
-				if (printer.print(pdfFile, defaultPrinter)) {
+				if (pdfManager.printFromPDF(pdfFile, defaultPrinter)) {
 					if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
 						pdfFile.delete();
 					}
@@ -305,16 +301,15 @@ public class QR_Outputter implements IRnOutputter {
 			
 			File rfhtml = tp.print(bill);
 			File pdfout = new File(bill.outputDirPDF, bill.rn.getNr() + "_rf.pdf");
-			FileOutputStream rfpdf = new FileOutputStream(pdfout);
-			PdfRendererBuilder builder = new PdfRendererBuilder();
-			
-			builder.useFastMode().withFile(rfhtml).toStream(rfpdf).run();
+			// FileOutputStream rfpdf = new FileOutputStream(pdfout);
+			Manager pdfBuilder = new Manager();
+			pdfBuilder.createPDF(rfhtml, pdfout);
 			if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
 				String defaultPrinter = null;
 				if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
 					defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
 				}
-				if (printer.print(pdfout, defaultPrinter)) {
+				if (pdfBuilder.printFromPDF(pdfout, defaultPrinter)) {
 					if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
 						pdfout.delete();
 					}
