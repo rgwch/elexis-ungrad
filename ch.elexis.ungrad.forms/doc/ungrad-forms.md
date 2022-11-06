@@ -51,3 +51,11 @@ Das Plugin verarbeitet auch [Medforms](https://www.medforms.ch/) Formulare. Das 
 ![Medforms](physio.png)
 
 Da es allerdings kein frei zugängliches API für Medforms-Dateien gibt, beruht dieses Ausfüllen auf einfachen Analysen einiger Formulare. Geben Sie doch eine Rückmeldung, falls Ihre Formulare nicht funktionieren.
+
+## Dank
+
+Die Verarbeitung von HTML- und PDF-Dateien wird ermöglicht durch:
+
+* [JSoup](https://jsoup.org/)
+* [Open HTML to PDF](https://github.com/danfickle/openhtmltopdf)
+* [Apache PDFBox](https://pdfbox.apache.org/)

@@ -110,7 +110,8 @@ public class DetailDisplay extends Composite {
 		MailUI mailer = new MailUI(getShell());
 		String subject = template.getMailSubject();
 		String body = template.getMailBody();
-		mailer.sendMail(subject, body, template.getMailRecipient(), output());
+		String recipient=template.getMailRecipient();
+		mailer.sendMail(subject, body, recipient, output());
 	}
 
 	void asyncRunViewer(String filepath) {

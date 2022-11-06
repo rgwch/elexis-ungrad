@@ -42,83 +42,105 @@ import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 
 public class Manager {
-
-  public String fillForm(String formpath, String outputPath, Map<String, String> fields) throws Exception {
-    PDDocument pdfDocument;
-    try {
-      InputStream resource = new FileInputStream(formpath);
-      pdfDocument = PDDocument.load(resource);
-      PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
-      pdfDocument.getDocumentInformation().setCreator("Elexis Ungrad");
-      pdfDocument.getDocumentInformation().setCustomMetadataValue("concern", "Forms");
-      PDAcroForm acroForm = docCatalog.getAcroForm();
-      for (Entry<String, String> e : fields.entrySet()) {
-        PDField pdField = acroForm.getField(e.getKey());
-        if (pdField != null) {
-          try {
-            String val = e.getValue();
-            pdField.setValue(val);
-          } catch (Exception ex) {
-            ex.printStackTrace();
-          }
-        }
-      }
-      pdfDocument.save(outputPath);
-      pdfDocument.close();
-      return outputPath;
-    } catch (Exception ex) {
-      ExHandler.handle(ex);
-      return "";
-    }
-  }
-
-  public void createPDF(File inputHtml, File outputFile)
-      throws FileNotFoundException, IOException, PrinterException {
-    FileOutputStream fout = new FileOutputStream(outputFile);
-    PdfRendererBuilder builder = new PdfRendererBuilder().useFastMode().withFile(inputHtml)
-        .withProducer("Elexis Ungrad");
-    builder.toStream(fout);
-    builder.run();
-
-  }
-
-  public boolean printFromPDF(File pdfFile, String printer) throws IOException, PrinterException {
-    PDDocument pdoc = PDDocument.load(pdfFile);
-    PDFPrintable printable = new PDFPrintable(pdoc);
-    PrinterJob job = PrinterJob.getPrinterJob();
-    PrintServiceAttributeSet attributes;
-    job.setPrintable(printable);
-    boolean printed = false;
-    if (!StringTool.isNothing(printer)) {
-      PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
-      int selectedService = 0;
-      /* Scan found services to see if anyone suits our needs */
-      for (int i = 0; i < services.length; i++) {
-        if (services[i].getName().toLowerCase().contains(printer.toLowerCase())) {
-          selectedService = i;
-          attributes = services[i].getAttributes();
-          break;
-        }
-      }
-      job.setPrintService(services[selectedService]);
-      HashPrintRequestAttributeSet attrs = new HashPrintRequestAttributeSet();
-      attrs.add(MediaSizeName.ISO_A4);
-      job.print(attrs);
-      printed = true;
-
-    } else {
-      if (job.printDialog()) {
-        job.print();
-        printed = true;
-      }
-
-    }
-    pdoc.close();
-    return printed;
-
-  }
-
-  public boolean printFromHTML(File htmlFle, String printer, boolean bKeepHtml, boolean bKeepPdf) {
-    return false;
-  }
+	private PDDocument pdfDoc;
+	
+	public String fillForm(String formpath, String outputPath, Map<String, String> fields)
+		throws Exception{
+		try {
+			if (pdfDoc == null) {
+				InputStream resource = new FileInputStream(formpath);
+				pdfDoc = PDDocument.load(resource);
+			}
+			PDDocumentCatalog docCatalog = pdfDoc.getDocumentCatalog();
+			pdfDoc.getDocumentInformation().setCreator("Elexis Ungrad");
+			pdfDoc.getDocumentInformation().setCustomMetadataValue("concern", "Forms");
+			PDAcroForm acroForm = docCatalog.getAcroForm();
+			for (Entry<String, String> e : fields.entrySet()) {
+				PDField pdField = acroForm.getField(e.getKey());
+				if (pdField != null) {
+					try {
+						String val = e.getValue();
+						pdField.setValue(val);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+			pdfDoc.save(outputPath);
+			pdfDoc.close();
+			pdfDoc = null;
+			return outputPath;
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+			return "";
+		}
+	}
+	
+	public String getFieldContents(String formPath, String fieldName) throws Exception{
+		if (pdfDoc == null) {
+			pdfDoc = PDDocument.load(new File(formPath));
+		}
+		PDDocumentCatalog docCatalog = pdfDoc.getDocumentCatalog();
+		PDAcroForm acroForm = docCatalog.getAcroForm();
+		PDField pdField = acroForm.getField(fieldName);
+		if (pdField != null) {
+			try {
+				String val = pdField.getValueAsString();
+				return val;
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return "";
+	}
+	
+	public void createPDF(File inputHtml, File outputFile)
+		throws FileNotFoundException, IOException, PrinterException{
+		FileOutputStream fout = new FileOutputStream(outputFile);
+		PdfRendererBuilder builder = new PdfRendererBuilder().useFastMode().withFile(inputHtml)
+			.withProducer("Elexis Ungrad");
+		builder.toStream(fout);
+		builder.run();
+		
+	}
+	
+	public boolean printFromPDF(File pdfFile, String printer) throws IOException, PrinterException{
+		PDDocument pdoc = PDDocument.load(pdfFile);
+		PDFPrintable printable = new PDFPrintable(pdoc);
+		PrinterJob job = PrinterJob.getPrinterJob();
+		PrintServiceAttributeSet attributes;
+		job.setPrintable(printable);
+		boolean printed = false;
+		if (!StringTool.isNothing(printer)) {
+			PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
+			int selectedService = 0;
+			/* Scan found services to see if anyone suits our needs */
+			for (int i = 0; i < services.length; i++) {
+				if (services[i].getName().toLowerCase().contains(printer.toLowerCase())) {
+					selectedService = i;
+					attributes = services[i].getAttributes();
+					break;
+				}
+			}
+			job.setPrintService(services[selectedService]);
+			HashPrintRequestAttributeSet attrs = new HashPrintRequestAttributeSet();
+			attrs.add(MediaSizeName.ISO_A4);
+			job.print(attrs);
+			printed = true;
+			
+		} else {
+			if (job.printDialog()) {
+				job.print();
+				printed = true;
+			}
+			
+		}
+		pdoc.close();
+		return printed;
+		
+	}
+	
+	public boolean printFromHTML(File htmlFle, String printer, boolean bKeepHtml, boolean bKeepPdf){
+		return false;
+	}
 }

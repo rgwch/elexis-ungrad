@@ -30,14 +30,17 @@ import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.forms.model.Controller;
+import ch.elexis.ungrad.forms.model.Template;
 import ch.elexis.ungrad.pdf.Manager;
+import ch.elexis.ungrad.pdf.Medform;
+import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 
 public class DocumentList extends Composite {
 	private TableViewer tv;
 	private Controller controller;
-
-	public DocumentList(Composite parent, Controller controller) {
+	
+	public DocumentList(Composite parent, Controller controller){
 		super(parent, SWT.NONE);
 		this.controller = controller;
 		setLayoutData(SWTHelper.getFillGridData());
@@ -46,27 +49,27 @@ public class DocumentList extends Composite {
 		tv.setContentProvider(controller);
 		tv.setLabelProvider(controller);
 		tv.setComparator(new ViewerComparator() {
-
+			
 			@Override
-			public int compare(Viewer viewer, Object e1, Object e2) {
+			public int compare(Viewer viewer, Object e1, Object e2){
 				return ((String) e2).compareTo((String) e1);
 			}
-
+			
 		});
 		tv.setInput(ElexisEventDispatcher.getSelectedPatient());
 		tv.getControl().setLayoutData(SWTHelper.getFillGridData());
-
+		
 	}
-
-	public void addSelectionListener(ISelectionChangedListener listener) {
+	
+	public void addSelectionListener(ISelectionChangedListener listener){
 		tv.addSelectionChangedListener(listener);
 	}
-
-	public void addDoubleclickListener(IDoubleClickListener listener) {
+	
+	public void addDoubleclickListener(IDoubleClickListener listener){
 		tv.addDoubleClickListener(listener);
 	}
-
-	public String getSelection() {
+	
+	public String getSelection(){
 		IStructuredSelection sel = tv.getStructuredSelection();
 		if (sel.isEmpty()) {
 			return null;
@@ -74,18 +77,39 @@ public class DocumentList extends Composite {
 			return (String) sel.getFirstElement();
 		}
 	}
-
-	public void sendMail() {
+	
+	public void sendMail(){
 		IStructuredSelection sel = tv.getStructuredSelection();
 		if (!sel.isEmpty()) {
 			String selected = (String) sel.getFirstElement();
 			File dir = controller.getOutputDirFor(null);
 			File outfile = new File(dir, selected + ".pdf");
+			File templateFile = new File(dir, selected + ".html");
+			try {
+				String subject=selected;
+				String body="Siehe Anhang";
+				String recipient="";
+				if (templateFile.exists()) {
+					Template template = new Template(FileTool.readTextFile(templateFile), null);
+					subject = template.getMailSubject();
+					body = template.getMailBody();
+					recipient=template.getMailRecipient();
+				}else if(outfile.exists()) {
+					Medform medform=new Medform(outfile.getAbsolutePath());
+					recipient=medform.getFieldValue("receiverMail");
+				}
+				
+				MailUI mailer = new MailUI(getShell());
+				mailer.sendMail(subject, body, recipient, outfile.getAbsolutePath());
+			} catch (Exception ex) {
+				ExHandler.handle(ex);
+				SWTHelper.showError("Fehler bei Ausdruck", ex.getMessage());
+			}
 			
 		}
 	}
-
-	public String output() {
+	
+	public String output(){
 		IStructuredSelection sel = tv.getStructuredSelection();
 		if (!sel.isEmpty()) {
 			String selected = (String) sel.getFirstElement();
@@ -102,8 +126,8 @@ public class DocumentList extends Composite {
 		}
 		return null;
 	}
-
-	void setPatient(Patient pat) {
+	
+	void setPatient(Patient pat){
 		tv.setInput(pat);
 	}
 }

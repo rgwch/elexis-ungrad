@@ -1,3 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2016-2022 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad;
 
 import java.util.Date;
@@ -6,14 +20,7 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.Authenticator;
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -22,7 +29,6 @@ import javax.mail.internet.MimeMultipart;
 
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.rgw.io.FileTool;
-import ch.rgw.tools.StringTool;
 
 public class Mailer {
 	String from;
@@ -60,10 +66,7 @@ public class Mailer {
 				messageBodyPart.setText(body);
 			}
 
-			// Create a multipart message for attachment
 			Multipart multipart = new MimeMultipart();
-
-			// Set text message part
 			multipart.addBodyPart(messageBodyPart);
 
 			for (String filename : attachments) {
@@ -73,7 +76,6 @@ public class Mailer {
 				messageBodyPart.setFileName(Util.reduceCharset(FileTool.getFilename(filename)));
 				multipart.addBodyPart(messageBodyPart);
 			}
-			// Send the complete message parts
 			msg.setContent(multipart);
 		} else {
 			msg.setText(body, "UTF-8");
@@ -84,6 +86,14 @@ public class Mailer {
 		SWTHelper.showInfo("Mail gesendet", "Die Mail wurde an " + toEmail + " gesendet.");
 	}
 
+	/**
+	 * Send without security (e.g. to al local smpt server like HIN Client
+	 * @param to
+	 * @param subject
+	 * @param body
+	 * @param attachments
+	 * @throws Exception
+	 */
 	public void simpleMail(String to, String subject, String body, String[] attachments) throws Exception {
 
 		Properties props = System.getProperties();
@@ -94,12 +104,21 @@ public class Mailer {
 		sendEmail(session, to, subject, body, attachments);
 	}
 
+
+	/**
+	 * Send via Starttls Connection
+	 * @param to
+	 * @param subject
+	 * @param body
+	 * @param attachments
+	 * @throws Exception
+	 */
 	public void tlsMail(String to, String subject, String body, String[] attachments) throws Exception {
 
 		System.out.println("TLSEmail Start");
 		Properties props = new Properties();
 		props.put("mail.smtp.host", smtpHost); // SMTP Host
-		props.put("mail.smtp.port", smtpPort /* "587" */ ); // TLS Port
+		props.put("mail.smtp.port", smtpPort /* "587" */ ); 
 		props.put("mail.smtp.auth", "true"); // enable authentication
 		props.put("mail.smtp.starttls.enable", "true"); // enable STARTTLS
 
@@ -114,6 +133,14 @@ public class Mailer {
 		sendEmail(session, to, subject, body, attachments);
 	}
 
+	/**
+	 * Send via SSL Connection
+	 * @param to
+	 * @param subject
+	 * @param body
+	 * @param attachments
+	 * @throws Exception
+	 */
 	public void sslMail(String to, String subject, String body, String[] attachments) throws Exception {
 		Properties props = new Properties();
 		props.put("mail.smtp.host", smtpHost); // SMTP Host
