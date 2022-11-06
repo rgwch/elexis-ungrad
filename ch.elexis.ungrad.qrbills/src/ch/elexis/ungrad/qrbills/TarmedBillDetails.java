@@ -40,6 +40,11 @@ import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
+/**
+ * Collect data needed for a Tarmed-Bill
+ * @author gerry
+ *
+ */
 public class TarmedBillDetails extends QRBillDetails {
 	public static int FALL_UVG = 1;
 	public static int FALL_IVG = 2;
@@ -72,6 +77,13 @@ public class TarmedBillDetails extends QRBillDetails {
 	
 	private static Logger logger = LoggerFactory.getLogger(TarmedBillDetails.class);
 	
+	/**
+	 * Analyze a "Rechnung" and collect data from different sources.
+	 * @param rn the bill to analyze
+	 * @param type original or copy
+	 * @param bStrict if true: create an Error when a bll is not strictly conformant 
+	 * @throws Exception
+	 */
 	public TarmedBillDetails(Rechnung rn, TYPE type, boolean bStrict) throws Exception{
 		super(rn);
 		this.type = type;

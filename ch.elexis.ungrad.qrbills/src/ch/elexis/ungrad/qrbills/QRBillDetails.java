@@ -1,24 +1,35 @@
+/*******************************************************************************
+ * Copyright (c) 2022, G. Weirich and Elexis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    G. Weirich - initial implementation
+ *    
+ *******************************************************************************/
 package ch.elexis.ungrad.qrbills;
 
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.elexis.TarmedRechnung.Messages;
 import ch.elexis.TarmedRechnung.TarmedACL;
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.data.*;
 import ch.elexis.ungrad.pdf.Manager;
-import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.rgw.crypt.BadParameterException;
 import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
-import ch.rgw.tools.TimeTool;
 
+/**
+ * Collect some data from different sources to create a valid QR Bill
+ * @author gerry
+ *
+ */
 public class QRBillDetails {
 	public Rechnung rn;
 	public Fall fall;
@@ -38,6 +49,11 @@ public class QRBillDetails {
 	
 	TarmedACL ta = TarmedACL.getInstance();
 	
+	/**
+	 * Analyze a "Rechnung" object
+	 * @param rn
+	 * @throws BadParameterException
+	 */
 	public QRBillDetails(Rechnung rn) throws BadParameterException{
 		this.rn = (Rechnung) checkNull(rn, "Rechnung");
 		fall = (Fall) checkNull(rn.getFall(), "Fall");
