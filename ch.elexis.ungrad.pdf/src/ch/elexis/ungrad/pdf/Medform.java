@@ -25,6 +25,11 @@ import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
+/**
+ * Handle medForm- forms (@see http://medforms.ch) 
+ * @author gerry
+ *
+ */
 public class Medform {
 	
 	String form;
@@ -83,10 +88,21 @@ public class Medform {
 		
 	}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 	
+	/**
+	 * 
+	 * @param formpath full path to the medForm to fill
+	 */
 	public Medform(String formpath){
 		this.form = formpath;
 	}
 	
+	/**
+	 * Create a PDF file from formPath with prefilled fields
+	 * @param outPath Path for the newly created PDF
+	 * @param pat Patient for which the form should be prefilled
+	 * @return The Path to the filled form
+	 * @throws Exception
+	 */
 	public String create(String outPath, Patient pat) throws Exception{
 		Map<String, String> m = new HashMap<String, String>();
 		if (pat != null) {
@@ -172,6 +188,11 @@ public class Medform {
 		}
 	}
 	
+	/**
+	 * Retrieve the Value of a field
+	 * @param name
+	 * @return
+	 */
 	public String getFieldValue(String name){
 		String medformsField = get(name);
 		if (medformsField != null) {

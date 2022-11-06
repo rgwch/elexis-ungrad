@@ -12,11 +12,7 @@
 
 package ch.elexis.ungrad.forms.model;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -25,15 +21,18 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
-import ch.elexis.data.Konsultation;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
-import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
+/**
+ * Handle forms
+ * @author gerry
+ *
+ */
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
 	private Patient currentPatient;
 
@@ -41,6 +40,11 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		currentPatient = pat;
 	}
 
+	/**
+	 * Find the configured output dir for a patient (highly opinionated filepath resolution)
+	 * @param p Patient whos output dir should be retrieved
+	 * @return The directory to store documents for that patient.
+	 */
 	public File getOutputDirFor(Patient p) {
 		if (p == null) {
 			p = ElexisEventDispatcher.getSelectedPatient();
@@ -88,6 +92,13 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return (String) element;
 	}
 
+	/**
+	 * Create a PDF file from a template
+	 * @param tmpl
+	 * @param printer
+	 * @return
+	 * @throws Exception
+	 */
 	public String createPDF(Template tmpl, String printer) throws Exception {
 
 		Manager pdf = new Manager();

@@ -14,12 +14,7 @@ package ch.elexis.ungrad.pdf;
 
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -28,7 +23,6 @@ import javax.print.PrintServiceLookup;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.MediaSizeName;
-import javax.swing.text.PlainDocument;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
@@ -41,9 +35,22 @@ import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 
+/**
+ * Handle HTML-to-PDF conversion, access PDF form fields, and print PDF files
+ * @author gerry
+ *
+ */
 public class Manager {
 	private PDDocument pdfDoc;
 	
+	/**
+	 * Fill out a PDF form. 
+	 * @param formpath full path to the pdf file with an embedded form
+	 * @param outputPath full lath for the resulting file with filled form
+	 * @param fields fields to write. fields in the form not mentioned herein remain simply unchanged. Fields not found in the form are ignored.
+	 * @return the path to the newly written file (which is the same as outputPath)
+	 * @throws Exception
+	 */
 	public String fillForm(String formpath, String outputPath, Map<String, String> fields)
 		throws Exception{
 		try {
@@ -76,6 +83,13 @@ public class Manager {
 		}
 	}
 	
+	/**
+	 * Retrieve the value of a field in a form embedded in a pdf file
+	 * @param formPath full filepath to the PDF File with an embedded form
+	 * @param fieldName Name of the field to retrieve
+	 * @return the contents of the field or empty string if no such field was found.
+	 * @throws Exception
+	 */
 	public String getFieldContents(String formPath, String fieldName) throws Exception{
 		if (pdfDoc == null) {
 			pdfDoc = PDDocument.load(new File(formPath));
@@ -94,6 +108,14 @@ public class Manager {
 		return "";
 	}
 	
+	/**
+	 * Create a PDF file from a HTML.
+	 * @param inputHtml the file to read. If a style sheet is linked, it must be in the current dir or an absolute path.
+	 * @param outputFile the PDF to write
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws PrinterException
+	 */
 	public void createPDF(File inputHtml, File outputFile)
 		throws FileNotFoundException, IOException, PrinterException{
 		FileOutputStream fout = new FileOutputStream(outputFile);
@@ -104,6 +126,14 @@ public class Manager {
 		
 	}
 	
+	/**
+	 * Print a PDF file
+	 * @param pdfFile the file to print
+	 * @param printer The printer to use. If it is null or the named printer is not found, a printer select dialog will open.
+	 * @return true after print-
+	 * @throws IOException
+	 * @throws PrinterException
+	 */
 	public boolean printFromPDF(File pdfFile, String printer) throws IOException, PrinterException{
 		PDDocument pdoc = PDDocument.load(pdfFile);
 		PDFPrintable printable = new PDFPrintable(pdoc);
