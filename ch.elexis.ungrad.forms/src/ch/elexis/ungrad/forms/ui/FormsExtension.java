@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2022, G. Weirich and Elexis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    G. Weirich - initial implementation
+ *    
+ *******************************************************************************/
+
 package ch.elexis.ungrad.forms.ui;
 
 import java.io.File;
@@ -19,6 +31,11 @@ import ch.elexis.data.Brief;
 import ch.elexis.ungrad.forms.Activator;
 import ch.rgw.tools.ExHandler;
 
+/**
+ * An IKonsExtension fpr Ungrad Forms: Will create entries in Necounter-Entries for created documents
+ * @author gerry
+ *
+ */
 public class FormsExtension implements IKonsExtension {
 	
 	@Override

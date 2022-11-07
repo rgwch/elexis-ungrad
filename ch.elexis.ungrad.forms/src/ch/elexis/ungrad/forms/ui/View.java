@@ -13,6 +13,7 @@
 package ch.elexis.ungrad.forms.ui;
 
 import java.io.File;
+import java.util.List;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -39,6 +40,7 @@ import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
+import ch.elexis.data.Query;
 import ch.elexis.ungrad.forms.model.Controller;
 import ch.elexis.ungrad.forms.model.Template;
 import ch.elexis.ungrad.pdf.Medform;
@@ -153,7 +155,15 @@ public class View extends ViewPart implements IActivationListener {
 							Medform medform = new Medform(templateFile.getAbsolutePath());
 							medform.create(outFile.getAbsolutePath(), currentPat);
 							detail.asyncRunViewer(outFile.getAbsolutePath());
-						} else {
+							String recipient = medform.getFieldValue("receiverMail");
+							Kontakt kRecipient = null;
+							Query<Kontakt> qbe = new Query<Kontakt>(Kontakt.class, Kontakt.FLD_E_MAIL, recipient);
+							List<Kontakt> found = qbe.execute();
+							if (found.size() > 0) {
+								kRecipient = found.get(0);
+							}
+							controller.createLinksWithElexis(outFile.getAbsolutePath(), kRecipient);
+						} else {	
 							Kontakt adressat = null;
 							String html = FileTool.readTextFile(templateFile);
 							if (templateFile.getName().endsWith("pug")) {
@@ -223,6 +233,11 @@ public class View extends ViewPart implements IActivationListener {
 					} catch (Exception e) {
 						SWTHelper.showError("Fehler bei Verarbeitung", e.getMessage());
 					}
+				} else {
+					document = new File(dir, docList.getSelection() + ".pdf");
+					if (document.exists()) {
+						detail.asyncRunViewer(document.getAbsolutePath());
+					}
 				}
 				container.layout();
 			}
@@ -254,7 +269,7 @@ public class View extends ViewPart implements IActivationListener {
 			public void run() {
 				if (stack.topControl.equals(detail)) {
 					detail.sendMail();
-				}else if(stack.topControl.equals(docList)) {
+				} else if (stack.topControl.equals(docList)) {
 					docList.sendMail();
 				}
 			}

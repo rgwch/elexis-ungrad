@@ -160,19 +160,23 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		FileTool.writeTextFile(htmlFile, content);
 		pdf.createPDF(htmlFile, pdfFile);
 		String outputFile = pdfFile.getAbsolutePath();
-		String briefTitle=FileTool.getNakedFilename(filename);
+		createLinksWithElexis(outputFile, tmpl.adressat);
+		return outputFile;	
+	}
+	
+	public void createLinksWithElexis(String filepath, Kontakt adressat) throws Exception {
+		String briefTitle=FileTool.getNakedFilename(filepath);
 		if(briefTitle.matches("A_[0-9]{4,4}-[0-1][0-9]-[0-3][0-9]_.+")){
 			briefTitle=briefTitle.substring(13);
 		}
 		Konsultation current =
 			(Konsultation) ElexisEventDispatcher.getInstance().getSelected(Konsultation.class);
-		Brief metadata = new Brief(briefTitle, new TimeTool(), CoreHub.actUser, tmpl.adressat,
+		Brief metadata = new Brief(briefTitle, new TimeTool(), CoreHub.actUser, adressat,
 			current, "Formular");
-		metadata.save(FileTool.readFile(new File(outputFile)), "pdf");
+		metadata.save(FileTool.readFile(new File(filepath)), "pdf");
 		addFormToKons(metadata, current);
-		return outputFile;	
+		
 	}
-	
 	private void addFormToKons(final Brief brief, final Konsultation kons){
 		if (kons != null) {
 			if (CoreHub.getLocalLockService().acquireLock(kons).isOk()) {
