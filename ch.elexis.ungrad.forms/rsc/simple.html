@@ -1,7 +1,33 @@
-<!Doctype html>
-<html>
-<body>
-<div data-input="Adressat">[Adressat.Anschrift]</div>
-	<div data-input="Diagnosen">[Patient.Diagnosen]</div>
-</body>
+<!DOCTYPE html>
+
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Elexis Forms Beispielvorlage</title>
+    <style>
+      @page{
+        size: A4 portrait;
+      }
+      h1{
+        color:blue;
+        text-align:center;
+        font-size: 14pt;
+      }
+      h2{
+        margin-top:5mm;
+      }
+      </style>
+  </head>
+  <body data-title="Beispielbrief">
+    <h1>Praxis Dr. Eisenbart</h1>
+    <hr/>
+    <h2 data-anrede="true">Liebe[Adressat:mw:r/ ] [Adressat.Vorname]</h2>
+    <p>Ich berichte kurz über [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]</p>
+    <div data-input="Bericht">Alles ist wieder gut.</div>
+    <p>Herzliche Grüsse<br/>[Mandant.Vorname]</p>
+  </body>
+  <div data-mail="subject" style="display:none"> [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]</div>
+  <div data-mail="body" style="display:none"> 
+    <p>Anbei der Bericht zu [Patient.Name] [Patient.Vorname]</p>
+    <p>Vielen Dank für die Zuweisung und herzliche Grüsse, Erwin</p>     
 </html>
