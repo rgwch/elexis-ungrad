@@ -22,6 +22,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.actions.AddStringEntryAction;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
+import ch.elexis.core.ui.preferences.inputs.MultilineFieldEditor;
 import ch.elexis.core.ui.preferences.inputs.PasswordFieldEditor;
 import ch.elexis.ungrad.forms.model.PreferenceConstants;
 
@@ -52,7 +53,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		addField(new StringFieldEditor(PreferenceConstants.SMTP_PORT, "SMTP Port", getFieldEditorParent()));
 		addField(new StringFieldEditor(PreferenceConstants.SMTP_USER, "SMTP User", getFieldEditorParent()));
 		addField(new PasswordFieldEditor(PreferenceConstants.SMTP_PWD, "SMTP Passwort", getFieldEditorParent()));
-
+		addField(new MultilineFieldEditor(PreferenceConstants.MAIL_BODY, "Mail-Standardtext", getFieldEditorParent()));
 
 	}
 

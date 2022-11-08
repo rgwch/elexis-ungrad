@@ -26,10 +26,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.forms.model.Controller;
+import ch.elexis.ungrad.forms.model.PreferenceConstants;
 import ch.elexis.ungrad.forms.model.Template;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.pdf.Medform;
@@ -87,7 +89,7 @@ public class DocumentList extends Composite {
 			File templateFile = new File(dir, selected + ".html");
 			try {
 				String subject=selected;
-				String body="Siehe Anhang";
+				String body=CoreHub.localCfg.get(PreferenceConstants.MAIL_BODY, "Siehe Anhang\nMit freundlichen Grüssen");
 				String recipient="";
 				if (templateFile.exists()) {
 					Template template = new Template(FileTool.readTextFile(templateFile), null);

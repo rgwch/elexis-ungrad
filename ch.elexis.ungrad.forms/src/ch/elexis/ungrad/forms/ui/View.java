@@ -105,6 +105,7 @@ public class View extends ViewPart implements IActivationListener {
 		toolbar.add(mailAction);
 		printAction.setEnabled(false);
 		showDetailAction.setEnabled(false);
+		mailAction.setEnabled(false);
 		docList.addSelectionListener(new ISelectionChangedListener() {
 
 			@Override
@@ -113,7 +114,7 @@ public class View extends ViewPart implements IActivationListener {
 				boolean bHasSelection = !sel.isEmpty();
 				printAction.setEnabled(bHasSelection);
 				showDetailAction.setEnabled(bHasSelection);
-
+				mailAction.setEnabled(true);
 			}
 		});
 		docList.addDoubleclickListener(new IDoubleClickListener() {
@@ -187,6 +188,7 @@ public class View extends ViewPart implements IActivationListener {
 							stack.topControl = detail;
 							container.layout();
 						}
+						docList.setPatient(ElexisEventDispatcher.getSelectedPatient());
 
 					} catch (Exception e) {
 						ExHandler.handle(e);
@@ -239,6 +241,8 @@ public class View extends ViewPart implements IActivationListener {
 						detail.asyncRunViewer(document.getAbsolutePath());
 					}
 				}
+				printAction.setEnabled(true);
+				mailAction.setEnabled(true);
 				container.layout();
 			}
 		};

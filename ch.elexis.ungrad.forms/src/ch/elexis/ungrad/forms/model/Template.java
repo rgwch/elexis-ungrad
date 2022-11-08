@@ -24,6 +24,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.model.IPersistentObject;
 import ch.elexis.data.Kontakt;
 import ch.elexis.ungrad.Resolver;
@@ -148,7 +149,11 @@ public class Template {
 	}
 
 	public String getMailBody() {
-		return mailBody;
+		if (StringTool.isNothing(mailBody)) {
+			return CoreHub.localCfg.get(PreferenceConstants.MAIL_BODY, "Siehe Anhang");
+		} else {
+			return mailBody;
+		}
 	}
 
 	public String getMailRecipient() {
