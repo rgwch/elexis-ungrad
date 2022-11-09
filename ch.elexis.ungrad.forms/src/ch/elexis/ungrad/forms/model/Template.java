@@ -68,11 +68,6 @@ public class Template {
 		if (eHeader != null) {
 			heading = eHeader.text();
 		}
-		if (adressat == null) {
-			if (findAdressat() != null) {
-
-			}
-		}
 		els = doc.getElementsByAttribute("data-anrede");
 		Element eAnrede = els.first();
 		if (eAnrede != null && adressat != null) {
@@ -165,7 +160,11 @@ public class Template {
 			return mailRecipient;
 		} else {
 			String ret = adressat.get(Kontakt.FLD_E_MAIL);
-			return ret;
+			if (StringTool.isNothing(ret)) {
+				return mailRecipient;
+			} else {
+				return ret;
+			}
 		}
 	}
 
