@@ -40,6 +40,7 @@ public class Template {
 	String mailSender = "";
 	String mailBody = "";
 	String mailSubject = "";
+	String mailRecipient = "";
 	String filename;
 	Kontakt adressat = null;
 	Map<String, String> inputs = new LinkedHashMap<String, String>();
@@ -118,6 +119,8 @@ public class Template {
 				mailBody = mailpart.html();
 			} else if (type.equals("subject")) {
 				mailSubject = mailpart.text();
+			} else if (type.equals("recipient")) {
+				mailRecipient = mailpart.text();
 			}
 		}
 	}
@@ -159,7 +162,7 @@ public class Template {
 	public String getMailRecipient() {
 		adressat = findAdressat();
 		if (adressat == null) {
-			return "";
+			return mailRecipient;
 		} else {
 			String ret = adressat.get(Kontakt.FLD_E_MAIL);
 			return ret;
