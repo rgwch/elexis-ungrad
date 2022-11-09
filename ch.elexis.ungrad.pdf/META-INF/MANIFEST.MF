@@ -6,7 +6,8 @@ Bundle-Version: 1.1.0.qualifier
 Automatic-Module-Name: ch.elexis.ungrad.pdf
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: ch.rgw.utility;bundle-version="3.7.0",
- ch.elexis.core.data;bundle-version="3.7.1"
+ ch.elexis.core.data;bundle-version="3.7.1",
+ ch.elexis.ungrad.common;bundle-version="1.2.0"
 Export-Package: ch.elexis.ungrad.pdf
 Bundle-ClassPath: lib/openhtmltopdf-core-1.0.11-SNAPSHOT-jar-with-dependencies.jar,
  lib/openhtmltopdf-pdfbox-1.0.11-SNAPSHOT-jar-with-dependencies.jar,

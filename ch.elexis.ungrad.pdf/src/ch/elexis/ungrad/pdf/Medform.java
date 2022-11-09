@@ -26,7 +26,8 @@ import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 /**
- * Handle medForm- forms (@see http://medforms.ch) 
+ * Handle medForm- forms (@see http://medforms.ch)
+ * 
  * @author gerry
  *
  */
@@ -90,16 +91,31 @@ public class Medform {
 	
 	/**
 	 * 
-	 * @param formpath full path to the medForm to fill
+	 * @param formpath
+	 *            full path to the medForm to fill
 	 */
 	public Medform(String formpath){
 		this.form = formpath;
 	}
 	
+	public boolean isMedform(){
+		try {
+			String oid =
+				mgr.getFieldContents(form, "topmostSubform[0].page1[0].formS1Struct[0].oid[0]");
+			return (oid != null) && oid.startsWith("medforms");
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+			return false;
+		}
+	}
+	
 	/**
 	 * Create a PDF file from formPath with prefilled fields
-	 * @param outPath Path for the newly created PDF
-	 * @param pat Patient for which the form should be prefilled
+	 * 
+	 * @param outPath
+	 *            Path for the newly created PDF
+	 * @param pat
+	 *            Patient for which the form should be prefilled
 	 * @return The Path to the filled form
 	 * @throws Exception
 	 */
@@ -190,6 +206,7 @@ public class Medform {
 	
 	/**
 	 * Retrieve the Value of a field
+	 * 
 	 * @param name
 	 * @return
 	 */

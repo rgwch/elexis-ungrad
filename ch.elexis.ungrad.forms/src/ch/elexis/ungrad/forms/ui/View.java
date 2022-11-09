@@ -13,7 +13,9 @@
 package ch.elexis.ungrad.forms.ui;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -43,6 +45,7 @@ import ch.elexis.data.Patient;
 import ch.elexis.data.Query;
 import ch.elexis.ungrad.forms.model.Controller;
 import ch.elexis.ungrad.forms.model.Template;
+import ch.elexis.ungrad.pdf.MappedForm;
 import ch.elexis.ungrad.pdf.Medform;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
@@ -60,28 +63,28 @@ public class View extends ViewPart implements IActivationListener {
 	private Composite container;
 	private StackLayout stack;
 	private Template currentTemplate;
-
-	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
-			ElexisEvent.EVENT_SELECTED) {
-
-		@Override
-		public void runInUi(ElexisEvent ev) {
-			// controller.changePatient((Patient) ev.getObject());
-			docList.setPatient((Patient) ev.getObject());
-			stack.topControl = docList;
-			detail.clear();
-			container.layout();
-		}
-
-	};
-
-	public View() {
+	
+	private final ElexisUiEventListenerImpl eeli_pat =
+		new ElexisUiEventListenerImpl(Patient.class, ElexisEvent.EVENT_SELECTED) {
+			
+			@Override
+			public void runInUi(ElexisEvent ev){
+				// controller.changePatient((Patient) ev.getObject());
+				docList.setPatient((Patient) ev.getObject());
+				stack.topControl = docList;
+				detail.clear();
+				container.layout();
+			}
+			
+		};
+	
+	public View(){
 		controller = new Controller();
 		stack = new StackLayout();
 	}
-
+	
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(Composite parent){
 		visible(true);
 		container = new Composite(parent, SWT.NONE);
 		container.setLayout(stack);
@@ -93,8 +96,8 @@ public class View extends ViewPart implements IActivationListener {
 		stack.topControl = docList;
 		container.layout();
 	}
-
-	private void contributeToActionBars() {
+	
+	private void contributeToActionBars(){
 		IActionBars bars = getViewSite().getActionBars();
 		IMenuManager menu = bars.getMenuManager();
 		IToolBarManager toolbar = bars.getToolBarManager();
@@ -107,9 +110,9 @@ public class View extends ViewPart implements IActivationListener {
 		showDetailAction.setEnabled(false);
 		mailAction.setEnabled(false);
 		docList.addSelectionListener(new ISelectionChangedListener() {
-
+			
 			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
+			public void selectionChanged(SelectionChangedEvent event){
 				IStructuredSelection sel = event.getStructuredSelection();
 				boolean bHasSelection = !sel.isEmpty();
 				printAction.setEnabled(bHasSelection);
@@ -118,26 +121,26 @@ public class View extends ViewPart implements IActivationListener {
 			}
 		});
 		docList.addDoubleclickListener(new IDoubleClickListener() {
-
+			
 			@Override
-			public void doubleClick(DoubleClickEvent arg0) {
+			public void doubleClick(DoubleClickEvent arg0){
 				showDetailAction.run();
 			}
 		});
 		// menu.add();
-
+		
 	}
-
-	private void makeActions() {
+	
+	private void makeActions(){
 		createNewAction = new Action("Laden") {
 			{
 				setToolTipText("Ein neues Dokument erstellen");
 				setImageDescriptor(Images.IMG_NEW.getImageDescriptor());
 				setText("Neu");
 			}
-
+			
 			@Override
-			public void run() {
+			public void run(){
 				SelectTemplateDialog std = new SelectTemplateDialog(getViewSite().getShell());
 				if (std.open() == Dialog.OK) {
 					File templateFile = std.result;
@@ -147,24 +150,41 @@ public class View extends ViewPart implements IActivationListener {
 							File outDir = controller.getOutputDirFor(currentPat);
 							if (!outDir.exists()) {
 								if (!outDir.mkdirs()) {
-									throw new Error("Can't create output dir " + outDir.getAbsolutePath());
+									throw new Error(
+										"Can't create output dir " + outDir.getAbsolutePath());
 								}
 							}
-							String basename = "A_" + new TimeTool().toString(TimeTool.DATE_ISO) + "_"
-									+ templateFile.getName();
+							String basename = "A_" + new TimeTool().toString(TimeTool.DATE_ISO)
+								+ "_" + templateFile.getName();
 							File outFile = new File(outDir, basename);
 							Medform medform = new Medform(templateFile.getAbsolutePath());
-							medform.create(outFile.getAbsolutePath(), currentPat);
-							detail.asyncRunViewer(outFile.getAbsolutePath());
-							String recipient = medform.getFieldValue("receiverMail");
 							Kontakt kRecipient = null;
-							Query<Kontakt> qbe = new Query<Kontakt>(Kontakt.class, Kontakt.FLD_E_MAIL, recipient);
-							List<Kontakt> found = qbe.execute();
-							if (found.size() > 0) {
-								kRecipient = found.get(0);
+							if (medform.isMedform()) {
+								medform.create(outFile.getAbsolutePath(), currentPat);
+								detail.asyncRunViewer(outFile.getAbsolutePath());
+								String recipient = medform.getFieldValue("receiverMail");
+								Query<Kontakt> qbe = new Query<Kontakt>(Kontakt.class,
+									Kontakt.FLD_E_MAIL, recipient);
+								List<Kontakt> found = qbe.execute();
+								if (found.size() > 0) {
+									kRecipient = found.get(0);
+								}
+							} else {
+								File mappingFile =
+									new File(templateFile.getParent(), FileTool.getNakedFilename(templateFile.getName()) + ".map");
+								if (!mappingFile.exists()) {
+									SWTHelper.showError("Unbekanntes Format",
+										"Diese Datei ist kein verwendbares Formular");
+									return;
+								} else {
+									String raw = FileTool.readTextFile(mappingFile);
+									MappedForm mapped =
+										new MappedForm(templateFile.getAbsolutePath());
+									mapped.create(outFile.getAbsolutePath(), raw, currentPat);
+								}
 							}
 							controller.createLinksWithElexis(outFile.getAbsolutePath(), kRecipient);
-						} else {	
+						} else {
 							Kontakt adressat = null;
 							String html = FileTool.readTextFile(templateFile);
 							if (templateFile.getName().endsWith("pug")) {
@@ -172,9 +192,11 @@ public class View extends ViewPart implements IActivationListener {
 								html = controller.convertPug(html, dir);
 							}
 							if (html.contains("[Adressat")) {
-								KontaktSelektor ksd = new KontaktSelektor(getSite().getShell(), Kontakt.class,
-										"Adressat", "Bitte Adressat auswählen",
-										new String[] { "Bezeichnung1", "Bezeichnung2" });
+								KontaktSelektor ksd =
+									new KontaktSelektor(getSite().getShell(), Kontakt.class,
+										"Adressat", "Bitte Adressat auswählen", new String[] {
+											"Bezeichnung1", "Bezeichnung2"
+								});
 								if (ksd.open() != Dialog.OK) {
 									return;
 								} else {
@@ -189,7 +211,7 @@ public class View extends ViewPart implements IActivationListener {
 							container.layout();
 						}
 						docList.setPatient(ElexisEventDispatcher.getSelectedPatient());
-
+						
 					} catch (Exception e) {
 						ExHandler.handle(e);
 						SWTHelper.showError("Fehler bei Ausgabe", e.getMessage());
@@ -203,9 +225,9 @@ public class View extends ViewPart implements IActivationListener {
 				setImageDescriptor(Images.IMG_DOCUMENT_STACK.getImageDescriptor());
 				setToolTipText("Zeige Liste der Dokumente");
 			}
-
+			
 			@Override
-			public void run() {
+			public void run(){
 				stack.topControl = docList;
 				if (docList.getSelection() == null) {
 					printAction.setEnabled(false);
@@ -220,9 +242,9 @@ public class View extends ViewPart implements IActivationListener {
 				setImageDescriptor(Images.IMG_DOCUMENT_PDF.getImageDescriptor());
 				setToolTipText("Zeige aktuelles Formular");
 			}
-
+			
 			@Override
-			public void run() {
+			public void run(){
 				stack.topControl = detail;
 				File dir = controller.getOutputDirFor(null);
 				File document = new File(dir, docList.getSelection() + ".html");
@@ -252,9 +274,9 @@ public class View extends ViewPart implements IActivationListener {
 				setImageDescriptor(Images.IMG_PRINTER.getImageDescriptor());
 				setToolTipText("Aktuelles Formular erstellen und ausgeben");
 			}
-
+			
 			@Override
-			public void run() {
+			public void run(){
 				if (stack.topControl.equals(detail)) {
 					detail.output();
 				} else if (stack.topControl.equals(docList)) {
@@ -268,38 +290,38 @@ public class View extends ViewPart implements IActivationListener {
 				setImageDescriptor(Images.IMG_MAIL_SEND.getImageDescriptor());
 				setToolTipText("Dokument als PDF per Mail versenden");
 			}
-
+			
 			@Override
-			public void run() {
+			public void run(){
 				if (stack.topControl.equals(detail)) {
 					detail.sendMail();
 				} else if (stack.topControl.equals(docList)) {
 					docList.sendMail();
 				}
 			}
-
+			
 		};
 	}
-
+	
 	@Override
-	public void setFocus() {
+	public void setFocus(){
 		// TODO Auto-generated method stub
-
+		
 	}
-
+	
 	@Override
-	public void activation(boolean mode) {
-
+	public void activation(boolean mode){
+		
 	}
-
+	
 	@Override
-	public void visible(boolean mode) {
+	public void visible(boolean mode){
 		if (mode) {
 			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
 		} else {
 			ElexisEventDispatcher.getInstance().removeListeners(eeli_pat);
 		}
-
+		
 	}
-
+	
 }
