@@ -145,7 +145,7 @@ public class Template {
 		if(eBrief==null) {
 			body.append("<span id=\"x-brief\" data-id=\""+brief.getId()+"\"></span>");
 		}else {
-			eBrief.id(brief.getId());
+			eBrief.attr("data-id", brief.getId());
 		}
 		html=doc.html();
 	}
@@ -156,7 +156,7 @@ public class Template {
 		if(eBrief==null) {
 			return null;
 		}else {
-			return eBrief.id();
+			return eBrief.attr("data-id");
 		}
 	}
 	

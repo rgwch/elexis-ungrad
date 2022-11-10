@@ -162,10 +162,16 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		String outputFile = pdfFile.getAbsolutePath();
 		String brief = template.getBrief();
 		if (brief == null) {
-			Brief meta=createLinksWithElexis(outputFile, template.adressat);
+			Brief meta = createLinksWithElexis(outputFile, template.adressat);
 			template.setBrief(meta);
+		} else {
+			Brief meta = Brief.load(brief);
+			if (meta.isValid()) {
+				meta.save(FileTool.readFile(pdfFile), "pdf");
+			}
+
 		}
-		return outputFile;	
+		return outputFile;
 	}
 
 	public Brief createLinksWithElexis(String filepath, Kontakt adressat) throws Exception {
