@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <style>
+        @page {
+            size: A4 portrait;
+            margin-top: 5mm;
+            margin-left: 5mm;
+            margin-bottom: 5mm;
+            margin-right: 5mm;
+        }
+    </style>
+</head>
+
+<body data-doctitle="Anmeldung_Testmeier"><img src="/home/eisenbart/elexis/schablonen/elexisforms/testmeier.png"
+        style="position:absolute;top:0;left:0;width:200mm;height:287mm;">
+    <div style="position:absolute;top:24mm;left:22mm"><span>Erwin Eisenbart</span><br><span>Facharzt für Elexik
+        </span><br><span>Unterdorf 17</span><br><span>9999 Elexikon</span><br><span>praxis-eisenbart@hin.ch</span>
+        <p style="margin-top:5mm;margin-bottom:0">ZSR-Nr: G 1234.56</p><span>GLN: 7601000070010</span>
+    </div>
+    <div style="position:absolute;top:89mm;left:32mm">[Patient.Name]</div>
+    <div style="position:absolute;top:89mm;left:83mm">[Patient.Vorname]</div>
+    <div style="position:absolute;top:89mm;left:137mm">[Patient.Geburtsdatum]</div>
+    <div style="position:absolute;top:100mm;left:35mm;white-space:nowrap">[Patient.Strasse]</div>
+    <div style="position:absolute;top:100mm;left:129mm;white-space:nowrap">[Patient.Telefon1]</div>
+    <div style="position:absolute;top:109mm;left:35mm;white-space:nowrap">[Patient.Plz] [Patient.Ort]</div>
+    <div style="position:absolute;top:109mm;left:129mm;white-space:nowrap">[Patient.E-Mail]</div>
+    <div style="position:absolute;top:140mm;left:69mm;white-space:nowrap" data-input="gastro">( )</div>
+    <div style="position:absolute;top:144mm;left:69mm;white-space:nowrap" data-input="colo">( )</div>
+    <div style="position:absolute;top:207mm;left:25mm;width:180mm;" data-input="Fragestellung">Frage</div>
+    <div style="position:absolute;top:264mm;left:35mm">[Datum.heute]</div>
+    <div data-mail="sender" style="display:none">praxis-eisenbart@hin.ch</div>
+    <div data-mail="subject" style="display:none">[Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]</div>
+    <div data-mail="recipient" style="display:none">prof.testmeier@hin.ch</div>
+    <div data-mail="body" style="display:none">
+        <p>Anbei die Zuweisung meine[Patient:mw:s Patienten/r Patientin] [Patient.Name] [Patient.Vorname]</p>
+        <p>Vielen Dank und freundliche Grüsse</p>
+        <p>Erwin Eisenbart</p>
+    </div>
+</body>
+
+</html>
