@@ -90,6 +90,10 @@ table, tr, td {
 	width: 100%;
 }
 
+.para {
+	width: 170mm;
+}
+
 #footer {
 	position: absolute;
 	left: 10mm;
@@ -130,9 +134,9 @@ table, tr, td {
 				genannten Patienten/der oben genannten Patientin] zur fachärztlichen
 				Untersuchung.</p>
 			<h2>Problem</h2>
-			<p data-input="Problem"></p>
+			<p class="para" data-input="Problem"></p>
 			<h2>Weitere Diagnosen</h2>
-			<p data-input="Diagnosen">[Patient.Diagnosen]</p>
+			<p class="para" data-input="Diagnosen">[Patient.Diagnosen]</p>
 			<h2>Medikation</h2>
 			<p data-input="Medikation">[Patient.Medikation]</p>
 		</div>
@@ -143,9 +147,15 @@ table, tr, td {
 		<div data-mail="sender" style="display: none">praxis@eisenbart.hin</div>
 		<div data-mail="subject" style="display: none">[Patient.Name]
 			[Patient.Vorname], [Patient.Geburtsdatum]</div>
-		<div data-mail="body" style="display: none">Anbei die Zuweisung
-			meine[Patient:mw:s Patienten/r Patientin] [Patient.Name]
-			[Patient.Vorname]\nVielen Dank und freundliche Grüsse</div>
+		<div data-mail="body" style="display: none">
+			<p>Anbei die Zuweisung meine[Patient:mw:s Patienten/r Patientin]
+				[Patient.Name] [Patient.Vorname]</p>
+			<p>Vielen Dank und freundliche Grüsse</p>
+			<p>
+				[Mandant.Vorname] [Mandant.Name]<br />Facharzt für Innere Medizin<br />[Mandant.Strasse]<br />[Mandant.Plz]
+				[Mandant.Ort]<br />[Mandant.Telefon1]
+			</p>
+		</div>
 	</div>
 </body>
 </html>

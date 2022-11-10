@@ -26,6 +26,7 @@ import org.jsoup.select.Elements;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.model.IPersistentObject;
+import ch.elexis.data.Brief;
 import ch.elexis.data.Kontakt;
 import ch.elexis.ungrad.Resolver;
 import ch.rgw.tools.StringTool;
@@ -138,6 +139,27 @@ public class Template {
 
 	}
 
+	public void setBrief(Brief brief) {
+		Element body = doc.body();
+		Element eBrief=body.getElementById("x-brief");
+		if(eBrief==null) {
+			body.append("<span id=\"x-brief\" data-id=\""+brief.getId()+"\"></span>");
+		}else {
+			eBrief.id(brief.getId());
+		}
+		html=doc.html();
+	}
+
+	public String getBrief() {
+		Element body = doc.body();
+		Element eBrief=body.getElementById("x-brief");
+		if(eBrief==null) {
+			return null;
+		}else {
+			return eBrief.id();
+		}
+	}
+	
 	public String getMailSender() {
 		return mailSender;
 	}

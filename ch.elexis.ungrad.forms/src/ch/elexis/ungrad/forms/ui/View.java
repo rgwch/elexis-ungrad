@@ -14,9 +14,7 @@ package ch.elexis.ungrad.forms.ui;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -70,11 +68,7 @@ public class View extends ViewPart implements IActivationListener {
 
 		@Override
 		public void runInUi(ElexisEvent ev) {
-			// controller.changePatient((Patient) ev.getObject());
-			docList.setPatient((Patient) ev.getObject());
-			stack.topControl = docList;
-			detail.clear();
-			container.layout();
+			setPatient((Patient) ev.getObject());
 		}
 
 	};
@@ -84,18 +78,26 @@ public class View extends ViewPart implements IActivationListener {
 		stack = new StackLayout();
 	}
 
+	void setPatient(Patient pat) {
+		// controller.changePatient((Patient) ev.getObject());
+		docList.setPatient(pat);
+		stack.topControl = docList;
+		detail.clear();
+		container.layout();
+	}
+
 	@Override
 	public void createPartControl(Composite parent) {
-		visible(true);
 		container = new Composite(parent, SWT.NONE);
 		container.setLayout(stack);
 		docList = new DocumentList(container, controller);
 		detail = new DetailDisplay(container, controller);
 		makeActions();
 		contributeToActionBars();
-		GlobalEventDispatcher.addActivationListener(this, this);
 		stack.topControl = docList;
 		container.layout();
+		GlobalEventDispatcher.addActivationListener(this, this);
+
 	}
 
 	private void contributeToActionBars() {
@@ -309,12 +311,21 @@ public class View extends ViewPart implements IActivationListener {
 
 	@Override
 	public void activation(boolean mode) {
-
+		if (!mode) {
+			try {
+				if (stack.topControl.equals(detail)) {
+					detail.saveHtml();
+				}
+			} catch (Exception ex) {
+				SWTHelper.showError("Fehler beim Sichern", ex.getMessage());
+			}
+		}
 	}
 
 	@Override
 	public void visible(boolean mode) {
 		if (mode) {
+			setPatient(ElexisEventDispatcher.getSelectedPatient());
 			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
 		} else {
 			ElexisEventDispatcher.getInstance().removeListeners(eeli_pat);

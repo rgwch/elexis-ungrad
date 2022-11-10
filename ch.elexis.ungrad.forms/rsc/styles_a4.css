@@ -85,6 +85,10 @@ td {
     top: 90mm;
     width: 100%;
 }
+
+.para{
+	width: 170mm;
+}
 #footer{
     position: absolute;
     left:10mm;

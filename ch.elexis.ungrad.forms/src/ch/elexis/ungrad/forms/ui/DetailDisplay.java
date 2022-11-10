@@ -12,10 +12,13 @@
 
 package ch.elexis.ungrad.forms.ui;
 
+import java.io.File;
 import java.util.Map.Entry;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
@@ -87,7 +90,7 @@ public class DetailDisplay extends Composite {
 		inlay.layout();
 	}
 
-	public String output() {
+	File saveHtml() throws Exception {
 		for (Control c : inlay.getChildren()) {
 			Object k = c.getData("input");
 			if (k instanceof String) {
@@ -95,8 +98,13 @@ public class DetailDisplay extends Composite {
 				template.setInput((String) k, val);
 			}
 		}
+		return controller.writeHTML(template);
+	}
+
+	public String output() {
 		try {
-			String pdffile = controller.createPDF(template, "");
+			File htmlFile = saveHtml();
+			String pdffile = controller.createPDF(htmlFile, template, "");
 			asyncRunViewer(pdffile);
 			return pdffile;
 		} catch (Exception e) {
@@ -110,7 +118,7 @@ public class DetailDisplay extends Composite {
 		MailUI mailer = new MailUI(getShell());
 		String subject = template.getMailSubject();
 		String body = template.getMailBody();
-		String recipient=template.getMailRecipient();
+		String recipient = template.getMailRecipient();
 		mailer.sendMail(subject, body, recipient, output());
 	}
 
