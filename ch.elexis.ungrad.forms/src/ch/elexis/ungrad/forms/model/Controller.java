@@ -14,7 +14,10 @@ package ch.elexis.ungrad.forms.model;
 
 import java.io.*;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
@@ -26,6 +29,7 @@ import ch.elexis.data.Brief;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
+import ch.elexis.data.Query;
 import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.rgw.io.FileTool;
@@ -122,6 +126,23 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return dir;
 	}
 
+	public Brief getCorrespondingBrief(String item, Patient patient) {
+		Pattern pat=Pattern.compile("A_([0-9]{4,4}-[0-1][0-9]-[0-3][0-9])_(.+)");
+		Matcher m=pat.matcher(item);
+		if(m.matches()) {
+			String date=m.group(1).replace("-", "");
+			String title=m.group(2);
+			Query<Brief> qbe=new Query<Brief>(Brief.class);
+			qbe.add(Brief.FLD_SUBJECT, Query.EQUALS, title);
+			qbe.add(Brief.FLD_DATE, Query.EQUALS, date);
+			qbe.add(Brief.FLD_PATIENT_ID, Query.EQUALS, patient.getId());
+			List<Brief> briefe=qbe.execute();
+			if(briefe.size()>0) {
+				return briefe.get(0);
+			}
+		}
+		return null;	
+	}
 	/**
 	 * Write an HTML file from the current state of the Template. This is called
 	 * with every deactivation of the Forms View to save current work if
@@ -273,5 +294,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		if (htmlFile.exists()) {
 			htmlFile.delete();
 		}
+		Brief brief=getCorrespondingBrief(item, pat);
+		brief.delete();
 	}
 }
