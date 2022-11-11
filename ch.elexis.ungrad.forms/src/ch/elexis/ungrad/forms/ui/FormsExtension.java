@@ -32,7 +32,7 @@ import ch.elexis.ungrad.forms.Activator;
 import ch.rgw.tools.ExHandler;
 
 /**
- * An IKonsExtension fpr Ungrad Forms: Will create entries in Necounter-Entries for created documents
+ * An IKonsExtension fpr Ungrad Forms: Will create entries in Encounter-Entries for created documents
  * @author gerry
  *
  */
@@ -52,7 +52,7 @@ public class FormsExtension implements IKonsExtension {
 	
 	@Override
 	public boolean doLayout(StyleRange styleRange, String provider, String id){
-		styleRange.background = UiDesk.getColor(UiDesk.COL_LIGHTBLUE);
+		styleRange.background = UiDesk.getColor(UiDesk.COL_GREEN);
 		styleRange.foreground = UiDesk.getColor(UiDesk.COL_BLACK);
 		return true;
 	}
@@ -91,7 +91,10 @@ public class FormsExtension implements IKonsExtension {
 	
 	@Override
 	public void removeXRef(String refProvider, String refID){
-		// TODO Auto-generated method stub
+		Brief brief=Brief.load(refID);
+		if(brief.isValid()) {
+			brief.delete();
+		}
 		
 	}
 	

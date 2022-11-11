@@ -104,7 +104,7 @@ public class DetailDisplay extends Composite {
 	public String output() {
 		try {
 			File htmlFile = saveHtml();
-			String pdffile = controller.createPDF(htmlFile, template, "");
+			String pdffile = controller.createPDF(htmlFile, template);
 			asyncRunViewer(pdffile);
 			return pdffile;
 		} catch (Exception e) {

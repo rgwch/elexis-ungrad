@@ -98,6 +98,10 @@ public class Medform {
 		this.form = formpath;
 	}
 	
+	/**
+	 * Check if the currentliy loaded pdf is a medForm. Read the oid form-field. 
+	 * @return true if an OID form field was found, and if its value starts with "medforms". 
+	 */
 	public boolean isMedform(){
 		try {
 			String oid =

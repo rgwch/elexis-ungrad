@@ -37,6 +37,7 @@ import ch.rgw.tools.StringTool;
 
 /**
  * Handle HTML-to-PDF conversion, access PDF form fields, and print PDF files
+ * Uses https://github.com/danfickle/openhtmltopdf and https://pdfbox.apache.org/
  * @author gerry
  *
  */

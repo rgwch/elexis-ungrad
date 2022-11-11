@@ -17,6 +17,13 @@ public class MailUI {
 		this.shell = shell;
 	}
 	
+	/**
+	 * Show a simple preview of a mail and allow attaching files from the file system
+	 * @param subject subject line for the mail
+	 * @param body body of the mail
+	 * @param recipient receiver
+	 * @param pdfFilePath first attachment
+	 */
 	public void sendMail(String subject, String body, String recipient, String pdfFilePath){
 		String sender = CoreHub.localCfg.get(PreferenceConstants.SMTP_USER, "");
 		String smtpserver = CoreHub.localCfg.get(PreferenceConstants.SMTP_HOST, "localhost");

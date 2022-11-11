@@ -134,6 +134,14 @@ public class View extends ViewPart implements IActivationListener {
 
 	}
 
+	/**
+	 * If the Template is a PDF:
+	 * - Check for medForms-signature and if so, fill medForms standardFiels and store in output dir.
+	 * - If not, check for corrseponding .map-file. If found, fill fields from .map and store n output dir.
+	 * - If not, just open file.
+	 * @param templateFile the template to check
+	 * @return full path of the resulting file in the output dir.
+	 */
 	private String fillPdf(File templateFile) throws Error, Exception, IOException {
 		Patient currentPat = ElexisEventDispatcher.getSelectedPatient();
 		File outDir = controller.getOutputDirFor(currentPat);

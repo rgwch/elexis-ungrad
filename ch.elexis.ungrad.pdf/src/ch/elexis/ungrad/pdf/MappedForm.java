@@ -20,7 +20,7 @@ import ch.elexis.ungrad.Resolver;
 import ch.rgw.tools.StringTool;
 
 /**
- * Handle pdf forms with mapping files. The ap is a String field with lines such as
+ * Handle pdf forms with mapping files. The map is a String field with lines such as
  * PdfFieldName:ElexisFieldName, e.g. lastname:[Patient.Name]
  * @author gerry
  *

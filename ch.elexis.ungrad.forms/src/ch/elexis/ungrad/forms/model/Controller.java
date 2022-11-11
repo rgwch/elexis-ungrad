@@ -99,6 +99,13 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return (String) element;
 	}
 
+	/**
+	 * Write an HTML file from the current state of the Template. This is called with every deactivation of the
+	 * Forms View to save current work if interrupted. And it's called befor pdf outputting.
+	 * @param tmpl The Template to save
+	 * @return The HTML file just written
+	 * @throws Exception
+	 */
 	public File writeHTML(Template tmpl) throws Exception {
 		String filename = tmpl.getFilename();
 		String prefix = "";
@@ -147,14 +154,16 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	}
 
 	/**
-	 * Create a PDF file from a template
+	 * Create a PDF file from a template. Connect an Elexis "Brief" to the resulting file, If there is
+	 * already a Brief connected, don't create a new one but update the existing (i.e. if the user just
+	 * modified and re-printed an existing document.
 	 * 
-	 * @param tmpl
-	 * @param printer
-	 * @return
+	 * @param htmlFile The HTML file
+	 * @param tmpl The Template to use
+	 * @return the full path of the pdf written
 	 * @throws Exception
 	 */
-	public String createPDF(File htmlFile, Template template, String printer) throws Exception {
+	public String createPDF(File htmlFile, Template template) throws Exception {
 
 		Manager pdf = new Manager();
 		File pdfFile = new File(htmlFile.getParent(), FileTool.getNakedFilename(htmlFile.getName()) + ".pdf");
