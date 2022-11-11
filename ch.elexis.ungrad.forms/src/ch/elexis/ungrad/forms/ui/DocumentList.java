@@ -71,6 +71,9 @@ public class DocumentList extends Composite {
 		tv.addDoubleClickListener(listener);
 	}
 	
+	/*
+	 * Get the currently selected item or null if none is selected
+	 */
 	public String getSelection(){
 		IStructuredSelection sel = tv.getStructuredSelection();
 		if (sel.isEmpty()) {

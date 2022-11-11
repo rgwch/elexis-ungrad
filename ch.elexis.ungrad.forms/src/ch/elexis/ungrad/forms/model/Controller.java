@@ -100,8 +100,33 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	}
 
 	/**
-	 * Write an HTML file from the current state of the Template. This is called with every deactivation of the
-	 * Forms View to save current work if interrupted. And it's called befor pdf outputting.
+	 * Return the output dir for a given patient.
+	 * 
+	 * @param pat The patient whose output dir should be returned. Will be created
+	 *            if doesn't exist
+	 * 
+	 * @return
+	 */
+	public File getOutputDir(Patient pat) throws Exception {
+		String dirname = pat.getName() + "_" + pat.getVorname() + "_" + pat.getGeburtsdatum();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, "")).append(File.separator)
+				.append(dirname.substring(0, 1).toLowerCase()).append(File.separator).append(dirname);
+		File dir = new File(sb.toString());
+		if (!dir.exists()) {
+			if (!dir.mkdirs()) {
+				throw new Exception("Can't create output dir");
+			}
+		}
+		return dir;
+	}
+
+	/**
+	 * Write an HTML file from the current state of the Template. This is called
+	 * with every deactivation of the Forms View to save current work if
+	 * interrupted. And it's called befor pdf outputting.
+	 * 
 	 * @param tmpl The Template to save
 	 * @return The HTML file just written
 	 * @throws Exception
@@ -132,13 +157,8 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 				filename = prefix + name;
 			}
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
-			String dirname = pat.getName() + "_" + pat.getVorname() + "_" + pat.getGeburtsdatum();
 
-			StringBuilder sb = new StringBuilder();
-			sb.append(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, "")).append(File.separator)
-					.append(dirname.substring(0, 1).toLowerCase()).append(File.separator).append(dirname);
-
-			File dir = new File(sb.toString());
+			File dir = getOutputDir(pat);
 			if (!dir.exists()) {
 				if (!dir.mkdirs()) {
 					throw new Exception("Could not create directory " + dir.getAbsolutePath());
@@ -154,12 +174,13 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	}
 
 	/**
-	 * Create a PDF file from a template. Connect an Elexis "Brief" to the resulting file, If there is
-	 * already a Brief connected, don't create a new one but update the existing (i.e. if the user just
-	 * modified and re-printed an existing document.
+	 * Create a PDF file from a template. Connect an Elexis "Brief" to the resulting
+	 * file, If there is already a Brief connected, don't create a new one but
+	 * update the existing (i.e. if the user just modified and re-printed an
+	 * existing document.
 	 * 
 	 * @param htmlFile The HTML file
-	 * @param tmpl The Template to use
+	 * @param tmpl     The Template to use
 	 * @return the full path of the pdf written
 	 * @throws Exception
 	 */
@@ -236,4 +257,21 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		}
 	}
 
+	/**
+	 * Revove documents from output dir (not from database)
+	 * @param item 
+	 * @param pat
+	 * @throws Exception
+	 */
+	public void delete(String item, Patient pat) throws Exception {
+		File dir = getOutputDir(pat);
+		File htmlFile = new File(dir, item + ".html");
+		File pdfFile = new File(dir, item + ".pdf");
+		if (pdfFile.exists()) {
+			pdfFile.delete();
+		}
+		if (htmlFile.exists()) {
+			htmlFile.delete();
+		}
+	}
 }

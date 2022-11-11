@@ -51,12 +51,14 @@ import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.TimeTool;
 
 /**
+ * Main View of the Elexis-Forms Plugin
+ * 
  * @author gerry
  *
  */
 public class View extends ViewPart implements IActivationListener {
 	private Controller controller;
-	private Action createNewAction, showListAction, showDetailAction, printAction, mailAction;
+	private Action createNewAction, showListAction, showDetailAction, printAction, mailAction, deleteAction;
 	private DocumentList docList;
 	private DetailDisplay detail;
 	private Composite container;
@@ -130,15 +132,16 @@ public class View extends ViewPart implements IActivationListener {
 				showDetailAction.run();
 			}
 		});
-		// menu.add();
+		menu.add(deleteAction);
 
 	}
 
 	/**
-	 * If the Template is a PDF:
-	 * - Check for medForms-signature and if so, fill medForms standardFiels and store in output dir.
-	 * - If not, check for corrseponding .map-file. If found, fill fields from .map and store n output dir.
-	 * - If not, just open file.
+	 * If the Template is a PDF: - Check for medForms-signature and if so, fill
+	 * medForms standardFiels and store in output dir. - If not, check for
+	 * corrseponding .map-file. If found, fill fields from .map and store n output
+	 * dir. - If not, just open file.
+	 * 
 	 * @param templateFile the template to check
 	 * @return full path of the resulting file in the output dir.
 	 */
@@ -308,6 +311,28 @@ public class View extends ViewPart implements IActivationListener {
 				}
 			}
 
+		};
+		deleteAction = new Action("Dokument löschen") {
+			{
+				setText("Löschen");
+				setImageDescriptor(Images.IMG_DELETE.getImageDescriptor());
+				setToolTipText("Dokument unwiderruflich löschen");
+			}
+
+			@Override
+			public void run() {
+				try {
+					String sel = docList.getSelection();
+					if (SWTHelper.askYesNo("Bitte bestätigen", sel + " Wirklich unwiderruflich löschen?")) {
+						Patient pat = ElexisEventDispatcher.getSelectedPatient();
+						controller.delete(sel, pat);
+						docList.setPatient(pat);
+					}
+				} catch (Exception e) {
+					ExHandler.handle(e);
+					SWTHelper.showError("Fehler beim Löschen", e.getMessage());
+				}
+			}
 		};
 	}
 
