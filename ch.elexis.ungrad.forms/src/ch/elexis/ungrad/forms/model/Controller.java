@@ -295,6 +295,10 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			htmlFile.delete();
 		}
 		Brief brief=getCorrespondingBrief(item, pat);
+		Konsultation k=Konsultation.load(brief.get(Brief.FLD_KONSULTATION_ID));
+		if(k.exists()) {
+			k.removeXRef(Activator.KonsXRef, brief.getId());
+		}
 		brief.delete();
 	}
 }
