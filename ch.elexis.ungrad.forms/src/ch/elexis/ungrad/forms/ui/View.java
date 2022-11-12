@@ -15,6 +15,7 @@ package ch.elexis.ungrad.forms.ui;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -147,7 +148,7 @@ public class View extends ViewPart implements IActivationListener {
 	 */
 	private String fillPdf(File templateFile) throws Error, Exception, IOException {
 		Patient currentPat = ElexisEventDispatcher.getSelectedPatient();
-		File outDir = controller.getOutputDirFor(currentPat);
+		File outDir = controller.getOutputDirFor(currentPat, true);
 		if (!outDir.exists()) {
 			if (!outDir.mkdirs()) {
 				throw new Error("Can't create output dir " + outDir.getAbsolutePath());
@@ -256,23 +257,22 @@ public class View extends ViewPart implements IActivationListener {
 
 			@Override
 			public void run() {
-				stack.topControl = detail;
-				File dir = controller.getOutputDirFor(null);
-				File document = new File(dir, docList.getSelection() + ".html");
-				if (document.exists()) {
-					try {
+				try {
+					File dir = controller.getOutputDirFor(null, true);
+					File document = new File(dir, docList.getSelection() + ".html");
+					if (document.exists()) {
 						String html = FileTool.readTextFile(document);
 						currentTemplate = new Template(html, null);
 						currentTemplate.setFilename(document.getAbsolutePath());
+						stack.topControl = detail;
 						detail.show(currentTemplate);
-					} catch (Exception e) {
-						SWTHelper.showError("Fehler bei Verarbeitung", e.getMessage());
+					} else {
+						stack.topControl = docList;
+						controller.showPDF(null, docList.getSelection());
 					}
-				} else {
-					document = new File(dir, docList.getSelection() + ".pdf");
-					if (document.exists()) {
-						detail.asyncRunViewer(document.getAbsolutePath());
-					}
+				} catch (Exception ex) {
+					SWTHelper.showError("Fehler bei Verarbeitung", ex.getMessage());
+
 				}
 				printAction.setEnabled(true);
 				mailAction.setEnabled(true);

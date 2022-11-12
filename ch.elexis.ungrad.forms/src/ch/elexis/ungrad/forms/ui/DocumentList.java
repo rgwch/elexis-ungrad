@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 
 import ch.elexis.core.data.activator.CoreHub;
@@ -41,8 +42,8 @@ import ch.rgw.tools.ExHandler;
 public class DocumentList extends Composite {
 	private TableViewer tv;
 	private Controller controller;
-	
-	public DocumentList(Composite parent, Controller controller){
+
+	public DocumentList(Composite parent, Controller controller) {
 		super(parent, SWT.NONE);
 		this.controller = controller;
 		setLayoutData(SWTHelper.getFillGridData());
@@ -51,30 +52,30 @@ public class DocumentList extends Composite {
 		tv.setContentProvider(controller);
 		tv.setLabelProvider(controller);
 		tv.setComparator(new ViewerComparator() {
-			
+
 			@Override
-			public int compare(Viewer viewer, Object e1, Object e2){
+			public int compare(Viewer viewer, Object e1, Object e2) {
 				return ((String) e2).compareTo((String) e1);
 			}
-			
+
 		});
 		tv.setInput(ElexisEventDispatcher.getSelectedPatient());
 		tv.getControl().setLayoutData(SWTHelper.getFillGridData());
-		
+
 	}
-	
-	public void addSelectionListener(ISelectionChangedListener listener){
+
+	public void addSelectionListener(ISelectionChangedListener listener) {
 		tv.addSelectionChangedListener(listener);
 	}
-	
-	public void addDoubleclickListener(IDoubleClickListener listener){
+
+	public void addDoubleclickListener(IDoubleClickListener listener) {
 		tv.addDoubleClickListener(listener);
 	}
-	
+
 	/*
 	 * Get the currently selected item or null if none is selected
 	 */
-	public String getSelection(){
+	public String getSelection() {
 		IStructuredSelection sel = tv.getStructuredSelection();
 		if (sel.isEmpty()) {
 			return null;
@@ -82,57 +83,56 @@ public class DocumentList extends Composite {
 			return (String) sel.getFirstElement();
 		}
 	}
-	
-	public void sendMail(){
+
+	public void sendMail() {
 		IStructuredSelection sel = tv.getStructuredSelection();
 		if (!sel.isEmpty()) {
 			String selected = (String) sel.getFirstElement();
-			File dir = controller.getOutputDirFor(null);
-			File outfile = new File(dir, selected + ".pdf");
-			File templateFile = new File(dir, selected + ".html");
 			try {
-				String subject=selected;
-				String body=CoreHub.localCfg.get(PreferenceConstants.MAIL_BODY, "Siehe Anhang\nMit freundlichen Grüssen");
-				String recipient="";
-				if (templateFile.exists()) {
-					Template template = new Template(FileTool.readTextFile(templateFile), null);
-					subject = template.getMailSubject();
-					body = template.getMailBody();
-					recipient=template.getMailRecipient();
-				}else if(outfile.exists()) {
-					Medform medform=new Medform(outfile.getAbsolutePath());
-					recipient=medform.getFieldValue("receiverMail");
+				File dir = controller.getOutputDirFor(null, false);
+				if (dir.exists()) {
+					File outfile = new File(dir, selected + ".pdf");
+					File templateFile = new File(dir, selected + ".html");
+					String subject = selected;
+					String body = CoreHub.localCfg.get(PreferenceConstants.MAIL_BODY,
+							"Siehe Anhang\nMit freundlichen Grüssen");
+					String recipient = "";
+					if (templateFile.exists()) {
+						Template template = new Template(FileTool.readTextFile(templateFile), null);
+						subject = template.getMailSubject();
+						body = template.getMailBody();
+						recipient = template.getMailRecipient();
+					} else if (outfile.exists()) {
+						Medform medform = new Medform(outfile.getAbsolutePath());
+						recipient = medform.getFieldValue("receiverMail");
+					}
+
+					MailUI mailer = new MailUI(getShell());
+					mailer.sendMail(subject, body, recipient, outfile.getAbsolutePath());
 				}
-				
-				MailUI mailer = new MailUI(getShell());
-				mailer.sendMail(subject, body, recipient, outfile.getAbsolutePath());
 			} catch (Exception ex) {
 				ExHandler.handle(ex);
 				SWTHelper.showError("Fehler bei Ausdruck", ex.getMessage());
 			}
-			
+
 		}
 	}
-	
-	public String output(){
+
+	public String output() {
 		IStructuredSelection sel = tv.getStructuredSelection();
 		if (!sel.isEmpty()) {
 			String selected = (String) sel.getFirstElement();
-			File dir = controller.getOutputDirFor(null);
-			File outfile = new File(dir, selected + ".pdf");
-			Manager m = new Manager();
 			try {
-				m.printFromPDF(outfile, "");
-				return outfile.getAbsolutePath();
-			} catch (IOException | PrinterException e) {
-				ExHandler.handle(e);
-				SWTHelper.showError("Fehler bei Ausgabe", e.getMessage());
+				controller.showPDF(null, selected);
+			} catch (Exception ex) {
+				ExHandler.handle(ex);
+				SWTHelper.showError("Could not create or show file", ex.getMessage());
 			}
 		}
 		return null;
 	}
-	
-	void setPatient(Patient pat){
+
+	void setPatient(Patient pat) {
 		tv.setInput(pat);
 	}
 }

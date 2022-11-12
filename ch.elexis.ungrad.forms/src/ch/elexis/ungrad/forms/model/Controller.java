@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.swt.program.Program;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
@@ -37,6 +38,7 @@ import ch.elexis.data.Query;
 import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.rgw.io.FileTool;
+import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
@@ -47,53 +49,40 @@ import ch.rgw.tools.TimeTool;
  *
  */
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
-	
-	/**
-	 * Find the configured output dir for a patient (highly opinionated filepath
-	 * resolution)
-	 * 
-	 * @param p Patient whos output dir should be retrieved
-	 * @return The directory to store documents for that patient.
-	 */
-	public File getOutputDirFor(Patient p) {
-		if (p == null) {
-			p = ElexisEventDispatcher.getSelectedPatient();
-		}
-		String name = p.getName();
-		String fname = p.getVorname();
-		String birthdate = p.getGeburtsdatum();
-		File superdir = new File(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, ""),
-				name.substring(0, 1).toLowerCase());
-		File dir = new File(superdir, name + "_" + fname + "_" + birthdate);
-		return dir;
-	}
 
 	/* CoontentProvider */
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Patient pat = (Patient) inputElement;
-		File dir = getOutputDirFor(pat);
-		String[] files = dir.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				if (name.startsWith("A_")) {
-					String ext = FileTool.getExtension(name);
-					return ext.equalsIgnoreCase("pdf") || ext.equalsIgnoreCase("html");
-				} else {
-					return false;
+		File dir;
+		try {
+			dir = getOutputDirFor(pat, true);
+			String[] files = dir.list(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					if (name.startsWith("A_")) {
+						String ext = FileTool.getExtension(name);
+						return ext.equalsIgnoreCase("pdf") || ext.equalsIgnoreCase("html");
+					} else {
+						return false;
+					}
 				}
+			});
+			if (files == null) {
+				return new String[0];
+			} else {
+				Set<String> deduplicated = new LinkedHashSet<String>();
+				for (String file : files) {
+					deduplicated.add(FileTool.getNakedFilename(file));
+				}
+				String[] ret = deduplicated.toArray(new String[0]);
+				return ret;
 			}
-		});
-		if (files == null) {
-			return new String[0];
-		} else {
-			Set<String> deduplicated = new LinkedHashSet<String>();
-			for (String file : files) {
-				deduplicated.add(FileTool.getNakedFilename(file));
-			}
-			String[] ret = deduplicated.toArray(new String[0]);
-			return ret;
+		} catch (Exception e) {
+			ExHandler.handle(e);
+			return new String[] { "Error reading directory" };
 		}
+
 	}
 
 	/* LabelProvider */
@@ -103,25 +92,29 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	}
 
 	/**
-	 * Return the output dir for a given patient.
+	 * Find the configured output dir for a patient (highly opinionated filepath
+	 * resolution)
 	 * 
-	 * @param pat The patient whose output dir should be returned. Will be created
-	 *            if doesn't exist
-	 * 
-	 * @return
+	 * @param p                  Patient whose output dir should be retrieved
+	 * @param bCreateIfNotExists create directory if it doesn't exist
+	 * @return The directory to store documents for that patient.
 	 */
-	public File getOutputDir(Person pat) throws Exception {
-		String dirname = pat.getName() + "_" + pat.getVorname() + "_" + pat.getGeburtsdatum();
-
-		StringBuilder sb = new StringBuilder();
-		sb.append(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, "")).append(File.separator)
-				.append(dirname.substring(0, 1).toLowerCase()).append(File.separator).append(dirname);
-		File dir = new File(sb.toString());
-		if (!dir.exists()) {
+	public File getOutputDirFor(Person p, boolean bCreateIfNotExists) throws Exception {
+		if (p == null) {
+			p = ElexisEventDispatcher.getSelectedPatient();
+		}
+		String name = p.getName();
+		String fname = p.getVorname();
+		String birthdate = p.getGeburtsdatum();
+		File superdir = new File(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, ""),
+				name.substring(0, 1).toLowerCase());
+		File dir = new File(superdir, name + "_" + fname + "_" + birthdate);
+		if (!dir.exists() && bCreateIfNotExists) {
 			if (!dir.mkdirs()) {
 				throw new Exception("Can't create output dir");
 			}
 		}
+
 		return dir;
 	}
 
@@ -179,7 +172,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			}
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
 
-			File dir = getOutputDir(pat);
+			File dir = getOutputDirFor(pat, true);
 			if (!dir.exists()) {
 				if (!dir.mkdirs()) {
 					throw new Exception("Could not create directory " + dir.getAbsolutePath());
@@ -223,6 +216,21 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 
 		}
 		return outputFile;
+	}
+
+	public String showPDF(Patient pat, String title) throws Exception {
+		File dir = getOutputDirFor(pat, false);
+		if (dir.exists()) {
+			File outfile = new File(dir, title + ".pdf");
+			if (outfile.exists()) {
+				String filepath = outfile.getAbsolutePath();
+				if (Program.launch(filepath) == false) {
+					Runtime.getRuntime().exec(filepath);
+				}
+				return filepath;
+			}
+		}
+		return null;
 	}
 
 	public Brief createLinksWithElexis(String filepath, Kontakt adressat) throws Exception {
@@ -286,14 +294,16 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	 * @throws Exception
 	 */
 	public void delete(String item, Person pat) throws Exception {
-		File dir = getOutputDir(pat);
-		File htmlFile = new File(dir, item + ".html");
-		File pdfFile = new File(dir, item + ".pdf");
-		if (pdfFile.exists()) {
-			pdfFile.delete();
-		}
-		if (htmlFile.exists()) {
-			htmlFile.delete();
+		File dir = getOutputDirFor(pat, false);
+		if (dir.exists()) {
+			File htmlFile = new File(dir, item + ".html");
+			File pdfFile = new File(dir, item + ".pdf");
+			if (pdfFile.exists()) {
+				pdfFile.delete();
+			}
+			if (htmlFile.exists()) {
+				htmlFile.delete();
+			}
 		}
 		Brief brief = getCorrespondingBrief(item, pat);
 		if (brief != null && brief.exists()) {
