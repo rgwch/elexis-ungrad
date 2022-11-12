@@ -250,7 +250,7 @@ public class View extends ViewPart implements IActivationListener {
 		showDetailAction = new Action("Formular") {
 			{
 				setText("Ausfüllen");
-				setImageDescriptor(Images.IMG_DOCUMENT_PDF.getImageDescriptor());
+				setImageDescriptor(Images.IMG_EDIT.getImageDescriptor());
 				setToolTipText("Zeige aktuelles Formular");
 			}
 
@@ -282,7 +282,7 @@ public class View extends ViewPart implements IActivationListener {
 		printAction = new Action("Ausgabe") {
 			{
 				setText("Ausgeben");
-				setImageDescriptor(Images.IMG_PRINTER.getImageDescriptor());
+				setImageDescriptor(Images.IMG_DOCUMENT_PDF.getImageDescriptor());
 				setToolTipText("Aktuelles Formular erstellen und ausgeben");
 			}
 
