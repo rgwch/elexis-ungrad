@@ -15,7 +15,6 @@ package ch.elexis.ungrad.forms.ui;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -42,6 +41,7 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Query;
+import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.forms.model.Controller;
 import ch.elexis.ungrad.forms.model.Template;
 import ch.elexis.ungrad.pdf.MappedForm;
@@ -76,7 +76,7 @@ public class View extends ViewPart implements IActivationListener {
 	};
 
 	public View() {
-		controller = new Controller();
+		controller = Activator.getController();
 		stack = new StackLayout();
 	}
 

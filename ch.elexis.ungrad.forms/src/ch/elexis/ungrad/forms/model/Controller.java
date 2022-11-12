@@ -12,7 +12,11 @@
 
 package ch.elexis.ungrad.forms.model;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,12 +27,12 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
-import ch.elexis.core.text.XRefExtensionConstants;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.elexis.data.Brief;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
+import ch.elexis.data.Person;
 import ch.elexis.data.Query;
 import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.pdf.Manager;
@@ -43,12 +47,7 @@ import ch.rgw.tools.TimeTool;
  *
  */
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
-	private Patient currentPatient;
-
-	void changePatient(Patient pat) {
-		currentPatient = pat;
-	}
-
+	
 	/**
 	 * Find the configured output dir for a patient (highly opinionated filepath
 	 * resolution)
@@ -111,7 +110,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	 * 
 	 * @return
 	 */
-	public File getOutputDir(Patient pat) throws Exception {
+	public File getOutputDir(Person pat) throws Exception {
 		String dirname = pat.getName() + "_" + pat.getVorname() + "_" + pat.getGeburtsdatum();
 
 		StringBuilder sb = new StringBuilder();
@@ -126,23 +125,24 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return dir;
 	}
 
-	public Brief getCorrespondingBrief(String item, Patient patient) {
-		Pattern pat=Pattern.compile("A_([0-9]{4,4}-[0-1][0-9]-[0-3][0-9])_(.+)");
-		Matcher m=pat.matcher(item);
-		if(m.matches()) {
-			String date=m.group(1).replace("-", "");
-			String title=m.group(2);
-			Query<Brief> qbe=new Query<Brief>(Brief.class);
+	public Brief getCorrespondingBrief(String item, Person patient) {
+		Pattern pat = Pattern.compile("A_([0-9]{4,4}-[0-1][0-9]-[0-3][0-9])_(.+)");
+		Matcher m = pat.matcher(item);
+		if (m.matches()) {
+			String date = m.group(1).replace("-", "");
+			String title = m.group(2);
+			Query<Brief> qbe = new Query<Brief>(Brief.class);
 			qbe.add(Brief.FLD_SUBJECT, Query.EQUALS, title);
 			qbe.add(Brief.FLD_DATE, Query.EQUALS, date);
 			qbe.add(Brief.FLD_PATIENT_ID, Query.EQUALS, patient.getId());
-			List<Brief> briefe=qbe.execute();
-			if(briefe.size()>0) {
+			List<Brief> briefe = qbe.execute();
+			if (briefe.size() > 0) {
 				return briefe.get(0);
 			}
 		}
-		return null;	
+		return null;
 	}
+
 	/**
 	 * Write an HTML file from the current state of the Template. This is called
 	 * with every deactivation of the Forms View to save current work if
@@ -280,11 +280,12 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 
 	/**
 	 * Revove documents from output dir (not from database)
-	 * @param item 
+	 * 
+	 * @param item
 	 * @param pat
 	 * @throws Exception
 	 */
-	public void delete(String item, Patient pat) throws Exception {
+	public void delete(String item, Person pat) throws Exception {
 		File dir = getOutputDir(pat);
 		File htmlFile = new File(dir, item + ".html");
 		File pdfFile = new File(dir, item + ".pdf");
@@ -294,11 +295,19 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		if (htmlFile.exists()) {
 			htmlFile.delete();
 		}
-		Brief brief=getCorrespondingBrief(item, pat);
-		Konsultation k=Konsultation.load(brief.get(Brief.FLD_KONSULTATION_ID));
-		if(k.exists()) {
-			k.removeXRef(Activator.KonsXRef, brief.getId());
+		Brief brief = getCorrespondingBrief(item, pat);
+		if (brief != null && brief.exists()) {
+			Konsultation k = Konsultation.load(brief.get(Brief.FLD_KONSULTATION_ID));
+			if (k.exists()) {
+				k.removeXRef(Activator.KonsXRef, brief.getId());
+			}
+			brief.delete();
 		}
-		brief.delete();
+	}
+
+	public void delete(Brief brief) throws Exception {
+		TimeTool tt = new TimeTool(brief.getDatum());
+		String basename = "A_" + tt.toString(TimeTool.DATE_ISO) + "_" + brief.getBetreff();
+		delete(basename, brief.getPatient());
 	}
 }
