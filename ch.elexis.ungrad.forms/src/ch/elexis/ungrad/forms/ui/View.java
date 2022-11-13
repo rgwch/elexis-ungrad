@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -27,6 +28,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
@@ -108,8 +110,10 @@ public class View extends ViewPart implements IActivationListener {
 		IMenuManager menu = bars.getMenuManager();
 		IToolBarManager toolbar = bars.getToolBarManager();
 		toolbar.add(createNewAction);
+		toolbar.add(new Separator());
 		toolbar.add(showListAction);
 		toolbar.add(showDetailAction);
+		toolbar.add(new Separator());
 		toolbar.add(printAction);
 		toolbar.add(mailAction);
 		printAction.setEnabled(false);
@@ -133,6 +137,10 @@ public class View extends ViewPart implements IActivationListener {
 				showDetailAction.run();
 			}
 		});
+		menu.add(createNewAction);
+		menu.add(printAction);
+		menu.add(mailAction);
+		menu.add(new Separator());
 		menu.add(deleteAction);
 
 	}
@@ -180,7 +188,7 @@ public class View extends ViewPart implements IActivationListener {
 	}
 
 	private void makeActions() {
-		createNewAction = new Action("Laden") {
+		createNewAction = new Action("Erstellen") {
 			{
 				setToolTipText("Ein neues Dokument erstellen");
 				setImageDescriptor(Images.IMG_NEW.getImageDescriptor());
@@ -195,7 +203,7 @@ public class View extends ViewPart implements IActivationListener {
 					try {
 						if (templateFile.getName().endsWith("pdf")) {
 							String outFile = fillPdf(templateFile);
-							detail.asyncRunViewer(outFile);
+							Program.launch(outFile);
 
 						} else {
 							Kontakt adressat = null;

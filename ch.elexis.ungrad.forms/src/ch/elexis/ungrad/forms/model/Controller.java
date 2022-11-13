@@ -118,6 +118,13 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return dir;
 	}
 
+	/**
+	 * Find the ELexis "Brief" that corresponds with a given Forms Document
+	 * 
+	 * @param item    Name of the douckent, as shown in the forms view
+	 * @param patient Patient concerned
+	 * @return The Brief or null if no such Brief was found.
+	 */
 	public Brief getCorrespondingBrief(String item, Person patient) {
 		Pattern pat = Pattern.compile("A_([0-9]{4,4}-[0-1][0-9]-[0-3][0-9])_(.+)");
 		Matcher m = pat.matcher(item);
@@ -218,7 +225,22 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return outputFile;
 	}
 
+	/**
+	 * Show an existing PDF file by launching the configured system PDF-viewer. If there is a corresponding
+	 * *Brief" and the PDF's last modification is newer than the Briefs's last update, then the Brief is updated with
+	 * the contents of the PDF.
+	 * 
+	 * @param pat   patient whose outboud directory should be searched. Can be null
+	 *              -> current patient
+	 *          
+	 * @param title Title of the document to retrieve (as shown in the forms view)
+	 * @return The full filepath of the displayed file or null
+	 * @throws Exception
+	 */
 	public String showPDF(Patient pat, String title) throws Exception {
+		if (pat == null) {
+			pat = ElexisEventDispatcher.getSelectedPatient();
+		}
 		File dir = getOutputDirFor(pat, false);
 		if (dir.exists()) {
 			File outfile = new File(dir, title + ".pdf");
@@ -227,12 +249,21 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 				if (Program.launch(filepath) == false) {
 					Runtime.getRuntime().exec(filepath);
 				}
+				Brief brief = getCorrespondingBrief(title, pat);
+				if (brief != null && brief.exists()) {
+					long lBrief = brief.getLastUpdate();
+					long lPdf = outfile.lastModified();
+					if (lPdf - lBrief > 1000) {
+						brief.save(FileTool.readFile(outfile), "pdf");
+					}
+				}
 				return filepath;
 			}
 		}
 		return null;
 	}
 
+	
 	public Brief createLinksWithElexis(String filepath, Kontakt adressat) throws Exception {
 		String briefTitle = FileTool.getNakedFilename(filepath);
 		if (briefTitle.matches("A_[0-9]{4,4}-[0-1][0-9]-[0-3][0-9]_.+")) {
