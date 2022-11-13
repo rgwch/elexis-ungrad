@@ -68,6 +68,7 @@ public class FormsExtension implements IKonsExtension {
 				try (FileOutputStream fos = new FileOutputStream(temp)) {
 					fos.write(brief.loadBinary());
 				}
+				temp.setReadOnly();
 				Program.launch(temp.getAbsolutePath());
 			}
 		} catch (IOException e) {
