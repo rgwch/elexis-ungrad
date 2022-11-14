@@ -12,9 +12,7 @@
 
 package ch.elexis.ungrad.forms.ui;
 
-import java.awt.print.PrinterException;
 import java.io.File;
-import java.io.IOException;
 
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -24,7 +22,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 
 import ch.elexis.core.data.activator.CoreHub;
@@ -34,7 +31,6 @@ import ch.elexis.data.Patient;
 import ch.elexis.ungrad.forms.model.Controller;
 import ch.elexis.ungrad.forms.model.PreferenceConstants;
 import ch.elexis.ungrad.forms.model.Template;
-import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.pdf.Medform;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;

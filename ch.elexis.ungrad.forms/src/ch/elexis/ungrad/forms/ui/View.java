@@ -89,6 +89,14 @@ public class View extends ViewPart implements IActivationListener {
 		stack.topControl = docList;
 		detail.clear();
 		container.layout();
+		setItemActions(docList.getSelection() != null);
+	}
+
+	private void setItemActions(boolean bMode) {
+		printAction.setEnabled(bMode);
+		mailAction.setEnabled(bMode);
+		deleteAction.setEnabled(bMode);
+		showDetailAction.setEnabled(bMode);
 	}
 
 	@Override
@@ -116,6 +124,12 @@ public class View extends ViewPart implements IActivationListener {
 		toolbar.add(new Separator());
 		toolbar.add(printAction);
 		toolbar.add(mailAction);
+		menu.add(createNewAction);
+		menu.add(printAction);
+		menu.add(mailAction);
+		menu.add(new Separator());
+		menu.add(deleteAction);
+
 		printAction.setEnabled(false);
 		showDetailAction.setEnabled(false);
 		mailAction.setEnabled(false);
@@ -124,10 +138,7 @@ public class View extends ViewPart implements IActivationListener {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection sel = event.getStructuredSelection();
-				boolean bHasSelection = !sel.isEmpty();
-				printAction.setEnabled(bHasSelection);
-				showDetailAction.setEnabled(bHasSelection);
-				mailAction.setEnabled(true);
+				setItemActions(!sel.isEmpty());
 			}
 		});
 		docList.addDoubleclickListener(new IDoubleClickListener() {
@@ -137,11 +148,6 @@ public class View extends ViewPart implements IActivationListener {
 				showDetailAction.run();
 			}
 		});
-		menu.add(createNewAction);
-		menu.add(printAction);
-		menu.add(mailAction);
-		menu.add(new Separator());
-		menu.add(deleteAction);
 
 	}
 
@@ -249,10 +255,7 @@ public class View extends ViewPart implements IActivationListener {
 			@Override
 			public void run() {
 				stack.topControl = docList;
-				if (docList.getSelection() == null) {
-					printAction.setEnabled(false);
-					mailAction.setEnabled(false);
-				}
+				setItemActions(docList.getSelection()!=null);
 				container.layout();
 			}
 		};
