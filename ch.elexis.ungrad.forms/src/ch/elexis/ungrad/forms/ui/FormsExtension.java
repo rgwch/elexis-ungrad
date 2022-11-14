@@ -32,33 +32,34 @@ import ch.elexis.ungrad.forms.Activator;
 import ch.rgw.tools.ExHandler;
 
 /**
- * An IKonsExtension fpr Ungrad Forms: Will create entries in Encounter-Entries for created documents
+ * An IKonsExtension for Ungrad Forms: Will create entries in Encounter-Entries
+ * for created documents
+ * 
  * @author gerry
  *
  */
 public class FormsExtension implements IKonsExtension {
-	
+
 	@Override
-	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2)
-		throws CoreException{
+	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2) throws CoreException {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
-	public String connect(IRichTextDisplay tf){
+	public String connect(IRichTextDisplay tf) {
 		return Activator.KonsXRef;
 	}
-	
+
 	@Override
-	public boolean doLayout(StyleRange styleRange, String provider, String id){
+	public boolean doLayout(StyleRange styleRange, String provider, String id) {
 		styleRange.background = UiDesk.getColor(UiDesk.COL_GREEN);
 		styleRange.foreground = UiDesk.getColor(UiDesk.COL_BLACK);
 		return true;
 	}
-	
+
 	@Override
-	public boolean doXRef(String refProvider, String refID){
+	public boolean doXRef(String refProvider, String refID) {
 		try {
 			Brief brief = Brief.load(refID);
 			if (brief.isValid()) {
@@ -67,35 +68,45 @@ public class FormsExtension implements IKonsExtension {
 				try (FileOutputStream fos = new FileOutputStream(temp)) {
 					fos.write(brief.loadBinary());
 				}
+				temp.setReadOnly();
 				Program.launch(temp.getAbsolutePath());
 			}
 		} catch (IOException e) {
 			ExHandler.handle(e);
-			SWTHelper.alert(Messages.BriefAuswahlErrorHeading, //$NON-NLS-1$
-				Messages.BriefAuswahlCouldNotLoadText); //$NON-NLS-1$
+			SWTHelper.alert(Messages.BriefAuswahlErrorHeading, // $NON-NLS-1$
+					Messages.BriefAuswahlCouldNotLoadText); // $NON-NLS-1$
 		}
 		return false;
 	}
-	
+
 	@Override
-	public IAction[] getActions(){
+	public IAction[] getActions() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
-	public void insert(Object o, int pos){
+	public void insert(Object o, int pos) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
-	public void removeXRef(String refProvider, String refID){
-		Brief brief=Brief.load(refID);
-		if(brief.isValid()) {
-			brief.delete();
+	public void removeXRef(String refProvider, String refID) {
+		try {
+			Brief brief = Brief.load(refID);
+			if (brief.exists() && SWTHelper.askYesNo("Bestätigung",
+					"Auch den Brief und alle damit verbundenen Dateien löschen?")) {
+				Activator.getController().delete(brief);
+			}
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+			SWTHelper.showError("Fehler beim Entfernen der Referenz", ex.getMessage());
 		}
-		
+		/*
+		 * if(brief.isValid()) { brief.delete(); }
+		 */
+
 	}
-	
+
 }

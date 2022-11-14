@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -27,6 +28,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
@@ -42,6 +44,7 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Query;
+import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.forms.model.Controller;
 import ch.elexis.ungrad.forms.model.Template;
 import ch.elexis.ungrad.pdf.MappedForm;
@@ -76,7 +79,7 @@ public class View extends ViewPart implements IActivationListener {
 	};
 
 	public View() {
-		controller = new Controller();
+		controller = Activator.getController();
 		stack = new StackLayout();
 	}
 
@@ -86,6 +89,14 @@ public class View extends ViewPart implements IActivationListener {
 		stack.topControl = docList;
 		detail.clear();
 		container.layout();
+		setItemActions(docList.getSelection() != null);
+	}
+
+	private void setItemActions(boolean bMode) {
+		printAction.setEnabled(bMode);
+		mailAction.setEnabled(bMode);
+		deleteAction.setEnabled(bMode);
+		showDetailAction.setEnabled(bMode);
 	}
 
 	@Override
@@ -107,10 +118,18 @@ public class View extends ViewPart implements IActivationListener {
 		IMenuManager menu = bars.getMenuManager();
 		IToolBarManager toolbar = bars.getToolBarManager();
 		toolbar.add(createNewAction);
+		toolbar.add(new Separator());
 		toolbar.add(showListAction);
 		toolbar.add(showDetailAction);
+		toolbar.add(new Separator());
 		toolbar.add(printAction);
 		toolbar.add(mailAction);
+		menu.add(createNewAction);
+		menu.add(printAction);
+		menu.add(mailAction);
+		menu.add(new Separator());
+		menu.add(deleteAction);
+
 		printAction.setEnabled(false);
 		showDetailAction.setEnabled(false);
 		mailAction.setEnabled(false);
@@ -119,10 +138,7 @@ public class View extends ViewPart implements IActivationListener {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection sel = event.getStructuredSelection();
-				boolean bHasSelection = !sel.isEmpty();
-				printAction.setEnabled(bHasSelection);
-				showDetailAction.setEnabled(bHasSelection);
-				mailAction.setEnabled(true);
+				setItemActions(!sel.isEmpty());
 			}
 		});
 		docList.addDoubleclickListener(new IDoubleClickListener() {
@@ -132,7 +148,6 @@ public class View extends ViewPart implements IActivationListener {
 				showDetailAction.run();
 			}
 		});
-		menu.add(deleteAction);
 
 	}
 
@@ -147,7 +162,7 @@ public class View extends ViewPart implements IActivationListener {
 	 */
 	private String fillPdf(File templateFile) throws Error, Exception, IOException {
 		Patient currentPat = ElexisEventDispatcher.getSelectedPatient();
-		File outDir = controller.getOutputDirFor(currentPat);
+		File outDir = controller.getOutputDirFor(currentPat, true);
 		if (!outDir.exists()) {
 			if (!outDir.mkdirs()) {
 				throw new Error("Can't create output dir " + outDir.getAbsolutePath());
@@ -179,7 +194,7 @@ public class View extends ViewPart implements IActivationListener {
 	}
 
 	private void makeActions() {
-		createNewAction = new Action("Laden") {
+		createNewAction = new Action("Erstellen") {
 			{
 				setToolTipText("Ein neues Dokument erstellen");
 				setImageDescriptor(Images.IMG_NEW.getImageDescriptor());
@@ -194,7 +209,7 @@ public class View extends ViewPart implements IActivationListener {
 					try {
 						if (templateFile.getName().endsWith("pdf")) {
 							String outFile = fillPdf(templateFile);
-							detail.asyncRunViewer(outFile);
+							Program.launch(outFile);
 
 						} else {
 							Kontakt adressat = null;
@@ -240,39 +255,35 @@ public class View extends ViewPart implements IActivationListener {
 			@Override
 			public void run() {
 				stack.topControl = docList;
-				if (docList.getSelection() == null) {
-					printAction.setEnabled(false);
-					mailAction.setEnabled(false);
-				}
+				setItemActions(docList.getSelection()!=null);
 				container.layout();
 			}
 		};
 		showDetailAction = new Action("Formular") {
 			{
 				setText("Ausfüllen");
-				setImageDescriptor(Images.IMG_DOCUMENT_PDF.getImageDescriptor());
+				setImageDescriptor(Images.IMG_EDIT.getImageDescriptor());
 				setToolTipText("Zeige aktuelles Formular");
 			}
 
 			@Override
 			public void run() {
-				stack.topControl = detail;
-				File dir = controller.getOutputDirFor(null);
-				File document = new File(dir, docList.getSelection() + ".html");
-				if (document.exists()) {
-					try {
+				try {
+					File dir = controller.getOutputDirFor(null, true);
+					File document = new File(dir, docList.getSelection() + ".html");
+					if (document.exists()) {
 						String html = FileTool.readTextFile(document);
 						currentTemplate = new Template(html, null);
 						currentTemplate.setFilename(document.getAbsolutePath());
+						stack.topControl = detail;
 						detail.show(currentTemplate);
-					} catch (Exception e) {
-						SWTHelper.showError("Fehler bei Verarbeitung", e.getMessage());
+					} else {
+						stack.topControl = docList;
+						controller.showPDF(null, docList.getSelection());
 					}
-				} else {
-					document = new File(dir, docList.getSelection() + ".pdf");
-					if (document.exists()) {
-						detail.asyncRunViewer(document.getAbsolutePath());
-					}
+				} catch (Exception ex) {
+					SWTHelper.showError("Fehler bei Verarbeitung", ex.getMessage());
+
 				}
 				printAction.setEnabled(true);
 				mailAction.setEnabled(true);
@@ -282,7 +293,7 @@ public class View extends ViewPart implements IActivationListener {
 		printAction = new Action("Ausgabe") {
 			{
 				setText("Ausgeben");
-				setImageDescriptor(Images.IMG_PRINTER.getImageDescriptor());
+				setImageDescriptor(Images.IMG_DOCUMENT_PDF.getImageDescriptor());
 				setToolTipText("Aktuelles Formular erstellen und ausgeben");
 			}
 

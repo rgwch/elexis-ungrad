@@ -12,7 +12,18 @@
 
 package ch.elexis.ungrad.forms.model;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import static java.nio.file.StandardWatchEventKinds.*;
+
+import java.awt.Desktop;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,19 +31,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.swt.program.Program;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
-import ch.elexis.core.text.XRefExtensionConstants;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.elexis.data.Brief;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
+import ch.elexis.data.Person;
 import ch.elexis.data.Query;
 import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.rgw.io.FileTool;
+import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
@@ -43,58 +56,40 @@ import ch.rgw.tools.TimeTool;
  *
  */
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
-	private Patient currentPatient;
-
-	void changePatient(Patient pat) {
-		currentPatient = pat;
-	}
-
-	/**
-	 * Find the configured output dir for a patient (highly opinionated filepath
-	 * resolution)
-	 * 
-	 * @param p Patient whos output dir should be retrieved
-	 * @return The directory to store documents for that patient.
-	 */
-	public File getOutputDirFor(Patient p) {
-		if (p == null) {
-			p = ElexisEventDispatcher.getSelectedPatient();
-		}
-		String name = p.getName();
-		String fname = p.getVorname();
-		String birthdate = p.getGeburtsdatum();
-		File superdir = new File(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, ""),
-				name.substring(0, 1).toLowerCase());
-		File dir = new File(superdir, name + "_" + fname + "_" + birthdate);
-		return dir;
-	}
 
 	/* CoontentProvider */
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Patient pat = (Patient) inputElement;
-		File dir = getOutputDirFor(pat);
-		String[] files = dir.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				if (name.startsWith("A_")) {
-					String ext = FileTool.getExtension(name);
-					return ext.equalsIgnoreCase("pdf") || ext.equalsIgnoreCase("html");
-				} else {
-					return false;
+		File dir;
+		try {
+			dir = getOutputDirFor(pat, true);
+			String[] files = dir.list(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					if (name.startsWith("A_")) {
+						String ext = FileTool.getExtension(name);
+						return ext.equalsIgnoreCase("pdf") || ext.equalsIgnoreCase("html");
+					} else {
+						return false;
+					}
 				}
+			});
+			if (files == null) {
+				return new String[0];
+			} else {
+				Set<String> deduplicated = new LinkedHashSet<String>();
+				for (String file : files) {
+					deduplicated.add(FileTool.getNakedFilename(file));
+				}
+				String[] ret = deduplicated.toArray(new String[0]);
+				return ret;
 			}
-		});
-		if (files == null) {
-			return new String[0];
-		} else {
-			Set<String> deduplicated = new LinkedHashSet<String>();
-			for (String file : files) {
-				deduplicated.add(FileTool.getNakedFilename(file));
-			}
-			String[] ret = deduplicated.toArray(new String[0]);
-			return ret;
+		} catch (Exception e) {
+			ExHandler.handle(e);
+			return new String[] { "Error reading directory" };
 		}
+
 	}
 
 	/* LabelProvider */
@@ -104,45 +99,57 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	}
 
 	/**
-	 * Return the output dir for a given patient.
+	 * Find the configured output dir for a patient (highly opinionated filepath
+	 * resolution)
 	 * 
-	 * @param pat The patient whose output dir should be returned. Will be created
-	 *            if doesn't exist
-	 * 
-	 * @return
+	 * @param p                  Patient whose output dir should be retrieved
+	 * @param bCreateIfNotExists create directory if it doesn't exist
+	 * @return The directory to store documents for that patient.
 	 */
-	public File getOutputDir(Patient pat) throws Exception {
-		String dirname = pat.getName() + "_" + pat.getVorname() + "_" + pat.getGeburtsdatum();
-
-		StringBuilder sb = new StringBuilder();
-		sb.append(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, "")).append(File.separator)
-				.append(dirname.substring(0, 1).toLowerCase()).append(File.separator).append(dirname);
-		File dir = new File(sb.toString());
-		if (!dir.exists()) {
+	public File getOutputDirFor(Person p, boolean bCreateIfNotExists) throws Exception {
+		if (p == null) {
+			p = ElexisEventDispatcher.getSelectedPatient();
+		}
+		String name = p.getName();
+		String fname = p.getVorname();
+		String birthdate = p.getGeburtsdatum();
+		File superdir = new File(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, ""),
+				name.substring(0, 1).toLowerCase());
+		File dir = new File(superdir, name + "_" + fname + "_" + birthdate);
+		if (!dir.exists() && bCreateIfNotExists) {
 			if (!dir.mkdirs()) {
 				throw new Exception("Can't create output dir");
 			}
 		}
+
 		return dir;
 	}
 
-	public Brief getCorrespondingBrief(String item, Patient patient) {
-		Pattern pat=Pattern.compile("A_([0-9]{4,4}-[0-1][0-9]-[0-3][0-9])_(.+)");
-		Matcher m=pat.matcher(item);
-		if(m.matches()) {
-			String date=m.group(1).replace("-", "");
-			String title=m.group(2);
-			Query<Brief> qbe=new Query<Brief>(Brief.class);
+	/**
+	 * Find the ELexis "Brief" that corresponds with a given Forms Document
+	 * 
+	 * @param item    Name of the douckent, as shown in the forms view
+	 * @param patient Patient concerned
+	 * @return The Brief or null if no such Brief was found.
+	 */
+	public Brief getCorrespondingBrief(String item, Person patient) {
+		Pattern pat = Pattern.compile("A_([0-9]{4,4}-[0-1][0-9]-[0-3][0-9])_(.+)");
+		Matcher m = pat.matcher(item);
+		if (m.matches()) {
+			String date = m.group(1).replace("-", "");
+			String title = m.group(2);
+			Query<Brief> qbe = new Query<Brief>(Brief.class);
 			qbe.add(Brief.FLD_SUBJECT, Query.EQUALS, title);
 			qbe.add(Brief.FLD_DATE, Query.EQUALS, date);
 			qbe.add(Brief.FLD_PATIENT_ID, Query.EQUALS, patient.getId());
-			List<Brief> briefe=qbe.execute();
-			if(briefe.size()>0) {
+			List<Brief> briefe = qbe.execute();
+			if (briefe.size() > 0) {
 				return briefe.get(0);
 			}
 		}
-		return null;	
+		return null;
 	}
+
 	/**
 	 * Write an HTML file from the current state of the Template. This is called
 	 * with every deactivation of the Forms View to save current work if
@@ -179,7 +186,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			}
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
 
-			File dir = getOutputDir(pat);
+			File dir = getOutputDirFor(pat, true);
 			if (!dir.exists()) {
 				if (!dir.mkdirs()) {
 					throw new Exception("Could not create directory " + dir.getAbsolutePath());
@@ -225,6 +232,46 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return outputFile;
 	}
 
+	/**
+	 * Show an existing PDF file by launching the configured system PDF-viewer. If there is a corresponding
+	 * *Brief" and the PDF's last modification is newer than the Briefs's last update, then the Brief is updated with
+	 * the contents of the PDF.
+	 * 
+	 * @param pat   patient whose outboud directory should be searched. Can be null
+	 *              -> current patient
+	 *          
+	 * @param title Title of the document to retrieve (as shown in the forms view)
+	 * @return The full filepath of the displayed file or null
+	 * @throws Exception
+	 */
+	public String showPDF(Patient pat, String title) throws Exception {
+		if (pat == null) {
+			pat = ElexisEventDispatcher.getSelectedPatient();
+		}
+		File dir = getOutputDirFor(pat, false);
+		if (dir.exists()) {
+		
+			File outfile = new File(dir, title + ".pdf");
+			if (outfile.exists()) {
+				String filepath = outfile.getAbsolutePath();
+				if (Program.launch(filepath) == false) {
+					Process process=Runtime.getRuntime().exec(filepath);
+				}
+				Brief brief = getCorrespondingBrief(title, pat);
+				if (brief != null && brief.exists()) {
+					long lBrief = brief.getLastUpdate();
+					long lPdf = outfile.lastModified();
+					if (lPdf - lBrief > 1000) {
+						brief.save(FileTool.readFile(outfile), "pdf");
+					}
+				}
+				return filepath;
+			}
+		}
+		return null;
+	}
+
+	
 	public Brief createLinksWithElexis(String filepath, Kontakt adressat) throws Exception {
 		String briefTitle = FileTool.getNakedFilename(filepath);
 		if (briefTitle.matches("A_[0-9]{4,4}-[0-1][0-9]-[0-3][0-9]_.+")) {
@@ -280,25 +327,36 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 
 	/**
 	 * Revove documents from output dir (not from database)
-	 * @param item 
+	 * 
+	 * @param item
 	 * @param pat
 	 * @throws Exception
 	 */
-	public void delete(String item, Patient pat) throws Exception {
-		File dir = getOutputDir(pat);
-		File htmlFile = new File(dir, item + ".html");
-		File pdfFile = new File(dir, item + ".pdf");
-		if (pdfFile.exists()) {
-			pdfFile.delete();
+	public void delete(String item, Person pat) throws Exception {
+		File dir = getOutputDirFor(pat, false);
+		if (dir.exists()) {
+			File htmlFile = new File(dir, item + ".html");
+			File pdfFile = new File(dir, item + ".pdf");
+			if (pdfFile.exists()) {
+				pdfFile.delete();
+			}
+			if (htmlFile.exists()) {
+				htmlFile.delete();
+			}
 		}
-		if (htmlFile.exists()) {
-			htmlFile.delete();
+		Brief brief = getCorrespondingBrief(item, pat);
+		if (brief != null && brief.exists()) {
+			Konsultation k = Konsultation.load(brief.get(Brief.FLD_KONSULTATION_ID));
+			if (k.exists()) {
+				k.removeXRef(Activator.KonsXRef, brief.getId());
+			}
+			brief.delete();
 		}
-		Brief brief=getCorrespondingBrief(item, pat);
-		Konsultation k=Konsultation.load(brief.get(Brief.FLD_KONSULTATION_ID));
-		if(k.exists()) {
-			k.removeXRef(Activator.KonsXRef, brief.getId());
-		}
-		brief.delete();
+	}
+
+	public void delete(Brief brief) throws Exception {
+		TimeTool tt = new TimeTool(brief.getDatum());
+		String basename = "A_" + tt.toString(TimeTool.DATE_ISO) + "_" + brief.getBetreff();
+		delete(basename, brief.getPatient());
 	}
 }

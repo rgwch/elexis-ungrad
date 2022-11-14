@@ -105,7 +105,7 @@ public class DetailDisplay extends Composite {
 		try {
 			File htmlFile = saveHtml();
 			String pdffile = controller.createPDF(htmlFile, template);
-			asyncRunViewer(pdffile);
+			Program.launch(pdffile);
 			return pdffile;
 		} catch (Exception e) {
 			SWTHelper.showError("Fehler bei Ausgabe", e.getMessage());
@@ -122,30 +122,22 @@ public class DetailDisplay extends Composite {
 		mailer.sendMail(subject, body, recipient, output());
 	}
 
-	void asyncRunViewer(String filepath) {
-		Display.getDefault().asyncExec(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					String ext = FileTool.getExtension(filepath); // $NON-NLS-1$
-
-					Program proggie = Program.findProgram(ext);
-					if (proggie != null) {
-						proggie.execute(filepath);
-					} else {
-						if (Program.launch(filepath) == false) {
-							Runtime.getRuntime().exec(filepath);
-						}
-					}
-
-				} catch (Exception ex) {
-					ExHandler.handle(ex);
-					SWTHelper.showError("Could not create or show file", ex.getMessage());
-				}
-			}
-
-		});
-
-	}
+	/*
+	 * void asyncRunViewer(String filepath) { Display.getDefault().asyncExec(new
+	 * Runnable() {
+	 * 
+	 * @Override public void run() { try { String ext =
+	 * FileTool.getExtension(filepath); // $NON-NLS-1$
+	 * 
+	 * Program proggie = Program.findProgram(ext); if (proggie != null) {
+	 * proggie.execute(filepath); } else { if (Program.launch(filepath) == false) {
+	 * Runtime.getRuntime().exec(filepath); } }
+	 * 
+	 * } catch (Exception ex) { ExHandler.handle(ex);
+	 * SWTHelper.showError("Could not create or show file", ex.getMessage()); } }
+	 * 
+	 * });
+	 * 
+	 * }
+	 */
 }
