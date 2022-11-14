@@ -22,5 +22,6 @@ public class PreferenceConstants {
 	public static final String SMTP_USER = BASE + "smtpUser";
 	public static final String SMTP_PWD = BASE + "smtpPwd";
 	public static final String MAIL_BODY = BASE + "defaultMailBody";
+	public static final String PDF_VIEWER = BASE + "pdfViewer";
 
 }
