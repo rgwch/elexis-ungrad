@@ -15,6 +15,7 @@ package ch.elexis.ungrad.forms.model;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.FileSystems;
@@ -30,11 +31,17 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.Display;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.elexis.data.Brief;
 import ch.elexis.data.Konsultation;
@@ -233,13 +240,14 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	}
 
 	/**
-	 * Show an existing PDF file by launching the configured system PDF-viewer. If there is a corresponding
-	 * *Brief" and the PDF's last modification is newer than the Briefs's last update, then the Brief is updated with
-	 * the contents of the PDF.
+	 * Show an existing PDF file by launching the configured system PDF-viewer. If
+	 * there is a corresponding *Brief" and the PDF's last modification is newer
+	 * than the Briefs's last update, then the Brief is updated with the contents of
+	 * the PDF.
 	 * 
 	 * @param pat   patient whose outboud directory should be searched. Can be null
 	 *              -> current patient
-	 *          
+	 * 
 	 * @param title Title of the document to retrieve (as shown in the forms view)
 	 * @return The full filepath of the displayed file or null
 	 * @throws Exception
@@ -250,13 +258,8 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		}
 		File dir = getOutputDirFor(pat, false);
 		if (dir.exists()) {
-		
 			File outfile = new File(dir, title + ".pdf");
 			if (outfile.exists()) {
-				String filepath = outfile.getAbsolutePath();
-				if (Program.launch(filepath) == false) {
-					Process process=Runtime.getRuntime().exec(filepath);
-				}
 				Brief brief = getCorrespondingBrief(title, pat);
 				if (brief != null && brief.exists()) {
 					long lBrief = brief.getLastUpdate();
@@ -265,13 +268,19 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 						brief.save(FileTool.readFile(outfile), "pdf");
 					}
 				}
+				String filepath = outfile.getAbsolutePath();
+				String viewer = CoreHub.localCfg.get(PreferenceConstants.PDF_VIEWER, "");
+				if (viewer != null) {
+					asyncRunViewer(viewer, outfile, brief);
+				} else {
+					Program.launch(filepath);
+				}
 				return filepath;
 			}
 		}
 		return null;
 	}
 
-	
 	public Brief createLinksWithElexis(String filepath, Kontakt adressat) throws Exception {
 		String briefTitle = FileTool.getNakedFilename(filepath);
 		if (briefTitle.matches("A_[0-9]{4,4}-[0-1][0-9]-[0-3][0-9]_.+")) {
@@ -358,5 +367,31 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		TimeTool tt = new TimeTool(brief.getDatum());
 		String basename = "A_" + tt.toString(TimeTool.DATE_ISO) + "_" + brief.getBetreff();
 		delete(basename, brief.getPatient());
+	}
+
+	void asyncRunViewer(String viewer, File pdf, Brief brief) {
+		Display.getDefault().asyncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					long ftime = pdf.lastModified();
+					Process process = Runtime.getRuntime().exec(new String[] { viewer, pdf.getAbsolutePath() });
+					process.waitFor();
+					int val = process.exitValue();
+					if (val == 0 && brief != null) {
+						long atime = pdf.lastModified();
+						if ((atime - ftime) > 100) {
+							brief.save(FileTool.readFile(pdf), "pdf");
+						}
+					}
+
+				} catch (Exception ex) {
+					ExHandler.handle(ex);
+					SWTHelper.showError("Could not create or show file", ex.getMessage());
+				}
+			}
+
+		});
 	}
 }
