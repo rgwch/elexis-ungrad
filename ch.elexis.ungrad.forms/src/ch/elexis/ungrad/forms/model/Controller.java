@@ -270,7 +270,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 				}
 				String filepath = outfile.getAbsolutePath();
 				String viewer = CoreHub.localCfg.get(PreferenceConstants.PDF_VIEWER, "");
-				if (viewer != null) {
+				if (!StringTool.isNothing(viewer)) {
 					asyncRunViewer(viewer, outfile, brief);
 				} else {
 					Program.launch(filepath);
