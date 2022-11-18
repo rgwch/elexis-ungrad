@@ -51,7 +51,7 @@ public class ProcessingSchemaDisplay extends Composite {
 	private static final Logger log = LoggerFactory.getLogger(ProcessingSchemaDisplay.class);
 	private static final String NO_SCHEMA_SELECTED = "Kein Schema ausgewählt";
 	private static final String NO_PATIENT_SELECTED = "Kein Patient ausgewählt ";
-	private IAction printAction, addAction, directOutputAction;
+	private IAction printAction, addAction, directOutputAction, mailAction;
 	ScrolledForm form;
 	Composite cFields;
 	ToolBar toolBar;
@@ -62,8 +62,8 @@ public class ProcessingSchemaDisplay extends Composite {
 	Combo cbProcessor;
 	Text tTemplate;
 	ICallback saveHandler;
-	
-	public ProcessingSchemaDisplay(Composite parent, ICallback handler){
+
+	public ProcessingSchemaDisplay(Composite parent, ICallback handler) {
 		super(parent, SWT.NONE);
 		if (parent.getLayout() instanceof GridLayout) {
 			setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
@@ -76,10 +76,11 @@ public class ProcessingSchemaDisplay extends Composite {
 		makeActions();
 		ToolBarManager tbm = new ToolBarManager(SWT.HORIZONTAL);
 		tbm.add(printAction);
+		tbm.add(mailAction);
 		tbm.add(addAction);
 		tbm.add(directOutputAction);
 		tbm.createControl(body);
-		
+
 		Composite cButtons = new Composite(body, SWT.NONE);
 		cButtons.setLayout(new GridLayout(3, false));
 		cButtons.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
@@ -89,51 +90,52 @@ public class ProcessingSchemaDisplay extends Composite {
 		Button bChoose = new Button(cButtons, SWT.PUSH);
 		bChoose.setText("wählen");
 		bChoose.addSelectionListener(new SelectionAdapter() {
-			
+
 			@Override
-			public void widgetSelected(SelectionEvent e){
+			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setFilterPath(CoreHub.localCfg.get(Preferences.PREF_TEMPLATEBASE,
-					System.getProperty("user.home")));
+				fd.setFilterPath(CoreHub.localCfg.get(Preferences.PREF_TEMPLATEBASE, System.getProperty("user.home")));
 				String fname = fd.open();
 				if (fname != null) {
 					File f = new File(fname);
 					tTemplate.setText(f.getName());
 				}
 			}
-			
+
 		});
 		new Label(cButtons, SWT.NONE).setText("Ausgabeprozessor");
 		cbProcessor = new Combo(cButtons, SWT.SINGLE);
 		cbProcessor.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		IProcessor[] processors = ProcessingSchema.getProcessors();
-		for (IProcessor pro : processors) {
-			cbProcessor.add(pro.getName());
+		if (processors != null) {
+			for (IProcessor pro : processors) {
+				cbProcessor.add(pro.getName());
+			}
 		}
 		cFields = new Composite(body, SWT.NONE);
 		cFields.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 		cFields.setLayout(new GridLayout(2, false));
-		
+
 	}
-	
-	private void makeActions(){
+
+	private void makeActions() {
 		printAction = new Action("Ausgeben") {
 			{
 				setImageDescriptor(Images.IMG_PRINTER.getImageDescriptor());
 				setToolTipText("Gibt dieses Dokument mit dem konfigurierten Ausgabeprogramm aus");
 			}
-			
+
 			@Override
-			public void run(){
+			public void run() {
 				save();
 				IProcessor pr = proc.getProcessor();
 				if (pr == null) {
 					SWTHelper.alert("Es ist kein Prozessor definiert",
-						"Die Vorlage hat keinen Prozessor. Ausgabe nicht möglich");
+							"Die Vorlage hat keinen Prozessor. Ausgabe nicht möglich");
 				} else {
 					pr.doOutput(proc);
 				}
-				
+
 			}
 		};
 		addAction = new Action("Variable hinzufügen") {
@@ -141,16 +143,14 @@ public class ProcessingSchemaDisplay extends Composite {
 				setImageDescriptor(Images.IMG_ADDITEM.getImageDescriptor());
 				setToolTipText("Ein neues Name-Wert-Paar hinzufügen");
 			}
-			
+
 			@Override
-			public void run(){
-				InputDialog id =
-					new InputDialog(getShell(), "Neues Prozessorfeld",
-						"Geben Sie bitte einen Namen für das Feld ein", "Textfeld",
-						new IInputValidator() {
-							
+			public void run() {
+				InputDialog id = new InputDialog(getShell(), "Neues Prozessorfeld",
+						"Geben Sie bitte einen Namen für das Feld ein", "Textfeld", new IInputValidator() {
+
 							@Override
-							public String isValid(String newText){
+							public String isValid(String newText) {
 								if (newText.matches("[a-zA-Z][a-zA-Z0-9-_]*")) {
 									return null;
 								}
@@ -162,25 +162,40 @@ public class ProcessingSchemaDisplay extends Composite {
 					proc.addField(name);
 					set(proc);
 				}
-				
+
 			}
 		};
-		
+
 		directOutputAction = new Action("Sofort ausgeben", Action.AS_CHECK_BOX) {
 			{
 				setToolTipText("Beim Drucken direkt zum Ausgabeprozessor senden");
 				setImageDescriptor(Images.IMG_NEXT.getImageDescriptor());
 			}
-			
+
 			@Override
-			public void run(){
+			public void run() {
 				proc.setDirectOutput(directOutputAction.isChecked());
 			}
 		};
-		
+		mailAction = new Action("Per Mail senden") {
+			{
+				setText("Senden");
+				setImageDescriptor(Images.IMG_MAIL_SEND.getImageDescriptor());
+				setToolTipText("Dokument als PDF per Mail versenden");
+			}
+
+			@Override
+			public void run() {
+				/*
+				 * if (stack.topControl.equals(detail)) { detail.sendMail(); } else if
+				 * (stack.topControl.equals(docList)) { docList.sendMail(); }
+				 */
+			}
+
+		};
 	}
-	
-	public void set(ProcessingSchema schema){
+
+	public void set(ProcessingSchema schema) {
 		proc = schema;
 		for (Control c : cFields.getChildren()) {
 			c.removeFocusListener(fs);
@@ -200,7 +215,7 @@ public class ProcessingSchemaDisplay extends Composite {
 			text.setText(e.getText());
 			text.setData(name);
 		}
-		
+
 		IProcessor p = schema.getProcessor();
 		if (p == null) {
 			if (cbProcessor.getItemCount() > 0) {
@@ -210,24 +225,24 @@ public class ProcessingSchemaDisplay extends Composite {
 			}
 		} else {
 			cbProcessor.setText(p.getName());
-			
+
 		}
 		File fTempl = schema.getTemplateFile();
 		tTemplate.setText(fTempl == null ? "unbekannt" : fTempl.getName());
 		directOutputAction.setChecked(schema.getDirectOutput());
 		cFields.layout();
 	}
-	
-	public void save(){
+
+	public void save() {
 		collect();
 		saveHandler.save();
 	}
-	
-	public void setSaveOnFocusLost(boolean bSave){
+
+	public void setSaveOnFocusLost(boolean bSave) {
 		bSaveOnFocusLost = bSave;
 	}
-	
-	void collect(){
+
+	void collect() {
 		for (Control c : cFields.getChildren()) {
 			if (c instanceof Text) {
 				Text text = (Text) c;
@@ -243,16 +258,16 @@ public class ProcessingSchemaDisplay extends Composite {
 		proc.setDirectOutput(directOutputAction.isChecked());
 		proc.setTemplate(tmpl.getName());
 	}
-	
+
 	class FocusSaver extends FocusAdapter {
 		@Override
-		public void focusLost(FocusEvent e){
+		public void focusLost(FocusEvent e) {
 			if (bSaveOnFocusLost) {
 				// proc.getProcessor().doOutput(proc);
 				save();
 			}
 		}
-		
+
 	}
-	
+
 }

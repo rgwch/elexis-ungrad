@@ -51,7 +51,7 @@ public class StorageController extends Job implements HeartListener {
 	}
 	
 	private StorageController(){
-		super("Medelexis-Text-Templator");
+		super("Ungrad-Text-Templator");
 		dm =
 			(IDocumentManager) Extensions
 				.findBestService(GlobalServiceDescriptors.DOCUMENT_MANAGEMENT);

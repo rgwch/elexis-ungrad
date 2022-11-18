@@ -162,7 +162,7 @@ public class ProcessingSchema extends Document {
 			List<IProcessor> ret = new ArrayList<IProcessor>();
 			IExtensionRegistry exr = Platform.getExtensionRegistry();
 			IExtensionPoint exp =
-				exr.getExtensionPoint("ch.medelexis.text.templator.Textprocessor");
+				exr.getExtensionPoint("ch.elexis.ungrad.text.templator.Textprocessor");
 			if (exp != null) {
 				IExtension[] extensions = exp.getExtensions();
 				for (IExtension ex : extensions) {
