@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
- <extension-point id="Textprocessor" name="%Textprozessor" schema="schema/Textprocessor.exsd"/>
+ <extension-point id="Textprocessor" name="Textprozessor" schema="schema/Textprocessor.exsd"/>
    <extension
          point="ch.elexis.core.ui.Text">
       <Texterweiterung
             Klasse="ch.elexis.ungrad.text.templator.ui.TextPluginImpl"
-            name="ch.elexis.ungrad.text.templator.Texterweiterung1">
+            name="Ungrad Text-Templator">
       </Texterweiterung>
    </extension>
    <extension
-         point="ch.medelexis.text.templator.Textprocessor">
+         point="ch.elexis.ungrad.text.templator.Textprocessor">
       <Textprocessor
             Name="OpenOffice-Prozessor"
             clazz="ch.elexis.ungrad.text.templator.model.OpenOfficeProcessor"
