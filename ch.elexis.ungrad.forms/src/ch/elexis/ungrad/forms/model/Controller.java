@@ -49,6 +49,7 @@ import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Person;
 import ch.elexis.data.Query;
+import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.rgw.io.FileTool;
@@ -64,13 +65,15 @@ import ch.rgw.tools.TimeTool;
  */
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
 
+	StorageController sc = new StorageController();
+
 	/* CoontentProvider */
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Patient pat = (Patient) inputElement;
 		File dir;
 		try {
-			dir = getOutputDirFor(pat, true);
+			dir = sc.getOutputDirFor(pat, true);
 			String[] files = dir.list(new FilenameFilter() {
 				@Override
 				public boolean accept(File dir, String name) {
@@ -105,31 +108,8 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return (String) element;
 	}
 
-	/**
-	 * Find the configured output dir for a patient (highly opinionated filepath
-	 * resolution)
-	 * 
-	 * @param p                  Patient whose output dir should be retrieved
-	 * @param bCreateIfNotExists create directory if it doesn't exist
-	 * @return The directory to store documents for that patient.
-	 */
-	public File getOutputDirFor(Person p, boolean bCreateIfNotExists) throws Exception {
-		if (p == null) {
-			p = ElexisEventDispatcher.getSelectedPatient();
-		}
-		String name = p.getName();
-		String fname = p.getVorname();
-		String birthdate = p.getGeburtsdatum();
-		File superdir = new File(CoreHub.localCfg.get(ch.elexis.ungrad.PreferenceConstants.DOCBASE, ""),
-				name.substring(0, 1).toLowerCase());
-		File dir = new File(superdir, name + "_" + fname + "_" + birthdate);
-		if (!dir.exists() && bCreateIfNotExists) {
-			if (!dir.mkdirs()) {
-				throw new Exception("Can't create output dir");
-			}
-		}
-
-		return dir;
+	public StorageController getStorageController() {
+		return sc;
 	}
 
 	/**
@@ -193,7 +173,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			}
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
 
-			File dir = getOutputDirFor(pat, true);
+			File dir = sc.getOutputDirFor(pat, true);
 			if (!dir.exists()) {
 				if (!dir.mkdirs()) {
 					throw new Exception("Could not create directory " + dir.getAbsolutePath());
@@ -256,7 +236,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		if (pat == null) {
 			pat = ElexisEventDispatcher.getSelectedPatient();
 		}
-		File dir = getOutputDirFor(pat, false);
+		File dir = sc.getOutputDirFor(pat, false);
 		if (dir.exists()) {
 			File outfile = new File(dir, title + ".pdf");
 			if (outfile.exists()) {
@@ -342,7 +322,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	 * @throws Exception
 	 */
 	public void delete(String item, Person pat) throws Exception {
-		File dir = getOutputDirFor(pat, false);
+		File dir = sc.getOutputDirFor(pat, false);
 		if (dir.exists()) {
 			File htmlFile = new File(dir, item + ".html");
 			File pdfFile = new File(dir, item + ".pdf");

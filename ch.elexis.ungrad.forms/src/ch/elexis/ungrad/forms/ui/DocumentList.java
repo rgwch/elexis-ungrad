@@ -86,7 +86,7 @@ public class DocumentList extends Composite {
 		if (!sel.isEmpty()) {
 			String selected = (String) sel.getFirstElement();
 			try {
-				File dir = controller.getOutputDirFor(null, false);
+				File dir = controller.getStorageController().getOutputDirFor(null, false);
 				if (dir.exists()) {
 					File outfile = new File(dir, selected + ".pdf");
 					File templateFile = new File(dir, selected + ".html");

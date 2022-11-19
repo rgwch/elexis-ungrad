@@ -43,7 +43,7 @@ public class StorageController extends Job implements HeartListener {
 	private static StorageController theInstance;
 	private String category = null;
 	
-	public static StorageController getInstance(){
+	private static StorageController getInstance(){
 		if (theInstance == null) {
 			theInstance = new StorageController();
 		}

@@ -162,7 +162,7 @@ public class View extends ViewPart implements IActivationListener {
 	 */
 	private String fillPdf(File templateFile) throws Error, Exception, IOException {
 		Patient currentPat = ElexisEventDispatcher.getSelectedPatient();
-		File outDir = controller.getOutputDirFor(currentPat, true);
+		File outDir = controller.getStorageController().getOutputDirFor(currentPat, true);
 		if (!outDir.exists()) {
 			if (!outDir.mkdirs()) {
 				throw new Error("Can't create output dir " + outDir.getAbsolutePath());
@@ -255,7 +255,7 @@ public class View extends ViewPart implements IActivationListener {
 			@Override
 			public void run() {
 				stack.topControl = docList;
-				setItemActions(docList.getSelection()!=null);
+				setItemActions(docList.getSelection() != null);
 				container.layout();
 			}
 		};
@@ -269,7 +269,7 @@ public class View extends ViewPart implements IActivationListener {
 			@Override
 			public void run() {
 				try {
-					File dir = controller.getOutputDirFor(null, true);
+					File dir = controller.getStorageController().getOutputDirFor(null, true);
 					File document = new File(dir, docList.getSelection() + ".html");
 					if (document.exists()) {
 						String html = FileTool.readTextFile(document);

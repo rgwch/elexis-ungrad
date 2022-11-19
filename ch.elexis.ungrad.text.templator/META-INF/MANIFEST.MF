@@ -13,6 +13,7 @@ Require-Bundle: ch.rgw.utility;bundle-version="3.7.0",
  org.jdom;bundle-version="1.1.3",
  org.eclipse.ui;bundle-version="3.109.0",
  ch.elexis.core.ui.icons;bundle-version="3.3.0",
- ch.elexis.ungrad.forms;bundle-version="1.0.7"
+ ch.elexis.ungrad.forms;bundle-version="1.0.7",
+ ch.elexis.ungrad.common;bundle-version="1.3.0"
 Automatic-Module-Name: ch.elexis.ungrad.text.templator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

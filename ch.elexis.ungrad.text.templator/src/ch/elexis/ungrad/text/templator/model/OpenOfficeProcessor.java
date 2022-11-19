@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.text.templator.ui.OOOProcessorPrefs;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
@@ -54,7 +55,7 @@ public class OpenOfficeProcessor implements IProcessor {
 			return false;
 		}
 		try {
-			StorageController sc = StorageController.getInstance();
+			StorageController sc = new StorageController();
 			ZipInputStream zis = new ZipInputStream(new FileInputStream(tmpl));
 			File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), tmpl.getName());
 			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
