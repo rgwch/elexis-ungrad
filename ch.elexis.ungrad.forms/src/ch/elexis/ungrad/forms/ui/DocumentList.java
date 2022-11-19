@@ -28,6 +28,7 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.common.ui.MailUI;
 import ch.elexis.ungrad.forms.model.Controller;
 import ch.elexis.ungrad.forms.model.PreferenceConstants;
 import ch.elexis.ungrad.forms.model.Template;

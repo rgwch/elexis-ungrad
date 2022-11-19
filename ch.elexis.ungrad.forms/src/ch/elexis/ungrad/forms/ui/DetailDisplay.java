@@ -15,32 +15,23 @@ package ch.elexis.ungrad.forms.ui;
 import java.io.File;
 import java.util.Map.Entry;
 
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.SWTHelper;
-import ch.elexis.ungrad.MailDialog;
-import ch.elexis.ungrad.Mailer;
+import ch.elexis.ungrad.common.ui.MailUI;
 import ch.elexis.ungrad.forms.model.Controller;
-import ch.elexis.ungrad.forms.model.PreferenceConstants;
 import ch.elexis.ungrad.forms.model.Template;
-import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
-import ch.rgw.tools.StringTool;
 
 public class DetailDisplay extends Composite {
 

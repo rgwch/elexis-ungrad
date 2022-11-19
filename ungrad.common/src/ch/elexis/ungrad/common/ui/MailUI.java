@@ -1,13 +1,12 @@
-package ch.elexis.ungrad.forms.ui;
+package ch.elexis.ungrad.common.ui;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Shell;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.SWTHelper;
-import ch.elexis.ungrad.MailDialog;
 import ch.elexis.ungrad.Mailer;
-import ch.elexis.ungrad.forms.model.PreferenceConstants;
+import ch.elexis.ungrad.PreferenceConstants;
 import ch.rgw.tools.ExHandler;
 
 public class MailUI {

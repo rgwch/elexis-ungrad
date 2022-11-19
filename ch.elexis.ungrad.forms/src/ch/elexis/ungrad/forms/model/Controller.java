@@ -120,7 +120,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		String name = p.getName();
 		String fname = p.getVorname();
 		String birthdate = p.getGeburtsdatum();
-		File superdir = new File(CoreHub.localCfg.get(PreferenceConstants.OUTPUT, ""),
+		File superdir = new File(CoreHub.localCfg.get(ch.elexis.ungrad.PreferenceConstants.DOCBASE, ""),
 				name.substring(0, 1).toLowerCase());
 		File dir = new File(superdir, name + "_" + fname + "_" + birthdate);
 		if (!dir.exists() && bCreateIfNotExists) {

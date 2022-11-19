@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
          <page
-            category="ch.elexis.preferences.transporters"
+            category="ch.elexis.ungrad.common.prefs"
             class="ch.elexis.ungrad.forms.ui.Preferences"
             id="ch.rgw.elexis.ungrad.forms.prefs"
             name="Forms">

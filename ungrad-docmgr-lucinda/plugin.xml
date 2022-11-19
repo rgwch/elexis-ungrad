@@ -15,7 +15,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="ch.elexis.preferences.transporters"
+            category="ch.elexis.ungrad.common.prefs"
             class="ch.elexis.ungrad.lucinda.view.LucindaPrefs"
             id="ch.rgw.elexis.docmgr-lucinda.prefs"
             name="Lucinda">

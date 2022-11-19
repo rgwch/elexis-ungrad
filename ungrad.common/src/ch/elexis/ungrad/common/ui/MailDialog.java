@@ -12,7 +12,7 @@
  * G. Weirich - initial implementation
  *********************************************************************************/
 
-package ch.elexis.ungrad;
+package ch.elexis.ungrad.common.ui;
 
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;

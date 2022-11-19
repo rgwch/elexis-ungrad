@@ -47,13 +47,8 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	protected void createFieldEditors() {
 		addField(
 				new DirectoryFieldEditor(PreferenceConstants.TEMPLATES, "Vorlagenverzeichnis", getFieldEditorParent()));
-		addField(new DirectoryFieldEditor(PreferenceConstants.OUTPUT, "Dokumentenverzeichnis", getFieldEditorParent()));
 		addField(new FileFieldEditor(PreferenceConstants.PUG, "Pug-Compiler", getFieldEditorParent()));
 		addField(new FileFieldEditor(PreferenceConstants.PDF_VIEWER, "PDF Viewer", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.SMTP_HOST, "SMTP Server", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.SMTP_PORT, "SMTP Port", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.SMTP_USER, "SMTP User", getFieldEditorParent()));
-		addField(new PasswordFieldEditor(PreferenceConstants.SMTP_PWD, "SMTP Passwort", getFieldEditorParent()));
 		addField(new MultilineFieldEditor(PreferenceConstants.MAIL_BODY, "Mail-Standardtext", getFieldEditorParent()));
 
 	}
