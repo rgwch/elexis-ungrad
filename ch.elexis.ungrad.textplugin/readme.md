@@ -1,0 +1,1 @@
+This plugin is deprecated. Use ch.elexis.ungrad.forms and ch.elexis.ungrad.text.templator

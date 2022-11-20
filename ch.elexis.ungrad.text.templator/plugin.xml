@@ -10,14 +10,6 @@
       </Texterweiterung>
    </extension>
    <extension
-         point="ch.elexis.ungrad.text.templator.Textprocessor">
-      <Textprocessor
-            Name="OpenOffice-Prozessor"
-            clazz="ch.elexis.ungrad.text.templator.model.OpenOfficeProcessor"
-            name="OpenOffice-Processor">
-      </Textprocessor>
-   </extension>
-   <extension
          point="org.eclipse.ui.preferencePages">
       <page
             category="ch.elexis.preferences.Texterstellung"
