@@ -52,7 +52,8 @@ public class OdfTemplateFilterStream extends FilterOutputStream {
 				if (StringTool.isNothing(val)) {
 					flush();
 				} else {
-					for (int c : val.getBytes()) {
+					String conv = convert(val);
+					for (int c : conv.getBytes()) {
 						super.write(c);
 					}
 				}
@@ -62,5 +63,11 @@ public class OdfTemplateFilterStream extends FilterOutputStream {
 			}
 			break;
 		}
+	}
+
+	private String convert(String input) {
+		String ret = input.replaceAll("\\t", "<text:tab/>");
+		ret = ret.replaceAll("\\n", "<text:line-break/>");
+		return ret;
 	}
 }

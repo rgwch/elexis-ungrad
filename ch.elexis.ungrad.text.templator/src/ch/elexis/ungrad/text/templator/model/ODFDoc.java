@@ -33,11 +33,13 @@ import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.text.templator.ui.OOOProcessorPrefs;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
+import ch.rgw.tools.StringTool;
 
 public class ODFDoc {
 	private Map<String, String> fields = new HashMap<String, String>();
 	private byte[] template;
-
+	private String title;
+	
 	public void clear() {
 		fields.clear();
 	}
@@ -51,7 +53,7 @@ public class ODFDoc {
 			zos.putNextEntry(ze);
 			if (ze.getName().equals("content.xml") || ze.getName().equals("styles.xml")) {
 				byte[] cnt = readStream(zis);
-				Pattern pFields = Pattern.compile("\\[[\\w\\.0-9]+\\]");
+				Pattern pFields = Pattern.compile("\\[[\\s\\w\\.:\\/0-9]+\\]");
 				String text = new String(cnt, "utf-8");
 				Matcher matcher = pFields.matcher(new String(cnt, "utf-8"));
 				while (matcher.find()) {
@@ -59,7 +61,23 @@ public class ODFDoc {
 					fields.put(found, found);
 				}
 				zos.write(cnt);
-			} else {
+			} else if(ze.getName().equals("meta.xml")) {
+				byte[] meta=readStream(zis);
+				String s=new String(meta);
+				Pattern pTitle=Pattern.compile("<dc:title>(.+)</dc:title>");
+				Matcher m=pTitle.matcher(s);
+				if(m.find()) {
+					title=m.group(1);
+				}else {
+					pTitle=Pattern.compile("<meta:template.+?xlink:title=\"(.+?)\"");
+					m=pTitle.matcher(s);
+					if(m.find()) {
+						title=m.group(1);
+					}
+				}
+				zos.write(meta);
+			}
+			else {
 				FileTool.copyStreams(zis, zos);
 			}
 
@@ -93,7 +111,10 @@ public class ODFDoc {
 		try {
 			StorageController sc = new StorageController();
 			ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(template));
-			File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), "Brief.odt");
+			if(StringTool.isNothing(title)) {
+				title="Brief";
+			}
+			File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), title+".odt");
 			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
 			ZipEntry ze;
 			while ((ze = zis.getNextEntry()) != null) {
@@ -117,7 +138,9 @@ public class ODFDoc {
 				param = param.substring(0, i) + output.getAbsolutePath() + param.substring(i + 1);
 			}
 
-			/* Process process = */ Runtime.getRuntime().exec(new String[] { cmd, param });
+			Process process = Runtime.getRuntime().exec(new String[] { cmd, param });
+			// process.waitFor();
+			
 			return true;
 		} catch (Exception e) {
 			ExHandler.handle(e);
