@@ -28,6 +28,7 @@ import java.util.zip.ZipOutputStream;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.ui.text.ITextPlugin.ICallback;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.text.templator.ui.OOOProcessorPrefs;
@@ -107,30 +108,37 @@ public class ODFDoc {
 		}
 	}
 
+	public byte[] asByteArray() throws Exception {
+		File f=store();
+		return FileTool.readFile(f);
+	}
+	
+	private File store() throws Exception {
+		StorageController sc = new StorageController();
+		ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(template));
+		if(StringTool.isNothing(title)) {
+			title="Brief";
+		}
+		File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), title+".odt");
+		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
+		ZipEntry ze;
+		while ((ze = zis.getNextEntry()) != null) {
+			zos.putNextEntry(ze);
+			if (ze.getName().equals("content.xml") || ze.getName().equals("styles.xml")) {
+				OdfTemplateFilterStream otf=new OdfTemplateFilterStream(this, zos);
+				FileTool.copyStreams(zis, otf);
+			} else {
+				FileTool.copyStreams(zis, zos);
+			}
+		}
+		zos.close();
+		zis.close();
+		return output;
+	}
+	
 	public boolean doOutput() {
 		try {
-			StorageController sc = new StorageController();
-			ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(template));
-			if(StringTool.isNothing(title)) {
-				title="Brief";
-			}
-			File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), title+".odt");
-			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
-			ZipEntry ze;
-			while ((ze = zis.getNextEntry()) != null) {
-				zos.putNextEntry(ze);
-				if (ze.getName().equals("content.xml") || ze.getName().equals("styles.xml")) {
-					OdfTemplateFilterStream otf=new OdfTemplateFilterStream(this, zos);
-					// SchemaFilterOutputStream sfo = new SchemaFilterOutputStream(proc, zos, this);
-					// FileTool.copyStreams(zis, sfo);
-					FileTool.copyStreams(zis, otf);
-					// sfo.close();
-				} else {
-					FileTool.copyStreams(zis, zos);
-				}
-			}
-			zos.close();
-			zis.close();
+			File output=store();
 			String cmd = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "cmd", "soffice");
 			String param = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "param", "%");
 			int i = param.indexOf('%');

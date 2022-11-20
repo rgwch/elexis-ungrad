@@ -52,6 +52,8 @@
         <module>ch.elexis.ungrad.qrbills.feature</module>
         <!-- module>ch.elexis.ungrad.textplugin</module>
         <module>ch.elexis.ungrad.textplugin.feature</module -->
+        <module>ch.elexis.ungrad.text.templator</module>
+        <module>ch.elexis.ungrad.text.templator.feature</module>
         <module>ungrad-artikelstamm</module>
         <module>ungrad-artikelstamm-feature</module>
         <!-- module>ch.berchtold.privatrechnung</module>

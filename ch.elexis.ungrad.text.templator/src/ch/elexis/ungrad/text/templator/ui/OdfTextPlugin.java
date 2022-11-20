@@ -37,7 +37,7 @@ public class OdfTextPlugin implements ITextPlugin {
 
 	@Override
 	public Composite createContainer(Composite parent, ICallback handler) {
-		display = new OdfTemplateFieldsDisplay(parent,handler);
+		display = new OdfTemplateFieldsDisplay(parent, handler);
 		saveHandler = handler;
 		return display;
 	}
@@ -99,13 +99,18 @@ public class OdfTextPlugin implements ITextPlugin {
 
 	@Override
 	public byte[] storeToByteArray() {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return doc.asByteArray();
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+			SWTHelper.showError("Fehler beim Speichern", ex.getMessage());
+			return new byte[0];
+		}
 	}
 
 	@Override
 	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished) {
-		doc.doOutput();
+		// doc.doOutput();
 		return false;
 	}
 
@@ -121,14 +126,14 @@ public class OdfTextPlugin implements ITextPlugin {
 		String repl = sbu.toString();
 		place = "\\[" + place.substring(1, place.length() - 1) + "\\]";
 		Pattern pat = Pattern.compile(place);
-		for (Entry<String,String> field : doc.getFields()) {
+		for (Entry<String, String> field : doc.getFields()) {
 			sbu = new StringBuffer();
 			Matcher matcher = pat.matcher(field.getKey());
 			while (matcher.find()) {
 				matcher.appendReplacement(sbu, (String) repl);
 			}
 			matcher.appendTail(sbu);
-			doc.setField(field.getKey(),sbu.toString());
+			doc.setField(field.getKey(), sbu.toString());
 		}
 		return true;
 	}
