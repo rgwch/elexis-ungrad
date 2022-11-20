@@ -1,12 +1,27 @@
+/**
+ * Copyright (c) 2022, G. Weirich and Elexis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    G. Weirich - initial implementation
+ */
+
 package ch.elexis.ungrad.text.templator.ui;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.swt.widgets.Composite;
+import org.jdom.Element;
 
 import ch.elexis.core.data.interfaces.text.ReplaceCallback;
 import ch.elexis.core.ui.text.ITextPlugin;
@@ -17,34 +32,14 @@ import ch.rgw.tools.ExHandler;
 public class OdfTextPlugin implements ITextPlugin {
 	private Map<String, String> fields;
 	private ODFDoc doc = new ODFDoc();
-
-	@Override
-	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2) throws CoreException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public PageFormat getFormat() {
-		return PageFormat.A4;
-	}
-
-	@Override
-	public void setFormat(PageFormat f) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setParameter(Parameter parameter) {
-		// TODO Auto-generated method stub
-
-	}
+	private OdfTemplateFieldsDisplay display;
+	private ICallback saveHandler;
 
 	@Override
 	public Composite createContainer(Composite parent, ICallback handler) {
-		// TODO Auto-generated method stub
-		return null;
+		display = new OdfTemplateFieldsDisplay(parent,handler);
+		saveHandler = handler;
+		return display;
 	}
 
 	@Override
@@ -59,26 +54,9 @@ public class OdfTextPlugin implements ITextPlugin {
 	}
 
 	@Override
-	public void showMenu(boolean b) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void showToolbar(boolean b) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setSaveOnFocusLost(boolean bSave) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public boolean createEmptyDocument() {
 		doc.clear();
+		display.set(doc);
 		return true;
 	}
 
@@ -93,6 +71,7 @@ public class OdfTextPlugin implements ITextPlugin {
 		try {
 			if (asTemplate) {
 				fields = doc.parseTemplate(is);
+				display.set(doc);
 				if (fields != null) {
 					return true;
 				}
@@ -106,8 +85,16 @@ public class OdfTextPlugin implements ITextPlugin {
 
 	@Override
 	public boolean findOrReplace(String pattern, ReplaceCallback cb) {
-		// TODO Auto-generated method stub
-		return false;
+		boolean hadMatch = false;
+		for (Entry<String, String> e : doc.getFields()) {
+			String k = e.getKey();
+			if (k.matches(pattern)) {
+				hadMatch = true;
+				doc.setField(k, (String) cb.replace(k));
+			}
+		}
+		display.set(doc);
+		return hadMatch;
 	}
 
 	@Override
@@ -117,9 +104,33 @@ public class OdfTextPlugin implements ITextPlugin {
 	}
 
 	@Override
-	public boolean insertTable(String place, int properties, String[][] contents, int[] columnSizes) {
-		// TODO Auto-generated method stub
+	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished) {
+		doc.doOutput();
 		return false;
+	}
+
+	@Override
+	public boolean insertTable(String place, int properties, String[][] contents, int[] columnSizes) {
+		StringBuffer sbu = new StringBuffer();
+		for (int z = 0; z < contents.length; z++) {
+			for (int s = 0; s < contents[z].length; s++) {
+				sbu.append(contents[z][s]).append("\t");
+			}
+			sbu.append("\n");
+		}
+		String repl = sbu.toString();
+		place = "\\[" + place.substring(1, place.length() - 1) + "\\]";
+		Pattern pat = Pattern.compile(place);
+		for (Entry<String,String> field : doc.getFields()) {
+			sbu = new StringBuffer();
+			Matcher matcher = pat.matcher(field.getKey());
+			while (matcher.find()) {
+				matcher.appendReplacement(sbu, (String) repl);
+			}
+			matcher.appendTail(sbu);
+			doc.setField(field.getKey(),sbu.toString());
+		}
+		return true;
 	}
 
 	@Override
@@ -159,12 +170,6 @@ public class OdfTextPlugin implements ITextPlugin {
 	}
 
 	@Override
-	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public String getMimeType() {
 		return "oasis/odf";
 	}
@@ -176,7 +181,48 @@ public class OdfTextPlugin implements ITextPlugin {
 	}
 
 	@Override
+	public PageFormat getFormat() {
+		return PageFormat.A4;
+	}
+
+	@Override
+	public void setFormat(PageFormat f) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setParameter(Parameter parameter) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void initTemplatePrintSettings(String template) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2) throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void showMenu(boolean b) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void showToolbar(boolean b) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setSaveOnFocusLost(boolean bSave) {
 		// TODO Auto-generated method stub
 
 	}

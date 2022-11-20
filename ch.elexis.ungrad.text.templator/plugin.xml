@@ -5,7 +5,7 @@
    <extension
          point="ch.elexis.core.ui.Text">
       <Texterweiterung
-            Klasse="ch.elexis.ungrad.text.templator.ui.TextPluginImpl"
+            Klasse="ch.elexis.ungrad.text.templator.ui.OdfTextPlugin"
             name="Ungrad Text-Templator">
       </Texterweiterung>
    </extension>
