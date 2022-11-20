@@ -127,13 +127,10 @@ public class OdfTextPlugin implements ITextPlugin {
 		place = "\\[" + place.substring(1, place.length() - 1) + "\\]";
 		Pattern pat = Pattern.compile(place);
 		for (Entry<String, String> field : doc.getFields()) {
-			sbu = new StringBuffer();
 			Matcher matcher = pat.matcher(field.getKey());
-			while (matcher.find()) {
-				matcher.appendReplacement(sbu, (String) repl);
+			if (matcher.find()) {
+				doc.setField(field.getKey(), repl);
 			}
-			matcher.appendTail(sbu);
-			doc.setField(field.getKey(), sbu.toString());
 		}
 		return true;
 	}
