@@ -26,7 +26,7 @@
             name="Ungrad-TextTemplator">
       </page>
       <page
-            category="ch.medelexis.text.templator.Preferences"
+            category="ch.elexis.ungrad.text.templator.Preferences"
             class="ch.elexis.ungrad.text.templator.ui.OOOProcessorPrefs"
             id="ch.elexis.ungrad.text.templator.oooprocessor.preferences"
             name="OpenOffice.org Processor">

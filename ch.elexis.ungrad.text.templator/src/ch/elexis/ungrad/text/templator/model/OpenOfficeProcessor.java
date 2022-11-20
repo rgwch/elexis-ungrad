@@ -39,19 +39,19 @@ import ch.rgw.tools.ExHandler;
 public class OpenOfficeProcessor implements IProcessor {
 	private static final Logger log = LoggerFactory.getLogger(OpenOfficeProcessor.class);
 	ProcessingSchema proc;
-	
-	public String getName(){
+
+	public String getName() {
 		return "OpenOffice-Processor";
 	}
-	
+
 	@Override
-	public boolean doOutput(ProcessingSchema schema){
+	public boolean doOutput(ProcessingSchema schema) {
 		proc = schema;
 		File tmpl = schema.getTemplateFile();
 		if (!tmpl.exists()) {
 			log.warn("Template " + schema + " missing");
-			SWTHelper.alert("Template missing", MessageFormat
-				.format("Konnte Vorlagedatei {0} nicht öffnen", tmpl.getAbsolutePath()));
+			SWTHelper.alert("Template missing",
+					MessageFormat.format("Konnte Vorlagedatei {0} nicht öffnen", tmpl.getAbsolutePath()));
 			return false;
 		}
 		try {
@@ -72,31 +72,28 @@ public class OpenOfficeProcessor implements IProcessor {
 			}
 			zos.close();
 			zis.close();
-			String cmd =
-				CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "cmd", "swriter.exe");
+			String cmd = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "cmd", "swriter.exe");
 			String param = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "param", "%");
 			int i = param.indexOf('%');
 			if (i != -1) {
 				param = param.substring(0, i) + output.getAbsolutePath() + param.substring(i + 1);
 			}
-			String[] params_ = param.split(" +");
-			String[] params = new String[params_.length + 1];
-			params[0] = cmd;
-			for (i = 0; i < params_.length; i++) {
-				params[i + 1] = params_[i];
-			}
-			/* Process process = */ Runtime.getRuntime().exec(params);	
+			/*
+			 * String[] params_ = param.split(" +"); String[] params = new
+			 * String[params_.length + 1]; params[0] = cmd; for (i = 0; i < params_.length;
+			 * i++) { params[i + 1] = params_[i]; }
+			 */
+			/* Process process = */ Runtime.getRuntime().exec(new String[] { cmd, param });
 			return true;
 		} catch (Exception e) {
 			ExHandler.handle(e);
-			SWTHelper.alert("OpenOffice Processor",
-				"Problem mit dem Erstellen des Dokuments " + e.getMessage());
+			SWTHelper.alert("OpenOffice Processor", "Problem mit dem Erstellen des Dokuments " + e.getMessage());
 		}
 		return false;
 	}
-	
+
 	@Override
-	public String convert(String input){
+	public String convert(String input) {
 		String ret = input.replaceAll("\\t", "<text:tab/>");
 		ret = ret.replaceAll("\\n", "<text:line-break/>");
 		return ret;
