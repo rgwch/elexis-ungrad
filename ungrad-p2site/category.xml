@@ -42,6 +42,9 @@
    <feature id="ch.elexis.ungrad.pdf.feature">
       <category name="ch.elexis.ungrad.common"/>
    </feature>
+   <feature id="ch.medelexis.text.templator.feature">
+      <category name="ch.elexis.ungrad.docmgr"/>
+   </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>
