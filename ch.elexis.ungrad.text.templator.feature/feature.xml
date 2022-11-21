@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="ch.elexis.ungrad.text.templator.feature"
-      label="Feature"
-      version="1.0.0.qualifier">
+      label="Ungrad Text Templator"
+      version="1.0.0.qualifier"
+      provider-name="ch.elexis">
 
    <description>
       A replacement for the medelexis-text templator and for the OpenOffice
