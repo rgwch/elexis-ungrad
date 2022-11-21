@@ -21,15 +21,15 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.swt.widgets.Composite;
-import org.jdom.Element;
 
 import ch.elexis.core.data.interfaces.text.ReplaceCallback;
-import ch.elexis.core.ui.text.ITextPlugin;
+import ch.elexis.core.ui.text.ITextPlugin2;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.data.Brief;
 import ch.elexis.ungrad.text.templator.model.ODFDoc;
 import ch.rgw.tools.ExHandler;
 
-public class OdfTextPlugin implements ITextPlugin {
+public class OdfTextPlugin implements ITextPlugin2 {
 	private Map<String, String> fields;
 	private ODFDoc doc = new ODFDoc();
 	private OdfTemplateFieldsDisplay display;
@@ -64,6 +64,22 @@ public class OdfTextPlugin implements ITextPlugin {
 	public boolean loadFromByteArray(byte[] bs, boolean asTemplate) {
 		ByteArrayInputStream bais = new ByteArrayInputStream(bs);
 		return loadFromStream(bais, asTemplate);
+	}
+
+	@Override
+	public boolean loadFromBrief(Brief brief, boolean asTemplate) {
+		try {
+			if (asTemplate) {
+				fields = doc.parseTemplate(brief);
+				if (fields != null) {
+					return true;
+				}
+			}
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+			SWTHelper.showError("Fehler beim Laden", ex.getMessage());
+		}
+		return false;
 	}
 
 	@Override

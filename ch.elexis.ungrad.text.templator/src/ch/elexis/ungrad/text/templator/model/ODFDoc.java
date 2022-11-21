@@ -28,8 +28,8 @@ import java.util.zip.ZipOutputStream;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
-import ch.elexis.core.ui.text.ITextPlugin.ICallback;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.data.Brief;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.text.templator.ui.OOOProcessorPrefs;
 import ch.rgw.io.FileTool;
@@ -40,9 +40,19 @@ public class ODFDoc {
 	private Map<String, String> fields = new HashMap<String, String>();
 	private byte[] template;
 	private String title;
-	
+
 	public void clear() {
 		fields.clear();
+	}
+
+	public Map<String, String> parseTemplate(Brief brief) throws Exception {
+		ByteArrayInputStream bais = new ByteArrayInputStream(brief.loadBinary());
+		parseTemplate(bais);
+		String nt = brief.getBetreff();
+		if (!StringTool.isNothing(nt)) {
+			title = nt;
+		}
+		return fields;
 	}
 
 	public Map<String, String> parseTemplate(InputStream tmpl) throws Exception {
@@ -62,23 +72,22 @@ public class ODFDoc {
 					fields.put(found, found);
 				}
 				zos.write(cnt);
-			} else if(ze.getName().equals("meta.xml")) {
-				byte[] meta=readStream(zis);
-				String s=new String(meta);
-				Pattern pTitle=Pattern.compile("<dc:title>(.+)</dc:title>");
-				Matcher m=pTitle.matcher(s);
-				if(m.find()) {
-					title=m.group(1);
-				}else {
-					pTitle=Pattern.compile("<meta:template.+?xlink:title=\"(.+?)\"");
-					m=pTitle.matcher(s);
-					if(m.find()) {
-						title=m.group(1);
+			} else if (ze.getName().equals("meta.xml")) {
+				byte[] meta = readStream(zis);
+				String s = new String(meta);
+				Pattern pTitle = Pattern.compile("<dc:title>(.+)</dc:title>");
+				Matcher m = pTitle.matcher(s);
+				if (m.find()) {
+					title = m.group(1);
+				} else {
+					pTitle = Pattern.compile("<meta:template.+?xlink:title=\"(.+?)\"");
+					m = pTitle.matcher(s);
+					if (m.find()) {
+						title = m.group(1);
 					}
 				}
 				zos.write(meta);
-			}
-			else {
+			} else {
 				FileTool.copyStreams(zis, zos);
 			}
 
@@ -109,23 +118,23 @@ public class ODFDoc {
 	}
 
 	public byte[] asByteArray() throws Exception {
-		File f=store();
+		File f = store();
 		return FileTool.readFile(f);
 	}
-	
+
 	private File store() throws Exception {
 		StorageController sc = new StorageController();
 		ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(template));
-		if(StringTool.isNothing(title)) {
-			title="Brief";
+		if (StringTool.isNothing(title)) {
+			title = "Brief";
 		}
-		File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), title+".odt");
+		File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), title + ".odt");
 		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
 		ZipEntry ze;
 		while ((ze = zis.getNextEntry()) != null) {
 			zos.putNextEntry(ze);
 			if (ze.getName().equals("content.xml") || ze.getName().equals("styles.xml")) {
-				OdfTemplateFilterStream otf=new OdfTemplateFilterStream(this, zos);
+				OdfTemplateFilterStream otf = new OdfTemplateFilterStream(this, zos);
 				FileTool.copyStreams(zis, otf);
 			} else {
 				FileTool.copyStreams(zis, zos);
@@ -135,10 +144,10 @@ public class ODFDoc {
 		zis.close();
 		return output;
 	}
-	
+
 	public boolean doOutput() {
 		try {
-			File output=store();
+			File output = store();
 			String cmd = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "cmd", "soffice");
 			String param = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "param", "%");
 			int i = param.indexOf('%');
@@ -148,7 +157,7 @@ public class ODFDoc {
 
 			Process process = Runtime.getRuntime().exec(new String[] { cmd, param });
 			// process.waitFor();
-			
+
 			return true;
 		} catch (Exception e) {
 			ExHandler.handle(e);
