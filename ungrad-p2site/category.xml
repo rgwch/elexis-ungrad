@@ -42,7 +42,7 @@
    <feature id="ch.elexis.ungrad.pdf.feature">
       <category name="ch.elexis.ungrad.common"/>
    </feature>
-   <feature id="ch.medelexis.text.templator.feature">
+   <feature id="ch.elexis.ungrad.text.templator.feature">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>

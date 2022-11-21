@@ -21,7 +21,7 @@
    <feature url="features/ch.elexis.ungrad.kassenbuch.feature_3.1.0.qualifier.jar" id="ch.elexis.ungrad.kassenbuch.feature" version="3.1.0.qualifier">
       <category name="ch.elexis.ungrad.financial"/>
    </feature>
-   <feature url="features/ch.medelexis.text.templator.feature_3.0.100.qualifier.jar" id="ch.medelexis.text.templator.feature" version="3.0.100.qualifier" nl="">
+   <feature url="features/ch.elexis.ungrad.text.templator.feature_1.0.0.qualifier.jar" id="ch.elexis.ungrad.text.templator.feature" version="1.0.0.qualifier">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
