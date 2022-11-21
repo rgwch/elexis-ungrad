@@ -3,7 +3,7 @@
   <parent>
     <groupId>ch.rgw</groupId>
     <artifactId>elexis-ungrad-aggregator</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>ch.berchtold.privatrechnung</artifactId>
   <packaging>eclipse-plugin</packaging>
