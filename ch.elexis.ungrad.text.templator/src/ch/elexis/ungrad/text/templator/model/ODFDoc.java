@@ -45,6 +45,12 @@ public class ODFDoc {
 		fields.clear();
 	}
 
+	/**
+	 * Load a Tenplate from an Elexis "Brief", i.e. from the default ouitgoing doc storage
+	 * @param brief
+	 * @return All Text variables found in the content of the Brief
+	 * @throws Exception
+	 */
 	public Map<String, String> parseTemplate(Brief brief) throws Exception {
 		ByteArrayInputStream bais = new ByteArrayInputStream(brief.loadBinary());
 		parseTemplate(bais);
@@ -55,6 +61,12 @@ public class ODFDoc {
 		return fields;
 	}
 
+	/**
+	 * Analyze an ODT-Stream for text variables and collect such variables in "fields".
+	 * @param tmpl The template to analyze
+	 * @return All text variables found in the stream
+	 * @throws Exception
+	 */
 	public Map<String, String> parseTemplate(InputStream tmpl) throws Exception {
 		ZipInputStream zis = new ZipInputStream(tmpl);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -98,10 +110,19 @@ public class ODFDoc {
 		return fields;
 	}
 
+	/**
+	 * get a Set with all text variables and their respective values
+	 * @return
+	 */
 	public Set<Entry<String, String>> getFields() {
 		return fields.entrySet();
 	}
 
+	/**
+	 * get the value of a text variable
+	 * @param name
+	 * @return
+	 */
 	public String getField(String name) {
 		String ret = fields.get(name);
 		if (ret == null) {
@@ -111,25 +132,27 @@ public class ODFDoc {
 		}
 	}
 
+	/**
+	 * Set the value of a text variable
+	 * @param name
+	 * @param value
+	 */
 	public void setField(String name, String value) {
 		if (!value.startsWith("??")) {
 			fields.put(name, value);
 		}
 	}
 
-	public byte[] asByteArray() throws Exception {
-		File f = store();
-		return FileTool.readFile(f);
-	}
 
-	private File store() throws Exception {
-		StorageController sc = new StorageController();
+	/**
+	 * Filter the current template through an  {#link OdfTemplateFilterStream}, i.e. replace text variables with their respective values
+	 * @return the resulting file as byte array.
+	 * @throws Exception
+	 */
+	public byte[] asByteArray() throws Exception {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(template));
-		if (StringTool.isNothing(title)) {
-			title = "Brief";
-		}
-		File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), title + ".odt");
-		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
+		ZipOutputStream zos = new ZipOutputStream(baos);
 		ZipEntry ze;
 		while ((ze = zis.getNextEntry()) != null) {
 			zos.putNextEntry(ze);
@@ -142,12 +165,19 @@ public class ODFDoc {
 		}
 		zos.close();
 		zis.close();
-		return output;
+		return baos.toByteArray();
 	}
 
+	/**
+	 * Create a file in the current patient's output directory and write the current document 
+	 * @return
+	 */
 	public boolean doOutput() {
 		try {
-			File output = store();
+			StorageController sc = new StorageController();
+			File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), title + ".odt");
+			byte[] contents = asByteArray();
+			FileTool.writeFile(output, contents);
 			String cmd = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "cmd", "soffice");
 			String param = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "param", "%");
 			int i = param.indexOf('%');

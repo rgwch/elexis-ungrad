@@ -29,6 +29,11 @@ import ch.elexis.data.Brief;
 import ch.elexis.ungrad.text.templator.model.ODFDoc;
 import ch.rgw.tools.ExHandler;
 
+/**
+ * The ITextPlugin. We implement ITextPlugin2, because we want more informations on about the documents we handle
+ * @author gerry
+ *
+ */
 public class OdfTextPlugin implements ITextPlugin2 {
 	private Map<String, String> fields;
 	private ODFDoc doc = new ODFDoc();
@@ -66,6 +71,9 @@ public class OdfTextPlugin implements ITextPlugin2 {
 		return loadFromStream(bais, asTemplate);
 	}
 
+	/**
+	 * Load a letter or a tenmplate. Since we get a refetence to a "Brief", wie have access to informations like title and recipient
+	 */
 	@Override
 	public boolean loadFromBrief(Brief brief, boolean asTemplate) {
 		try {
