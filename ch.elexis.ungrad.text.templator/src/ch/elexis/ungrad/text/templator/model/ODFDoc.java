@@ -30,6 +30,7 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Brief;
+import ch.elexis.data.Kontakt;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.text.templator.ui.OOOProcessorPrefs;
 import ch.rgw.io.FileTool;
@@ -49,8 +50,22 @@ public class ODFDoc {
 		ByteArrayInputStream bais = new ByteArrayInputStream(brief.loadBinary());
 		parseTemplate(bais);
 		String nt = brief.getBetreff();
-		if (!StringTool.isNothing(nt)) {
+		if (StringTool.isNothing(nt)) {
+			title="Brief";
+		}else {
 			title = nt;
+		}
+	
+		Kontakt k=brief.getAdressat();
+		if(k!=null) {
+			String n1=k.get(Kontakt.FLD_NAME1);
+			if(n1!=null) {
+				title+="_"+n1;
+			}
+			String n2=k.get(Kontakt.FLD_NAME2);
+			if(n2!=null) {
+				title+="_"+n2;
+			}
 		}
 		return fields;
 	}
