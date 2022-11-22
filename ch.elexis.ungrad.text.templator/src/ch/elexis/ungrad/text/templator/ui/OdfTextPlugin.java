@@ -12,6 +12,7 @@
 package ch.elexis.ungrad.text.templator.ui;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,18 +25,22 @@ import org.eclipse.swt.widgets.Composite;
 
 import ch.elexis.core.data.interfaces.text.ReplaceCallback;
 import ch.elexis.core.ui.text.ITextPlugin2;
+import ch.elexis.core.ui.text.MimeTypeUtil;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Brief;
 import ch.elexis.ungrad.text.templator.model.ODFDoc;
+import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 
 /**
- * The ITextPlugin. We implement ITextPlugin2, because we want more informations on about the documents we handle
+ * The ITextPlugin. We implement ITextPlugin2, because we want more informations
+ * on about the documents we handle
+ * 
  * @author gerry
  *
  */
 public class OdfTextPlugin implements ITextPlugin2 {
-	private Map<String, String> fields;
+	// private Map<String, String> fields;
 	private ODFDoc doc = new ODFDoc();
 	private OdfTemplateFieldsDisplay display;
 	private ICallback saveHandler;
@@ -67,21 +72,30 @@ public class OdfTextPlugin implements ITextPlugin2 {
 
 	@Override
 	public boolean loadFromByteArray(byte[] bs, boolean asTemplate) {
-		ByteArrayInputStream bais = new ByteArrayInputStream(bs);
-		return loadFromStream(bais, asTemplate);
+		if (asTemplate) {
+			ByteArrayInputStream bais = new ByteArrayInputStream(bs);
+			return loadFromStream(bais, asTemplate);
+		} else {
+			doc.setTemplate(bs);
+			return true;
+		}
 	}
 
 	/**
-	 * Load a letter or a tenmplate. Since we get a refetence to a "Brief", wie have access to informations like title and recipient
+	 * Load a letter or a template. Since we get a reference to a "Brief", wie have
+	 * access to informations like title and recipient
 	 */
 	@Override
 	public boolean loadFromBrief(Brief brief, boolean asTemplate) {
 		try {
 			if (asTemplate) {
-				fields = doc.parseTemplate(brief);
+				Object fields = doc.parseTemplate(brief);
+				display.set(doc);
 				if (fields != null) {
 					return true;
 				}
+			}else {
+				return loadFromByteArray(brief.loadBinary(), false);
 			}
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
@@ -94,11 +108,15 @@ public class OdfTextPlugin implements ITextPlugin2 {
 	public boolean loadFromStream(InputStream is, boolean asTemplate) {
 		try {
 			if (asTemplate) {
-				fields = doc.parseTemplate(is);
+				Object fields = doc.parseTemplate(is);
 				display.set(doc);
 				if (fields != null) {
 					return true;
 				}
+			} else {
+				ByteArrayOutputStream baos=new ByteArrayOutputStream();
+				FileTool.copyStreams(is, baos);
+				return loadFromByteArray(baos.toByteArray(), false);
 			}
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
@@ -197,7 +215,7 @@ public class OdfTextPlugin implements ITextPlugin2 {
 
 	@Override
 	public String getMimeType() {
-		return "oasis/odf";
+		return MimeTypeUtil.MIME_TYPE_OPENOFFICE;
 	}
 
 	@Override

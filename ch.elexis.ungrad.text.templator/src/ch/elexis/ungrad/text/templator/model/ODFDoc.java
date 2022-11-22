@@ -124,6 +124,11 @@ public class ODFDoc {
 		template = baos.toByteArray();
 		return fields;
 	}
+	
+	public void setTemplate(byte[] template) {
+		this.template=template;
+		fields.clear();		
+	}
 
 	/**
 	 * get a Set with all text variables and their respective values
