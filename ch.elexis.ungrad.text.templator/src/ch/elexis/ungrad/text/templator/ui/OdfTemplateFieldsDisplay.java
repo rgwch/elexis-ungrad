@@ -41,11 +41,9 @@ public class OdfTemplateFieldsDisplay extends Composite {
 		if (parent.getLayout() instanceof GridLayout) {
 			setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 		}
-		// setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		setLayout(new FillLayout());
 		Composite body = new Composite(this, SWT.NONE);
 		body.setLayout(new GridLayout());
-		// body.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		makeActions();
 		ToolBarManager tbm = new ToolBarManager(SWT.HORIZONTAL);
 		tbm.add(printAction);
@@ -61,16 +59,21 @@ public class OdfTemplateFieldsDisplay extends Composite {
 			// c.removeFocusListener(fs);
 			c.dispose();
 		}
-
-		for (Entry<String, String> e : doc.getFields()) {
-			Label lbl = new Label(cFields, SWT.NONE);
-			lbl.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-			Text text = new Text(cFields, SWT.BORDER);
-			text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-			// text.addFocusListener(fs);
-			lbl.setText(e.getKey());
-			text.setText(e.getValue());
-			text.setData("field", e.getKey());
+		if (doc == null) {
+			Label lbl=new Label(cFields,SWT.NONE);
+			lbl.setText("Externes Dokument");
+			lbl.setLayoutData(SWTHelper.getFillGridData(2,true,1,false));
+		} else {
+			for (Entry<String, String> e : doc.getFields()) {
+				Label lbl = new Label(cFields, SWT.NONE);
+				lbl.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+				Text text = new Text(cFields, SWT.BORDER);
+				text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+				// text.addFocusListener(fs);
+				lbl.setText(e.getKey());
+				text.setText(e.getValue());
+				text.setData("field", e.getKey());
+			}
 		}
 		cFields.layout();
 		this.doc = doc;

@@ -77,6 +77,7 @@ public class OdfTextPlugin implements ITextPlugin2 {
 			return loadFromStream(bais, asTemplate);
 		} else {
 			doc.setTemplate(bs);
+			display.set(null);
 			return true;
 		}
 	}
@@ -95,6 +96,7 @@ public class OdfTextPlugin implements ITextPlugin2 {
 					return true;
 				}
 			}else {
+				display.set(null);
 				return loadFromByteArray(brief.loadBinary(), false);
 			}
 		} catch (Exception ex) {
@@ -116,6 +118,7 @@ public class OdfTextPlugin implements ITextPlugin2 {
 			} else {
 				ByteArrayOutputStream baos=new ByteArrayOutputStream();
 				FileTool.copyStreams(is, baos);
+				display.set(null);
 				return loadFromByteArray(baos.toByteArray(), false);
 			}
 		} catch (Exception ex) {
