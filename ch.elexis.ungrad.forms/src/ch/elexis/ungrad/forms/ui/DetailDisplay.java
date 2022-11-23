@@ -60,7 +60,7 @@ public class DetailDisplay extends Composite {
 		for (Control c : inlay.getChildren()) {
 			c.dispose();
 		}
-		form.setText("");
+		form.setText(""); //$NON-NLS-1$
 	}
 
 	void show(Template template) {
@@ -74,7 +74,7 @@ public class DetailDisplay extends Composite {
 			Text text = new Text(inlay, SWT.MULTI | SWT.BORDER);
 			text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 			String val = e.getValue();
-			val = val.replace("<br />", "\n");
+			val = val.replace("<br />", "\n"); //$NON-NLS-1$
 			text.setText(val);
 			text.setData("input", e.getKey());
 		}
@@ -85,7 +85,7 @@ public class DetailDisplay extends Composite {
 		for (Control c : inlay.getChildren()) {
 			Object k = c.getData("input");
 			if (k instanceof String) {
-				String val = ((Text) c).getText().replaceAll("\n", "<br />");
+				String val = ((Text) c).getText().replaceAll("\n", "<br />"); //$NON-NLS-1$ //$NON-NLS-2$
 				template.setInput((String) k, val);
 			}
 		}
@@ -99,7 +99,7 @@ public class DetailDisplay extends Composite {
 			Program.launch(pdffile);
 			return pdffile;
 		} catch (Exception e) {
-			SWTHelper.showError("Fehler bei Ausgabe", e.getMessage());
+			SWTHelper.showError(Messages.DetailDisplay_OutputError, e.getMessage());
 			ExHandler.handle(e);
 			return null;
 		}

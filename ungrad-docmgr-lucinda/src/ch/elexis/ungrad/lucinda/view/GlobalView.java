@@ -165,9 +165,9 @@ public class GlobalView extends ViewPart implements IActivationListener {
 	}
 
 	private void makeActions() {
-		showDirectoryAction = new Action("Directory", Action.AS_CHECK_BOX) {
+		showDirectoryAction = new Action(Messages.GlobalView_Directory, Action.AS_CHECK_BOX) {
 			{
-				setToolTipText("Verzeichnis-Sicht");
+				setToolTipText(Messages.GlobalView_CommonDirectory);
 				setImageDescriptor(Images.IMG_FOLDER.getImageDescriptor());
 			}
 
@@ -185,11 +185,13 @@ public class GlobalView extends ViewPart implements IActivationListener {
 				} else {
 					controller.setLucindaView();
 				}
+				save(USE_COMMON_DIRECTORY,isChecked());
 			}
 		};
-		rescanAction = new Action("Rescan") {
+		showDirectoryAction.setChecked(is(USE_COMMON_DIRECTORY));
+		rescanAction = new Action(Messages.GlobalView_Rescan) {
 			{
-				setToolTipText("Lucinda Dokumente neu einlesen");
+				setToolTipText(Messages.GlobalView_Rescan_Tooltip);
 				setImageDescriptor(Images.IMG_REFRESH.getImageDescriptor());
 			}
 
@@ -234,7 +236,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 
 		aquireAction = new Action(Preferences.AQUIRE_ACTION_NAME) {
 			{
-				setToolTipText("Document von externer Quelle einlesen");
+				setToolTipText(Messages.GlobalView_ReadExternal);
 				setImageDescriptor(Images.IMG_IMPORT.getImageDescriptor());
 			}
 

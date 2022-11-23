@@ -56,7 +56,8 @@ public class Preferences {
 	
 	public static final String DOCUMENT_STORE=BASE+"document_store"; //$NON-NLS-1$
 	
-	public static final String COMMON_DIRECTORY = BASE + "common_dir";  //$NON-NLS-1$
+	public static final String COMMON_DIRECTORY = BASE + "commonDir";  //$NON-NLS-1$
+	public static final String USE_COMMON_DIRECTORY = BASE + "useCommonDir";  //$NON-NLS-1$
 
 	 
 	public List<String> getNetworks() {

@@ -21,6 +21,8 @@ public class Messages extends NLS {
 	public static String GlobalView_11;
 	public static String GlobalView_actPatient_name;
 	public static String GlobalView_actPatient_tooltip;
+	public static String GlobalView_CommonDirectory;
+	public static String GlobalView_Directory;
 	public static String GlobalView_filterInbox_name;
 	public static String GlobalView_filterKons_name;
 	public static String GlobalView_filterKons_tooltip;
@@ -28,6 +30,9 @@ public class Messages extends NLS {
 	public static String GlobalView_filterOmni_tooltip;
 	public static String GlobalView_omnivoreImport_Name;
 	public static String GlobalView_omnivoreImport_tooltip;
+	public static String GlobalView_ReadExternal;
+	public static String GlobalView_Rescan;
+	public static String GlobalView_Rescan_Tooltip;
 	public static String GlobalView_synckons_Name;
 	public static String GlobalView_synckons_tooltip;
 	public static String LucindaPrefs_exclude_Metadata;

@@ -92,8 +92,8 @@ public class DocumentList extends Composite {
 					File templateFile = new File(dir, selected + ".html");
 					String subject = selected;
 					String body = CoreHub.localCfg.get(PreferenceConstants.MAIL_BODY,
-							"Siehe Anhang\nMit freundlichen Grüssen");
-					String recipient = "";
+							Messages.DocumentList_MessageBodyDefault);
+					String recipient = ""; //$NON-NLS-1$
 					if (templateFile.exists()) {
 						Template template = new Template(FileTool.readTextFile(templateFile), null);
 						subject = template.getMailSubject();
@@ -109,7 +109,7 @@ public class DocumentList extends Composite {
 				}
 			} catch (Exception ex) {
 				ExHandler.handle(ex);
-				SWTHelper.showError("Fehler bei Ausdruck", ex.getMessage());
+				SWTHelper.showError(Messages.DocumentList_PrintError, ex.getMessage());
 			}
 
 		}
@@ -123,7 +123,7 @@ public class DocumentList extends Composite {
 				controller.showPDF(null, selected);
 			} catch (Exception ex) {
 				ExHandler.handle(ex);
-				SWTHelper.showError("Could not create or show file", ex.getMessage());
+				SWTHelper.showError(Messages.DocumentList_CreateError, ex.getMessage());
 			}
 		}
 		return null;
