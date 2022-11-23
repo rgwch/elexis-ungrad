@@ -53,7 +53,7 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 
 	public SelectTemplateDialog(Shell parentShell) {
 		super(parentShell);
-		templateDir = CoreHub.localCfg.get(PreferenceConstants.TEMPLATES, "");
+		templateDir = CoreHub.localCfg.get(PreferenceConstants.TEMPLATES, ""); //$NON-NLS-1$
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		setTitle("Formular auswählen");
+		setTitle(Messages.SelectTemplateDialog_SelectForm);
 	}
 
 	@Override

@@ -97,7 +97,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			}
 		} catch (Exception e) {
 			ExHandler.handle(e);
-			return new String[] { "Error reading directory" };
+			return new String[] { Messages.Controller_ErrorReadingDirectory };
 		}
 
 	}
@@ -123,7 +123,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		Pattern pat = Pattern.compile("A_([0-9]{4,4}-[0-1][0-9]-[0-3][0-9])_(.+)");
 		Matcher m = pat.matcher(item);
 		if (m.matches()) {
-			String date = m.group(1).replace("-", "");
+			String date = m.group(1).replace("-", Messages.Controller_6);
 			String title = m.group(2);
 			Query<Brief> qbe = new Query<Brief>(Brief.class);
 			qbe.add(Brief.FLD_SUBJECT, Query.EQUALS, title);
@@ -148,7 +148,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	 */
 	public File writeHTML(Template tmpl) throws Exception {
 		String filename = tmpl.getFilename();
-		String prefix = "";
+		String prefix = Messages.Controller_7;
 		File htmlFile;
 		if (StringTool.isNothing(filename)) {
 			String doctype = tmpl.getDoctype();
@@ -161,14 +161,14 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			}
 
 			filename = new TimeTool().toString(TimeTool.FULL_ISO);
-			prefix = "A_" + new TimeTool().toString(TimeTool.DATE_ISO) + "_";
+			prefix = "A_" + new TimeTool().toString(TimeTool.DATE_ISO) + Messages.Controller_11;
 			if (!StringTool.isNothing(tmpl.getTitle())) {
-				prefix += tmpl.getTitle() + "_";
+				prefix += tmpl.getTitle() + Messages.Controller_12;
 			}
 			if (tmpl.adressat != null) {
-				filename = prefix + tmpl.adressat.get(Kontakt.FLD_NAME1) + "_" + tmpl.adressat.get(Kontakt.FLD_NAME2);
+				filename = prefix + tmpl.adressat.get(Kontakt.FLD_NAME1) + Messages.Controller_13 + tmpl.adressat.get(Kontakt.FLD_NAME2);
 			} else {
-				String name = "Ausgang";
+				String name = Messages.Controller_Output;
 				filename = prefix + name;
 			}
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
@@ -176,7 +176,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			File dir = sc.getOutputDirFor(pat, true);
 			if (!dir.exists()) {
 				if (!dir.mkdirs()) {
-					throw new Exception("Could not create directory " + dir.getAbsolutePath());
+					throw new Exception(Messages.Controller_CouldNotCreateDir + dir.getAbsolutePath());
 				}
 			}
 			htmlFile = new File(dir, filename + ".html");
@@ -249,7 +249,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 					}
 				}
 				String filepath = outfile.getAbsolutePath();
-				String viewer = CoreHub.localCfg.get(PreferenceConstants.PDF_VIEWER, "");
+				String viewer = CoreHub.localCfg.get(PreferenceConstants.PDF_VIEWER, Messages.Controller_21);
 				if (!StringTool.isNothing(viewer)) {
 					asyncRunViewer(viewer, outfile, brief);
 				} else {
@@ -368,7 +368,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 
 				} catch (Exception ex) {
 					ExHandler.handle(ex);
-					SWTHelper.showError("Could not create or show file", ex.getMessage());
+					SWTHelper.showError(Messages.Controller_CouldNotCreateFile, ex.getMessage());
 				}
 			}
 

@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
+import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.common.ui.MailUI;
 import ch.elexis.ungrad.forms.model.Controller;
@@ -60,7 +61,7 @@ public class DetailDisplay extends Composite {
 		for (Control c : inlay.getChildren()) {
 			c.dispose();
 		}
-		form.setText(""); //$NON-NLS-1$
+		form.setText(StringConstants.EMPTY); 
 	}
 
 	void show(Template template) {
@@ -74,7 +75,7 @@ public class DetailDisplay extends Composite {
 			Text text = new Text(inlay, SWT.MULTI | SWT.BORDER);
 			text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 			String val = e.getValue();
-			val = val.replace("<br />", "\n"); //$NON-NLS-1$
+			val = val.replace("<br />", StringConstants.LF); //$NON-NLS-1$
 			text.setText(val);
 			text.setData("input", e.getKey());
 		}
@@ -85,7 +86,7 @@ public class DetailDisplay extends Composite {
 		for (Control c : inlay.getChildren()) {
 			Object k = c.getData("input");
 			if (k instanceof String) {
-				String val = ((Text) c).getText().replaceAll("\n", "<br />"); //$NON-NLS-1$ //$NON-NLS-2$
+				String val = ((Text) c).getText().replaceAll(StringConstants.LF, "<br />"); //$NON-NLS-1$ //$NON-NLS-2$
 				template.setInput((String) k, val);
 			}
 		}

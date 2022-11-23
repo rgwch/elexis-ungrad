@@ -164,10 +164,10 @@ public class View extends ViewPart implements IActivationListener {
 		File outDir = controller.getStorageController().getOutputDirFor(currentPat, true);
 		if (!outDir.exists()) {
 			if (!outDir.mkdirs()) {
-				throw new Error("Can't create output dir " + outDir.getAbsolutePath());
+				throw new Error(Messages.View_CantCreateOutputDir + outDir.getAbsolutePath());
 			}
 		}
-		String basename = "A_" + new TimeTool().toString(TimeTool.DATE_ISO) + "_" + templateFile.getName();
+		String basename = "A_" + new TimeTool().toString(TimeTool.DATE_ISO) + "_" + templateFile.getName(); //$NON-NLS-1$ //$NON-NLS-2$
 		File outFile = new File(outDir, basename);
 		Medform medform = new Medform(templateFile.getAbsolutePath());
 		Kontakt kRecipient = null;
@@ -193,11 +193,11 @@ public class View extends ViewPart implements IActivationListener {
 	}
 
 	private void makeActions() {
-		createNewAction = new Action("Erstellen") {
+		createNewAction = new Action(Messages.View_Create) {
 			{
-				setToolTipText("Ein neues Dokument erstellen");
+				setToolTipText(Messages.View_CreateNewDocument);
 				setImageDescriptor(Images.IMG_NEW.getImageDescriptor());
-				setText("Neu");
+				setText(Messages.View_New);
 			}
 
 			@Override
@@ -219,7 +219,7 @@ public class View extends ViewPart implements IActivationListener {
 							}
 							if (html.contains("[Adressat")) {
 								KontaktSelektor ksd = new KontaktSelektor(getSite().getShell(), Kontakt.class,
-										"Adressat", "Bitte Adressat auswählen",
+										Messages.View_Receiver, Messages.View_PleaseSelectReceiver,
 										new String[] { "Bezeichnung1", "Bezeichnung2" });
 								if (ksd.open() != Dialog.OK) {
 									return;
@@ -238,17 +238,17 @@ public class View extends ViewPart implements IActivationListener {
 
 					} catch (Exception e) {
 						ExHandler.handle(e);
-						SWTHelper.showError("Fehler bei Ausgabe", e.getMessage());
+						SWTHelper.showError(Messages.View_OutputError, e.getMessage());
 					}
 				}
 			}
 
 		};
-		showListAction = new Action("Dokumentenliste") {
+		showListAction = new Action(Messages.View_Doclist) {
 			{
-				setText("Dokumente");
+				setText(Messages.View_Documents);
 				setImageDescriptor(Images.IMG_DOCUMENT_STACK.getImageDescriptor());
-				setToolTipText("Zeige Liste der Dokumente");
+				setToolTipText(Messages.View_ShowListOfDocuments);
 			}
 
 			@Override
@@ -258,11 +258,11 @@ public class View extends ViewPart implements IActivationListener {
 				container.layout();
 			}
 		};
-		showDetailAction = new Action("Formular") {
+		showDetailAction = new Action(Messages.View_Form) {
 			{
-				setText("Ausfüllen");
+				setText(Messages.View_Completion);
 				setImageDescriptor(Images.IMG_EDIT.getImageDescriptor());
-				setToolTipText("Zeige aktuelles Formular");
+				setToolTipText(Messages.View_ShowCurrentForm);
 			}
 
 			@Override
@@ -281,7 +281,7 @@ public class View extends ViewPart implements IActivationListener {
 						controller.showPDF(null, docList.getSelection());
 					}
 				} catch (Exception ex) {
-					SWTHelper.showError("Fehler bei Verarbeitung", ex.getMessage());
+					SWTHelper.showError(Messages.View_ErrorProcessing, ex.getMessage());
 
 				}
 				printAction.setEnabled(true);
@@ -289,11 +289,11 @@ public class View extends ViewPart implements IActivationListener {
 				container.layout();
 			}
 		};
-		printAction = new Action("Ausgabe") {
+		printAction = new Action(Messages.View_Output_Heading) {
 			{
-				setText("Ausgeben");
+				setText(Messages.View_Output_Text);
 				setImageDescriptor(Images.IMG_DOCUMENT_PDF.getImageDescriptor());
-				setToolTipText("Aktuelles Formular erstellen und ausgeben");
+				setToolTipText(Messages.View_CreateAndOutput);
 			}
 
 			@Override
@@ -305,11 +305,11 @@ public class View extends ViewPart implements IActivationListener {
 				}
 			}
 		};
-		mailAction = new Action("Per Mail senden") {
+		mailAction = new Action(Messages.View_SendByMail) {
 			{
-				setText("Senden");
+				setText(Messages.View_Send_Header);
 				setImageDescriptor(Images.IMG_MAIL_SEND.getImageDescriptor());
-				setToolTipText("Dokument als PDF per Mail versenden");
+				setToolTipText(Messages.View_SendAsPDFByMail);
 			}
 
 			@Override
@@ -322,25 +322,25 @@ public class View extends ViewPart implements IActivationListener {
 			}
 
 		};
-		deleteAction = new Action("Dokument löschen") {
+		deleteAction = new Action(Messages.View_Delete_Header) {
 			{
-				setText("Löschen");
+				setText(Messages.View_Delete_Text);
 				setImageDescriptor(Images.IMG_DELETE.getImageDescriptor());
-				setToolTipText("Dokument unwiderruflich löschen");
+				setToolTipText(Messages.View_DeleteDocument);
 			}
 
 			@Override
 			public void run() {
 				try {
 					String sel = docList.getSelection();
-					if (SWTHelper.askYesNo("Bitte bestätigen", sel + " Wirklich unwiderruflich löschen?")) {
+					if (SWTHelper.askYesNo(Messages.View_PleaseConfirm, sel + Messages.View_ReallyDelete)) {
 						Patient pat = ElexisEventDispatcher.getSelectedPatient();
 						controller.delete(sel, pat);
 						docList.setPatient(pat);
 					}
 				} catch (Exception e) {
 					ExHandler.handle(e);
-					SWTHelper.showError("Fehler beim Löschen", e.getMessage());
+					SWTHelper.showError(Messages.View_ErrorDeleting, e.getMessage());
 				}
 			}
 		};
@@ -360,7 +360,7 @@ public class View extends ViewPart implements IActivationListener {
 					detail.saveHtml();
 				}
 			} catch (Exception ex) {
-				SWTHelper.showError("Fehler beim Sichern", ex.getMessage());
+				SWTHelper.showError(Messages.View_ErrorSaving, ex.getMessage());
 			}
 		}
 	}

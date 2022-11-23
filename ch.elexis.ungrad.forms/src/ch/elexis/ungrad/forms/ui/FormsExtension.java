@@ -95,13 +95,13 @@ public class FormsExtension implements IKonsExtension {
 	public void removeXRef(String refProvider, String refID) {
 		try {
 			Brief brief = Brief.load(refID);
-			if (brief.exists() && SWTHelper.askYesNo("Bestätigung",
-					"Auch den Brief und alle damit verbundenen Dateien löschen?")) {
+			if (brief.exists() && SWTHelper.askYesNo(ch.elexis.ungrad.forms.ui.Messages.FormsExtension_Confirm,
+					ch.elexis.ungrad.forms.ui.Messages.FormsExtension_DeleteAllFiles)) {
 				Activator.getController().delete(brief);
 			}
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
-			SWTHelper.showError("Fehler beim Entfernen der Referenz", ex.getMessage());
+			SWTHelper.showError(ch.elexis.ungrad.forms.ui.Messages.FormsExtension_ErrorRemovingReference, ex.getMessage());
 		}
 		/*
 		 * if(brief.isValid()) { brief.delete(); }
