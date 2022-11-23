@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.text.model.Samdas;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -54,7 +55,7 @@ import ch.rgw.tools.TimeTool;;
  *
  */
 public class Controller implements IProgressController {
-	GlobalViewPane view;
+	GlobalViewPane lucindaView;
 	DirectoryViewPane dirView;
 	ContentProvider cnt;
 	TableViewer viewer;
@@ -89,7 +90,7 @@ public class Controller implements IProgressController {
 
 		envelope = new Composite(parent, SWT.NONE);
 		envelope.setLayout(stack);
-		view = new GlobalViewPane(envelope, this);
+		lucindaView = new GlobalViewPane(envelope, this);
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			@Override
@@ -110,7 +111,11 @@ public class Controller implements IProgressController {
 			}
 		});
 		dirView = new DirectoryViewPane(envelope);
-		stack.topControl = view;
+		if (CoreHub.localCfg.get(Preferences.COMMON_DIRECTORY, false) == true) {
+			stack.topControl = dirView;
+		} else {
+			stack.topControl = lucindaView;
+		}
 		changePatient(ElexisEventDispatcher.getSelectedPatient());
 		return envelope;
 	}
@@ -121,7 +126,7 @@ public class Controller implements IProgressController {
 	}
 
 	public void setLucindaView() {
-		stack.topControl = view;
+		stack.topControl = lucindaView;
 		envelope.layout();
 	}
 
@@ -151,11 +156,11 @@ public class Controller implements IProgressController {
 		} else {
 			tc.setWidth(cPatWidth > 0 ? cPatWidth : 100);
 		}
-		runQuery(view.getSearchField().getText());
+		runQuery(lucindaView.getSearchField().getText());
 	}
 
 	public void reload() {
-		runQuery(view.getSearchField().getText());
+		runQuery(lucindaView.getSearchField().getText());
 	}
 
 	public void doRescan() {
@@ -403,7 +408,7 @@ public class Controller implements IProgressController {
 			div = 1;
 		}
 		int amount = (int) (val / div);
-		view.initProgress(amount);
+		lucindaView.initProgress(amount);
 
 		return proc;
 	}
@@ -424,13 +429,13 @@ public class Controller implements IProgressController {
 			visibleProcesses.remove(handle);
 			amount += val;
 			if (visibleProcesses.isEmpty()) {
-				view.finishProgress();
+				lucindaView.finishProgress();
 				actValue = 0;
 			}
 		} else {
 			visibleProcesses.put(handle, val);
 			actValue += amount;
-			view.showProgress(actValue / div);
+			lucindaView.showProgress(actValue / div);
 		}
 	}
 
@@ -451,7 +456,7 @@ public class Controller implements IProgressController {
 
 	public void changePatient(Patient object) {
 		if (bRestrictCurrentPatient) {
-			Text text = view.getSearchField();
+			Text text = lucindaView.getSearchField();
 			String q = text.getText();
 			runQuery(q);
 		}

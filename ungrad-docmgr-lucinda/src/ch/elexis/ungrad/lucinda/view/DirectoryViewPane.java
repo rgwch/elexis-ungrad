@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -30,6 +31,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
@@ -66,16 +69,38 @@ public class DirectoryViewPane extends Composite {
 			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 				if (!sel.isEmpty()) {
-					File selected=(File)sel.getFirstElement();
-					String pname=selected.getAbsolutePath();
-					Program proggie=Program.findProgram(FileTool.getExtension(pname));
-					if(proggie!=null) {
+					File selected = (File) sel.getFirstElement();
+					String pname = selected.getAbsolutePath();
+					Program proggie = Program.findProgram(FileTool.getExtension(pname));
+					if (proggie != null) {
 						proggie.execute(pname);
 					}
-					// gvp.loadDocument(sel.getFirstElement());
 				}
 
 			}
+		});
+		Menu menu = new Menu(table);
+		MenuItem mEdit = new MenuItem(menu, SWT.NONE);
+		mEdit.setText("Umbenennen..");
+		table.setMenu(menu);
+		mEdit.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IStructuredSelection sel = tv.getStructuredSelection();
+				if (!sel.isEmpty()) {
+					File selected = (File) sel.getFirstElement();
+					ChangeNameDialog cnd = new ChangeNameDialog(parent.getShell(),selected.getName());
+					int res = cnd.open();
+					if (res == 0) {
+						File dest=new File(selected.getParent(),cnd.inputText);
+						selected.renameTo(dest);
+						tv.refresh();
+						tv.setSelection(new StructuredSelection(dest));
+					}
+				}
+			}
+
 		});
 
 	}
