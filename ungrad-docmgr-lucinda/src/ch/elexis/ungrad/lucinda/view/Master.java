@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-2022 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -31,7 +31,6 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -40,7 +39,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.ui.icons.Images;
-import ch.elexis.ungrad.lucinda.controller.DocumentSorter;
+import ch.elexis.ungrad.lucinda.controller.DocumentComparator;
 
 public class Master extends Composite {
 
@@ -158,8 +157,8 @@ public class Master extends Composite {
 
 			}
 		});
-		Menu menu=new Menu(tableViewer.getTable());
-		MenuItem mEdit=new MenuItem(menu,SWT.NONE);
+		Menu menu = new Menu(tableViewer.getTable());
+		MenuItem mEdit = new MenuItem(menu, SWT.NONE);
 		mEdit.setText("Edit");
 		tableViewer.getTable().setMenu(menu);
 
@@ -185,7 +184,8 @@ public class Master extends Composite {
 					tc.setData("direction", false); //$NON-NLS-1$
 				}
 				boolean bDirec = !(Boolean) tc.getData("direction"); //$NON-NLS-1$
-				tableViewer.setSorter(new DocumentSorter(index, bDirec,tc.getText().equals(Messages.Master_col_caption_date)));
+				tableViewer.setComparator(
+						new DocumentComparator(index, bDirec, tc.getText().equals(Messages.Master_col_caption_date)));
 				tc.setData("direction", bDirec); //$NON-NLS-1$
 			}
 

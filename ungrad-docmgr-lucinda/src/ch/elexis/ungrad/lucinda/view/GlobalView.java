@@ -17,6 +17,7 @@ package ch.elexis.ungrad.lucinda.view;
 import static ch.elexis.ungrad.lucinda.Preferences.*;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.action.*;
@@ -27,6 +28,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
@@ -44,8 +46,12 @@ import ch.rgw.tools.StringTool;
 public class GlobalView extends ViewPart implements IActivationListener {
 
 	private Controller controller;
-	private Action doubleClickAction, filterCurrentPatAction, showInboxAction, aquireAction, rescanAction;
-
+	private Action doubleClickAction, filterCurrentPatAction, showInboxAction, aquireAction, rescanAction,
+			showDirectoryAction;
+	private List<IDocumentHandler> addons;
+	private List<IAction> addonActions=new ArrayList<IAction>();
+	
+	
 	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
 			ElexisEvent.EVENT_SELECTED) {
 
@@ -58,14 +64,14 @@ public class GlobalView extends ViewPart implements IActivationListener {
 
 	public GlobalView() {
 		controller = new Controller();
-
+		addons=Activator.getDefault().getAddons();
 	}
 
 	@Override
 	public void createPartControl(Composite parent) {
 		/*
-		 * If the view is set to show nothing at all (which is the case e.g. on
-		 * first launch), set it to show all results.
+		 * If the view is set to show nothing at all (which is the case e.g. on first
+		 * launch), set it to show all results.
 		 */
 		if ((is(SHOW_CONS) || is(SHOW_INBOX) || is(SHOW_OMNIVORE)) == false) {
 			save(SHOW_CONS, true);
@@ -79,6 +85,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 		String colWidths = load(COLUMN_WIDTHS);
 		controller.setColumnWidths(colWidths);
 		GlobalEventDispatcher.addActivationListener(this, this);
+		visible(true);
 	}
 
 	public void visible(final boolean mode) {
@@ -101,13 +108,19 @@ public class GlobalView extends ViewPart implements IActivationListener {
 		IActionBars bars = getViewSite().getActionBars();
 		IMenuManager menu = bars.getMenuManager();
 		IToolBarManager toolbar = bars.getToolBarManager();
+		if (CoreHub.localCfg.get(Preferences.COMMON_DIRECTORY, false)) {
+			toolbar.add(showDirectoryAction);
+			toolbar.add(new Separator());
+		}
 		toolbar.add(filterCurrentPatAction);
 		toolbar.add(showInboxAction);
-
-		for (IDocumentHandler dh : Activator.getDefault().getAddons()) {
+		
+		
+		for (IDocumentHandler dh : addons) {
 			IAction toolbarAction = dh.getFilterAction(controller);
 			if (toolbarAction != null) {
 				toolbar.add(toolbarAction);
+				addonActions.add(toolbarAction);
 			}
 			IAction menuAction = dh.getSyncAction(controller);
 			if (menuAction != null) {
@@ -120,22 +133,21 @@ public class GlobalView extends ViewPart implements IActivationListener {
 
 	}
 	
-	public void createViewerContextMenu(StructuredViewer viewer,
-			final List<IContributionItem> contributionItems){
-			MenuManager menuMgr = new MenuManager();
-			menuMgr.setRemoveAllWhenShown(true);
-			menuMgr.addMenuListener(new IMenuListener() {
-				public void menuAboutToShow(IMenuManager manager){
-					fillContextMenu(manager, contributionItems);
-				}
-			});
-			Menu menu = menuMgr.createContextMenu(viewer.getControl());
-			viewer.getControl().setMenu(menu);
-			
-			getViewSite().registerContextMenu(menuMgr, viewer);
-		}
+	public void createViewerContextMenu(StructuredViewer viewer, final List<IContributionItem> contributionItems) {
+		MenuManager menuMgr = new MenuManager();
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
+				fillContextMenu(manager, contributionItems);
+			}
+		});
+		Menu menu = menuMgr.createContextMenu(viewer.getControl());
+		viewer.getControl().setMenu(menu);
 
-	private void fillContextMenu(IMenuManager manager, List<IContributionItem> contributionItems){
+		getViewSite().registerContextMenu(menuMgr, viewer);
+	}
+
+	private void fillContextMenu(IMenuManager manager, List<IContributionItem> contributionItems) {
 		manager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 		for (IContributionItem contributionItem : contributionItems) {
 			if (contributionItem == null) {
@@ -151,17 +163,41 @@ public class GlobalView extends ViewPart implements IActivationListener {
 			manager.add(contributionItem);
 		}
 	}
+
 	private void makeActions() {
+		showDirectoryAction = new Action("Directory", Action.AS_CHECK_BOX) {
+			{
+				setToolTipText("Verzeichnis-Sicht");
+				setImageDescriptor(Images.IMG_FOLDER.getImageDescriptor());
+			}
+
+			@Override
+			public void run() {
+				boolean off=!isChecked();
+				rescanAction.setEnabled(off);
+				filterCurrentPatAction.setEnabled(off);
+				showInboxAction.setEnabled(off);
+				for(IAction ac:addonActions) {
+					ac.setEnabled(off);
+				}
+				if (isChecked()) {
+					controller.setDirView();
+				} else {
+					controller.setLucindaView();
+				}
+			}
+		};
 		rescanAction = new Action("Rescan") {
 			{
 				setToolTipText("Lucinda Dokumente neu einlesen");
 				setImageDescriptor(Images.IMG_REFRESH.getImageDescriptor());
 			}
+
 			@Override
 			public void run() {
 				controller.doRescan();
 			}
-			
+
 		};
 
 		filterCurrentPatAction = new Action(Messages.GlobalView_actPatient_name, Action.AS_CHECK_BOX) {

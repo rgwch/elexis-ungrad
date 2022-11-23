@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-2022 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -16,17 +16,17 @@ package ch.elexis.ungrad.lucinda.controller;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.rgw.tools.TimeTool;
 
-public class DocumentSorter extends ViewerSorter {
+public class DocumentComparator extends ViewerComparator {
 	int index;
 	boolean bIncreasing;
 	boolean isDate;
 	
-	public DocumentSorter(int index, boolean bIncreasing, boolean isDate){
+	public DocumentComparator(int index, boolean bIncreasing, boolean isDate){
 		this.index = index;
 		this.bIncreasing = bIncreasing;
 		this.isDate = isDate;

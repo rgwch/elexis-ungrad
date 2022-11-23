@@ -55,6 +55,8 @@ public class Preferences {
 	public static final String AQUIRE_ACTION_NAME="Aquire"; 
 	
 	public static final String DOCUMENT_STORE=BASE+"document_store"; //$NON-NLS-1$
+	
+	public static final String COMMON_DIRECTORY = BASE + "common_dir";  //$NON-NLS-1$
 
 	 
 	public List<String> getNetworks() {

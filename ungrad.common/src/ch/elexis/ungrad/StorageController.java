@@ -27,6 +27,9 @@ public class StorageController {
 	public File getOutputDirFor(Person p, boolean bCreateIfNotExists) throws Exception {
 		if (p == null) {
 			p = ElexisEventDispatcher.getSelectedPatient();
+			if(p==null) {
+				return null;
+			}
 		}
 		String name = p.getName();
 		String fname = p.getVorname();

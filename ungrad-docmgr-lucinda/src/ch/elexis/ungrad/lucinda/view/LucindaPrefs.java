@@ -14,6 +14,7 @@
 
 package ch.elexis.ungrad.lucinda.view;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -54,6 +55,7 @@ public class LucindaPrefs extends FieldEditorPreferencePage implements IWorkbenc
 				getFieldEditorParent()));
 		// addField(new MultilineFieldEditor(Preferences.MACROS, "Makros für das
 		// Suchfeld", 5,0,true,getFieldEditorParent()));
+		addField(new BooleanFieldEditor(Preferences.COMMON_DIRECTORY, "Ungrad-Dokumementen-Verzeichnis verwenden (Neustart nötig)", getFieldEditorParent()));
 
 	}
 

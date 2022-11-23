@@ -1,6 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2022 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad.lucinda.view;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -13,20 +28,28 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
-import ch.elexis.ungrad.lucinda.controller.DocumentSorter;
+import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.data.Patient;
+import ch.elexis.ungrad.StorageController;
+import ch.elexis.ungrad.lucinda.controller.DirectoryLabelProvider;
+import ch.elexis.ungrad.lucinda.controller.DocumentComparator;
+import ch.rgw.io.FileTool;
+import ch.rgw.tools.ExHandler;
 
 public class DirectoryViewPane extends Composite {
 	private static int COLUMN_DATE = 0;
 	private static int COLUMN_NAME = 1;
 	private static String[] columnTitles = { "Datum", "Dateiname" };
-	private int[] columnWidths = { 50, 300 };
+	private int[] columnWidths = { 80, 300 };
 	private Table table;
 	private TableViewer tv;
-	private DirectoryContentProvider dcp=new DirectoryContentProvider();
+	private DirectoryContentProvider dcp = new DirectoryContentProvider();
+	private StorageController sc = new StorageController();
 
 	public DirectoryViewPane(Composite parent) {
 		super(parent, SWT.NONE);
@@ -36,18 +59,36 @@ public class DirectoryViewPane extends Composite {
 		createColumns();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
+		tv.setLabelProvider(new DirectoryLabelProvider());
 		tv.setContentProvider(dcp);
 		tv.addDoubleClickListener(new IDoubleClickListener() {
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 				if (!sel.isEmpty()) {
+					File selected=(File)sel.getFirstElement();
+					String pname=selected.getAbsolutePath();
+					Program proggie=Program.findProgram(FileTool.getExtension(pname));
+					if(proggie!=null) {
+						proggie.execute(pname);
+					}
 					// gvp.loadDocument(sel.getFirstElement());
 				}
 
 			}
 		});
 
+	}
+
+	public void setPatient(Patient pat) {
+		File dir;
+		try {
+			dir = sc.getOutputDirFor(pat, true);
+			tv.setInput(dir);
+		} catch (Exception e) {
+			ExHandler.handle(e);
+			SWTHelper.showError("Can't set Patient", e.getMessage());
+		}
 
 	}
 
@@ -69,12 +110,14 @@ public class DirectoryViewPane extends Composite {
 					tc.setData("direction", false); //$NON-NLS-1$
 				}
 				boolean bDirec = !(Boolean) tc.getData("direction"); //$NON-NLS-1$
-				tv.setSorter(new DocumentSorter(index, bDirec, tc.getText().equals(Messages.Master_col_caption_date)));
+				tv.setComparator(
+						new DocumentComparator(index, bDirec, tc.getText().equals(Messages.Master_col_caption_date)));
 				tc.setData("direction", bDirec); //$NON-NLS-1$
 			}
 
 		});
 	}
+
 	private static class DirectoryContentProvider implements IStructuredContentProvider {
 		File dir;
 
@@ -86,10 +129,18 @@ public class DirectoryViewPane extends Composite {
 
 		@Override
 		public Object[] getElements(Object arg0) {
-			return dir.listFiles();
+			if (dir == null) {
+				return new Object[0];
+			}
+			return dir.listFiles(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					String ext = FileTool.getExtension(name).toLowerCase();
+					return ext.equals("pdf") || ext.equals("jpg") || ext.equals("png") || ext.equals("txt");
+				}
+			});
 		}
 
 	}
-
 
 }
