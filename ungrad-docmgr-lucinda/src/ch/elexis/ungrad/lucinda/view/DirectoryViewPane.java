@@ -17,6 +17,8 @@ package ch.elexis.ungrad.lucinda.view;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -90,10 +92,9 @@ public class DirectoryViewPane extends Composite {
 				IStructuredSelection sel = tv.getStructuredSelection();
 				if (!sel.isEmpty()) {
 					File selected = (File) sel.getFirstElement();
-					ChangeNameDialog cnd = new ChangeNameDialog(parent.getShell(),selected.getName());
-					int res = cnd.open();
-					if (res == 0) {
-						File dest=new File(selected.getParent(),cnd.inputText);
+					InputDialog id=new InputDialog(getShell(), "Dateinamen ändern", "Bitte geben Sie den neuen Dateinamen ein", selected.getName(), null);
+					if(id.open()==Dialog.OK) {
+						File dest=new File(selected.getParent(),id.getValue());
 						selected.renameTo(dest);
 						tv.refresh();
 						tv.setSelection(new StructuredSelection(dest));

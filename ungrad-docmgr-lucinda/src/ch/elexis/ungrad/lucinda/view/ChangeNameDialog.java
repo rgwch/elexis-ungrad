@@ -16,6 +16,7 @@ public class ChangeNameDialog extends Dialog {
 	protected ChangeNameDialog(Shell parentShell, String name) {
 		super(parentShell);
 		inputText=name;
+		
 	}
 
 	@Override
