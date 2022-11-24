@@ -50,7 +50,7 @@ public class DetailDisplay extends Composite {
 		form = tk.createScrolledForm(this);
 		Composite body = form.getBody();
 		body.setLayout(new GridLayout());
-		inlay = new Composite(body, SWT.NONE);
+		inlay = new Composite(body, SWT.V_SCROLL);
 		inlay.setLayoutData(SWTHelper.getFillGridData());
 		body.setBackground(new Color(getDisplay(), 100, 100, 100));
 		inlay.setBackground(new Color(getDisplay(), 200, 200, 200));

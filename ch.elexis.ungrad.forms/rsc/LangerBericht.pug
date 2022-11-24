@@ -1,0 +1,36 @@
+extends a4 
+
+block content
+  #maintext(data-doctype="AnmeldungSie" data-doctitle="Anmeldung")
+    p [Patient.Name] [Patient.Vorname], [Patient.Geburtsdatum]
+      br/
+      span [Patient.Strasse], [Patient.Plz] [Patient.Ort]
+      br/
+      span Tel: [Patient.Telefon1] [Patient.Natel] [Patient.Telefon2]
+    p(data-anrede="true") Sehr geehrte[Adressat:mw:r Herr/ Frau] [Adressat.Titel] [Adressat.Name]
+    p Ich berichte über die Untersuchung [Patient:mw:des oben genannten Patienten/der oben genannten Patientin].
+
+    h2 Diagnose
+    p.para(data-input="Diagnose")
+
+    h2 Anamnese
+    p.para(data-input="Anamnese") [Patient.Diagnosen]
+
+    h2 Medikation
+    p(data-input="Medikation") [Patient.Medikation]
+
+    h2 Status
+    p(data-input="Status") 
+
+    h2 Beurteilung 
+    p(data-input="Beurteilung")
+
+    h2 Prozedere 
+    p(data-input="Prozedere")
+
+    h2 Abschliessende Bemerkungen 
+    p(data-input="Bemerkungen") 
+
+
+    p Vielen Dank und freundliche Grüsse 
+    p [Mandant.Vorname] [Mandant.Name] 
