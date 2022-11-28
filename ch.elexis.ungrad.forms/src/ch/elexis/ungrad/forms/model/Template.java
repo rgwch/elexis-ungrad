@@ -43,7 +43,7 @@ public class Template {
 	String mailSubject = "";
 	String mailRecipient = "";
 	String filename;
-	Kontakt adressat = null;
+	private Kontakt adressat = null;
 	Map<String, String> inputs = new LinkedHashMap<String, String>();
 
 	public Template(String rawhtml, Kontakt adressat) throws Exception {
@@ -121,45 +121,56 @@ public class Template {
 		}
 	}
 
-	private Kontakt findAdressat() {
-		Element body = doc.body();
-		Element eAdressat = body.getElementById("x-adressat");
-		if (eAdressat == null) {
+	public Kontakt getAdressat() {
+		if (adressat == null) {
+			Element body = doc.body();
+			Element eAdressat = body.getElementById("x-adressat");
+			if (eAdressat == null) {
+				Brief brief = getBrief();
+				if (brief != null) {
+					adressat = brief.getAdressat();
+				}
+
+			} else {
+				String id = eAdressat.attr("data-id");
+				Kontakt ka = Kontakt.load(id);
+				if (ka.isValid()) {
+					adressat = ka;
+				}
+			}
 			if (adressat != null) {
 				body.append("<span id=\"x-adressat\" data-id=\"" + adressat.getId() + "\"></span>");
 			}
-		} else {
-			String id = eAdressat.attr("data-id");
-			Kontakt ka = Kontakt.load(id);
-			if (ka.isValid()) {
-				adressat = ka;
-			}
 		}
+
 		return adressat;
 
 	}
 
 	public void setBrief(Brief brief) {
 		Element body = doc.body();
-		Element eBrief=body.getElementById("x-brief");
-		if(eBrief==null) {
-			body.append("<span id=\"x-brief\" data-id=\""+brief.getId()+"\"></span>");
-		}else {
+		Element eBrief = body.getElementById("x-brief");
+		if (eBrief == null) {
+			body.append("<span id=\"x-brief\" data-id=\"" + brief.getId() + "\"></span>");
+		} else {
 			eBrief.attr("data-id", brief.getId());
 		}
-		html=doc.html();
+		html = doc.html();
 	}
 
-	public String getBrief() {
+	public Brief getBrief() {
 		Element body = doc.body();
-		Element eBrief=body.getElementById("x-brief");
-		if(eBrief==null) {
-			return null;
-		}else {
-			return eBrief.attr("data-id");
+		Element eBrief = body.getElementById("x-brief");
+		if (eBrief != null) {
+			String bid = eBrief.attr("data-id");
+			Brief ret = Brief.load(bid);
+			if (ret.isValid()) {
+				return ret;
+			}
 		}
+		return null;
 	}
-	
+
 	public String getMailSender() {
 		return mailSender;
 	}
@@ -177,7 +188,7 @@ public class Template {
 	}
 
 	public String getMailRecipient() {
-		adressat = findAdressat();
+		adressat = getAdressat();
 		if (adressat == null) {
 			return mailRecipient;
 		} else {

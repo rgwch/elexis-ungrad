@@ -15,26 +15,14 @@ package ch.elexis.ungrad.forms.model;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
-import static java.nio.file.StandardWatchEventKinds.*;
-
-import java.awt.Desktop;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
@@ -165,8 +153,10 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			if (!StringTool.isNothing(tmpl.getTitle())) {
 				prefix += tmpl.getTitle() + Messages.Controller_12;
 			}
-			if (tmpl.adressat != null) {
-				filename = prefix + tmpl.adressat.get(Kontakt.FLD_NAME1) + Messages.Controller_13 + tmpl.adressat.get(Kontakt.FLD_NAME2);
+			Kontakt adressat = tmpl.getAdressat();
+			if (adressat != null) {
+				filename = prefix + adressat.get(Kontakt.FLD_NAME1) + Messages.Controller_13
+						+ adressat.get(Kontakt.FLD_NAME2);
 			} else {
 				String name = Messages.Controller_Output;
 				filename = prefix + name;
@@ -205,16 +195,12 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		File pdfFile = new File(htmlFile.getParent(), FileTool.getNakedFilename(htmlFile.getName()) + ".pdf");
 		pdf.createPDF(htmlFile, pdfFile);
 		String outputFile = pdfFile.getAbsolutePath();
-		String brief = template.getBrief();
-		if (brief == null) {
-			Brief meta = createLinksWithElexis(outputFile, template.adressat);
+		Brief meta = template.getBrief();
+		if (meta == null) {
+			meta = createLinksWithElexis(outputFile, template.getAdressat());
 			template.setBrief(meta);
 		} else {
-			Brief meta = Brief.load(brief);
-			if (meta.isValid()) {
-				meta.save(FileTool.readFile(pdfFile), "pdf");
-			}
-
+			meta.save(FileTool.readFile(pdfFile), "pdf");
 		}
 		return outputFile;
 	}

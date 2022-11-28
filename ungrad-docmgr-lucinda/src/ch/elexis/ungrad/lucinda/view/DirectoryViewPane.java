@@ -73,7 +73,7 @@ public class DirectoryViewPane extends Composite {
 				if (!sel.isEmpty()) {
 					File selected = (File) sel.getFirstElement();
 					String pname = selected.getAbsolutePath();
-					Program proggie = Program.findProgram(FileTool.getExtension(pname));
+					Program proggie = Program.findProgram(FileTool.getExtension(pname).toLowerCase());
 					if (proggie != null) {
 						proggie.execute(pname);
 					}
