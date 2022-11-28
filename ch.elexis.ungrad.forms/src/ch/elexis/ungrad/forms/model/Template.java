@@ -122,29 +122,38 @@ public class Template {
 	}
 
 	public Kontakt getAdressat() {
-		if (adressat == null) {
-			Element body = doc.body();
-			Element eAdressat = body.getElementById("x-adressat");
-			if (eAdressat == null) {
+		Element body = doc.body();
+		Element eAdressat = body.getElementById("x-adressat");
+		if (eAdressat == null) {
+			if (adressat == null) {
 				Brief brief = getBrief();
 				if (brief != null) {
-					adressat = brief.getAdressat();
+					setAdressat(brief.getAdressat());
 				}
-
 			} else {
-				String id = eAdressat.attr("data-id");
-				Kontakt ka = Kontakt.load(id);
-				if (ka.isValid()) {
-					adressat = ka;
-				}
+				setAdressat(adressat);
 			}
-			if (adressat != null) {
-				body.append("<span id=\"x-adressat\" data-id=\"" + adressat.getId() + "\"></span>");
+		} else {
+			String id = eAdressat.attr("data-id");
+			Kontakt ka = Kontakt.load(id);
+			if (ka.isValid()) {
+				adressat = ka;
 			}
 		}
-
 		return adressat;
+	}
 
+	public void setAdressat(Kontakt adr) {
+		if (adressat != null && adressat.isValid()) {
+			adressat = adr;
+			Element eAdressat = doc.getElementById("x-adressat");
+			if (eAdressat == null) {
+				doc.body().append("<span id=\"x-adressat\" data-id=\"" + adressat.getId() + "\"></span>");
+			} else {
+				eAdressat.attr("data-id", adressat.getId());
+			}
+			html = doc.html();
+		}
 	}
 
 	public void setBrief(Brief brief) {
