@@ -31,6 +31,11 @@ import ch.elexis.data.Kontakt;
 import ch.elexis.ungrad.Resolver;
 import ch.rgw.tools.StringTool;
 
+/**
+ * In-Memory representation of a partly processed HTML template.
+ * @author gerry
+ *
+ */
 public class Template {
 
 	private String html;
@@ -46,6 +51,12 @@ public class Template {
 	private Kontakt adressat = null;
 	Map<String, String> inputs = new LinkedHashMap<String, String>();
 
+	/**
+	 * Analyze a HTML template and prefill some elements with the given recipient 
+	 * @param rawhtml unprocessed HTML, possibly with variable fields.
+	 * @param adressat the recipient
+	 * @throws Exception
+	 */
 	public Template(String rawhtml, Kontakt adressat) throws Exception {
 		Map<String, IPersistentObject> replacer = new HashMap<>();
 		if (adressat != null) {
@@ -121,6 +132,11 @@ public class Template {
 		}
 	}
 
+	/**
+	 * Retrieve the recipient of documents created from this template. Will set "x-adressat"-elements in the HTML with
+	 * any found receiver
+	 * @return the receiver or null, if none defined
+	 */
 	public Kontakt getAdressat() {
 		Element body = doc.body();
 		Element eAdressat = body.getElementById("x-adressat");
@@ -143,6 +159,11 @@ public class Template {
 		return adressat;
 	}
 
+	/**
+	 * Set the intended recipient for documents created with this template. Will set "x-adressat"- fields in the HTML
+	 * to persist the recipient.
+	 * @param adr the recipient
+	 */
 	public void setAdressat(Kontakt adr) {
 		if (adressat != null && adressat.isValid()) {
 			adressat = adr;
@@ -156,6 +177,11 @@ public class Template {
 		}
 	}
 
+	/**
+	 * Set the Elexis "Brief" connected do the document created with this template. Will also create "x-brief" element
+	 * to persist the information.
+	 * @param brief
+	 */
 	public void setBrief(Brief brief) {
 		Element body = doc.body();
 		Element eBrief = body.getElementById("x-brief");
@@ -167,6 +193,10 @@ public class Template {
 		html = doc.html();
 	}
 
+	/**
+	 * Find the Elexis "Brief" linked to this template, if any
+	 * @return the Brief or null.
+	 */
 	public Brief getBrief() {
 		Element body = doc.body();
 		Element eBrief = body.getElementById("x-brief");
@@ -180,14 +210,26 @@ public class Template {
 		return null;
 	}
 
+	/**
+	 * Get the Mail sender for this template
+	 * @return
+	 */
 	public String getMailSender() {
 		return mailSender;
 	}
 
+	/**
+	 * Get The subject for mails created with this template
+	 * @return
+	 */
 	public String getMailSubject() {
 		return mailSubject;
 	}
 
+	/**
+	 * Get the body for mails created witg this subject. 
+	 * @return
+	 */
 	public String getMailBody() {
 		if (StringTool.isNothing(mailBody)) {
 			return CoreHub.localCfg.get(PreferenceConstants.MAIL_BODY, "Siehe Anhang");
@@ -210,6 +252,11 @@ public class Template {
 		}
 	}
 
+	/**
+	 * Replace an input field in the HTML with an entry.
+	 * @param key id of the input field
+	 * @param value value to place there (can cpntain HTML))
+	 */
 	public void setInput(String key, String value) {
 		inputs.put(key, value);
 		Elements els = doc.getElementsByAttributeValue("data-input", key);
@@ -217,11 +264,20 @@ public class Template {
 		html = doc.html();
 	}
 
+	/**
+	 * Replace any text in the template with a value. Will replace all occurences
+	 * @param orig text to search
+	 * @param replacement new Text
+	 */
 	public void replace(String orig, String replacement) {
 		html = doc.html().replace(orig, replacement);
 		doc = Jsoup.parse(html);
 	}
 
+	/**
+	 * Return the template as XHTML
+	 * @return
+	 */
 	public String getXml() {
 		Document.OutputSettings settings = doc.outputSettings();
 		settings.syntax(Document.OutputSettings.Syntax.xml);
@@ -241,10 +297,18 @@ public class Template {
 		return inputs;
 	}
 
+	/**
+	 * Set the filenome for a document created with this template
+	 * @param absoluteFile An absolute pathname for the output file
+	 */
 	public void setFilename(String absoluteFile) {
 		this.filename = absoluteFile;
 	}
 
+	/**
+	 * Get the absolute Pathname for documents created with this template
+	 * @return
+	 */
 	public String getFilename() {
 		return this.filename;
 	}

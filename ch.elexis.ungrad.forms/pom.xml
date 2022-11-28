@@ -11,5 +11,5 @@
 	<artifactId>ch.elexis.ungrad.forms</artifactId>
 	<packaging>eclipse-plugin</packaging>
 	<groupId>ch.rgw</groupId>
-	<version>1.0.8-SNAPSHOT</version>
+	<version>1.0.9-SNAPSHOT</version>
 </project>
