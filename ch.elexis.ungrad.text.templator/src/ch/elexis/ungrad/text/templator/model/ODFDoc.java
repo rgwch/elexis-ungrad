@@ -41,13 +41,16 @@ public class ODFDoc {
 	private Map<String, String> fields = new HashMap<String, String>();
 	private byte[] template;
 	private String title;
+	private boolean bExternal = false;
 
 	public void clear() {
 		fields.clear();
 	}
 
 	/**
-	 * Load a Tenplate from an Elexis "Brief", i.e. from the default ouitgoing doc storage
+	 * Load a Tenplate from an Elexis "Brief", i.e. from the default ouitgoing doc
+	 * storage
+	 * 
 	 * @param brief
 	 * @return All Text variables found in the content of the Brief
 	 * @throws Exception
@@ -57,27 +60,30 @@ public class ODFDoc {
 		parseTemplate(bais);
 		String nt = brief.getBetreff();
 		if (StringTool.isNothing(nt)) {
-			title="Brief";
-		}else {
+			title = "Brief";
+		} else {
 			title = nt;
 		}
-	
-		Kontakt k=brief.getAdressat();
-		if(k!=null) {
-			String n1=k.get(Kontakt.FLD_NAME1);
-			if(n1!=null) {
-				title+="_"+n1;
+
+		Kontakt k = brief.getAdressat();
+		if (k != null) {
+			String n1 = k.get(Kontakt.FLD_NAME1);
+			if (n1 != null) {
+				title += "_" + n1;
 			}
-			String n2=k.get(Kontakt.FLD_NAME2);
-			if(n2!=null) {
-				title+="_"+n2;
+			String n2 = k.get(Kontakt.FLD_NAME2);
+			if (n2 != null) {
+				title += "_" + n2;
 			}
 		}
+		bExternal = false;
 		return fields;
 	}
 
 	/**
-	 * Analyze an ODT-Stream for text variables and collect such variables in "fields".
+	 * Analyze an ODT-Stream for text variables and collect such variables in
+	 * "fields".
+	 * 
 	 * @param tmpl The template to analyze
 	 * @return All text variables found in the stream
 	 * @throws Exception
@@ -122,16 +128,20 @@ public class ODFDoc {
 		zos.flush();
 		zos.close();
 		template = baos.toByteArray();
+		bExternal = false;
 		return fields;
 	}
-	
-	public void setTemplate(byte[] template) {
-		this.template=template;
-		fields.clear();		
+
+	public void setTemplate(byte[] template, String title) {
+		this.template = template;
+		fields.clear();
+		this.title=title;
+		bExternal = true;
 	}
 
 	/**
 	 * get a Set with all text variables and their respective values
+	 * 
 	 * @return
 	 */
 	public Set<Entry<String, String>> getFields() {
@@ -140,6 +150,7 @@ public class ODFDoc {
 
 	/**
 	 * get the value of a text variable
+	 * 
 	 * @param name
 	 * @return
 	 */
@@ -154,6 +165,7 @@ public class ODFDoc {
 
 	/**
 	 * Set the value of a text variable
+	 * 
 	 * @param name
 	 * @param value
 	 */
@@ -163,9 +175,10 @@ public class ODFDoc {
 		}
 	}
 
-
 	/**
-	 * Filter the current template through an  {#link OdfTemplateFilterStream}, i.e. replace text variables with their respective values
+	 * Filter the current template through an {#link OdfTemplateFilterStream}, i.e.
+	 * replace text variables with their respective values
+	 * 
 	 * @return the resulting file as byte array.
 	 * @throws Exception
 	 */
@@ -189,15 +202,19 @@ public class ODFDoc {
 	}
 
 	/**
-	 * Create a file in the current patient's output directory and write the current document 
+	 * Create a file in the current patient's output directory and write the current
+	 * document
+	 * 
 	 * @return
 	 */
 	public boolean doOutput() {
 		try {
 			StorageController sc = new StorageController();
 			File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), title + ".odt");
-			byte[] contents = asByteArray();
-			FileTool.writeFile(output, contents);
+			if (!bExternal || !output.exists()) {
+				byte[] contents = asByteArray();
+				FileTool.writeFile(output, contents);
+			}
 			String cmd = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "cmd", "soffice");
 			String param = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "param", "%");
 			int i = param.indexOf('%');

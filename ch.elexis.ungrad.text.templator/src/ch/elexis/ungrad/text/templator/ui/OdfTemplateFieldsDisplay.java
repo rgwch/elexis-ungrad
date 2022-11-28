@@ -28,6 +28,7 @@ import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.text.ITextPlugin.ICallback;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.text.templator.model.ODFDoc;
+import ch.rgw.tools.ExHandler;
 
 public class OdfTemplateFieldsDisplay extends Composite {
 	private IAction printAction;
@@ -59,7 +60,7 @@ public class OdfTemplateFieldsDisplay extends Composite {
 			// c.removeFocusListener(fs);
 			c.dispose();
 		}
-		if (doc == null) {
+		if (doc.getFields().size() == 0) {
 			Label lbl=new Label(cFields,SWT.NONE);
 			lbl.setText("Externes Dokument");
 			lbl.setLayoutData(SWTHelper.getFillGridData(2,true,1,false));
@@ -91,7 +92,8 @@ public class OdfTemplateFieldsDisplay extends Composite {
 				try {
 					doc.doOutput();
 				} catch (Exception e) {
-					SWTHelper.showError("Fehler bei Ausgabe", e.getMessage());
+					ExHandler.handle(e);
+					SWTHelper.showError("Fehler bei Ausgabe", e.getMessage() == null ? e.getClass().toString() : e.getMessage());
 
 				}
 			}

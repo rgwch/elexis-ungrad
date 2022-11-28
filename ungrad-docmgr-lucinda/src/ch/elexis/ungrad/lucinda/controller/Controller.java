@@ -160,6 +160,7 @@ public class Controller implements IProgressController {
 	}
 
 	public void reload() {
+		dirView.setPatient(ElexisEventDispatcher.getSelectedPatient());
 		runQuery(lucindaView.getSearchField().getText());
 	}
 
