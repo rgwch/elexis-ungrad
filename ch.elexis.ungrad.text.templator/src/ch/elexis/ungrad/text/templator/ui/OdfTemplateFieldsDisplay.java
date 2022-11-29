@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.text.ITextPlugin.ICallback;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -31,7 +32,7 @@ import ch.elexis.ungrad.text.templator.model.ODFDoc;
 import ch.rgw.tools.ExHandler;
 
 public class OdfTemplateFieldsDisplay extends Composite {
-	private IAction printAction;
+	private IAction printAction, directPrintAction;
 	private ch.elexis.core.ui.text.ITextPlugin.ICallback saveHandler;
 	private Composite cFields;
 	private ODFDoc doc;
@@ -48,6 +49,7 @@ public class OdfTemplateFieldsDisplay extends Composite {
 		makeActions();
 		ToolBarManager tbm = new ToolBarManager(SWT.HORIZONTAL);
 		tbm.add(printAction);
+		tbm.add(directPrintAction);
 		tbm.createControl(body);
 		cFields = new Composite(body, SWT.NONE);
 		// cFields.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -61,9 +63,9 @@ public class OdfTemplateFieldsDisplay extends Composite {
 			c.dispose();
 		}
 		if (doc.getFields().size() == 0) {
-			Label lbl=new Label(cFields,SWT.NONE);
+			Label lbl = new Label(cFields, SWT.NONE);
 			lbl.setText("Externes Dokument");
-			lbl.setLayoutData(SWTHelper.getFillGridData(2,true,1,false));
+			lbl.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		} else {
 			for (Entry<String, String> e : doc.getFields()) {
 				Label lbl = new Label(cFields, SWT.NONE);
@@ -78,6 +80,9 @@ public class OdfTemplateFieldsDisplay extends Composite {
 		}
 		cFields.layout();
 		this.doc = doc;
+		if(CoreHub.localCfg.get(Preferences.PREF_DIRECT, false)) {
+			printAction.run();
+		}
 	}
 
 	private void makeActions() {
@@ -93,9 +98,20 @@ public class OdfTemplateFieldsDisplay extends Composite {
 					doc.doOutput();
 				} catch (Exception e) {
 					ExHandler.handle(e);
-					SWTHelper.showError("Fehler bei Ausgabe", e.getMessage() == null ? e.getClass().toString() : e.getMessage());
+					SWTHelper.showError("Fehler bei Ausgabe",
+							e.getMessage() == null ? e.getClass().toString() : e.getMessage());
 
 				}
+			}
+		};
+		directPrintAction = new Action("Direkt ausgeben", Action.AS_CHECK_BOX) {
+			{
+				setImageDescriptor(Images.IMG_EXPORT.getImageDescriptor());
+				setToolTipText("Überspringt dieses Fenster bei der Ausgabe");
+			}
+
+			public void run() {
+				CoreHub.localCfg.set(Preferences.PREF_DIRECT, isChecked());
 			}
 		};
 
