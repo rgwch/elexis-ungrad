@@ -1,2 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="ungrad-target" sequenceNumber="34"/>
+<?pde version="3.8"?>
+<target name="ungrad-target" sequenceNumber="34">
+	<locations>
+		<location path="/home/gerry/Schreibtisch/elexis-ungrad22" type="Profile"/>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<repository location="file:/home/gerry/git/elexis/elexis-ungrad-dependencies/derived-deps/target/repository/"/>
+			<unit id="junit" version="4.12.0"/>
+			<unit id="org.hamcrest.core" version="1.3.0"/>
+			<unit id="org.apache.commons.exec" version="1.3.0"/>
+		</location>
+	</locations>
+</target>
