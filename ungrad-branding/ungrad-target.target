@@ -2,12 +2,38 @@
 <?pde version="3.8"?>
 <target name="ungrad-target" sequenceNumber="34">
 	<locations>
-		<location path="/home/gerry/Schreibtisch/elexis-ungrad22" type="Profile"/>
 		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<repository location="file:/home/gerry/git/elexis/elexis-ungrad-dependencies/derived-deps/target/repository/"/>
 			<unit id="junit" version="4.12.0"/>
-			<unit id="org.hamcrest.core" version="1.3.0"/>
 			<unit id="org.apache.commons.exec" version="1.3.0"/>
+			<unit id="bouncycastle.bcmail-jdk14" version="138.0.0"/>
+			<unit id="bouncycastle.bcprov-jdk14" version="138.0.0"/>
+			<unit id="com.fasterxml.jackson.core.jackson-annotations" version="2.7.0"/>
+			<unit id="com.fasterxml.jackson.core.jackson-core" version="2.7.4"/>
+			<unit id="com.fasterxml.jackson.core.jackson-databind" version="2.7.4"/>
+			<unit id="com.lowagie.itext" version="2.1.5"/>
+			<unit id="com.sun.jna" version="3.0.9"/>
+			<unit id="org.apache.commons.logging" version="1.1.1.v201101211721"/>
+			<unit id="org.apache.servicemix.bundles.zxing" version="3.0.1.1"/>
+			<unit id="org.jfree.chart" version="1.0.19"/>
+			<unit id="org.jfree.jcommon" version="1.0.23"/>
+			<unit id="xml-apis" version="1.3.4"/>
+			<unit id="org.hamcrest" version="2.2.0"/>
+			<unit id="org.hamcrest.core" version="2.2.0"/>
+			<unit id="org.hamcrest.library" version="2.2.0"/>
+			<unit id="org.eclipse.swt.cocoa.macosx.x86_64" version="4.3.0"/>
+			<unit id="org.jfree.chart-swt" version="1.0.0"/>
+			<unit id="org.jfree.swtgraphics2d" version="1.0.0"/>
+			<unit id="xerces.Impl" version="2.4.0"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<repository location="https://elexis.ch/ungrad2022/elexis-core/repository/"/>
+			<unit id="ch.elexis.core.application.feature.feature.group" version="3.7.0.20221113-1548"/>
+			<unit id="ch.elexis.core.common.feature.feature.group" version="3.7.0.20221106-0934"/>
+			<unit id="ch.elexis.core.logging.feature.feature.group" version="3.7.0.20221030-1836"/>
+			<unit id="ch.elexis.core.ui.feature.feature.group" version="3.7.0.20221030-1836"/>
+			<unit id="ch.elexis.core.ui.medication.os.feature.feature.group" version="3.7.0.20221030-1836"/>
+			<unit id="ch.elexis.core.ui.p2.feature.feature.group" version="3.7.0.20221030-1836"/>
 		</location>
 	</locations>
 </target>
