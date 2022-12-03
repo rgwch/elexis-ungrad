@@ -8,17 +8,11 @@
     <artifactId>elexis-ungrad-aggregator</artifactId>
     <version>0.2.0-SNAPSHOT</version>
     <properties>
-        <tycho-version>1.0.0</tycho-version>
+        <tycho-version>1.7.0</tycho-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tycho-extras.version>${tycho-version}</tycho-extras.version>
-        <juno-repo.url>http://download.eclipse.org/releases/juno</juno-repo.url>
         <tycho-repo.url>https://oss.sonatype.org/content/groups/public/</tycho-repo.url>
-        <repo_name>docmgr-lucinda</repo_name>
-        <repo_variant>prerelease</repo_variant>
-        <useBranch>ungrad</useBranch>
-        <nonElexisP2variant>release</nonElexisP2variant>
         <ROOT>${project.basedir}/compositeRepository</ROOT>
-        <vertx-version>3.3.0</vertx-version>
     </properties>
     <packaging>pom</packaging>
     <modules>
@@ -61,19 +55,14 @@
         <module>ungrad-p2site</module>
     </modules>
     <repositories>
-        <!-- repository>
-            <id>elexis-core</id>
-            <url>http://www.elexis.ch/ungrad2018/p2/elexis-core/latest</url>
+       <repository>
+            <id>elexis-ungrad</id>
+            <url>http://www.elexis.ch/ungrad2023/ungrad-target</url>
             <layout>p2</layout>
         </repository>
         <repository>
-            <id>elexis-base</id>
-            <url>http://www.elexis.ch/ungrad2018/p2/elexis-base/latest</url>
-            <layout>p2</layout>
-        </repository -->
-        <repository>
-            <id>elexis-ungrad</id>
-            <url>http://www.elexis.ch/ungrad2018/p2/dependencies/latest</url>
+            <id>ungrad-extras</id>
+            <url>https://elexis.ch/ungrad2023/ungrad-target-extras</url>
             <layout>p2</layout>
         </repository>
         <repository>
@@ -85,7 +74,6 @@
             <id>elexis-core-local</id>
             <url>file:../elexis-3-core/ch.elexis.core.p2site/target/repository</url>
             <layout>p2</layout>
-
         </repository>
     </repositories>
     <build>
@@ -115,11 +103,11 @@
                 <artifactId>target-platform-configuration</artifactId>
                 <configuration>
                     <environments>
-                        <environment>
+                        <!-- environment>
                             <os>linux</os>
                             <ws>gtk</ws>
                             <arch>x86</arch>
-                        </environment>
+                        </environment -->
                         <environment>
                             <os>linux</os>
                             <ws>gtk</ws>

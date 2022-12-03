@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/ch.elexis.ungrad.docmgr-lucinda.feature_2.0.0.qualifier.jar" id="ch.elexis.ungrad.docmgr-lucinda.feature" version="2.0.0.qualifier" os="linux,macosx,win32" ws="cocoa,gtk,win32">
+   <feature url="features/ch.elexis.ungrad.docmgr-lucinda.feature_2.0.1.qualifier.jar" id="ch.elexis.ungrad.docmgr-lucinda.feature" version="2.0.1.qualifier">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
    <feature url="features/ch.elexis.ungrad.labview.feature_1.0.1.qualifier.jar" id="ch.elexis.ungrad.labview.feature" version="1.0.1.qualifier">
