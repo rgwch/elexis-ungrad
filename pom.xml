@@ -61,31 +61,28 @@
         <module>ungrad-p2site</module>
     </modules>
     <repositories>
-        <!-- repository>
-            <id>elexis-core</id>
-            <url>http://www.elexis.ch/ungrad2018/p2/elexis-core/latest</url>
+        <repository>
+            <id>ungrad target</id>
+            <url>https://elexis.ch/ungrad2023/ungrad-target</url>
             <layout>p2</layout>
         </repository>
         <repository>
-            <id>elexis-base</id>
-            <url>http://www.elexis.ch/ungrad2018/p2/elexis-base/latest</url>
-            <layout>p2</layout>
-        </repository -->
-        <repository>
-            <id>elexis-ungrad</id>
-            <url>http://www.elexis.ch/ungrad2018/p2/dependencies/latest</url>
+            <id>ungrad extras</id>
+            <url>https://elexis.ch/ungrad2023/ungrad-target-extras</url>
             <layout>p2</layout>
         </repository>
-        <repository>
-            <id>elexis-base-local</id>
-            <url>file:../elexis-3-base/ch.elexis.base.p2site/target/repository</url>
-            <layout>p2</layout>
-        </repository>
-        <repository>
-            <id>elexis-core-local</id>
-            <url>file:../elexis-3-core/ch.elexis.core.p2site/target/repository</url>
-            <layout>p2</layout>
 
+        <repository>
+            <id>elexis.3.core</id>
+            <!-- url>http://download.elexis.info/elexis/${git.core.branch}/p2/elexis-3-core</url -->
+            <url>file:${elexis_root}/elexis-3-core/ch.elexis.core.p2site/target/repository</url>
+            <layout>p2</layout>
+        </repository>
+        <repository>
+            <id>elexis.3.base</id>
+            <!-- url>http://download.elexis.info/elexis/${git.core.branch}/p2/elexis-3-core</url -->
+            <url>file:${elexis_root}/elexis-3-base/ch.elexis.base.p2site/target/repository</url>
+            <layout>p2</layout>
         </repository>
     </repositories>
     <build>
