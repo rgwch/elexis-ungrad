@@ -31,13 +31,13 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.rgw.io.FileTool;
 
 public class Mailer {
-	String from;
+	String sender;
 	String smtpHost;
 	String smtpPassword;
 	String smtpPort;
 
 	public Mailer(String from, String smtpHost, String smtpPassword, String smtpPort) {
-		this.from = from;
+		this.sender = from;
 		this.smtpHost = smtpHost;
 		this.smtpPassword = smtpPassword;
 		this.smtpPort = smtpPort;
@@ -51,7 +51,7 @@ public class Mailer {
 		msg.addHeader("format", "flowed");
 		msg.addHeader("Content-Transfer-Encoding", "8bit");
 
-		msg.setFrom(new InternetAddress(from));
+		msg.setFrom(new InternetAddress(sender));
 		msg.addRecipient(RecipientType.BCC, msg.getFrom()[0]);
 		msg.setReplyTo(msg.getFrom());
 	
@@ -113,7 +113,7 @@ public class Mailer {
 	 * @param attachments
 	 * @throws Exception
 	 */
-	public void tlsMail(String to, String subject, String body, String[] attachments) throws Exception {
+	public void tlsMail(String user, String to, String subject, String body, String[] attachments) throws Exception {
 
 		System.out.println("TLSEmail Start");
 		Properties props = new Properties();
@@ -126,7 +126,7 @@ public class Mailer {
 		Authenticator auth = new Authenticator() {
 			// override the getPasswordAuthentication method
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(from, smtpPassword);
+				return new PasswordAuthentication(user, smtpPassword);
 			}
 		};
 		Session session = Session.getInstance(props, auth);
@@ -141,7 +141,7 @@ public class Mailer {
 	 * @param attachments
 	 * @throws Exception
 	 */
-	public void sslMail(String to, String subject, String body, String[] attachments) throws Exception {
+	public void sslMail(String user, String to, String subject, String body, String[] attachments) throws Exception {
 		Properties props = new Properties();
 		props.put("mail.smtp.host", smtpHost); // SMTP Host
 		props.put("mail.smtp.socketFactory.port", smtpPort /* "465" */); // SSL Port
@@ -152,7 +152,7 @@ public class Mailer {
 		Authenticator auth = new Authenticator() {
 			// override the getPasswordAuthentication method
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(from, smtpPassword);
+				return new PasswordAuthentication(user, smtpPassword);
 			}
 		};
 
