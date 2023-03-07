@@ -52,6 +52,7 @@ public class Preferences {
 	public static final String FLD_LOCATION="loc"; //$NON-NLS-1$
 	
 	public static final String AQUIRE_ACTION_SCRIPT=BASE+"aquire_action"; //$NON-NLS-1$
+	public static final String AQUIRE_ACTION_SCRIPTS=BASE+"aquire_actions"; //$NON-NLS-1$
 	public static final String AQUIRE_ACTION_NAME="Aquire"; 
 	
 	public static final String DOCUMENT_STORE=BASE+"document_store"; //$NON-NLS-1$

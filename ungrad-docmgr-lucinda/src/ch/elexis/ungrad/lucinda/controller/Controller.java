@@ -354,7 +354,7 @@ public class Controller implements IProgressController {
 	 * 
 	 * @param shell
 	 */
-	public void launchAquireScript(Shell shell) {
+	public void launchAquireScript(String command, Shell shell) {
 		try {
 			Patient pat = ElexisEventDispatcher.getSelectedPatient();
 			if (pat == null) {
@@ -371,8 +371,7 @@ public class Controller implements IProgressController {
 						null);
 				if (id.open() == Dialog.OK) {
 					String title = id.getValue().replaceAll("[\\/\\:\\- ]", "_");
-					Process proc = Runtime.getRuntime().exec(new String[] {
-							Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT, ""), sbConcern.toString(), title });
+					Process proc = Runtime.getRuntime().exec(new String[] { command, sbConcern.toString(), title });
 					int result = proc.waitFor();
 					if (result != 0) {
 						log.error("could not launch aquire script");

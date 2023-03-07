@@ -43,15 +43,20 @@ import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.Controller;
 import ch.rgw.tools.StringTool;
 
+/**
+ * Main Window with the action buttons
+ * 
+ * @author gerry
+ *
+ */
 public class GlobalView extends ViewPart implements IActivationListener {
 
 	private Controller controller;
-	private Action doubleClickAction, filterCurrentPatAction, showInboxAction, aquireAction, rescanAction,
-			showDirectoryAction;
+	private Action doubleClickAction, filterCurrentPatAction, showInboxAction, rescanAction, showDirectoryAction;
+	private Action[] aquireActions;
 	private List<IDocumentHandler> addons;
-	private List<IAction> addonActions=new ArrayList<IAction>();
-	
-	
+	private List<IAction> addonActions = new ArrayList<IAction>();
+
 	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
 			ElexisEvent.EVENT_SELECTED) {
 
@@ -64,7 +69,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 
 	public GlobalView() {
 		controller = new Controller();
-		addons=Activator.getDefault().getAddons();
+		addons = Activator.getDefault().getAddons();
 	}
 
 	@Override
@@ -114,8 +119,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 		}
 		toolbar.add(filterCurrentPatAction);
 		toolbar.add(showInboxAction);
-		
-		
+
 		for (IDocumentHandler dh : addons) {
 			IAction toolbarAction = dh.getFilterAction(controller);
 			if (toolbarAction != null) {
@@ -127,12 +131,19 @@ public class GlobalView extends ViewPart implements IActivationListener {
 				menu.add(menuAction);
 			}
 		}
-		toolbar.add(new Separator());
-		toolbar.add(aquireAction);
 		menu.add(rescanAction);
-
+		if (aquireActions.length == 1) {
+			toolbar.add(new Separator());
+			toolbar.add(aquireActions[0]);
+		} else if (aquireActions.length > 1) {
+			MenuManager popup = new MenuManager("Scanner");
+			for (int i = 0; i < aquireActions.length; i++) {
+				popup.add(aquireActions[i]);
+			}
+			menu.add(popup);
+		}
 	}
-	
+
 	public void createViewerContextMenu(StructuredViewer viewer, final List<IContributionItem> contributionItems) {
 		MenuManager menuMgr = new MenuManager();
 		menuMgr.setRemoveAllWhenShown(true);
@@ -173,11 +184,11 @@ public class GlobalView extends ViewPart implements IActivationListener {
 
 			@Override
 			public void run() {
-				boolean off=!isChecked();
+				boolean off = !isChecked();
 				rescanAction.setEnabled(off);
 				filterCurrentPatAction.setEnabled(off);
 				showInboxAction.setEnabled(off);
-				for(IAction ac:addonActions) {
+				for (IAction ac : addonActions) {
 					ac.setEnabled(off);
 				}
 				if (isChecked()) {
@@ -185,7 +196,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 				} else {
 					controller.setLucindaView();
 				}
-				save(USE_COMMON_DIRECTORY,isChecked());
+				save(USE_COMMON_DIRECTORY, isChecked());
 			}
 		};
 		showDirectoryAction.setChecked(is(USE_COMMON_DIRECTORY));
@@ -233,19 +244,25 @@ public class GlobalView extends ViewPart implements IActivationListener {
 
 		};
 		showInboxAction.setChecked(is(SHOW_INBOX));
+		String[] aquire = CoreHub.localCfg.get(Preferences.AQUIRE_ACTION_SCRIPTS, "").split("\\n");
+		aquireActions = new Action[aquire.length];
+		for (int i = 0; i < aquire.length; i++) {
+			String[] line = aquire[i].split(":");
+			aquireActions[i] = new Action(line[0]) {
+				{
+					setToolTipText(Messages.GlobalView_ReadExternal);
+					setImageDescriptor(Images.IMG_IMPORT.getImageDescriptor());
+				}
 
-		aquireAction = new Action(Preferences.AQUIRE_ACTION_NAME) {
-			{
-				setToolTipText(Messages.GlobalView_ReadExternal);
-				setImageDescriptor(Images.IMG_IMPORT.getImageDescriptor());
-			}
+				@Override
+				public void run() {
+					controller.launchAquireScript((line.length == 2 ? line[1] : line[0]), getSite().getShell());
+				}
+			};
 
-			@Override
-			public void run() {
-				controller.launchAquireScript(getSite().getShell());
-			}
-		};
-		aquireAction.setEnabled(false);
+			// aquireAction.setEnabled(false);
+		}
+		/*
 		String actionScript = Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT, null);
 		if (!StringTool.isNothing(actionScript)) {
 			File ac = new File(actionScript);
@@ -253,6 +270,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 				aquireAction.setEnabled(true);
 			}
 		}
+		*/
 	}
 
 	@Override
