@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022 by G. Weirich
+ * Copyright (c) 2022-2023 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -38,14 +38,23 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.StorageController;
+import ch.elexis.ungrad.common.ui.MailUI;
+import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.DirectoryLabelProvider;
 import ch.elexis.ungrad.lucinda.controller.DocumentComparator;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 
+/**
+ * Show the documents folder
+ * 
+ * @author gerry
+ *
+ */
 public class DirectoryViewPane extends Composite {
 	private static int COLUMN_DATE = 0;
 	private static int COLUMN_NAME = 1;
@@ -83,7 +92,9 @@ public class DirectoryViewPane extends Composite {
 		});
 		Menu menu = new Menu(table);
 		MenuItem mEdit = new MenuItem(menu, SWT.NONE);
+		MenuItem mSend = new MenuItem(menu, SWT.NONE);
 		mEdit.setText("Umbenennen..");
+		mSend.setText("Per Mail senden");
 		table.setMenu(menu);
 		mEdit.addSelectionListener(new SelectionAdapter() {
 
@@ -92,9 +103,10 @@ public class DirectoryViewPane extends Composite {
 				IStructuredSelection sel = tv.getStructuredSelection();
 				if (!sel.isEmpty()) {
 					File selected = (File) sel.getFirstElement();
-					InputDialog id=new InputDialog(getShell(), "Dateinamen ändern", "Bitte geben Sie den neuen Dateinamen ein", selected.getName(), null);
-					if(id.open()==Dialog.OK) {
-						File dest=new File(selected.getParent(),id.getValue());
+					InputDialog id = new InputDialog(getShell(), "Dateinamen ändern",
+							"Bitte geben Sie den neuen Dateinamen ein", selected.getName(), null);
+					if (id.open() == Dialog.OK) {
+						File dest = new File(selected.getParent(), id.getValue());
 						selected.renameTo(dest);
 						tv.refresh();
 						tv.setSelection(new StructuredSelection(dest));
@@ -102,6 +114,19 @@ public class DirectoryViewPane extends Composite {
 				}
 			}
 
+		});
+		mSend.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IStructuredSelection sel = tv.getStructuredSelection();
+				if (!sel.isEmpty()) {
+					File selected = (File) sel.getFirstElement();
+					String subject = CoreHub.localCfg.get(Preferences.DEFAULT_MAILSUBJECT, "Dokumente");
+					String body = CoreHub.localCfg.get(Preferences.DEFAULT_MAILBODY, "Bitte beachten Sie den Anhang");
+					MailUI mailer = new MailUI(getShell());
+					mailer.sendMail(subject, body, "", selected.getAbsolutePath());
+				}
+			}
 		});
 
 	}
@@ -162,7 +187,8 @@ public class DirectoryViewPane extends Composite {
 				@Override
 				public boolean accept(File dir, String name) {
 					String ext = FileTool.getExtension(name).toLowerCase();
-					return ext.equals("pdf") || ext.equals("jpg") || ext.equals("png") || ext.equals("txt");
+					return ext.equals("pdf") || ext.equals("jpg") || ext.equals("png") || ext.equals("txt")
+							|| ext.equals("odt") || ext.startsWith("doc");
 				}
 			});
 		}

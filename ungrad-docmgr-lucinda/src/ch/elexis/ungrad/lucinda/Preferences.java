@@ -59,6 +59,9 @@ public class Preferences {
 	
 	public static final String COMMON_DIRECTORY = BASE + "commonDir";  //$NON-NLS-1$
 	public static final String USE_COMMON_DIRECTORY = BASE + "useCommonDir";  //$NON-NLS-1$
+	public static final String DEFAULT_MAILSUBJECT = BASE + "mailsubject"; //$NON-NLS-1$
+	public static final String DEFAULT_MAILBODY = BASE + "mailbody"; //$NON-NLS-1$
+	
 
 	 
 	public List<String> getNetworks() {

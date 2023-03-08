@@ -56,6 +56,8 @@ public class LucindaPrefs extends FieldEditorPreferencePage implements IWorkbenc
 				getFieldEditorParent()));
 		// addField(new MultilineFieldEditor(Preferences.MACROS, "Makros für das
 		// Suchfeld", 5,0,true,getFieldEditorParent()));
+		addField(new StringFieldEditor(Preferences.DEFAULT_MAILSUBJECT,"Mail Betreff", getFieldEditorParent()));
+		addField(new MultilineFieldEditor(Preferences.DEFAULT_MAILBODY, "Mail Text", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(Preferences.COMMON_DIRECTORY, "Ungrad-Dokumenten-Verzeichnis verwenden (Neustart nötig)", getFieldEditorParent()));
 
 	}
