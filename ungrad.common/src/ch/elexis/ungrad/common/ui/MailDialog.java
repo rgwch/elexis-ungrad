@@ -14,52 +14,62 @@
 
 package ch.elexis.ungrad.common.ui;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 
+import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.data.Kontakt;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
 
 public class MailDialog extends TitleAreaDialog {
-	
+
 	Text tTo;
 	Text tSubject;
 	Text tBody;
 	List lAttachments;
-	
+
 	public String mailTo = "";
 	public String sender = "";
 	public String subject = "";
 	public String body = "";
 	public String[] attachments = new String[0];
-	
-	public MailDialog(Shell parentShell){
+
+	public MailDialog(Shell parentShell) {
 		super(parentShell);
 	}
-	
+
 	@Override
-	protected Control createDialogArea(Composite parent){
+	protected Control createDialogArea(Composite parent) {
 		Composite ret = new Composite(parent, SWT.NONE);
 		ret.setLayoutData(SWTHelper.getFillGridData());
 		ret.setLayout(new GridLayout(2, false));
 		Label lbTo = new Label(ret, SWT.NONE);
 		lbTo.setLayoutData(SWTHelper.getFillGridData(1, false, 1, false));
 		lbTo.setText("An");
-		tTo = new Text(ret, SWT.BORDER);
+		Composite cTo = new Composite(ret, SWT.NONE);
+		cTo.setLayout(new GridLayout(2, false));
+		cTo.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		tTo = new Text(cTo, SWT.BORDER);
 		tTo.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		tTo.setText(mailTo);
+		Button bSelect = new Button(cTo, SWT.PUSH);
+		bSelect.setText("Suche...");
 		tTo.addFocusListener(new FocusAdapter() {
-			
+
 			@Override
-			public void focusLost(FocusEvent e){
+			public void focusLost(FocusEvent e) {
 				mailTo = tTo.getText();
 				if (StringTool.isMailAddress(mailTo)) {
 					setErrorMessage(null);
@@ -69,16 +79,27 @@ public class MailDialog extends TitleAreaDialog {
 				}
 				super.focusLost(e);
 			}
-			
+
 		});
-		
+		bSelect.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				KontaktSelektor ksl = new KontaktSelektor(getParentShell(), Kontakt.class, "Addressat",
+						"Bitte wählen Sie", Kontakt.DEFAULT_SORT);
+				if (ksl.open()==Dialog.OK) {
+					Kontakt sel=(Kontakt) ksl.getSelection();
+					tTo.setText(sel.getMailAddress());
+					tTo.setFocus();
+				}
+			}
+		});
 		Label lbSubject = new Label(ret, SWT.NONE);
 		lbSubject.setLayoutData(SWTHelper.getFillGridData(1, false, 1, false));
 		lbSubject.setText("Betreff");
 		tSubject = new Text(ret, SWT.BORDER);
 		tSubject.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		tSubject.setText(subject);
-		
+
 		tBody = new Text(ret, SWT.BORDER | SWT.MULTI | SWT.WRAP);
 		GridData gd = new GridData(SWT.DEFAULT, 100);
 		gd.horizontalSpan = 2;
@@ -87,7 +108,7 @@ public class MailDialog extends TitleAreaDialog {
 		tBody.setLayoutData(gd);
 		String esc = body.replace("<br />", "\n");
 		tBody.setText(esc);
-		
+
 		Label lbAttachments = new Label(ret, SWT.NONE);
 		lbAttachments.setLayoutData(SWTHelper.getFillGridData(2, false, 1, false));
 		lbAttachments.setText("Anhänge");
@@ -95,21 +116,21 @@ public class MailDialog extends TitleAreaDialog {
 		bAdd.setLayoutData(SWTHelper.getFillGridData(1, false, 1, false));
 		bAdd.setText("Hinzu...");
 		bAdd.addSelectionListener(new SelectionAdapter() {
-			
+
 			@Override
-			public void widgetSelected(SelectionEvent e){
+			public void widgetSelected(SelectionEvent e) {
 				FileDialog fld = new FileDialog(getShell());
 				if (attachments.length > 0) {
 					fld.setFilterPath(FileTool.getFilepath(attachments[0]));
 				}
-				fld.setFilterExtensions(new String[] {"*.pdf;*.doc;*.odt","*.*"});
+				fld.setFilterExtensions(new String[] { "*.pdf;*.doc;*.odt", "*.*" });
 				String result = fld.open();
 				if (result != null) {
 					lAttachments.add(result);
 					ret.layout();
 				}
 			}
-			
+
 		});
 		GridData lgd = new GridData(SWT.DEFAULT, 50);
 		lgd.horizontalSpan = 1;
@@ -119,9 +140,9 @@ public class MailDialog extends TitleAreaDialog {
 		lAttachments.setItems(attachments);
 		return ret;
 	}
-	
+
 	@Override
-	public void create(){
+	public void create() {
 		super.create();
 		setTitle("Dokument als Mailanhang versenden");
 		if (StringTool.isNothing(mailTo)) {
@@ -130,14 +151,14 @@ public class MailDialog extends TitleAreaDialog {
 			setMessage("Mail von: " + sender);
 		}
 	}
-	
+
 	@Override
-	protected void okPressed(){
+	protected void okPressed() {
 		mailTo = tTo.getText();
 		subject = tSubject.getText();
 		body = tBody.getText().replace("\n", "<br />");
 		attachments = lAttachments.getItems();
 		super.okPressed();
 	}
-	
+
 }
