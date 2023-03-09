@@ -7,6 +7,7 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.PreferenceConstants;
+import ch.elexis.ungrad.Resolver;
 import ch.rgw.tools.ExHandler;
 
 public class MailUI {
@@ -32,12 +33,19 @@ public class MailUI {
 		String smtppwd = CoreHub.localCfg.get(PreferenceConstants.SMTP_PWD, "doesntMatter");
 		String smtpport = CoreHub.localCfg.get(PreferenceConstants.SMTP_PORT, "53");
 		String[] attachments = new String[] { pdfFilePath };
+		Resolver resolver = new Resolver();
 		Mailer mailer = new Mailer(sender, smtpserver, smtppwd, smtpport);
 		MailDialog mailDialog = new MailDialog(shell);
 		mailDialog.sender = sender;
 		mailDialog.mailTo = recipient;
-		mailDialog.body = body;
-		mailDialog.subject = subject;
+		try {
+			mailDialog.body = resolver.resolve(body);
+			mailDialog.subject = resolver.resolve(subject);
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+			mailDialog.body = body;
+			mailDialog.subject = subject;
+		}
 		mailDialog.attachments = attachments;
 		if (mailDialog.open() == Dialog.OK) {
 			sender = mailDialog.sender;
@@ -50,7 +58,7 @@ public class MailUI {
 				if (sec.equals("plain")) {
 					mailer.simpleMail(recipient, subject, body, attachments);
 				} else if (sec.equals("tls")) {
-					mailer.tlsMail(user,recipient, subject, body, attachments);
+					mailer.tlsMail(user, recipient, subject, body, attachments);
 				} else if (sec.equals("ssl")) {
 					mailer.sslMail(user, recipient, subject, body, attachments);
 				}
