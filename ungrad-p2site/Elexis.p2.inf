@@ -1,6 +1,6 @@
-# prerelease will be replaced via the com.google.code.maven-replacer-plugin by snapshot (default) or release 
+#  will be replaced via the com.google.code.maven-replacer-plugin by snapshot (default) or release 
 instructions.configure=\
-  addRepository(type:0,location:http${#58}//download.elexis.info/elexis.3.base/prerelease,name:Elexis 3 Base prerelease");\
-  addRepository(type:1,location:http${#58}//download.elexis.info/elexis.3.base/prerelease,name:Elexis 3 Base prerelease");\
-  addRepository(type:0,location:http${#58}//download.elexis.info/elexis.3.core/prerelease,name:Elexis 3 Core prerelease");\
-  addRepository(type:1,location:http${#58}//download.elexis.info/elexis.3.core/prerelease,name:Elexis 3 Core prerelease");
+  addRepository(type:0,location:http${#58}//download.elexis.info/elexis.3.base/,name:Elexis 3 Base ");\
+  addRepository(type:1,location:http${#58}//download.elexis.info/elexis.3.base/,name:Elexis 3 Base ");\
+  addRepository(type:0,location:http${#58}//download.elexis.info/elexis.3.core/,name:Elexis 3 Core ");\
+  addRepository(type:1,location:http${#58}//download.elexis.info/elexis.3.core/,name:Elexis 3 Core ");
