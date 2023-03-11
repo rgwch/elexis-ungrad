@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+         <view
+            class="ch.elexis.ungrad.inbox.ui.View"
+            id="ch.rgw.elexis.ungrad.inbox.ui.View"
+            name="Eingangsfach"
+            icon="icons/form.png"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+              <page
+            category="ch.elexis.ungrad.common.prefs"
+            class="ch.elexis.ungrad.inbox.ui.Preferences"
+            id="ch.rgw.elexis.ungrad.inbox.prefs"
+            name="Eingangsfach">
+      </page>
+   </extension>
+
+</plugin>
