@@ -7,7 +7,7 @@
             class="ch.elexis.ungrad.inbox.ui.View"
             id="ch.rgw.elexis.ungrad.inbox.ui.View"
             name="Eingangsfach"
-            icon="icons/form.png"
+            icon="icons/inbox.jpg"
             restorable="true">
       </view>
    </extension>
