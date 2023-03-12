@@ -5,7 +5,7 @@
       version="1.0.0.qualifier"
       provider-name="ch.elexis">
 
-   <description url="http://www.example.com/description">
+   <description url="https://elexis.ch/ungrad/features/forms/">
       Create PDF files based on HTML- PUG- or PDF forms, or from MedForms
    </description>
 

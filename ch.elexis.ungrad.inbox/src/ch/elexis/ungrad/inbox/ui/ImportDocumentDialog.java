@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2023, G. Weirich and Elexis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    G. Weirich - initial implementation
+ *    
+ *******************************************************************************/
+
 package ch.elexis.ungrad.inbox.ui;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -22,7 +34,8 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 	DocumentDescriptor dd;
 	Text text;
 	Label lPat;
-
+	String result="";
+	
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite ret = new Composite(parent, SWT.NONE);
@@ -64,7 +77,13 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 		this.dd = dd;
 	}
 
+	@Override
+	protected void okPressed() {
+		result=text.getText();
+		super.okPressed();
+	}
+
 	public String getValue() {
-		return dd.filename;
+		return result;
 	}
 }

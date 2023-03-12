@@ -7,7 +7,7 @@
       os="linux,macosx,win32"
       ws="cocoa,gtk,win32">
 
-   <description url="http://github.com/rgwch/Lucinda">
+   <description url="https://elexis.ch/ungrad/features/lucinda/">
       A Lucene based document manager for Elexis
    </description>
 

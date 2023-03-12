@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2023, G. Weirich and Elexis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    G. Weirich - initial implementation
+ *    
+ *******************************************************************************/
+
 package ch.elexis.ungrad.inbox.ui;
 
 import java.io.File;
@@ -6,7 +18,6 @@ import java.text.MessageFormat;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -19,9 +30,6 @@ import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
-import ch.elexis.core.data.services.GlobalServiceDescriptors;
-import ch.elexis.core.data.services.IDocumentManager;
-import ch.elexis.core.data.util.Extensions;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -33,7 +41,6 @@ import ch.elexis.ungrad.inbox.model.FilenameMatcher;
 import ch.elexis.ungrad.inbox.model.PreferenceConstants;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
-import ch.rgw.tools.TimeTool;
 
 public class View extends ViewPart {
 	TableViewer tv;
@@ -113,8 +120,6 @@ public class View extends ViewPart {
 					if (sel != null && pat != null) {
 						DocumentDescriptor dd = fmatch.analyze(pat,sel);
 						ImportDocumentDialog idlg=new ImportDocumentDialog(getSite().getShell(), dd);
-						// InputDialog idlg = new InputDialog(getSite().getShell(), "Datei Speichern als", dd.concerns.getLabel(),
-						//		dd.filename, null);
 						if (idlg.open() == Dialog.OK) {
 							System.out.print(idlg.getValue());
 							controller.moveFileToDocbase(dd.concerns, sel, idlg.getValue());

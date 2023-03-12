@@ -5,8 +5,8 @@
       version="1.0.0.qualifier"
       provider-name="weirich@elexis.ch">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description>
+      Analyzing inbox to add incoming documents to patient&apos;s document base.
    </description>
 
    <copyright url="http://www.example.com/copyright">
