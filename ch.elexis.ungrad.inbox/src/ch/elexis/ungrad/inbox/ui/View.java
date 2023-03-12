@@ -112,8 +112,9 @@ public class View extends ViewPart {
 					Patient pat = ElexisEventDispatcher.getSelectedPatient();
 					if (sel != null && pat != null) {
 						DocumentDescriptor dd = fmatch.analyze(pat,sel);
-						InputDialog idlg = new InputDialog(getSite().getShell(), "Datei Speichern als", dd.concerns.getLabel(),
-								dd.filename, null);
+						ImportDocumentDialog idlg=new ImportDocumentDialog(getSite().getShell(), dd);
+						// InputDialog idlg = new InputDialog(getSite().getShell(), "Datei Speichern als", dd.concerns.getLabel(),
+						//		dd.filename, null);
 						if (idlg.open() == Dialog.OK) {
 							System.out.print(idlg.getValue());
 							controller.moveFileToDocbase(dd.concerns, sel, idlg.getValue());
