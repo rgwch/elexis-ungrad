@@ -28,10 +28,12 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.inbox.model.Controller;
+import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
 import ch.elexis.ungrad.inbox.model.FilenameMatcher;
 import ch.elexis.ungrad.inbox.model.PreferenceConstants;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
+import ch.rgw.tools.TimeTool;
 
 public class View extends ViewPart {
 	TableViewer tv;
@@ -109,12 +111,12 @@ public class View extends ViewPart {
 					File sel = getSelection();
 					Patient pat = ElexisEventDispatcher.getSelectedPatient();
 					if (sel != null && pat != null) {
-						String propose = fmatch.convert(sel);
-						InputDialog idlg = new InputDialog(getSite().getShell(), "Datei Speichern als", pat.getLabel(),
-								propose, null);
+						DocumentDescriptor dd = fmatch.analyze(pat,sel);
+						InputDialog idlg = new InputDialog(getSite().getShell(), "Datei Speichern als", dd.concerns.getLabel(),
+								dd.filename, null);
 						if (idlg.open() == Dialog.OK) {
 							System.out.print(idlg.getValue());
-							controller.moveFileToDocbase(pat, sel, idlg.getValue());
+							controller.moveFileToDocbase(dd.concerns, sel, idlg.getValue());
 							reload();
 						}
 					}
