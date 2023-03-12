@@ -38,6 +38,8 @@
         <module>ch.elexis.laborimport.sftp.feature</module>
         <module>ch.elexis.ungrad.forms</module>
         <module>ch.elexis.ungrad.forms.feature</module>
+        <module>ch.elexis.ungrad.inbox</module>
+        <module>ch.elexis.ungrad.inbox.feature</module>
         <module>ch.elexis.ungrad.pdf</module>
         <module>ch.elexis.ungrad.pdf.feature</module>
         <module>ch.elexis.ungrad.privatrechnung_qr</module>

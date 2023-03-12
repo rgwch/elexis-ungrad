@@ -48,6 +48,9 @@
    <feature id="ch.berchtold.privatrechnung.feature">
       <category name="ch.elexis.ungrad.financial"/>
    </feature>
+   <feature id="ch.elexis.ungrad.inbox.feature">
+      <category name="ch.elexis.ungrad.docmgr"/>
+   </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>
