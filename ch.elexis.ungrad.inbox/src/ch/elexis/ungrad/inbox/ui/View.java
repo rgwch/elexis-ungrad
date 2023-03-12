@@ -28,6 +28,7 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.inbox.model.Controller;
+import ch.elexis.ungrad.inbox.model.FilenameMatcher;
 import ch.elexis.ungrad.inbox.model.PreferenceConstants;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
@@ -35,6 +36,7 @@ import ch.rgw.tools.ExHandler;
 public class View extends ViewPart {
 	TableViewer tv;
 	Controller controller = new Controller();
+	FilenameMatcher fmatch=new FilenameMatcher();
 	private IAction addAction, deleteAction, execAction, reloadAction;
 
 	@Override
@@ -106,8 +108,8 @@ public class View extends ViewPart {
 				File sel = getSelection();
 				Patient pat = ElexisEventDispatcher.getSelectedPatient();
 				if (sel != null && pat != null) {
-					
-					InputDialog idlg=new InputDialog(getSite().getShell(), "Datei Speichern als", pat.getLabel(), sel.getName(), null);
+					String propose=fmatch.convert(sel);
+					InputDialog idlg=new InputDialog(getSite().getShell(), "Datei Speichern als", pat.getLabel(), propose, null);
 					if(idlg.open()==Dialog.OK) {
 						System.out.print(idlg.getValue());
 					}
