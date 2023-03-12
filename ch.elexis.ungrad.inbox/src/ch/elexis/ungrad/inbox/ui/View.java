@@ -36,7 +36,7 @@ import ch.rgw.tools.ExHandler;
 public class View extends ViewPart {
 	TableViewer tv;
 	Controller controller = new Controller();
-	FilenameMatcher fmatch=new FilenameMatcher();
+	FilenameMatcher fmatch = new FilenameMatcher();
 	private IAction addAction, deleteAction, execAction, reloadAction;
 
 	@Override
@@ -56,9 +56,9 @@ public class View extends ViewPart {
 
 		tv.getControl().setLayoutData(SWTHelper.getFillGridData());
 		tv.addSelectionChangedListener(new ISelectionChangedListener() {
-			
+
 			@Override
-			public void selectionChanged(SelectionChangedEvent event){
+			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection sel = (IStructuredSelection) tv.getSelection();
 				addAction.setEnabled(!sel.isEmpty());
 				deleteAction.setEnabled(!sel.isEmpty());
@@ -105,14 +105,21 @@ public class View extends ViewPart {
 
 			@Override
 			public void run() {
-				File sel = getSelection();
-				Patient pat = ElexisEventDispatcher.getSelectedPatient();
-				if (sel != null && pat != null) {
-					String propose=fmatch.convert(sel);
-					InputDialog idlg=new InputDialog(getSite().getShell(), "Datei Speichern als", pat.getLabel(), propose, null);
-					if(idlg.open()==Dialog.OK) {
-						System.out.print(idlg.getValue());
+				try {
+					File sel = getSelection();
+					Patient pat = ElexisEventDispatcher.getSelectedPatient();
+					if (sel != null && pat != null) {
+						String propose = fmatch.convert(sel);
+						InputDialog idlg = new InputDialog(getSite().getShell(), "Datei Speichern als", pat.getLabel(),
+								propose, null);
+						if (idlg.open() == Dialog.OK) {
+							System.out.print(idlg.getValue());
+							controller.moveFileToDocbase(pat, sel, idlg.getValue());
+							reload();
+						}
 					}
+				} catch (Exception ex) {
+					SWTHelper.showError("Fehler beim Verschieben", ex.getMessage());
 				}
 			}
 		};
