@@ -18,6 +18,8 @@ import java.text.MessageFormat;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -74,7 +76,13 @@ public class View extends ViewPart {
 				execAction.setEnabled(!sel.isEmpty());
 			}
 		});
-
+		tv.addDoubleClickListener(new IDoubleClickListener() {
+			
+			@Override
+			public void doubleClick(DoubleClickEvent arg0) {
+				launchViewer();
+			}
+		});
 		ViewMenus menus = new ViewMenus(getViewSite());
 		menus.createToolbar(addAction, execAction, reloadAction, null, deleteAction);
 		addAction.setEnabled(false);
@@ -105,6 +113,27 @@ public class View extends ViewPart {
 		});
 	}
 
+	private void launchViewer() {
+		try {
+			File sel = getSelection();
+			String ext = FileTool.getExtension(sel.getName());
+			Program proggie = Program.findProgram(ext);
+			String arg = sel.getAbsolutePath();
+			if (proggie != null) {
+				proggie.execute(arg);
+			} else {
+				if (Program.launch(sel.getAbsolutePath()) == false) {
+					Runtime.getRuntime().exec(arg);
+				}
+
+			}
+
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+			SWTHelper.showError("Konnte nicht starten", ex.getMessage());
+		}
+	}
+
 	private void makeActions() {
 		addAction = new Action("Zuweisen") {
 			{
@@ -118,8 +147,8 @@ public class View extends ViewPart {
 					File sel = getSelection();
 					Patient pat = ElexisEventDispatcher.getSelectedPatient();
 					if (sel != null && pat != null) {
-						DocumentDescriptor dd = fmatch.analyze(pat,sel);
-						ImportDocumentDialog idlg=new ImportDocumentDialog(getSite().getShell(), dd);
+						DocumentDescriptor dd = fmatch.analyze(pat, sel);
+						ImportDocumentDialog idlg = new ImportDocumentDialog(getSite().getShell(), dd);
 						if (idlg.open() == Dialog.OK) {
 							System.out.print(idlg.getValue());
 							controller.moveFileToDocbase(dd.concerns, sel, idlg.getValue());
@@ -155,24 +184,7 @@ public class View extends ViewPart {
 
 			@Override
 			public void run() {
-				try {
-					File sel = getSelection();
-					String ext = FileTool.getExtension(sel.getName());
-					Program proggie = Program.findProgram(ext);
-					String arg = sel.getAbsolutePath();
-					if (proggie != null) {
-						proggie.execute(arg);
-					} else {
-						if (Program.launch(sel.getAbsolutePath()) == false) {
-							Runtime.getRuntime().exec(arg);
-						}
-
-					}
-
-				} catch (Exception ex) {
-					ExHandler.handle(ex);
-					SWTHelper.showError("Konnte nicht starten", ex.getMessage());
-				}
+				launchViewer();
 			}
 		};
 		reloadAction = new Action("Neu einlesen") {
