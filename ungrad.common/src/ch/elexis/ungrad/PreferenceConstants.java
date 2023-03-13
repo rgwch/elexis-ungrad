@@ -15,5 +15,7 @@ public class PreferenceConstants {
 	public static final String IMAP_PORT = BASE + "imapPort";
 	public static final String IMAP_USER = BASE + "imapUser";
 	public static final String IMAP_PWD = BASE + "imapPwd";
+	public static final String IMAP_UIDVALIDITY = BASE + "imapUIDValidity";
+	public static final String IMAP_LAST_SEEN = BASE + "imapLastSeen";
 
 }

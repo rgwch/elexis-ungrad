@@ -13,7 +13,10 @@
 package ch.elexis.ungrad.inbox.ui;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
+
+import javax.mail.MessagingException;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -37,7 +40,9 @@ import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
 import ch.elexis.data.Patient;
-import ch.elexis.ungrad.Mailbox;
+import ch.elexis.ungrad.common.ui.IMAPMail;
+import ch.elexis.ungrad.common.ui.Testmail;
+// import ch.elexis.ungrad.Mailbox;
 import ch.elexis.ungrad.inbox.model.Controller;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
 import ch.elexis.ungrad.inbox.model.FilenameMatcher;
@@ -144,8 +149,14 @@ public class View extends ViewPart {
 
 			@Override
 			public void run() {
-				Mailbox mailbox = new Mailbox();
-				mailbox.fetch();
+				try {
+					new IMAPMail().fetch();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				// Mailbox mailbox = new Mailbox();
+				// mailbox.fetch();
 			}
 		};
 		addAction = new Action("Zuweisen") {
