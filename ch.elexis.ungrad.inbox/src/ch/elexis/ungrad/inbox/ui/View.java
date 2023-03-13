@@ -37,6 +37,7 @@ import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.Mailbox;
 import ch.elexis.ungrad.inbox.model.Controller;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
 import ch.elexis.ungrad.inbox.model.FilenameMatcher;
@@ -48,7 +49,7 @@ public class View extends ViewPart {
 	TableViewer tv;
 	Controller controller = new Controller();
 	FilenameMatcher fmatch = new FilenameMatcher();
-	private IAction addAction, deleteAction, execAction, reloadAction;
+	private IAction addAction, deleteAction, execAction, reloadAction, loadMailAction;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -77,14 +78,14 @@ public class View extends ViewPart {
 			}
 		});
 		tv.addDoubleClickListener(new IDoubleClickListener() {
-			
+
 			@Override
 			public void doubleClick(DoubleClickEvent arg0) {
 				launchViewer();
 			}
 		});
 		ViewMenus menus = new ViewMenus(getViewSite());
-		menus.createToolbar(addAction, execAction, reloadAction, null, deleteAction);
+		menus.createToolbar(addAction, execAction, loadMailAction, null, deleteAction);
 		addAction.setEnabled(false);
 		deleteAction.setEnabled(false);
 		execAction.setEnabled(false);
@@ -135,6 +136,18 @@ public class View extends ViewPart {
 	}
 
 	private void makeActions() {
+		loadMailAction = new Action("Mails holen") {
+			{
+				setToolTipText("IMAP Mails holen");
+				setImageDescriptor(Images.IMG_MAIL.getImageDescriptor());
+			}
+
+			@Override
+			public void run() {
+				Mailbox mailbox = new Mailbox();
+				mailbox.fetch();
+			}
+		};
 		addAction = new Action("Zuweisen") {
 			{
 				setToolTipText("Dokument zuweisen");

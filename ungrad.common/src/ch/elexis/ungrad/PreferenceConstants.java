@@ -10,4 +10,10 @@ public class PreferenceConstants {
 	public static final String SMTP_USER = BASE + "smtpUser";
 	public static final String SMTP_PWD = BASE + "smtpPwd";
 
+	public static final String IMAP_SECURITY = BASE + "imapSec";
+	public static final String IMAP_HOST = BASE + "imapHost";
+	public static final String IMAP_PORT = BASE + "imapPort";
+	public static final String IMAP_USER = BASE + "imapUser";
+	public static final String IMAP_PWD = BASE + "imapPwd";
+
 }
