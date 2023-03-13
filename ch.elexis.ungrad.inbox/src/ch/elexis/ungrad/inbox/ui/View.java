@@ -109,7 +109,7 @@ public class View extends ViewPart {
 		addAction = new Action("Zuweisen") {
 			{
 				setToolTipText("Dokument zuweisen");
-				setImageDescriptor(Images.IMG_OK.getImageDescriptor());
+				setImageDescriptor(Images.IMG_IMPORT.getImageDescriptor());
 			}
 
 			@Override
@@ -150,7 +150,7 @@ public class View extends ViewPart {
 		execAction = new Action("Öffnen") {
 			{
 				setToolTipText("Dokument öffnen");
-				setImageDescriptor(Images.IMG_EDIT.getImageDescriptor());
+				setImageDescriptor(Images.IMG_EYE_WO_SHADOW.getImageDescriptor());
 			}
 
 			@Override
