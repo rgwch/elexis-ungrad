@@ -38,9 +38,9 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		addField(new StringFieldEditor(PreferenceConstants.SMTP_USER, "SMTP User", getFieldEditorParent()));
 		addField(new PasswordFieldEditor(PreferenceConstants.SMTP_PWD, "SMTP Passwort", getFieldEditorParent()));
 
-		addField(new RadioGroupFieldEditor(PreferenceConstants.IMAP_SECURITY, "IMAP-Verbindung", 3 , conn , getFieldEditorParent()));
+		// addField(new RadioGroupFieldEditor(PreferenceConstants.IMAP_SECURITY, "IMAP-Verbindung", 3 , conn , getFieldEditorParent()));
 		addField(new StringFieldEditor(PreferenceConstants.IMAP_HOST, "IMAP Server", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.IMAP_PORT, "IMAP Port", getFieldEditorParent()));
+		// addField(new StringFieldEditor(PreferenceConstants.IMAP_PORT, "IMAP Port", getFieldEditorParent()));
 		addField(new StringFieldEditor(PreferenceConstants.IMAP_USER, "IMAP User", getFieldEditorParent()));
 		addField(new PasswordFieldEditor(PreferenceConstants.IMAP_PWD, "IMAP Passwort", getFieldEditorParent()));
 	}
