@@ -19,6 +19,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
+import ch.elexis.core.ui.preferences.inputs.MultilineFieldEditor;
 import ch.elexis.ungrad.inbox.model.PreferenceConstants;
 
 
@@ -38,7 +39,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	@Override
 	protected void createFieldEditors() {
 		addField(new DirectoryFieldEditor(PreferenceConstants.BASEDIR, "Verzeichnis", getFieldEditorParent()));
-		
+		addField(new MultilineFieldEditor(PreferenceConstants.WHITELIST, "Sender", getFieldEditorParent()));
 	}
 
 }

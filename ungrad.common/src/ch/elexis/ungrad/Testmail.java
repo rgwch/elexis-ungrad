@@ -1,4 +1,4 @@
-package ch.elexis.ungrad.common.ui;
+package ch.elexis.ungrad;
 
 import java.io.*;
 import java.util.*;

@@ -40,8 +40,8 @@ import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
 import ch.elexis.data.Patient;
-import ch.elexis.ungrad.common.ui.IMAPMail;
-import ch.elexis.ungrad.common.ui.Testmail;
+import ch.elexis.ungrad.IMAPMail;
+import ch.elexis.ungrad.Testmail;
 // import ch.elexis.ungrad.Mailbox;
 import ch.elexis.ungrad.inbox.model.Controller;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
@@ -49,12 +49,24 @@ import ch.elexis.ungrad.inbox.model.FilenameMatcher;
 import ch.elexis.ungrad.inbox.model.PreferenceConstants;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
+import ch.rgw.tools.StringTool;
 
 public class View extends ViewPart {
 	TableViewer tv;
 	Controller controller = new Controller();
 	FilenameMatcher fmatch = new FilenameMatcher();
 	private IAction addAction, deleteAction, execAction, reloadAction, loadMailAction;
+	private String[] whitelist;
+
+	public View() {
+		String senders = CoreHub.localCfg.get(PreferenceConstants.WHITELIST, "");
+		if (StringTool.isNothing(senders)) {
+			whitelist = new String[0];
+		} else {
+			whitelist = senders.split("\\n");
+		}
+
+	}
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -150,7 +162,7 @@ public class View extends ViewPart {
 			@Override
 			public void run() {
 				try {
-					new IMAPMail().fetch();
+					new IMAPMail().fetch(whitelist);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

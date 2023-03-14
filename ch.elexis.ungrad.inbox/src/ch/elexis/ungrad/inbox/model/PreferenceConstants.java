@@ -13,6 +13,7 @@
 package ch.elexis.ungrad.inbox.model;
 
 public class PreferenceConstants {
-	private static final String BASE="ch.elexis.ungrad.inbox.";
-	public static final String BASEDIR=BASE+"dir";
+	private static final String BASE = "ch.elexis.ungrad.inbox.";
+	public static final String BASEDIR = BASE + "dir";
+	public static final String WHITELIST = BASE + "whiteleist";
 }
