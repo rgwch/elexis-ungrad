@@ -15,6 +15,8 @@ package ch.elexis.ungrad.inbox.ui;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.mail.MessagingException;
 
@@ -164,7 +166,12 @@ public class View extends ViewPart {
 			public void run() {
 				try {
 					// new IMAPMail().fetch(whitelist);
-					new MBox().readMessages();
+					File dir=new File(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
+					Map<String, byte[]> pdfs = new MBox().readMessages(whitelist);
+					for (Entry<String, byte[]> e : pdfs.entrySet()) {
+						FileTool.writeFile(new File(dir,e.getKey()), e.getValue());
+						System.out.println(e.getKey());
+					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

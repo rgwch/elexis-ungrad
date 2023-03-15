@@ -1,48 +1,134 @@
 package ch.elexis.ungrad;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringBufferInputStream;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Properties;
 
-import javax.mail.Folder;
+import javax.mail.Address;
 import javax.mail.Message;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Provider;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.Session;
-import javax.mail.URLName;
-import com.sun.mail.mbox.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
+
+import ch.rgw.io.FileTool;
+import ch.rgw.tools.StringTool;
 
 public class MBox {
-	private final Path path; // Path to .mbox file
-	private Provider mbox;
+	final static String p = "/home/gerry/.thunderbird/3a33d0y1.default/ImapMail/imap.mail.hin.ch/INBOX";
+	private final File mbox; // Path to .mbox file
 
-	public MBox() {
-		this.path = Paths.get("/home/gerry/.thunderbird/9n40ugmr.default/ImapMail/mail.weirich.ch/INBOX");
-
-		// this.path =
-		// Paths.get("/home/gerry/.thunderbird/vvdxj3mb.default-release/ImapMail/imap.mail.hin.ch/INBOX");
-		// mbox=new Provider(Provider.Type.STORE, "mbox", "com.sun.mail.mbox.MboxStore",
-		// "Oracle", "3.2.1");
-		mbox = new MboxProvider();
+	public MBox() throws Exception {
+		this(p);
 	}
 
-	public Message[] readMessages() throws NoSuchProviderException {
-		Message[] messages = new Message[0];
-		URLName server = new URLName("mbox:" + path.toString());
-		Properties props = new Properties();
-		props.setProperty("mail.mbox.locktype", "none");
-		props.setProperty("mail.mime.address.strict", "false");
-		// props.setProperty("mail.store.protocol", "mstore");
-		Session session = Session.getDefaultInstance(props);
-		// Session session=Session.getInstance(props);
-		// session.setProvider(mbox);
-		try {
-			Folder folder = session.getFolder(server);
-			folder.open(Folder.READ_ONLY);
-			messages = folder.getMessages();
-		} catch (Exception e) {
-			e.printStackTrace();
+	public MBox(String file) throws Exception {
+
+		this.mbox = new File(file);
+		if (!mbox.exists() || !mbox.isFile() || !mbox.canRead()) {
+			throw new Exception("Can't read mbox");
 		}
-		return messages;
+	}
+
+	public Map<String, byte[]> readMessages(String[] whitelist) throws Exception {
+		Map<String, byte[]> ret = new HashMap<String, byte[]>();
+		Session session = Session.getDefaultInstance(new Properties());
+		InputStream in = new FileInputStream(mbox);
+		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		StringBuilder msg = new StringBuilder();
+		String line = null;
+		while ((line = br.readLine()) != null) {
+			if (line.startsWith("From ")) {
+				if (msg.length() > 0) {
+					String sMsg = msg.toString();
+					StringBufferInputStream strin = new StringBufferInputStream(sMsg);
+					MimeMessage m = new MimeMessage(session, strin);
+					Address[] from = m.getFrom();
+					if (from.length == 0) {
+						from = m.getReplyTo();
+					}
+					if (from.length > 0) {
+						InternetAddress[] iadr = (InternetAddress[]) from;
+						String sender = findSender(iadr, whitelist);
+						if (sender != null) {
+							System.out.println(sender);
+							saveParts(m.getContent(), ret);
+						}
+					}
+					msg.setLength(0);
+				}
+			}
+			msg.append(line).append("\r\n");
+		}
+		return ret;
+	}
+
+	String findSender(InternetAddress[] addr, String[] whitelist) {
+		String ret = null;
+		for (InternetAddress adr : addr) {
+			if (adr.getAddress().contains("@")) {
+				ret = adr.getAddress();
+				break;
+			}
+		}
+		if (whitelist == null || whitelist.length == 0) {
+			return ret;
+		}
+		for (String wl : whitelist) {
+			String[] w = wl.split(":");
+			if (w[0].startsWith("@")) {
+				int idx = ret.indexOf("@");
+				if (w[0].substring(1).equalsIgnoreCase(ret.substring(idx + 1))) {
+					return w.length == 2 ? w[1] : ret;
+				}
+			} else {
+				if (w[0].equalsIgnoreCase(ret)) {
+					return w.length == 2 ? w[1] : ret;
+				}
+			}
+		}
+		return null;
+	}
+
+	void saveParts(Object content, Map<String, byte[]> attachments) throws Exception {
+		if (content instanceof Multipart) {
+			Multipart multi = (Multipart) content;
+			int parts = multi.getCount();
+			for (int j = 0; j < parts; ++j) {
+				MimeBodyPart part = (MimeBodyPart) multi.getBodyPart(j);
+				if (part.getContent() instanceof Multipart) {
+					// part-within-a-part, do some recursion...
+					saveParts(part.getContent(), attachments);
+				} else {
+					String extension = "";
+					String fn = part.getFileName();
+					if (!StringTool.isNothing(fn)) {
+						String f2 = MimeUtility.decodeText(fn);
+						if (f2.toLowerCase().endsWith("pdf")) {
+							ByteArrayOutputStream baos = new ByteArrayOutputStream();
+							InputStream is = part.getInputStream();
+							FileTool.copyStreams(is, baos);
+							attachments.put(f2, baos.toByteArray());
+						}
+					}
+
+				}
+
+			}
+		}
 	}
 }
