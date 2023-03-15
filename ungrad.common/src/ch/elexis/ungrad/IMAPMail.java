@@ -35,7 +35,7 @@ public class IMAPMail {
 		Session session = Session.getDefaultInstance(props, null);
 		session.setDebug(true);
 		store = session.getStore("imaps");
-		store.connect(host, 993, user,null);
+		store.connect(host, user,pwd);
 		folder = store.getFolder("Inbox");
 		if (folder.exists()) {
 			folder.open(Folder.READ_ONLY);
