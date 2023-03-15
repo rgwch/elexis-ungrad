@@ -13,12 +13,9 @@
 package ch.elexis.ungrad.inbox.ui;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.mail.MessagingException;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -42,9 +39,7 @@ import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
 import ch.elexis.data.Patient;
-import ch.elexis.ungrad.IMAPMail;
 import ch.elexis.ungrad.MBox;
-import ch.elexis.ungrad.Testmail;
 // import ch.elexis.ungrad.Mailbox;
 import ch.elexis.ungrad.inbox.model.Controller;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
@@ -105,10 +100,14 @@ public class View extends ViewPart {
 			}
 		});
 		ViewMenus menus = new ViewMenus(getViewSite());
-		menus.createToolbar(addAction, execAction, loadMailAction, null, deleteAction);
+		menus.createToolbar(addAction, execAction, loadMailAction, reloadAction, null, deleteAction);
+
 		addAction.setEnabled(false);
 		deleteAction.setEnabled(false);
 		execAction.setEnabled(false);
+		if (CoreHub.localCfg.get(PreferenceConstants.MAILMODE, "none").equals("none")) {
+			loadMailAction.setEnabled(false);
+		}
 		tv.setInput(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
 	}
 
@@ -165,12 +164,14 @@ public class View extends ViewPart {
 			@Override
 			public void run() {
 				try {
-					// new IMAPMail().fetch(whitelist);
-					File dir=new File(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
-					Map<String, byte[]> pdfs = new MBox().readMessages(whitelist);
-					for (Entry<String, byte[]> e : pdfs.entrySet()) {
-						FileTool.writeFile(new File(dir,e.getKey()), e.getValue());
-						System.out.println(e.getKey());
+					if (CoreHub.localCfg.get(PreferenceConstants.MAILMODE, "none").equals("mbox")) {
+						File dir = new File(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
+						Map<String, byte[]> pdfs = new MBox().readMessages(whitelist);
+						for (Entry<String, byte[]> e : pdfs.entrySet()) {
+							FileTool.writeFile(new File(dir, e.getKey()), e.getValue());
+						}
+					}else {
+						// new IMAPMail().fetch(whitelist);						
 					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -191,13 +192,18 @@ public class View extends ViewPart {
 				try {
 					File sel = getSelection();
 					Patient pat = ElexisEventDispatcher.getSelectedPatient();
-					if (sel != null && pat != null) {
+					if (sel != null) {
 						DocumentDescriptor dd = fmatch.analyze(pat, sel);
 						ImportDocumentDialog idlg = new ImportDocumentDialog(getSite().getShell(), dd);
 						if (idlg.open() == Dialog.OK) {
 							System.out.print(idlg.getValue());
-							controller.moveFileToDocbase(dd.concerns, sel, idlg.getValue());
-							reload();
+							if (dd.concerns != null) {
+								controller.moveFileToDocbase(dd.concerns, sel, idlg.getValue());
+								reload();
+							} else {
+								SWTHelper.alert("Kein Patient zugewiesen",
+										"Bitte weisen Sie dieses Dokument einem Patienten zu");
+							}
 						}
 					}
 				} catch (Exception ex) {

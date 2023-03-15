@@ -51,9 +51,11 @@ public class FilenameMatcher {
 		findDates(dd);
 		String ret = dd.filename;
 		ret = cutDate(ret, dd.docDate);
-		ret = cutDate(ret, new TimeTool(dd.concerns.getGeburtsdatum()));
-		ret = cut(ret, dd.concerns.get(Person.NAME));
-		ret = cut(ret, dd.concerns.get(Person.FIRSTNAME));
+		if (dd.concerns != null) {
+			ret = cutDate(ret, new TimeTool(dd.concerns.getGeburtsdatum()));
+			ret = cut(ret, dd.concerns.get(Person.NAME));
+			ret = cut(ret, dd.concerns.get(Person.FIRSTNAME));
+		}
 		ret = ret.replaceAll("[,':;]", " ");
 		ret = ret.replaceAll("\\s+", "_");
 		while (ret.startsWith("-") || ret.startsWith("_")) {
@@ -64,9 +66,9 @@ public class FilenameMatcher {
 
 		int ext = dd.filename.lastIndexOf('.');
 		if (ext > -1) {
-			String base=dd.filename.substring(0,ext);
-			while(base.endsWith("-") || base.endsWith("_")) {
-				base=base.substring(0,base.length()-1);
+			String base = dd.filename.substring(0, ext);
+			while (base.endsWith("-") || base.endsWith("_")) {
+				base = base.substring(0, base.length() - 1);
 			}
 			dd.filename = base + dd.filename.substring(ext).toLowerCase();
 		}

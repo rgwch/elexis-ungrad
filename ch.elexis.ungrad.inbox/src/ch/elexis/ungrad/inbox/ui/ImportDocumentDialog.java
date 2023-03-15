@@ -34,8 +34,8 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 	DocumentDescriptor dd;
 	Text text;
 	Label lPat;
-	String result="";
-	
+	String result = "";
+
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite ret = new Composite(parent, SWT.NONE);
@@ -48,16 +48,21 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				KontaktSelektor ksl=new KontaktSelektor(getShell(), Person.class, "Bitte Patient wählen", "Patient für Zuordnung", null);
-				if(ksl.open()==Dialog.OK) {
-					Person pat=(Person) ksl.getSelection();
-					lPat.setText("Zu Patient: "+pat.getLabel());
-					dd.concerns=pat;
+				KontaktSelektor ksl = new KontaktSelektor(getShell(), Person.class, "Bitte Patient wählen",
+						"Patient für Zuordnung", null);
+				if (ksl.open() == Dialog.OK) {
+					Person pat = (Person) ksl.getSelection();
+					lPat.setText("Zu Patient: " + pat.getLabel());
+					dd.concerns = pat;
 				}
 			}
-			
+
 		});
-		lPat.setText("Zu Patient: "+dd.concerns.getLabel());
+		if (dd.concerns == null) {
+			lPat.setText("Kein Patient ausgewählt");
+		} else {
+			lPat.setText("Zu Patient: " + dd.concerns.getLabel());
+		}
 		lPat.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		text = new Text(ret, SWT.BORDER);
 		text.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
@@ -79,7 +84,7 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 
 	@Override
 	protected void okPressed() {
-		result=text.getText();
+		result = text.getText();
 		super.okPressed();
 	}
 
