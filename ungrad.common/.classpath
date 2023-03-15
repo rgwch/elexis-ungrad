@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="javax.mail.jar" sourcepath="/home/gerry/git/javamail/mail/target/javax.mail-1.6.2-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="mbox.jar" sourcepath="/home/gerry/git/javamail/mbox/src/main/java"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

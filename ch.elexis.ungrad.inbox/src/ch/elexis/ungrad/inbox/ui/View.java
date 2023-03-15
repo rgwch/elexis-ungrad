@@ -41,6 +41,7 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.IMAPMail;
+import ch.elexis.ungrad.MBox;
 import ch.elexis.ungrad.Testmail;
 // import ch.elexis.ungrad.Mailbox;
 import ch.elexis.ungrad.inbox.model.Controller;
@@ -162,7 +163,8 @@ public class View extends ViewPart {
 			@Override
 			public void run() {
 				try {
-					new IMAPMail().fetch(whitelist);
+					// new IMAPMail().fetch(whitelist);
+					new MBox().readMessages();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
