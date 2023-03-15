@@ -166,12 +166,14 @@ public class View extends ViewPart {
 				try {
 					if (CoreHub.localCfg.get(PreferenceConstants.MAILMODE, "none").equals("mbox")) {
 						File dir = new File(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
-						Map<String, byte[]> pdfs = new MBox().readMessages(whitelist);
+						String mbox = CoreHub.localCfg.get(PreferenceConstants.MBOX, "");
+						Map<String, byte[]> pdfs = new MBox(mbox, whitelist).readMessages();
 						for (Entry<String, byte[]> e : pdfs.entrySet()) {
 							FileTool.writeFile(new File(dir, e.getKey()), e.getValue());
 						}
-					}else {
-						// new IMAPMail().fetch(whitelist);						
+						reload();
+					} else {
+						// new IMAPMail().fetch(whitelist);
 					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block

@@ -19,11 +19,13 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringBufferInputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Address;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
@@ -36,19 +38,19 @@ import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 public class MBox {
-	final static String p = "/home/gerry/.thunderbird/3a33d0y1.default/ImapMail/imap.mail.hin.ch/INBOX";
 	private final File mbox; // Path to .mbox file
+	private Session session;
+	private String[] whitelist;
+	private TimeTool today;
 
-	public MBox() throws Exception {
-		this(p);
-	}
-
-	public MBox(String file) throws Exception {
-
+	public MBox(String file, String[] whitelist) throws Exception {
 		this.mbox = new File(file);
 		if (!mbox.exists() || !mbox.isFile() || !mbox.canRead()) {
 			throw new Exception("Can't read mbox");
 		}
+		this.whitelist = whitelist;
+		this.session = Session.getDefaultInstance(new Properties());
+		this.today = new TimeTool();
 	}
 
 	/**
@@ -59,43 +61,62 @@ public class MBox {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, byte[]> readMessages(String[] whitelist) throws Exception {
+	public Map<String, byte[]> readMessages() throws Exception {
 		Map<String, byte[]> ret = new HashMap<String, byte[]>();
-		Session session = Session.getDefaultInstance(new Properties());
 		InputStream in = new FileInputStream(mbox);
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		StringBuilder msg = new StringBuilder();
 		String line = null;
+		int count = 0;
 		while ((line = br.readLine()) != null) {
 			if (line.startsWith("From ")) {
 				if (msg.length() > 0) {
-					String sMsg = msg.toString();
-					StringBufferInputStream strin = new StringBufferInputStream(sMsg);
-					MimeMessage m = new MimeMessage(session, strin);
-					TimeTool date = new TimeTool(m.getReceivedDate());
-					if (date.isSameDay(new TimeTool())) {
-						Address[] from = m.getFrom();
-						if (from.length == 0) {
-							from = m.getReplyTo();
-						}
-						if (from.length > 0) {
-							InternetAddress[] iadr = (InternetAddress[]) from;
-							String sender = findSender(iadr, whitelist);
-							if (sender != null) {
-								System.out.println(sender);
-								saveParts(m.getContent(), ret);
-							}
-						}
-					}
+					process(msg.toString(), ret);
 					msg.setLength(0);
+					count++;
 				}
 			}
 			msg.append(line).append("\r\n");
 		}
+		if (msg.length() > 0) {
+			process(msg.toString(), ret);
+			count++;
+		}
+		System.out.println("parsed " + count);
 		return ret;
 	}
 
-	String findSender(InternetAddress[] addr, String[] whitelist) {
+	private void process(String sMsg, Map<String, byte[]> ret) throws Exception {
+		StringBufferInputStream strin = new StringBufferInputStream(sMsg);
+		MimeMessage m = new MimeMessage(session, strin);
+		Date sent = m.getSentDate();
+		Date received = m.getReceivedDate();
+		TimeTool date = new TimeTool();
+		if (received != null) {
+			date = new TimeTool(received);
+		} else if (sent != null) {
+			date = new TimeTool(sent);
+		}
+		Address[] from = m.getFrom();
+		if (from.length == 0) {
+			from = m.getReplyTo();
+		}
+		if (from.length > 0) {
+			InternetAddress[] iadr = (InternetAddress[]) from;
+			String sender = findSender(iadr);
+			if (sender != null) {
+				System.out.println(sender + ", " + date.toString(TimeTool.DATE_GER));
+				if (date.isSameDay(today)) {
+					System.out.println(sender);
+					saveParts(m.getContent(), ret);
+				}
+			}
+
+		}
+
+	}
+
+	String findSender(InternetAddress[] addr) {
 		String ret = null;
 		for (InternetAddress adr : addr) {
 			if (adr.getAddress().contains("@")) {
