@@ -96,7 +96,7 @@ public class View extends ViewPart {
 
 			@Override
 			public void doubleClick(DoubleClickEvent arg0) {
-				launchViewer();
+				launchViewer(getSelection());
 			}
 		});
 		ViewMenus menus = new ViewMenus(getViewSite());
@@ -133,9 +133,8 @@ public class View extends ViewPart {
 		});
 	}
 
-	private void launchViewer() {
+	void launchViewer(File sel) {
 		try {
-			File sel = getSelection();
 			String ext = FileTool.getExtension(sel.getName());
 			Program proggie = Program.findProgram(ext);
 			String arg = sel.getAbsolutePath();
@@ -196,7 +195,7 @@ public class View extends ViewPart {
 					Patient pat = ElexisEventDispatcher.getSelectedPatient();
 					if (sel != null) {
 						DocumentDescriptor dd = fmatch.analyze(pat, sel);
-						ImportDocumentDialog idlg = new ImportDocumentDialog(getSite().getShell(), dd);
+						ImportDocumentDialog idlg = new ImportDocumentDialog(View.this, dd);
 						if (idlg.open() == Dialog.OK) {
 							System.out.print(idlg.getValue());
 							if (dd.concerns != null) {
@@ -237,7 +236,7 @@ public class View extends ViewPart {
 
 			@Override
 			public void run() {
-				launchViewer();
+				launchViewer(getSelection());
 			}
 		};
 		reloadAction = new Action("Neu einlesen") {

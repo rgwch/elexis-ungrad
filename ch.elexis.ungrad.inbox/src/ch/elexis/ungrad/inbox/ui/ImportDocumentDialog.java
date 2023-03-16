@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
+import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Person;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
@@ -35,6 +36,7 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 	Text text;
 	Label lPat;
 	String result = "";
+	private View view;
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
@@ -64,8 +66,21 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 			lPat.setText("Zu Patient: " + dd.concerns.getLabel());
 		}
 		lPat.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		text = new Text(ret, SWT.BORDER);
-		text.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		Composite cText=new Composite(ret,SWT.NONE);
+		cText.setLayoutData(SWTHelper.getFillGridData(2,true,1,false));
+		cText.setLayout(new GridLayout(2, false));
+		text = new Text(cText, SWT.BORDER);
+		text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		Button bView=new Button(cText,SWT.PUSH);
+		bView.setImage(Images.IMG_EYE_WO_SHADOW.getImage());
+		bView.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				view.launchViewer(dd.file);
+			}
+			
+		});
 		text.setText(dd.filename);
 		return ret;
 	}
@@ -77,8 +92,9 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 		setMessage("Bitte prüfen und korrigieren Sie die Zuordnung zu Patient und den Dateinamen");
 	}
 
-	public ImportDocumentDialog(Shell parentShell, DocumentDescriptor dd) {
-		super(parentShell);
+	public ImportDocumentDialog(View view, DocumentDescriptor dd) {
+		super(view.getSite().getShell());
+		this.view=view;
 		this.dd = dd;
 	}
 

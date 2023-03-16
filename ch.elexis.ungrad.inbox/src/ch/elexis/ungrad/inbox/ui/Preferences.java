@@ -12,11 +12,11 @@
 
 package ch.elexis.ungrad.inbox.ui;
 
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -44,8 +44,8 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	@Override
 	protected void createFieldEditors() {
 		addField(new DirectoryFieldEditor(PreferenceConstants.BASEDIR, "Verzeichnis", getFieldEditorParent()));
-		addField(
-				new MultilineFieldEditor(PreferenceConstants.WHITELIST, "Dokumenten-Absender", getFieldEditorParent()));
+		addField(new MultilineFieldEditor(PreferenceConstants.WHITELIST, "Dokumenten-Absender", 4, SWT.V_SCROLL, false,
+				getFieldEditorParent()));
 		addField(new RadioGroupFieldEditor(PreferenceConstants.MAILMODE, "Emails einlesen", 3, methods,
 				getFieldEditorParent()));
 		addField(new FileFieldEditor(PreferenceConstants.MBOX, "MBox-Datei", getFieldEditorParent()));
