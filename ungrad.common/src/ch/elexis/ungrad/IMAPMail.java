@@ -53,13 +53,10 @@ public class IMAPMail {
 		long uidvalidity = Long.parseLong(CoreHub.localCfg.get(PreferenceConstants.IMAP_UIDVALIDITY, "0"));
 
 		long lastseen = Long.parseLong(CoreHub.localCfg.get(PreferenceConstants.IMAP_LAST_SEEN, "1"));
-		// System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
 		Properties props = System.getProperties();
 		props.setProperty("mail.store.protocol", "imaps");
-		// props.setProperty("mail.imap.auth.login.disable", "true");
-		// props.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
 		session = Session.getDefaultInstance(props, null);
-		session.setDebug(true);
+		// session.setDebug(true);
 		store = session.getStore("imaps");
 		store.connect(host, user, pwd);
 		folder = store.getFolder("Inbox");
