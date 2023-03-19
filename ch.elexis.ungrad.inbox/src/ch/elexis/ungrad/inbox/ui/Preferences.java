@@ -44,11 +44,12 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	@Override
 	protected void createFieldEditors() {
 		addField(new DirectoryFieldEditor(PreferenceConstants.BASEDIR, "Verzeichnis", getFieldEditorParent()));
-		addField(new MultilineFieldEditor(PreferenceConstants.WHITELIST, "Dokumenten-Absender", 4, SWT.V_SCROLL, false,
-				getFieldEditorParent()));
 		addField(new RadioGroupFieldEditor(PreferenceConstants.MAILMODE, "Emails einlesen", 3, methods,
 				getFieldEditorParent()));
 		addField(new FileFieldEditor(PreferenceConstants.MBOX, "MBox-Datei", getFieldEditorParent()));
+		addField(new MultilineFieldEditor(PreferenceConstants.WHITELIST, "Absender", 4, SWT.V_SCROLL, false,
+				getFieldEditorParent()));
+
 	}
 
 }
