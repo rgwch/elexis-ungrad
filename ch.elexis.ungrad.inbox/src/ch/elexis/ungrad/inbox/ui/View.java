@@ -14,6 +14,7 @@ package ch.elexis.ungrad.inbox.ui;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -39,6 +40,7 @@ import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.IMAPMail;
 import ch.elexis.ungrad.MBox;
 // import ch.elexis.ungrad.Mailbox;
 import ch.elexis.ungrad.inbox.model.Controller;
@@ -163,20 +165,23 @@ public class View extends ViewPart {
 			@Override
 			public void run() {
 				try {
-					if (CoreHub.localCfg.get(PreferenceConstants.MAILMODE, "none").equals("mbox")) {
-						File dir = new File(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
+					Map<String, byte[]> pdfs = new HashMap<String, byte[]>();
+					File dir = new File(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
+					String mailMode = CoreHub.localCfg.get(PreferenceConstants.MAILMODE, "none");
+					if (mailMode.equals("mbox")) {
 						String mbox = CoreHub.localCfg.get(PreferenceConstants.MBOX, "");
-						Map<String, byte[]> pdfs = new MBox(mbox, whitelist).readMessages();
-						for (Entry<String, byte[]> e : pdfs.entrySet()) {
-							FileTool.writeFile(new File(dir, e.getKey()), e.getValue());
-						}
-						reload();
-					} else {
-						// new IMAPMail().fetch(whitelist);
+						pdfs = new MBox(mbox, whitelist).readMessages();
+					} else if (mailMode.equals("imap")) {
+						pdfs = new IMAPMail(whitelist).fetch();
 					}
+					for (Entry<String, byte[]> e : pdfs.entrySet()) {
+						FileTool.writeFile(new File(dir, e.getKey()), e.getValue());
+					}
+					reload();
+
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					SWTHelper.alert("Fehler bei Nachrichtenabruf", e.getLocalizedMessage());
+					ExHandler.handle(e);
 				}
 				// Mailbox mailbox = new Mailbox();
 				// mailbox.fetch();
