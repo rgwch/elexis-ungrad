@@ -121,9 +121,9 @@ public class View extends ViewPart implements IActivationListener {
 		toolbar.add(showListAction);
 		toolbar.add(showDetailAction);
 		toolbar.add(new Separator());
+		toolbar.add(signAction);
 		toolbar.add(printAction);
 		toolbar.add(mailAction);
-		toolbar.add(signAction);
 		menu.add(createNewAction);
 		menu.add(printAction);
 		menu.add(mailAction);
@@ -323,15 +323,74 @@ public class View extends ViewPart implements IActivationListener {
 			}
 
 		};
-		signAction=new Action("Unterschreiben") {
+		signAction = new Action("Unterschreiben") {
 			{
 				setText("Dokument signieren");
-				setDisabledImageDescriptor(Images.IMG_OK.getImageDescriptor());
+				setImageDescriptor(Images.IMG_PERSON_OK.getImageDescriptor());
+				setToolTipText("Das ausgewählte DOkument unterschreiben");
 			}
-			
+
 			@Override
 			public void run() {
-				
+				if (stack.topControl.equals(docList)) {
+					docList.sign();
+				}
+			}
+		};
+		signAction = new Action("Unterschreiben") {
+			{
+				setText("Dokument signieren");
+				setImageDescriptor(Images.IMG_PERSON_OK.getImageDescriptor());
+				setToolTipText("Das ausgewählte DOkument unterschreiben");
+			}
+
+			@Override
+			public void run() {
+				if (stack.topControl.equals(docList)) {
+					docList.sign();
+				}
+			}
+		};
+		signAction = new Action("Unterschreiben") {
+			{
+				setText("Dokument signieren");
+				setImageDescriptor(Images.IMG_PERSON_OK.getImageDescriptor());
+				setToolTipText("Das ausgewählte DOkument unterschreiben");
+			}
+
+			@Override
+			public void run() {
+				if (stack.topControl.equals(docList)) {
+					docList.sign();
+				}
+			}
+		};
+		signAction = new Action("Unterschreiben") {
+			{
+				setText("Dokument signieren");
+				setImageDescriptor(Images.IMG_PERSON_OK.getImageDescriptor());
+				setToolTipText("Das ausgewählte DOkument unterschreiben");
+			}
+
+			@Override
+			public void run() {
+				if (stack.topControl.equals(docList)) {
+					docList.sign();
+				}
+			}
+		};
+		signAction = new Action("Unterschreiben") {
+			{
+				setText("Dokument signieren");
+				setImageDescriptor(Images.IMG_PERSON_OK.getImageDescriptor());
+				setToolTipText("Das ausgewählte DOkument unterschreiben");
+			}
+
+			@Override
+			public void run() {
+				if (stack.topControl.equals(docList)) {
+					docList.sign();
+				}
 			}
 		};
 		deleteAction = new Action(Messages.View_Delete_Header) {
