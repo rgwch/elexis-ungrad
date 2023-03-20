@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, G. Weirich and Elexis
+ * Copyright (c) 2022-2023, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ import ch.elexis.data.Query;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.pdf.Manager;
+import ch.elexis.ungrad.pdf.Signer;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
@@ -103,7 +104,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	/**
 	 * Find the ELexis "Brief" that corresponds with a given Forms Document
 	 * 
-	 * @param item    Name of the douckent, as shown in the forms view
+	 * @param item    Name of the document, as shown in the forms view
 	 * @param patient Patient concerned
 	 * @return The Brief or null if no such Brief was found.
 	 */
@@ -128,7 +129,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	/**
 	 * Write an HTML file from the current state of the Template. This is called
 	 * with every deactivation of the Forms View to save current work if
-	 * interrupted. And it's called befor pdf outputting.
+	 * interrupted. And it's called before pdf outputting.
 	 * 
 	 * @param tmpl The Template to save
 	 * @return The HTML file just written
@@ -211,7 +212,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	 * than the Briefs's last update, then the Brief is updated with the contents of
 	 * the PDF.
 	 * 
-	 * @param pat   patient whose outboud directory should be searched. Can be null
+	 * @param pat   patient whose outbound directory should be searched. Can be null
 	 *              -> current patient
 	 * 
 	 * @param title Title of the document to retrieve (as shown in the forms view)
@@ -270,6 +271,13 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		}
 	}
 
+	/**
+	 * Launch the configured pug compiler with a pug template to process
+	 * @param pug The pug template
+	 * @param dirthe working directory
+	 * @return the html as created by the pug compiler
+	 * @throws Exception
+	 */
 	public String convertPug(String pug, String dir) throws Exception {
 		dir += File.separator + "x";
 		String pugbin = CoreHub.localCfg.get(PreferenceConstants.PUG, "pug");
@@ -359,5 +367,13 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			}
 
 		});
+	}
+	
+	public void signPDF(File pdfFile) throws Exception{
+		Signer signer=new Signer();
+		String imgFile=CoreHub.localCfg.get(PreferenceConstants.SIGNATURE, null);
+		if(imgFile!=null) {
+			signer.sign(pdfFile.getAbsolutePath(), imgFile, 10, 10);
+		}
 	}
 }

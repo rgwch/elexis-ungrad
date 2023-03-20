@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, G. Weirich and Elexis
+ * Copyright (c) 2022-2023, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,7 +60,7 @@ import ch.rgw.tools.TimeTool;
  */
 public class View extends ViewPart implements IActivationListener {
 	private Controller controller;
-	private Action createNewAction, showListAction, showDetailAction, printAction, mailAction, deleteAction;
+	private Action createNewAction, showListAction, showDetailAction, printAction, mailAction, deleteAction, signAction;
 	private DocumentList docList;
 	private DetailDisplay detail;
 	private Composite container;
@@ -123,6 +123,7 @@ public class View extends ViewPart implements IActivationListener {
 		toolbar.add(new Separator());
 		toolbar.add(printAction);
 		toolbar.add(mailAction);
+		toolbar.add(signAction);
 		menu.add(createNewAction);
 		menu.add(printAction);
 		menu.add(mailAction);
@@ -321,6 +322,17 @@ public class View extends ViewPart implements IActivationListener {
 				}
 			}
 
+		};
+		signAction=new Action("Unterschreiben") {
+			{
+				setText("Dokument signieren");
+				setDisabledImageDescriptor(Images.IMG_OK.getImageDescriptor());
+			}
+			
+			@Override
+			public void run() {
+				
+			}
 		};
 		deleteAction = new Action(Messages.View_Delete_Header) {
 			{
