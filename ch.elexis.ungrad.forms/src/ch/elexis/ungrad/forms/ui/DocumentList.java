@@ -81,6 +81,20 @@ public class DocumentList extends Composite {
 		}
 	}
 
+	public void sign() {
+		IStructuredSelection sel = tv.getStructuredSelection();
+		if (!sel.isEmpty()) {
+			File dir;
+			try {
+				dir = controller.getStorageController().getOutputDirFor(null, false);
+				File file = new File(dir, sel.getFirstElement() + ".pdf");
+				controller.signPDF(file);
+			} catch (Exception e) {
+				SWTHelper.showError("Fehler beim Signieren", e.getMessage());
+				ExHandler.handle(e);
+			}
+		}	
+	}
 	public void sendMail() {
 		IStructuredSelection sel = tv.getStructuredSelection();
 		if (!sel.isEmpty()) {

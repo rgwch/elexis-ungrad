@@ -17,27 +17,15 @@ public class Signer {
 
   public void sign(String pdfFile, String imgFile, int x, int y) throws IOException {
 
-    // Loading an already existing pdf document
     PDDocument doc = PDDocument.load(new File(pdfFile));
-
-    // Retrieve the page
     PDPage page = doc.getPage(0);
 
-    // Creating Object of PDImageXObject for selecting
-    // Image and provide the path of file in argument
     PDImageXObject pdfimg = PDImageXObject.createFromFile(imgFile, doc);
 
-    // Creating the PDPageContentStream Object
-    // for Inserting Image
-    PDPageContentStream image = new PDPageContentStream(doc, page);
+    PDPageContentStream image = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, false);
 
-    // set the Image inside the Page
     image.drawImage(pdfimg, x, y);
-    System.out.println("Image Inserted");
-
-    // Closing the page of PDF by closing
-    // PDPageContentStream Object
-    // && Saving the Document
+  
     image.close();
     String path = FileTool.getFilepath(pdfFile);
     String base = FileTool.getNakedFilename(pdfFile);
