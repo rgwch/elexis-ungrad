@@ -32,6 +32,8 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
+
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
@@ -45,6 +47,7 @@ import ch.elexis.data.Patient;
 import ch.elexis.data.Query;
 import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.forms.model.Controller;
+import ch.elexis.ungrad.forms.model.PreferenceConstants;
 import ch.elexis.ungrad.forms.model.Template;
 import ch.elexis.ungrad.pdf.MappedForm;
 import ch.elexis.ungrad.pdf.Medform;
@@ -66,6 +69,7 @@ public class View extends ViewPart implements IActivationListener {
 	private Composite container;
 	private StackLayout stack;
 	private Template currentTemplate;
+	private boolean bHasSignature;
 
 	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
 			ElexisEvent.EVENT_SELECTED) {
@@ -80,6 +84,10 @@ public class View extends ViewPart implements IActivationListener {
 	public View() {
 		controller = Activator.getController();
 		stack = new StackLayout();
+		String signature = CoreHub.localCfg.get(PreferenceConstants.SIGNATURE, null);
+		if (signature != null && new File(signature).exists()) {
+			bHasSignature = true;
+		}
 	}
 
 	void setPatient(Patient pat) {
@@ -96,6 +104,7 @@ public class View extends ViewPart implements IActivationListener {
 		mailAction.setEnabled(bMode);
 		deleteAction.setEnabled(bMode);
 		showDetailAction.setEnabled(bMode);
+		signAction.setEnabled(bMode);
 	}
 
 	@Override
@@ -121,7 +130,9 @@ public class View extends ViewPart implements IActivationListener {
 		toolbar.add(showListAction);
 		toolbar.add(showDetailAction);
 		toolbar.add(new Separator());
-		toolbar.add(signAction);
+		if (bHasSignature) {
+			toolbar.add(signAction);
+		}
 		toolbar.add(printAction);
 		toolbar.add(mailAction);
 		menu.add(createNewAction);
@@ -133,6 +144,7 @@ public class View extends ViewPart implements IActivationListener {
 		printAction.setEnabled(false);
 		showDetailAction.setEnabled(false);
 		mailAction.setEnabled(false);
+		signAction.setEnabled(false);
 		docList.addSelectionListener(new ISelectionChangedListener() {
 
 			@Override
@@ -285,6 +297,7 @@ public class View extends ViewPart implements IActivationListener {
 					SWTHelper.showError(Messages.View_ErrorProcessing, ex.getMessage());
 
 				}
+				signAction.setEnabled(false);
 				printAction.setEnabled(true);
 				mailAction.setEnabled(true);
 				container.layout();

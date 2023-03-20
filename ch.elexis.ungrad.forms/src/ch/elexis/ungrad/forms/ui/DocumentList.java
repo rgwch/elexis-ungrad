@@ -82,19 +82,21 @@ public class DocumentList extends Composite {
 	}
 
 	public void sign() {
-		IStructuredSelection sel = tv.getStructuredSelection();
-		if (!sel.isEmpty()) {
+		String sel = getSelection();
+		if (sel != null) {
 			File dir;
 			try {
 				dir = controller.getStorageController().getOutputDirFor(null, false);
-				File file = new File(dir, sel.getFirstElement() + ".pdf");
+				File file = new File(dir, sel + ".pdf");
 				controller.signPDF(file);
+				tv.refresh();
 			} catch (Exception e) {
 				SWTHelper.showError("Fehler beim Signieren", e.getMessage());
 				ExHandler.handle(e);
 			}
-		}	
+		}
 	}
+
 	public void sendMail() {
 		IStructuredSelection sel = tv.getStructuredSelection();
 		if (!sel.isEmpty()) {
@@ -130,9 +132,8 @@ public class DocumentList extends Composite {
 	}
 
 	public String output() {
-		IStructuredSelection sel = tv.getStructuredSelection();
-		if (!sel.isEmpty()) {
-			String selected = (String) sel.getFirstElement();
+		String selected = getSelection();
+		if (selected != null) {
 			try {
 				controller.showPDF(null, selected);
 			} catch (Exception ex) {
