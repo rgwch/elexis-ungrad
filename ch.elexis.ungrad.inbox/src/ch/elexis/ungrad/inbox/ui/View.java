@@ -161,30 +161,39 @@ public class View extends ViewPart {
 				setToolTipText("IMAP Mails holen");
 				setImageDescriptor(Images.IMG_MAIL.getImageDescriptor());
 			}
+			private IMAPMail.INotifier notifier = new IMAPMail.INotifier() {
+				File dir = new File(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
+
+				@Override
+				public void documentFound(String name, byte[] doc) {
+					try {
+						FileTool.writeFile(new File(dir, name), doc);
+						reload();
+					} catch (Exception ex) {
+						SWTHelper.alert("Fehler beim Schreiben " + name, ex.getMessage());
+					}
+
+				}
+			};
 
 			@Override
 			public void run() {
 				try {
-					Map<String, byte[]> pdfs = new HashMap<String, byte[]>();
-					File dir = new File(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
 					String mailMode = CoreHub.localCfg.get(PreferenceConstants.MAILMODE, "none");
 					if (mailMode.equals("mbox")) {
 						String mbox = CoreHub.localCfg.get(PreferenceConstants.MBOX, "");
-						pdfs = new MBox(mbox, whitelist).readMessages();
+						Map<String, byte[]> pdfs = new MBox(mbox, whitelist).readMessages();
+						for (Entry<String, byte[]> e : pdfs.entrySet()) {
+							notifier.documentFound(e.getKey(), e.getValue());
+						}
 					} else if (mailMode.equals("imap")) {
-						pdfs = new IMAPMail(whitelist).fetch();
+						new IMAPMail(whitelist, notifier).fetch();
 					}
-					for (Entry<String, byte[]> e : pdfs.entrySet()) {
-						FileTool.writeFile(new File(dir, e.getKey()), e.getValue());
-					}
-					reload();
 
 				} catch (Exception e) {
 					SWTHelper.alert("Fehler bei Nachrichtenabruf", e.getLocalizedMessage());
 					ExHandler.handle(e);
 				}
-				// Mailbox mailbox = new Mailbox();
-				// mailbox.fetch();
 			}
 		};
 		addAction = new Action("Zuweisen") {

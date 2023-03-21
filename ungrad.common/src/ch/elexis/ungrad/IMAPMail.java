@@ -30,6 +30,11 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeUtility;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+
 import ch.elexis.core.data.activator.CoreHub;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
@@ -39,20 +44,84 @@ public class IMAPMail {
 	Folder folder;
 	Session session;
 	Store store;
+	long uidvalidity;
+	long lastseen;
+	INotifier notifier;
 
-	public IMAPMail(String[] whitelist) {
-		this.whitelist = whitelist;
+	public static interface INotifier {
+		public void documentFound(String name, byte[] doc);
 	}
 
-	public Map<String, byte[]> fetch() throws Exception {
+	public IMAPMail(String[] whitelist, INotifier notify) {
+		this.whitelist = whitelist;
+		this.notifier = notify;
+	}
+
+	class FetchJob extends Job {
+
+		public FetchJob() {
+			super("Import Imap Mails");
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			try {
+				folder.open(Folder.READ_ONLY);
+				UIDFolder uf = (UIDFolder) folder;
+				long uid = uf.getUIDValidity();
+				if (uid != uidvalidity) {
+					lastseen = 1;
+					uidvalidity = uid;
+					CoreHub.localCfg.set(PreferenceConstants.IMAP_UIDVALIDITY, Long.toString(uidvalidity, 10));
+					CoreHub.localCfg.flush();
+				}
+				// Message m1=uf.getMessageByUID(1);
+				Message[] messages = uf.getMessagesByUID(lastseen + 1, -1);// folder.getMessages();
+				monitor.beginTask("Reading IMAP", messages.length);
+				for (int i = 0; i < messages.length; i++) {
+					Message msg = messages[i];
+					System.out.println(uf.getUID(msg));
+					Address[] from = msg.getFrom();
+					if (from.length == 0) {
+						from = msg.getReplyTo();
+					}
+					if (from.length > 0) {
+						InternetAddress[] iadr = (InternetAddress[]) from;
+						String sender = findSender(iadr);
+						if (sender != null) {
+							System.out.println(sender + " " + msg.getMessageNumber());
+							saveParts(msg.getContent());
+						}
+					}
+					lastseen = uf.getUID(msg);
+					CoreHub.localCfg.set(PreferenceConstants.IMAP_LAST_SEEN, Long.toString(lastseen, 10));
+					CoreHub.localCfg.flush();
+					monitor.worked(1);
+					if (monitor.isCanceled()) {
+						folder.close(false);
+						store.close();
+						return Status.CANCEL_STATUS;
+					}
+				}
+				folder.close(false);
+				store.close();
+				monitor.done();
+				return Status.OK_STATUS;
+			} catch (Exception ex) {
+				return new Status(Status.ERROR, "Imapmail", ex.getMessage());
+			}
+		}
+
+	}
+
+	public void fetch() throws Exception {
 		Map<String, byte[]> ret = new HashMap<String, byte[]>();
 		String host = CoreHub.localCfg.get(PreferenceConstants.IMAP_HOST, "");
 		String user = CoreHub.localCfg.get(PreferenceConstants.IMAP_USER, "");
 		String pwd = CoreHub.localCfg.get(PreferenceConstants.IMAP_PWD, "");
 		// String port = CoreHub.localCfg.get(PreferenceConstants.IMAP_PORT, "993");
-		long uidvalidity = Long.parseLong(CoreHub.localCfg.get(PreferenceConstants.IMAP_UIDVALIDITY, "0"));
-
-		long lastseen = Long.parseLong(CoreHub.localCfg.get(PreferenceConstants.IMAP_LAST_SEEN, "1"));
+		uidvalidity = Long.parseLong(CoreHub.localCfg.get(PreferenceConstants.IMAP_UIDVALIDITY, "0"));
+		lastseen = Long.parseLong(CoreHub.localCfg.get(PreferenceConstants.IMAP_LAST_SEEN, "1"));
 		Properties props = System.getProperties();
 		props.setProperty("mail.store.protocol", "imaps");
 		session = Session.getDefaultInstance(props, null);
@@ -61,40 +130,10 @@ public class IMAPMail {
 		store.connect(host, user, pwd);
 		folder = store.getFolder("Inbox");
 		if (folder.exists()) {
-			folder.open(Folder.READ_ONLY);
-			UIDFolder uf = (UIDFolder) folder;
-			long uid = uf.getUIDValidity();
-			if (uid != uidvalidity) {
-				lastseen = 1;
-				uidvalidity = uid;
-				CoreHub.localCfg.set(PreferenceConstants.IMAP_UIDVALIDITY, Long.toString(uidvalidity, 10));
-				CoreHub.localCfg.flush();
-			}
-			// Message m1=uf.getMessageByUID(1);
-			Message[] messages = uf.getMessagesByUID(lastseen+1, -1);// folder.getMessages();
-			for (int i = 0; i < messages.length; i++) {
-				Message msg = messages[i];
-				System.out.println(uf.getUID(msg));
-				Address[] from = msg.getFrom();
-				if (from.length == 0) {
-					from = msg.getReplyTo();
-				}
-				if (from.length > 0) {
-					InternetAddress[] iadr = (InternetAddress[]) from;
-					String sender = findSender(iadr);
-					if (sender != null) {
-						System.out.println(sender + " " + msg.getMessageNumber());
-						saveParts(msg.getContent(), ret);
-					}
-				}
-				lastseen = uf.getUID(msg);
-				CoreHub.localCfg.set(PreferenceConstants.IMAP_LAST_SEEN, Long.toString(lastseen, 10));
-				CoreHub.localCfg.flush();
-			}
-			folder.close(false);
+			FetchJob fetcher = new FetchJob();
+			fetcher.setUser(true);
+			fetcher.schedule();
 		}
-		store.close();
-		return ret;
 	}
 
 	String findSender(InternetAddress[] addr) {
@@ -131,7 +170,7 @@ public class IMAPMail {
 	 * @param attachments
 	 * @throws Exception
 	 */
-	void saveParts(Object content, Map<String, byte[]> attachments) throws Exception {
+	void saveParts(Object content) throws Exception {
 		if (content instanceof Multipart) {
 			Multipart multi = (Multipart) content;
 			int parts = multi.getCount();
@@ -139,7 +178,7 @@ public class IMAPMail {
 				MimeBodyPart part = (MimeBodyPart) multi.getBodyPart(j);
 				if (part.getContent() instanceof Multipart) {
 					// part-within-a-part, do some recursion...
-					saveParts(part.getContent(), attachments);
+					saveParts(part.getContent());
 				} else {
 					String extension = "";
 					String fn = part.getFileName();
@@ -149,7 +188,7 @@ public class IMAPMail {
 							ByteArrayOutputStream baos = new ByteArrayOutputStream();
 							InputStream is = part.getInputStream();
 							FileTool.copyStreams(is, baos);
-							attachments.put(f2, baos.toByteArray());
+							notifier.documentFound(f2, baos.toByteArray());
 						}
 					}
 
