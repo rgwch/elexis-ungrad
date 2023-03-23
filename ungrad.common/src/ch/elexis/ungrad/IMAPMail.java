@@ -184,7 +184,8 @@ public class IMAPMail {
 					String fn = part.getFileName();
 					if (!StringTool.isNothing(fn)) {
 						String f2 = MimeUtility.decodeText(fn);
-						if (f2.toLowerCase().endsWith("pdf")) {
+						String f3=f2.toLowerCase();
+						if (f3.matches(".+\\.(jpe?g|pdf)")) {
 							ByteArrayOutputStream baos = new ByteArrayOutputStream();
 							InputStream is = part.getInputStream();
 							FileTool.copyStreams(is, baos);
