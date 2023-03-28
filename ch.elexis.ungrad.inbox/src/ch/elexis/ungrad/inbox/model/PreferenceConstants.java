@@ -18,4 +18,5 @@ public class PreferenceConstants {
 	public static final String WHITELIST = BASE + "whiteleist";
 	public static final String MAILMODE = BASE + "mailmode";
 	public static final String MBOX = BASE + "mboxfile";
+	public static final String MAPPINGS =BASE + "mappingfile";
 }

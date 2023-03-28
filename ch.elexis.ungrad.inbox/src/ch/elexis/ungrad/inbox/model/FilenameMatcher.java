@@ -17,12 +17,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.data.Person;
 import ch.elexis.data.Query;
+import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 public class FilenameMatcher {
-	Pattern datePattern;
+	Pattern datePattern, datePattern2;
 
 	public FilenameMatcher() {
 		datePattern = Pattern.compile("\\d{2,4}[\\.-]\\d\\d[\\.-]\\d{2,4}");
@@ -46,31 +48,50 @@ public class FilenameMatcher {
 		return ret;
 	}
 
-	public DocumentDescriptor analyze(final Person p, final File file) {
-		DocumentDescriptor dd = new DocumentDescriptor(p, new TimeTool(), file, file.getName());
-		findDates(dd);
-		String ret = dd.filename;
-		ret = cutDate(ret, dd.docDate);
-		if (dd.concerns != null) {
-			ret = cutDate(ret, new TimeTool(dd.concerns.getGeburtsdatum()));
-			ret = cut(ret, dd.concerns.get(Person.NAME));
-			ret = cut(ret, dd.concerns.get(Person.FIRSTNAME));
-		}
-		ret = ret.replaceAll("[,':;]", " ");
-		ret = ret.replaceAll("\\s+", "_");
-		while (ret.startsWith("-") || ret.startsWith("_")) {
-			ret = ret.substring(1);
-		}
-		ret = ret.replaceAll("\\(\\)", "");
-		dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + ret.trim();
-
-		int ext = dd.filename.lastIndexOf('.');
-		if (ext > -1) {
-			String base = dd.filename.substring(0, ext);
-			while (base.endsWith("-") || base.endsWith("_")) {
-				base = base.substring(0, base.length() - 1);
+	private DocumentDescriptor analyzeMappings(final File file) throws Exception {
+		String mapfilename = CoreHub.localCfg.get(PreferenceConstants.MAPPINGS, null);
+		if (mapfilename != null) {
+			File mapfile = new File(mapfilename);
+			if (mapfile.exists() && mapfile.canRead()) {
+				FilenameMapper fmap = new FilenameMapper(mapfile);
+				Docinfo docinfo = fmap.map(file.getName());
+				if(!StringTool.isNothing(docinfo.docname)) {
+					
+				}
 			}
-			dd.filename = base + dd.filename.substring(ext).toLowerCase();
+		}
+		return null;
+	}
+
+	public DocumentDescriptor analyze(final Person p, final File file) throws Exception {
+		DocumentDescriptor dd = analyzeMappings(file);
+		if (dd == null) {
+			dd = new DocumentDescriptor(p, new TimeTool(), file, file.getName());
+
+			findDates(dd);
+			String ret = dd.filename;
+			ret = cutDate(ret, dd.docDate);
+			if (dd.concerns != null) {
+				ret = cutDate(ret, new TimeTool(dd.concerns.getGeburtsdatum()));
+				ret = cut(ret, dd.concerns.get(Person.NAME));
+				ret = cut(ret, dd.concerns.get(Person.FIRSTNAME));
+			}
+			ret = ret.replaceAll("[,':;]", " ");
+			ret = ret.replaceAll("\\s+", "_");
+			while (ret.startsWith("-") || ret.startsWith("_")) {
+				ret = ret.substring(1);
+			}
+			ret = ret.replaceAll("\\(\\)", "");
+			dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + ret.trim();
+
+			int ext = dd.filename.lastIndexOf('.');
+			if (ext > -1) {
+				String base = dd.filename.substring(0, ext);
+				while (base.endsWith("-") || base.endsWith("_")) {
+					base = base.substring(0, base.length() - 1);
+				}
+				dd.filename = base + dd.filename.substring(ext).toLowerCase();
+			}
 		}
 		return dd;
 	}

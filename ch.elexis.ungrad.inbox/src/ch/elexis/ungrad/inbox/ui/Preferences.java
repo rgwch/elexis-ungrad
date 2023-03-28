@@ -49,6 +49,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		addField(new FileFieldEditor(PreferenceConstants.MBOX, "MBox-Datei", getFieldEditorParent()));
 		addField(new MultilineFieldEditor(PreferenceConstants.WHITELIST, "Absender", 4, SWT.V_SCROLL, false,
 				getFieldEditorParent()));
+		addField(new FileFieldEditor(PreferenceConstants.MAPPINGS, "Dateinamen-Analyse", getFieldEditorParent()));
 
 	}
 
