@@ -54,9 +54,25 @@ public class FilenameMatcher {
 			File mapfile = new File(mapfilename);
 			if (mapfile.exists() && mapfile.canRead()) {
 				FilenameMapper fmap = new FilenameMapper(mapfile);
-				Docinfo docinfo = fmap.map(file.getName());
-				if(!StringTool.isNothing(docinfo.docname)) {
-					
+				String filename = file.getName();
+				Docinfo docinfo = fmap.map(filename);
+				if (!StringTool.isNothing(docinfo.docname)) {
+					int extpos = filename.lastIndexOf('.');
+					String ext = extpos > -1 ? filename.substring(extpos).toLowerCase() : "";
+					DocumentDescriptor ret = new DocumentDescriptor(null, docinfo.docDate, file, filename);
+					if (docinfo.dob != null && checkBirthdate(ret, docinfo.dob)) {
+						ret.filename = docinfo.docname + ext;
+						return ret;
+					} else {
+						Query<Person> qbe = new Query<Person>(Person.class);
+						qbe.add(Person.FIRSTNAME, Query.EQUALS, docinfo.firstname);
+						qbe.add(Person.NAME, Query.EQUALS, docinfo.lastname);
+						List<Person> result = qbe.execute();
+						if (result.size() == 1) {
+							ret.concerns = result.get(0);
+							return ret;
+						}
+					}
 				}
 			}
 		}

@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ch.rgw.tools.TimeTool;
+
 public class FilenameMapper {
 	Map<Pattern, String[]> patterns = new HashMap<Pattern, String[]>();
 
@@ -33,6 +35,7 @@ public class FilenameMapper {
 	public Docinfo map(String in) throws Exception {
 		Docinfo ret = null;
 		for (Pattern p : patterns.keySet()) {
+//			System.out.println(p);
 			Matcher m = p.matcher(in);
 			if (m.find()) {
 				ret = new Docinfo();
@@ -41,6 +44,11 @@ public class FilenameMapper {
 					String val = m.group(1 + c);
 					switch (repl[c]) {
 					case "name":
+						String[] names=val.split("[ _]",2);
+						if(names.length>1) {
+							ret.firstname=names[0];
+							ret.lastname=names[1];
+						}
 						ret.patient = val;
 						break;
 					case "firstname":
@@ -53,18 +61,58 @@ public class FilenameMapper {
 						ret.docname = val;
 						break;
 					case "docdate":
-						ret.docDate = val;
+						ret.docDate = parseDate(val);
 						break;
 					case "dob":
-						ret.dob = val;
+						ret.dob = parseDate(val);
 						break;
 					default:
 						throw new Exception("Unknown identifier " + repl[c]);
 					}
 				}
-
+				return ret;
 			}
 		}
 		return ret;
+	}
+
+	private TimeTool parseDate(String date) {
+		if (date.matches("\\d{8,8}")) {
+			int y = Integer.parseInt(date.substring(0, 4));
+			int m = Integer.parseInt(date.substring(4, 6));
+			int d = Integer.parseInt(date.substring(6));
+			if (y > 1900 && y < 2100 && m < 13 && d < 32) {
+				return makeDate(y, m, d);
+			} else {
+				if (d > 1900 && d < 2100 && y < 32) {
+					return makeDate(d, m, y);
+				}
+			}
+		} else if (date.matches("\\d{6,6}")) {
+			int y = Integer.parseInt(date.substring(0, 2));
+			int m = Integer.parseInt(date.substring(2, 4));
+			int d = Integer.parseInt(date.substring(4));
+			if (y < 99 && m < 13 && d < 32) {
+				return makeDate(y, m, d);
+			} else {
+				if (d < 99 && y < 32) {
+					return makeDate(d, m, y);
+				}
+			}
+		} else if (date.matches("\\d{1,4}[\\.-]\\d?\\d[\\.-]\\d{1,4}")) {
+			return new TimeTool(date);
+		}
+		return null;
+
+	}
+
+	private TimeTool makeDate(int y, int m, int d) {
+		if (y < 100) {
+			y = y + 2000;
+		}
+		String year = String.format("%4d", y);
+		String month = String.format("%02d", m);
+		String day = String.format("%02d", d);
+		return new TimeTool(year + "-" + month + "-" + day);
 	}
 }
