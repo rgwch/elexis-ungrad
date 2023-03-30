@@ -22,6 +22,13 @@ public class DocumentDescriptor {
 	public TimeTool docDate;
 	public File file;
 	public String filename;
+	public String sender;
+	public String subject;
+	public String lastname;
+	public String firstname;
+	public String fullname;
+	public String docname;
+	public TimeTool dob;
 	public DocumentDescriptor(Person c,TimeTool tt,File f, String fn) {
 		concerns=c;
 		docDate=new TimeTool(tt);

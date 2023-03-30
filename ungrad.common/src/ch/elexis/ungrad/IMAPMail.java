@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Address;
-import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.Multipart;
@@ -49,7 +48,7 @@ public class IMAPMail {
 	INotifier notifier;
 
 	public static interface INotifier {
-		public void documentFound(String name, byte[] doc);
+		public void documentFound(String name, byte[] doc, String sender, String subject);
 	}
 
 	public IMAPMail(String[] whitelist, INotifier notify) {
@@ -90,7 +89,8 @@ public class IMAPMail {
 						String sender = findSender(iadr);
 						if (sender != null) {
 							System.out.println(sender + " " + msg.getMessageNumber());
-							saveParts(msg.getContent());
+							String subject = msg.getSubject();
+							saveParts(msg.getContent(), sender, subject);
 						}
 					}
 					lastseen = uf.getUID(msg);
@@ -170,7 +170,7 @@ public class IMAPMail {
 	 * @param attachments
 	 * @throws Exception
 	 */
-	void saveParts(Object content) throws Exception {
+	void saveParts(Object content, String sender, String subject) throws Exception {
 		if (content instanceof Multipart) {
 			Multipart multi = (Multipart) content;
 			int parts = multi.getCount();
@@ -178,18 +178,18 @@ public class IMAPMail {
 				MimeBodyPart part = (MimeBodyPart) multi.getBodyPart(j);
 				if (part.getContent() instanceof Multipart) {
 					// part-within-a-part, do some recursion...
-					saveParts(part.getContent());
+					saveParts(part.getContent(), sender, subject);
 				} else {
 					String extension = "";
 					String fn = part.getFileName();
 					if (!StringTool.isNothing(fn)) {
 						String f2 = MimeUtility.decodeText(fn);
-						String f3=f2.toLowerCase();
+						String f3 = f2.toLowerCase();
 						if (f3.matches(".+\\.(jpe?g|pdf)")) {
 							ByteArrayOutputStream baos = new ByteArrayOutputStream();
 							InputStream is = part.getInputStream();
 							FileTool.copyStreams(is, baos);
-							notifier.documentFound(f2, baos.toByteArray());
+							notifier.documentFound(f2, baos.toByteArray(), sender, subject);
 						}
 					}
 

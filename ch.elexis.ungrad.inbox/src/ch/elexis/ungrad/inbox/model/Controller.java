@@ -45,6 +45,10 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	public void moveFileToDocbase(Person p, File f, String destName) throws Exception {
 		File dir = sc.getOutputDirFor(p, true);
 		FileTool.copyFile(f, new File(dir, destName), FileTool.FAIL_IF_EXISTS);
+		File meta=new File(f.getAbsolutePath()+".meta");
+		if(meta.exists()) {
+			meta.delete();
+		}
 		f.delete();
 	}
 }

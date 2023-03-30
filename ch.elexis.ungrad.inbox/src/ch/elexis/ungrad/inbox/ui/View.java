@@ -165,9 +165,10 @@ public class View extends ViewPart {
 				File dir = new File(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
 
 				@Override
-				public void documentFound(String name, byte[] doc) {
+				public void documentFound(String name, byte[] doc, String sender, String subject) {
 					try {
 						FileTool.writeFile(new File(dir, name), doc);
+						FileTool.writeTextFile(new File(dir,name+".meta"), sender+","+subject);
 						reload();
 					} catch (Exception ex) {
 						SWTHelper.alert("Fehler beim Schreiben " + name, ex.getMessage());
@@ -182,10 +183,7 @@ public class View extends ViewPart {
 					String mailMode = CoreHub.localCfg.get(PreferenceConstants.MAILMODE, "none");
 					if (mailMode.equals("mbox")) {
 						String mbox = CoreHub.localCfg.get(PreferenceConstants.MBOX, "");
-						Map<String, byte[]> pdfs = new MBox(mbox, whitelist).readMessages();
-						for (Entry<String, byte[]> e : pdfs.entrySet()) {
-							notifier.documentFound(e.getKey(), e.getValue());
-						}
+						new MBox(mbox, whitelist).readMessages(notifier);
 					} else if (mailMode.equals("imap")) {
 						new IMAPMail(whitelist, notifier).fetch();
 					}
@@ -206,9 +204,9 @@ public class View extends ViewPart {
 			public void run() {
 				try {
 					File sel = getSelection();
-					Patient pat = ElexisEventDispatcher.getSelectedPatient();
+					// Patient pat = ElexisEventDispatcher.getSelectedPatient();
 					if (sel != null) {
-						DocumentDescriptor dd = fmatch.analyze(pat, sel);
+						DocumentDescriptor dd = fmatch.analyze(sel);
 						ImportDocumentDialog idlg = new ImportDocumentDialog(View.this, dd);
 						if (idlg.open() == Dialog.OK) {
 							System.out.print(idlg.getValue());

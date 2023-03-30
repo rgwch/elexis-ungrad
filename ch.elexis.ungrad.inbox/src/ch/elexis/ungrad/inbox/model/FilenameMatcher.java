@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.data.Person;
 import ch.elexis.data.Query;
+import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
@@ -48,43 +49,49 @@ public class FilenameMatcher {
 		return ret;
 	}
 
-	private DocumentDescriptor analyzeMappings(final File file) throws Exception {
+	private void analyzeMappings(DocumentDescriptor dd) throws Exception {
 		String mapfilename = CoreHub.localCfg.get(PreferenceConstants.MAPPINGS, null);
 		if (mapfilename != null) {
 			File mapfile = new File(mapfilename);
 			if (mapfile.exists() && mapfile.canRead()) {
 				FilenameMapper fmap = new FilenameMapper(mapfile);
-				String filename = file.getName();
-				Docinfo docinfo = fmap.map(filename);
-				if (docinfo!= null && !StringTool.isNothing(docinfo.docname)) {
-					int extpos = filename.lastIndexOf('.');
-					String ext = extpos > -1 ? filename.substring(extpos).toLowerCase() : "";
-					DocumentDescriptor ret = new DocumentDescriptor(null, docinfo.docDate, file, filename);
-					if (docinfo.dob != null && checkBirthdate(ret, docinfo.dob)) {
-						ret.filename = docinfo.docDate.toString(TimeTool.DATE_ISO) + "_"+docinfo.docname + ext;
-						return ret;
+				fmap.map(dd);
+				if (!StringTool.isNothing(dd.docname)) {
+					int extpos = dd.filename.lastIndexOf('.');
+					String ext = extpos > -1 ? dd.filename.substring(extpos).toLowerCase() : "";
+					if (dd.dob != null && checkBirthdate(dd, dd.dob)) {
+						dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + dd.docname + ext;
+						return;
 					} else {
 						Query<Person> qbe = new Query<Person>(Person.class);
-						qbe.add(Person.FIRSTNAME, Query.EQUALS, docinfo.firstname);
-						qbe.add(Person.NAME, Query.EQUALS, docinfo.lastname);
+						qbe.add(Person.FIRSTNAME, Query.EQUALS, dd.firstname);
+						qbe.add(Person.NAME, Query.EQUALS, dd.lastname);
 						List<Person> result = qbe.execute();
 						if (result.size() == 1) {
-							ret.concerns = result.get(0);
-							ret.filename = docinfo.docDate.toString(TimeTool.DATE_ISO) + "_"+docinfo.docname + ext;
-							return ret;
+							dd.concerns = result.get(0);
+							dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + dd.docname + ext;
+							return;
 						}
 					}
 				}
 			}
 		}
-		return null;
 	}
 
-	public DocumentDescriptor analyze(final Person p, final File file) throws Exception {
-		DocumentDescriptor dd = analyzeMappings(file);
-		if (dd == null) {
-			dd = new DocumentDescriptor(p, new TimeTool(), file, file.getName());
-
+	public DocumentDescriptor analyze(final File file) throws Exception {
+		DocumentDescriptor dd = new DocumentDescriptor(null, new TimeTool(), file, file.getName());
+		File meta = new File(file.getAbsolutePath() + ".meta");
+		if (meta.exists() && meta.canRead()) {
+			String[] metadata = FileTool.readTextFile(meta).split(",", 2);
+			if (metadata[0].indexOf('@') == -1) {
+				dd.sender = metadata[0];
+			}
+			if (metadata.length > 1) {
+				dd.subject = metadata[1];
+			}
+		}
+		analyzeMappings(dd);
+		if (dd.docname == null) {
 			findDates(dd);
 			String ret = dd.filename;
 			ret = cutDate(ret, dd.docDate);

@@ -34,7 +34,7 @@ import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
 public class ImportDocumentDialog extends TitleAreaDialog {
 	DocumentDescriptor dd;
 	Text text;
-	Label lPat;
+	// Label lPat;
 	String result = "";
 	private View view;
 
@@ -43,29 +43,29 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 		Composite ret = new Composite(parent, SWT.NONE);
 		ret.setLayoutData(SWTHelper.getFillGridData());
 		ret.setLayout(new GridLayout(2, false));
-		lPat = new Label(ret, SWT.NONE);
+		// lPat = new Label(ret, SWT.NONE);
 		Button bSelect = new Button(ret, SWT.PUSH);
-		bSelect.setText("Ändern...");
+		bSelect.setText("Patient/in zuweisen...");
 		bSelect.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				KontaktSelektor ksl = new KontaktSelektor(getShell(), Person.class, "Bitte Patient wählen",
-						"Patient für Zuordnung", null);
+				KontaktSelektor ksl = new KontaktSelektor(getShell(), Person.class, "Bitte Patient/in wählen",
+						"Patient/in für Zuordnung", null);
 				if (ksl.open() == Dialog.OK) {
 					Person pat = (Person) ksl.getSelection();
-					lPat.setText("Zu Patient: " + pat.getLabel());
+					setErrorMessage(null);
+					setMessage(pat.getLabel());
 					dd.concerns = pat;
 				}
 			}
 
 		});
 		if (dd.concerns == null) {
-			lPat.setText("Kein Patient ausgewählt");
+			setErrorMessage("Bitte weisen Sie eine Patientin oder einen Patienten zu");
 		} else {
-			lPat.setText("Zu Patient: " + dd.concerns.getLabel());
+			setMessage(dd.concerns.getLabel());
 		}
-		lPat.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		Composite cText=new Composite(ret,SWT.NONE);
 		cText.setLayoutData(SWTHelper.getFillGridData(2,true,1,false));
 		cText.setLayout(new GridLayout(2, false));
@@ -88,8 +88,8 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		setTitle("Dokument zuweisen");
-		setMessage("Bitte prüfen und korrigieren Sie die Zuordnung zu Patient und den Dateinamen");
+		super.getShell().setText("Dokument importieren");
+		setTitle("Dieses Dokument gehört zu:");
 	}
 
 	public ImportDocumentDialog(View view, DocumentDescriptor dd) {

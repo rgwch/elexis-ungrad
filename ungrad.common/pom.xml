@@ -9,6 +9,6 @@
     <artifactId>ch.elexis.ungrad.common</artifactId>
     <packaging>eclipse-plugin</packaging>
     <groupId>ch.rgw</groupId>
-    <version>1.4.1-SNAPSHOT</version>
+    <version>1.4.2-SNAPSHOT</version>
 
 </project>
