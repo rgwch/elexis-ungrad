@@ -56,12 +56,12 @@ public class FilenameMatcher {
 				FilenameMapper fmap = new FilenameMapper(mapfile);
 				String filename = file.getName();
 				Docinfo docinfo = fmap.map(filename);
-				if (!StringTool.isNothing(docinfo.docname)) {
+				if (docinfo!= null && !StringTool.isNothing(docinfo.docname)) {
 					int extpos = filename.lastIndexOf('.');
 					String ext = extpos > -1 ? filename.substring(extpos).toLowerCase() : "";
 					DocumentDescriptor ret = new DocumentDescriptor(null, docinfo.docDate, file, filename);
 					if (docinfo.dob != null && checkBirthdate(ret, docinfo.dob)) {
-						ret.filename = docinfo.docname + ext;
+						ret.filename = docinfo.docDate.toString(TimeTool.DATE_ISO) + "_"+docinfo.docname + ext;
 						return ret;
 					} else {
 						Query<Person> qbe = new Query<Person>(Person.class);
@@ -70,6 +70,7 @@ public class FilenameMatcher {
 						List<Person> result = qbe.execute();
 						if (result.size() == 1) {
 							ret.concerns = result.get(0);
+							ret.filename = docinfo.docDate.toString(TimeTool.DATE_ISO) + "_"+docinfo.docname + ext;
 							return ret;
 						}
 					}

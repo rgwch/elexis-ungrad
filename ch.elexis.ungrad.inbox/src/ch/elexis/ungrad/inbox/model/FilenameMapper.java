@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2023, G. Weirich and Elexis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    G. Weirich - initial implementation
+ *    
+ *******************************************************************************/
+
 package ch.elexis.ungrad.inbox.model;
 
 import java.io.BufferedReader;
@@ -8,6 +20,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 public class FilenameMapper {
@@ -35,7 +48,7 @@ public class FilenameMapper {
 	public Docinfo map(String in) throws Exception {
 		Docinfo ret = null;
 		for (Pattern p : patterns.keySet()) {
-//			System.out.println(p);
+			System.out.println(p);
 			Matcher m = p.matcher(in);
 			if (m.find()) {
 				ret = new Docinfo();
@@ -68,6 +81,14 @@ public class FilenameMapper {
 						break;
 					default:
 						throw new Exception("Unknown identifier " + repl[c]);
+					}
+				}
+				if(ret.docname==null) {
+					ret.docname="";
+				}
+				for(String r:repl) {
+					if(r.startsWith("append:")) {
+						ret.docname+=r.substring(7);
 					}
 				}
 				return ret;
