@@ -49,6 +49,11 @@ public class FilenameMatcher {
 		return ret;
 	}
 
+	private Person findKontakt(String text) {
+		Query<Person> qbe = new Query<Person>(Person.class);
+		return null;
+	}
+
 	private void analyzeMappings(DocumentDescriptor dd) throws Exception {
 		String mapfilename = CoreHub.localCfg.get(PreferenceConstants.MAPPINGS, null);
 		if (mapfilename != null) {
@@ -120,6 +125,15 @@ public class FilenameMatcher {
 		return dd;
 	}
 
+	/**
+	 * Extract dates from the filename. If a date is found, check if it might be a
+	 * birthdate of a patient. If so, set the concern. If not, set the docDate. If
+	 * more than one date is found, the latest will be the docdate. If None is
+	 * found, today is the docdate.
+	 * 
+	 * @param dd DocumentDescriptor prefilled with at least filename. Will fill
+	 *           dd.concern and dd.docDate as found.
+	 */
 	public void findDates(DocumentDescriptor dd) {
 		TimeTool now = new TimeTool();
 		TimeTool cand = new TimeTool();
@@ -138,23 +152,32 @@ public class FilenameMatcher {
 	}
 
 	private boolean checkBirthdate(DocumentDescriptor dd, TimeTool cand) {
+		if (dd.concerns == null) {
+			dd.concerns = checkBirthdate(dd.filename, cand);
+			if (dd.concerns != null) {
+				dd.dob = new TimeTool(dd.concerns.getGeburtsdatum());
+			}
+		}
+		return dd.dob != null ? cand.isEqual(dd.dob) : false;
+	}
+
+	private Person checkBirthdate(String text, TimeTool cand) {
 		Query<Person> qbe = new Query<Person>(Person.class, Person.BIRTHDATE, cand.toString(TimeTool.DATE_COMPACT));
 		List<Person> result = qbe.execute();
 		if (result.size() == 0) {
-			return false;
+			return null;
 		} else if (result.size() == 1) {
-			dd.concerns = result.get(0);
-			return true;
+			return result.get(0);
 		} else {
 			String[] pp = new String[] { Person.NAME, Person.FIRSTNAME };
 			String[] hits = new String[2];
 			for (Person hit : result) {
 				hit.get(pp, hits);
-				if (dd.filename.contains(hits[0]) && dd.filename.contains(hits[1])) {
-					dd.concerns = hit;
+				if (text.contains(hits[0]) && text.contains(hits[1])) {
+					return hit;
 				}
 			}
-			return true;
 		}
+		return null;
 	}
 }
