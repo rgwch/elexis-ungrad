@@ -13,6 +13,8 @@
 package ch.elexis.ungrad.inbox.model;
 
 import java.io.File;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,7 +52,21 @@ public class FilenameMatcher {
 	}
 
 	private Person findKontakt(String text) {
-		Query<Person> qbe = new Query<Person>(Person.class);
+		if (!StringTool.isNothing(text)) {
+			Query<Person> qbe = new Query<Person>(Person.class);
+			List<TimeTool> dates = new LinkedList<TimeTool>();
+			Matcher m = datePattern.matcher(text);
+			while (m.find()) {
+				TimeTool t = new TimeTool(m.group());
+				dates.add(t);
+			}
+			for (TimeTool tt : dates) {
+				Person p = checkBirthdate(text, tt);
+				if (p != null) {
+					return p;
+				}
+			}
+		}
 		return null;
 	}
 
@@ -95,6 +111,7 @@ public class FilenameMatcher {
 				dd.subject = metadata[1];
 			}
 		}
+		dd.concerns = findKontakt(dd.subject);
 		analyzeMappings(dd);
 		if (dd.docname == null) {
 			findDates(dd);
@@ -110,7 +127,7 @@ public class FilenameMatcher {
 			while (ret.startsWith("-") || ret.startsWith("_")) {
 				ret = ret.substring(1);
 			}
-			ret = ret.replaceAll("\\(\\)", "");
+			ret = ret.replaceAll("\\(\\)", "").replaceAll("__+","_");
 			dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + ret.trim();
 
 			int ext = dd.filename.lastIndexOf('.');
