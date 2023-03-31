@@ -77,22 +77,29 @@ public class FilenameMatcher {
 			if (mapfile.exists() && mapfile.canRead()) {
 				FilenameMapper fmap = new FilenameMapper(mapfile);
 				fmap.map(dd);
-				if (!StringTool.isNothing(dd.docname)) {
-					int extpos = dd.filename.lastIndexOf('.');
-					String ext = extpos > -1 ? dd.filename.substring(extpos).toLowerCase() : "";
-					if (dd.dob != null && checkBirthdate(dd, dd.dob)) {
-						dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + dd.docname + ext;
-						return;
-					} else {
-						Query<Person> qbe = new Query<Person>(Person.class);
+				if (dd.concerns == null) {
+					Query<Person> qbe = new Query<Person>(Person.class);
+					if (dd.dob != null) {
+						qbe.add(Person.BIRTHDATE, qbe.EQUALS, dd.dob.toString(TimeTool.DATE_COMPACT));
+					}
+					if (dd.firstname != null) {
+						qbe.startGroup();
 						qbe.add(Person.FIRSTNAME, Query.EQUALS, dd.firstname);
+						qbe.or();
+						qbe.add(Person.NAME, Query.EQUALS, dd.firstname);
+						qbe.endGroup();
+					}
+					if (dd.lastname != null) {
+						qbe.startGroup();
 						qbe.add(Person.NAME, Query.EQUALS, dd.lastname);
-						List<Person> result = qbe.execute();
-						if (result.size() == 1) {
-							dd.concerns = result.get(0);
-							dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + dd.docname + ext;
-							return;
-						}
+						qbe.or();
+						qbe.add(Person.FIRSTNAME, Query.EQUALS, dd.lastname);
+						qbe.endGroup();
+
+					}
+					List<Person> result = qbe.execute();
+					if (result.size() == 1) {
+						dd.concerns = result.get(0);
 					}
 				}
 			}
@@ -113,33 +120,37 @@ public class FilenameMatcher {
 		}
 		dd.concerns = findKontakt(dd.subject);
 		analyzeMappings(dd);
-		if (dd.docname == null) {
-			findDates(dd);
-			String ret = dd.filename;
-			ret = cutDate(ret, dd.docDate);
-			if (dd.concerns != null) {
-				ret = cutDate(ret, new TimeTool(dd.concerns.getGeburtsdatum()));
-				ret = cut(ret, dd.concerns.get(Person.NAME));
-				ret = cut(ret, dd.concerns.get(Person.FIRSTNAME));
-			}
-			ret = ret.replaceAll("[,':;]", " ");
-			ret = ret.replaceAll("\\s+", "_");
-			while (ret.startsWith("-") || ret.startsWith("_")) {
-				ret = ret.substring(1);
-			}
-			ret = ret.replaceAll("\\(\\)", "").replaceAll("__+","_");
-			dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + ret.trim();
-
-			int ext = dd.filename.lastIndexOf('.');
-			if (ext > -1) {
-				String base = dd.filename.substring(0, ext);
-				while (base.endsWith("-") || base.endsWith("_")) {
-					base = base.substring(0, base.length() - 1);
-				}
-				dd.filename = base + dd.filename.substring(ext).toLowerCase();
-			}
-		}
+		findDates(dd);
+		makeFilename(dd);
 		return dd;
+	}
+
+	private void makeFilename(DocumentDescriptor dd) {
+		if (dd.docname == null) {
+			dd.docname = cutDate(dd.filename, dd.docDate);
+			if (dd.concerns != null) {
+				dd.docname = cutDate(dd.docname, new TimeTool(dd.concerns.getGeburtsdatum()));
+				dd.docname = cut(dd.docname, dd.concerns.get(Person.NAME));
+				dd.docname = cut(dd.docname, dd.concerns.get(Person.FIRSTNAME));
+			}
+			dd.docname = dd.docname.replaceAll("[,':;]", " ");
+			dd.docname = dd.docname.replaceAll("\\s+", "_");
+			while (dd.docname.startsWith("-") || dd.docname.startsWith("_")) {
+				dd.docname = dd.docname.substring(1);
+			}
+			dd.docname = dd.docname.replaceAll("\\(\\)", "").replaceAll("__+", "_");
+		}
+		dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + dd.docname.trim();
+
+		int ext = dd.filename.lastIndexOf('.');
+		if (ext > -1) {
+			String base = dd.filename.substring(0, ext);
+			while (base.endsWith("-") || base.endsWith("_")) {
+				base = base.substring(0, base.length() - 1);
+			}
+			dd.filename = base + dd.filename.substring(ext).toLowerCase();
+		}
+
 	}
 
 	/**

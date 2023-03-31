@@ -14,9 +14,6 @@ package ch.elexis.ungrad.inbox.ui;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -34,15 +31,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
-import ch.elexis.data.Patient;
 import ch.elexis.ungrad.IMAPMail;
 import ch.elexis.ungrad.MBox;
-// import ch.elexis.ungrad.Mailbox;
 import ch.elexis.ungrad.inbox.model.Controller;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
 import ch.elexis.ungrad.inbox.model.FilenameMatcher;
@@ -168,7 +162,7 @@ public class View extends ViewPart {
 				public void documentFound(String name, byte[] doc, String sender, String subject) {
 					try {
 						FileTool.writeFile(new File(dir, name), doc);
-						FileTool.writeTextFile(new File(dir,name+".meta"), sender+","+subject);
+						FileTool.writeTextFile(new File(dir, name + ".meta"), sender + "," + subject);
 						reload();
 					} catch (Exception ex) {
 						SWTHelper.alert("Fehler beim Schreiben " + name, ex.getMessage());
@@ -204,7 +198,6 @@ public class View extends ViewPart {
 			public void run() {
 				try {
 					File sel = getSelection();
-					// Patient pat = ElexisEventDispatcher.getSelectedPatient();
 					if (sel != null) {
 						DocumentDescriptor dd = fmatch.analyze(sel);
 						ImportDocumentDialog idlg = new ImportDocumentDialog(View.this, dd);
@@ -234,6 +227,10 @@ public class View extends ViewPart {
 			public void run() {
 				File sel = getSelection();
 				if (SWTHelper.askYesNo("Eingangsfach", MessageFormat.format("{0} wirklich löschen?", sel.getName()))) {
+					File meta = new File(sel.getAbsolutePath() + ".meta");
+					if (meta.exists()) {
+						meta.delete();
+					}
 					sel.delete();
 					reload();
 				}
