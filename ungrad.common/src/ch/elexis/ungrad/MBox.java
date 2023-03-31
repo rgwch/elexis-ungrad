@@ -20,12 +20,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringBufferInputStream;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Address;
-import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
@@ -33,6 +30,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
+import ch.elexis.ungrad.IMAPMail.INotifier;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
@@ -61,8 +59,8 @@ public class MBox {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, byte[]> readMessages() throws Exception {
-		Map<String, byte[]> ret = new HashMap<String, byte[]>();
+	public void readMessages(IMAPMail.INotifier notifier) throws Exception {
+		// Map<String, byte[]> ret = new HashMap<String, byte[]>();
 		InputStream in = new FileInputStream(mbox);
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		StringBuilder msg = new StringBuilder();
@@ -71,7 +69,7 @@ public class MBox {
 		while ((line = br.readLine()) != null) {
 			if (line.startsWith("From ")) {
 				if (msg.length() > 0) {
-					process(msg.toString(), ret);
+					process(msg.toString(), notifier);
 					msg.setLength(0);
 					count++;
 				}
@@ -79,14 +77,13 @@ public class MBox {
 			msg.append(line).append("\r\n");
 		}
 		if (msg.length() > 0) {
-			process(msg.toString(), ret);
+			process(msg.toString(), notifier);
 			count++;
 		}
-		System.out.println("parsed " + count);
-		return ret;
+// 		System.out.println("parsed " + count);
 	}
 
-	private void process(String sMsg, Map<String, byte[]> ret) throws Exception {
+	private void process(String sMsg, INotifier notifier) throws Exception {
 		StringBufferInputStream strin = new StringBufferInputStream(sMsg);
 		MimeMessage m = new MimeMessage(session, strin);
 		Date sent = m.getSentDate();
@@ -107,8 +104,9 @@ public class MBox {
 			if (sender != null) {
 				System.out.println(sender + ", " + date.toString(TimeTool.DATE_GER));
 				if (date.isSameDay(today)) {
-					System.out.println(sender);
-					saveParts(m.getContent(), ret);
+					// System.out.println(sender);
+					String subject = m.getSubject();
+					saveParts(m.getContent(), notifier, sender, subject);
 				}
 			}
 
@@ -150,7 +148,7 @@ public class MBox {
 	 * @param attachments
 	 * @throws Exception
 	 */
-	void saveParts(Object content, Map<String, byte[]> attachments) throws Exception {
+	void saveParts(Object content, INotifier notifier, String sender, String subject) throws Exception {
 		if (content instanceof Multipart) {
 			Multipart multi = (Multipart) content;
 			int parts = multi.getCount();
@@ -158,7 +156,7 @@ public class MBox {
 				MimeBodyPart part = (MimeBodyPart) multi.getBodyPart(j);
 				if (part.getContent() instanceof Multipart) {
 					// part-within-a-part, do some recursion...
-					saveParts(part.getContent(), attachments);
+					saveParts(part.getContent(), notifier, sender, subject);
 				} else {
 					String extension = "";
 					String fn = part.getFileName();
@@ -168,7 +166,7 @@ public class MBox {
 							ByteArrayOutputStream baos = new ByteArrayOutputStream();
 							InputStream is = part.getInputStream();
 							FileTool.copyStreams(is, baos);
-							attachments.put(f2, baos.toByteArray());
+							notifier.documentFound(f2, baos.toByteArray(), sender, subject);
 						}
 					}
 

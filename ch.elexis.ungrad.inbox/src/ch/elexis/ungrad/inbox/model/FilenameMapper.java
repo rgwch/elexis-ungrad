@@ -45,56 +45,52 @@ public class FilenameMapper {
 		br.close();
 	}
 
-	public Docinfo map(String in) throws Exception {
-		Docinfo ret = null;
+	public void map(DocumentDescriptor dd) throws Exception {
 		for (Pattern p : patterns.keySet()) {
 			System.out.println(p);
-			Matcher m = p.matcher(in);
+			Matcher m = p.matcher(dd.filename);
 			if (m.find()) {
-				ret = new Docinfo();
 				String[] repl = patterns.get(p);
 				for (int c = 0; c < m.groupCount(); c++) {
 					String val = m.group(1 + c);
 					switch (repl[c]) {
 					case "name":
-						String[] names=val.split("[ _]",2);
-						if(names.length>1) {
-							ret.firstname=names[0];
-							ret.lastname=names[1];
+						String[] names = val.split("[ _]", 2);
+						if (names.length > 1) {
+							dd.firstname = names[0];
+							dd.lastname = names[1];
 						}
-						ret.patient = val;
+						dd.fullname = val;
 						break;
 					case "firstname":
-						ret.firstname = val;
+						dd.firstname = val;
 						break;
 					case "lastname":
-						ret.lastname = val;
+						dd.lastname = val;
 						break;
 					case "title":
-						ret.docname = val;
+						dd.docname = val;
 						break;
 					case "docdate":
-						ret.docDate = parseDate(val);
+						dd.docDate = parseDate(val);
 						break;
 					case "dob":
-						ret.dob = parseDate(val);
+						dd.dob = parseDate(val);
 						break;
 					default:
 						throw new Exception("Unknown identifier " + repl[c]);
 					}
 				}
-				if(ret.docname==null) {
-					ret.docname="";
+				if (dd.docname == null) {
+					dd.docname = "";
 				}
-				for(String r:repl) {
-					if(r.startsWith("append:")) {
-						ret.docname+=r.substring(7);
+				for (String r : repl) {
+					if (r.startsWith("append:")) {
+						dd.docname += r.substring(7);
 					}
 				}
-				return ret;
 			}
 		}
-		return ret;
 	}
 
 	private TimeTool parseDate(String date) {

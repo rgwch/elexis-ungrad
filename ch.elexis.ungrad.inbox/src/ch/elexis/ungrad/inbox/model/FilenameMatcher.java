@@ -13,6 +13,8 @@
 package ch.elexis.ungrad.inbox.model;
 
 import java.io.File;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +22,7 @@ import java.util.regex.Pattern;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.data.Person;
 import ch.elexis.data.Query;
+import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
@@ -48,43 +51,69 @@ public class FilenameMatcher {
 		return ret;
 	}
 
-	private DocumentDescriptor analyzeMappings(final File file) throws Exception {
-		String mapfilename = CoreHub.localCfg.get(PreferenceConstants.MAPPINGS, null);
-		if (mapfilename != null) {
-			File mapfile = new File(mapfilename);
-			if (mapfile.exists() && mapfile.canRead()) {
-				FilenameMapper fmap = new FilenameMapper(mapfile);
-				String filename = file.getName();
-				Docinfo docinfo = fmap.map(filename);
-				if (docinfo!= null && !StringTool.isNothing(docinfo.docname)) {
-					int extpos = filename.lastIndexOf('.');
-					String ext = extpos > -1 ? filename.substring(extpos).toLowerCase() : "";
-					DocumentDescriptor ret = new DocumentDescriptor(null, docinfo.docDate, file, filename);
-					if (docinfo.dob != null && checkBirthdate(ret, docinfo.dob)) {
-						ret.filename = docinfo.docDate.toString(TimeTool.DATE_ISO) + "_"+docinfo.docname + ext;
-						return ret;
-					} else {
-						Query<Person> qbe = new Query<Person>(Person.class);
-						qbe.add(Person.FIRSTNAME, Query.EQUALS, docinfo.firstname);
-						qbe.add(Person.NAME, Query.EQUALS, docinfo.lastname);
-						List<Person> result = qbe.execute();
-						if (result.size() == 1) {
-							ret.concerns = result.get(0);
-							ret.filename = docinfo.docDate.toString(TimeTool.DATE_ISO) + "_"+docinfo.docname + ext;
-							return ret;
-						}
-					}
+	private Person findKontakt(String text) {
+		if (!StringTool.isNothing(text)) {
+			Query<Person> qbe = new Query<Person>(Person.class);
+			List<TimeTool> dates = new LinkedList<TimeTool>();
+			Matcher m = datePattern.matcher(text);
+			while (m.find()) {
+				TimeTool t = new TimeTool(m.group());
+				dates.add(t);
+			}
+			for (TimeTool tt : dates) {
+				Person p = checkBirthdate(text, tt);
+				if (p != null) {
+					return p;
 				}
 			}
 		}
 		return null;
 	}
 
-	public DocumentDescriptor analyze(final Person p, final File file) throws Exception {
-		DocumentDescriptor dd = analyzeMappings(file);
-		if (dd == null) {
-			dd = new DocumentDescriptor(p, new TimeTool(), file, file.getName());
+	private void analyzeMappings(DocumentDescriptor dd) throws Exception {
+		String mapfilename = CoreHub.localCfg.get(PreferenceConstants.MAPPINGS, null);
+		if (mapfilename != null) {
+			File mapfile = new File(mapfilename);
+			if (mapfile.exists() && mapfile.canRead()) {
+				FilenameMapper fmap = new FilenameMapper(mapfile);
+				fmap.map(dd);
+				if (!StringTool.isNothing(dd.docname)) {
+					int extpos = dd.filename.lastIndexOf('.');
+					String ext = extpos > -1 ? dd.filename.substring(extpos).toLowerCase() : "";
+					if (dd.dob != null && checkBirthdate(dd, dd.dob)) {
+						dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + dd.docname + ext;
+						return;
+					} else {
+						Query<Person> qbe = new Query<Person>(Person.class);
+						qbe.add(Person.FIRSTNAME, Query.EQUALS, dd.firstname);
+						qbe.add(Person.NAME, Query.EQUALS, dd.lastname);
+						List<Person> result = qbe.execute();
+						if (result.size() == 1) {
+							dd.concerns = result.get(0);
+							dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + dd.docname + ext;
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
 
+	public DocumentDescriptor analyze(final File file) throws Exception {
+		DocumentDescriptor dd = new DocumentDescriptor(null, new TimeTool(), file, file.getName());
+		File meta = new File(file.getAbsolutePath() + ".meta");
+		if (meta.exists() && meta.canRead()) {
+			String[] metadata = FileTool.readTextFile(meta).split(",", 2);
+			if (metadata[0].indexOf('@') == -1) {
+				dd.sender = metadata[0];
+			}
+			if (metadata.length > 1) {
+				dd.subject = metadata[1];
+			}
+		}
+		dd.concerns = findKontakt(dd.subject);
+		analyzeMappings(dd);
+		if (dd.docname == null) {
 			findDates(dd);
 			String ret = dd.filename;
 			ret = cutDate(ret, dd.docDate);
@@ -98,7 +127,7 @@ public class FilenameMatcher {
 			while (ret.startsWith("-") || ret.startsWith("_")) {
 				ret = ret.substring(1);
 			}
-			ret = ret.replaceAll("\\(\\)", "");
+			ret = ret.replaceAll("\\(\\)", "").replaceAll("__+","_");
 			dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + ret.trim();
 
 			int ext = dd.filename.lastIndexOf('.');
@@ -113,6 +142,15 @@ public class FilenameMatcher {
 		return dd;
 	}
 
+	/**
+	 * Extract dates from the filename. If a date is found, check if it might be a
+	 * birthdate of a patient. If so, set the concern. If not, set the docDate. If
+	 * more than one date is found, the latest will be the docdate. If None is
+	 * found, today is the docdate.
+	 * 
+	 * @param dd DocumentDescriptor prefilled with at least filename. Will fill
+	 *           dd.concern and dd.docDate as found.
+	 */
 	public void findDates(DocumentDescriptor dd) {
 		TimeTool now = new TimeTool();
 		TimeTool cand = new TimeTool();
@@ -131,23 +169,32 @@ public class FilenameMatcher {
 	}
 
 	private boolean checkBirthdate(DocumentDescriptor dd, TimeTool cand) {
+		if (dd.concerns == null) {
+			dd.concerns = checkBirthdate(dd.filename, cand);
+			if (dd.concerns != null) {
+				dd.dob = new TimeTool(dd.concerns.getGeburtsdatum());
+			}
+		}
+		return dd.dob != null ? cand.isEqual(dd.dob) : false;
+	}
+
+	private Person checkBirthdate(String text, TimeTool cand) {
 		Query<Person> qbe = new Query<Person>(Person.class, Person.BIRTHDATE, cand.toString(TimeTool.DATE_COMPACT));
 		List<Person> result = qbe.execute();
 		if (result.size() == 0) {
-			return false;
+			return null;
 		} else if (result.size() == 1) {
-			dd.concerns = result.get(0);
-			return true;
+			return result.get(0);
 		} else {
 			String[] pp = new String[] { Person.NAME, Person.FIRSTNAME };
 			String[] hits = new String[2];
 			for (Person hit : result) {
 				hit.get(pp, hits);
-				if (dd.filename.contains(hits[0]) && dd.filename.contains(hits[1])) {
-					dd.concerns = hit;
+				if (text.contains(hits[0]) && text.contains(hits[1])) {
+					return hit;
 				}
 			}
-			return true;
 		}
+		return null;
 	}
 }

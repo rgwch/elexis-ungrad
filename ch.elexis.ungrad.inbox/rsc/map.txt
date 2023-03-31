@@ -1,0 +1,23 @@
+# Sample filename mapping file for ungrad inbox
+# look for parts title (Title of document), docdate (date of document), name, lastname. firstname (of patient), dob (Date of birth)
+# add "append:suffix" to append suffix to title (if any) when constructing resulting filename.
+# Empty lines and lines starting with # are ignored
+
+# Teststrings
+# Something like Austritsbericht Chirurgie-20230112,pdf
+([a-zA-Z0-9 ]+)-(\d{8,8}).pdf=title,docdate
+
+# Something like Austrittsbericht Medizin-2023-01-12.pdf
+([a-zA-Z0-9 ]+)-(20[0-9][0-9]-[01]?[0-9]-[012]?[0-9]).pef=title,docdate
+
+# Something like Austrittsbericht Orthopädie-12.1.2023.doc
+([\w\d ]+)-([0-3]?[0-9]\.[01]?[012]\.20[0-9][0-9]).doc=title,docdate
+
+# Berichte USZ
+Bericht_'(Ambulanter_Bericht_[^_]+)_vom_([0-3]?[0-9]\.[01]?[0-9]\.20[0-9][0-9])'_für_([\w_]+).PDF=title,docdate,name
+
+# Berichte Chir
+([0-3][0-9]\.[01][0-9]\.20[0-9][0-9]) (Sprechstundenbericht) (\w+) (\w+).pdf=docdate,title,lastname,firstname,append:_Chirurgie 
+
+# Derma
+(\w+)_(\w+),_([0-3][0-9]\.[01][0-1]\.20[0-9][0-9])_([0-9]{6,6})_([0-9]+).pdf=lastname,firstname,dob,docdate,title
