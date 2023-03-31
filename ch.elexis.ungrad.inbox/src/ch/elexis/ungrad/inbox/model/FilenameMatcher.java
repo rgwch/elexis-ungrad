@@ -13,7 +13,6 @@
 package ch.elexis.ungrad.inbox.model;
 
 import java.io.File;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -30,7 +29,8 @@ public class FilenameMatcher {
 	Pattern datePattern, datePattern2;
 
 	public FilenameMatcher() {
-		datePattern = Pattern.compile("\\d{2,4}[\\.-]\\d\\d[\\.-]\\d{2,4}");
+		// Patterns like 1.2.1960, 01.02.1960, 1960-02-01, 1960-2-1
+		datePattern = Pattern.compile("\\d{1,4}[\\.-]\\d?\\d[\\.-]\\d{1,4}");
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class FilenameMatcher {
 	}
 
 	/**
-	 * Cutr a date repesentation from a String
+	 * Cut a date representation from a String
 	 * 
 	 * @param in   the String probably containing date
 	 * @param date a date as dd.mm.yyyy or yyyy-mm-dd
@@ -66,15 +66,15 @@ public class FilenameMatcher {
 	}
 
 	/**
-	 * Find a Kontakt from a String. Tries first to find a date. If a date is found,
-	 * find a patient with that birthdate
+	 * Find a "Kontakt" from a String. Tries first to find a date. If a date is found,
+	 * find a patient with that birth date
+	 * If no date is found, try all words of the text as last name. On Match, find first name. 
 	 * 
-	 * @param text
+	 * @param text a text to scan for first name, last name and birth date
 	 * @return The found Person or null if none was found
 	 */
 	private Person findKontakt(String text) {
 		if (!StringTool.isNothing(text)) {
-			Query<Person> qbe = new Query<Person>(Person.class);
 			List<TimeTool> dates = new LinkedList<TimeTool>();
 			Matcher m = datePattern.matcher(text);
 			while (m.find()) {
@@ -85,6 +85,23 @@ public class FilenameMatcher {
 				Person p = checkBirthdate(text, tt);
 				if (p != null) {
 					return p;
+				}
+			}
+			Query<Person> qbe = new Query<Person>(Person.class);
+			String[] words=text.split("[^\\wäöüÄÖÜéàè]+");
+			for(String word:words) {
+				if(word.matches("\\w+")) {
+					qbe.clear();
+					qbe.add(Person.NAME, qbe.EQUALS, word);
+					List<Person> result=qbe.execute();
+					if(result.size()>0) {
+						for(Person p:result) {
+							String vn=p.getVorname();
+							if(text.contains(vn)){
+								return p;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -164,7 +181,13 @@ public class FilenameMatcher {
 	 * @param dd
 	 */
 	private void makeFilename(DocumentDescriptor dd) {
+		int extpos = dd.filename.lastIndexOf('.');
+		String ext = extpos == -1 ? "" : dd.filename.substring(extpos);
+
 		if (dd.docname == null) {
+			if (extpos != -1) {
+				dd.filename = dd.filename.substring(0, extpos);
+			}
 			dd.docname = cutDate(dd.filename, dd.docDate);
 			if (dd.concerns != null) {
 				dd.docname = cutDate(dd.docname, new TimeTool(dd.concerns.getGeburtsdatum()));
@@ -184,22 +207,19 @@ public class FilenameMatcher {
 
 		dd.docname = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + dd.docname.trim();
 
-		int extpos = dd.filename.lastIndexOf('.');
-		String ext = extpos == -1 ? "" : dd.filename.substring(extpos);
 		while (dd.docname.endsWith("-") || dd.docname.endsWith("_")) {
 			dd.docname = dd.docname.substring(0, dd.docname.length() - 1);
 		}
 		dd.filename = dd.docname + ext.toLowerCase();
 	}
 
-
 	/**
 	 * Extract dates from the filename. If a date is found, check if it might be a
-	 * birthdate of a patient. If so, set the concern. If not, set the docDate. If
+	 * birth date of a patient. If so, set the concern. If not, set the docDate. If
 	 * more than one date is found, the latest will be the docdate. If None is
 	 * found, today is the docdate.
 	 * 
-	 * @param dd DocumentDescriptor prefilled with at least filename. Will fill
+	 * @param dd DocumentDescriptor pre-filled with at least filename. Will fill
 	 *           dd.concern and dd.docDate as found.
 	 */
 	public void findDates(DocumentDescriptor dd) {
@@ -230,11 +250,14 @@ public class FilenameMatcher {
 	}
 
 	/**
-	 * Test if a date is the birthdate of a patient. Look if we have at least one patient with that birthdate.
-	 * if we have one patient, return this. If more than one, try t match firstnbame and lastname with the string. bIf no patient is found, return null
+	 * Test if a date is the birth date of a patient. Look if we have at least one
+	 * patient with that birth date. if we have one patient, return this. If more
+	 * than one, try t match firstname and lastname with the string. bIf no patient
+	 * is found, return null
+	 * 
 	 * @param text the text to match lastname and firstname
-	 * @param cand the date we try as borthdate
-	 * @return the person wirth the given birthdate or null.
+	 * @param cand the date we try as birth date
+	 * @return the person with the given birth date or null.
 	 */
 	private Person checkBirthdate(String text, TimeTool cand) {
 		Query<Person> qbe = new Query<Person>(Person.class, Person.BIRTHDATE, cand.toString(TimeTool.DATE_COMPACT));
