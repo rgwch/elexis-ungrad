@@ -35,6 +35,11 @@ import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
+/**
+ * Read Messages from an MBox file
+ * @author gerry
+ *
+ */
 public class MBox {
 	private final File mbox; // Path to .mbox file
 	private Session session;

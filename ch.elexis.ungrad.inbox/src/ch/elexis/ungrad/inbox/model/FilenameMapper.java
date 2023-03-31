@@ -20,9 +20,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
+/**
+ * Map a file against a mapping definition
+ * @author gerry
+ *
+ */
 public class FilenameMapper {
 	Map<Pattern, String[]> patterns = new HashMap<Pattern, String[]>();
 

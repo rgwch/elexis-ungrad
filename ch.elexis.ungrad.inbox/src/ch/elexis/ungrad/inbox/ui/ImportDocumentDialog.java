@@ -21,8 +21,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
@@ -31,6 +29,11 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Person;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
 
+/**
+ * Dialog opened to allow the userr to accept or modify a proposal for an association of a file to a patiebnt
+ * @author gerry
+ *
+ */
 public class ImportDocumentDialog extends TitleAreaDialog {
 	DocumentDescriptor dd;
 	Text text;

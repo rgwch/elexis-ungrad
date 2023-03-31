@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022 by G. Weirich
+ * Copyright (c) 2022-2023 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -21,11 +21,16 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -33,6 +38,11 @@ import ch.elexis.data.Kontakt;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
 
+/**
+ * Show the user a mail templkate to edit, attach files and send
+ * @author gerry
+ *
+ */
 public class MailDialog extends TitleAreaDialog {
 
 	Text tTo;
@@ -86,8 +96,8 @@ public class MailDialog extends TitleAreaDialog {
 			public void widgetSelected(SelectionEvent e) {
 				KontaktSelektor ksl = new KontaktSelektor(getParentShell(), Kontakt.class, "Addressat",
 						"Bitte wählen Sie", Kontakt.DEFAULT_SORT);
-				if (ksl.open()==Dialog.OK) {
-					Kontakt sel=(Kontakt) ksl.getSelection();
+				if (ksl.open() == Dialog.OK) {
+					Kontakt sel = (Kontakt) ksl.getSelection();
 					tTo.setText(sel.getMailAddress());
 					tTo.setFocus();
 				}

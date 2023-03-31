@@ -45,6 +45,11 @@ import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 
+/**
+ * The Main View of Ungrad Inbox
+ * @author gerry
+ *
+ */
 public class View extends ViewPart {
 	TableViewer tv;
 	Controller controller = new Controller();
@@ -129,6 +134,10 @@ public class View extends ViewPart {
 		});
 	}
 
+	/**
+	 * Display the currently selected file with its associated viewer
+	 * @param sel
+	 */
 	void launchViewer(File sel) {
 		try {
 			String ext = FileTool.getExtension(sel.getName());
@@ -150,6 +159,9 @@ public class View extends ViewPart {
 	}
 
 	private void makeActions() {
+		/**
+		 * Fetch Mail attachments into inbox (If mail receive is configured)
+		 */
 		loadMailAction = new Action("Mails holen") {
 			{
 				setToolTipText("IMAP Mails holen");
@@ -188,6 +200,10 @@ public class View extends ViewPart {
 				}
 			}
 		};
+		
+		/**
+		 * Associate selected faile with patient and optional change filename
+		 */
 		addAction = new Action("Zuweisen") {
 			{
 				setToolTipText("Dokument zuweisen");
@@ -217,6 +233,10 @@ public class View extends ViewPart {
 				}
 			}
 		};
+		
+		/**
+		 * Delete currently selected file
+		 */
 		deleteAction = new Action("Löschen") {
 			{
 				setToolTipText("Dokument löschen");
@@ -236,7 +256,10 @@ public class View extends ViewPart {
 				}
 			}
 		};
-
+		
+		/**
+		 * Display currently selected file
+		 */
 		execAction = new Action("Öffnen") {
 			{
 				setToolTipText("Dokument öffnen");
@@ -248,6 +271,11 @@ public class View extends ViewPart {
 				launchViewer(getSelection());
 			}
 		};
+		
+		/**
+		 * Refresh contents of the inbox view
+		 * 
+		 */
 		reloadAction = new Action("Neu einlesen") {
 			{
 				setToolTipText("Eingangsfach neu einlesen");

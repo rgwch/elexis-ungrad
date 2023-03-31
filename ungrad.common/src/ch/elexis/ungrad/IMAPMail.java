@@ -38,6 +38,11 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
 
+/**
+ * Fetch Messages from an IMAP Server
+ * @author gerry
+ *
+ */
 public class IMAPMail {
 	private String[] whitelist;
 	Folder folder;

@@ -30,6 +30,11 @@ import javax.mail.internet.MimeMultipart;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.rgw.io.FileTool;
 
+/**
+ * Send Mails via SMTP
+ * @author gerry
+ *
+ */
 public class Mailer {
 	String sender;
 	String smtpHost;

@@ -229,6 +229,13 @@ public class FilenameMatcher {
 		return dd.dob != null ? cand.isEqual(dd.dob) : false;
 	}
 
+	/**
+	 * Test if a date is the birthdate of a patient. Look if we have at least one patient with that birthdate.
+	 * if we have one patient, return this. If more than one, try t match firstnbame and lastname with the string. bIf no patient is found, return null
+	 * @param text the text to match lastname and firstname
+	 * @param cand the date we try as borthdate
+	 * @return the person wirth the given birthdate or null.
+	 */
 	private Person checkBirthdate(String text, TimeTool cand) {
 		Query<Person> qbe = new Query<Person>(Person.class, Person.BIRTHDATE, cand.toString(TimeTool.DATE_COMPACT));
 		List<Person> result = qbe.execute();

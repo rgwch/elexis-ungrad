@@ -19,7 +19,11 @@ import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Person;
 import ch.rgw.tools.TimeTool;
-
+/**
+ * Manage patient related directories in docbase
+ * @author gerry
+ *
+ */
 public class StorageController {
 
 	public File createFile(Patient pat, String title) throws Exception {
@@ -32,7 +36,7 @@ public class StorageController {
 	 * Find the configured output dir for a patient (highly opinionated filepath
 	 * resolution)
 	 * 
-	 * @param p                  Patient whose output dir should be retrieved
+	 * @param p  Patient whose output dir should be retrieved
 	 * @param bCreateIfNotExists create directory if it doesn't exist
 	 * @return The directory to store documents for that patient.
 	 */
