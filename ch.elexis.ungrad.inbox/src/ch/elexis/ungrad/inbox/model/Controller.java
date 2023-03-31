@@ -13,6 +13,7 @@
 package ch.elexis.ungrad.inbox.model;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
@@ -28,7 +29,16 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	public Object[] getElements(Object dirname) {
 		File dir = new File((String) dirname);
 		if (dir.exists()) {
-			File[] files = dir.listFiles();
+			File[] files = dir.listFiles(new FilenameFilter() {
+
+				@Override
+				public boolean accept(File dir, String name) {
+					if (name.endsWith(".meta")) {
+						return false;
+					}
+					return true;
+				}
+			});
 			if (files != null) {
 				return files;
 			}
