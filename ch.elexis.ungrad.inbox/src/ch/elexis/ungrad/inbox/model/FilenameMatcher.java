@@ -33,6 +33,13 @@ public class FilenameMatcher {
 		datePattern = Pattern.compile("\\d{2,4}[\\.-]\\d\\d[\\.-]\\d{2,4}");
 	}
 
+	/**
+	 * Cut a String from another string
+	 * 
+	 * @param in   the String probably containing frag
+	 * @param frag the fragment to cut out
+	 * @return in without frag
+	 */
 	private String cut(String in, String frag) {
 		int idx = in.indexOf(frag);
 		if (idx == -1) {
@@ -43,6 +50,13 @@ public class FilenameMatcher {
 		}
 	}
 
+	/**
+	 * Cutr a date repesentation from a String
+	 * 
+	 * @param in   the String probably containing date
+	 * @param date a date as dd.mm.yyyy or yyyy-mm-dd
+	 * @return in without date
+	 */
 	private String cutDate(String in, TimeTool date) {
 		String ret = cut(in, date.toString(TimeTool.DATE_GER));
 		if (ret.equals(in)) {
@@ -51,6 +65,13 @@ public class FilenameMatcher {
 		return ret;
 	}
 
+	/**
+	 * Find a Kontakt from a String. Tries first to find a date. If a date is found,
+	 * find a patient with that birthdate
+	 * 
+	 * @param text
+	 * @return The found Person or null if none was found
+	 */
 	private Person findKontakt(String text) {
 		if (!StringTool.isNothing(text)) {
 			Query<Person> qbe = new Query<Person>(Person.class);
@@ -70,6 +91,13 @@ public class FilenameMatcher {
 		return null;
 	}
 
+	/**
+	 * Match a file against a mapfile
+	 * 
+	 * @param dd DocumentDescriptor containing all known data. Will be completed
+	 *           with docName, dob, firstname, lastname, name if matched.
+	 * @throws Exception
+	 */
 	private void analyzeMappings(DocumentDescriptor dd) throws Exception {
 		String mapfilename = CoreHub.localCfg.get(PreferenceConstants.MAPPINGS, null);
 		if (mapfilename != null) {
@@ -106,14 +134,19 @@ public class FilenameMatcher {
 		}
 	}
 
+	/**
+	 * Try to extract patient, title and date from a file.
+	 * 
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
 	public DocumentDescriptor analyze(final File file) throws Exception {
 		DocumentDescriptor dd = new DocumentDescriptor(null, new TimeTool(), file, file.getName());
 		File meta = new File(file.getAbsolutePath() + ".meta");
 		if (meta.exists() && meta.canRead()) {
 			String[] metadata = FileTool.readTextFile(meta).split(",", 2);
-			if (metadata[0].indexOf('@') == -1) {
-				dd.sender = metadata[0];
-			}
+			dd.sender = metadata[0].split("@")[0];
 			if (metadata.length > 1) {
 				dd.subject = metadata[1];
 			}
@@ -125,6 +158,11 @@ public class FilenameMatcher {
 		return dd;
 	}
 
+	/**
+	 * Make a Filename from the document title
+	 * 
+	 * @param dd
+	 */
 	private void makeFilename(DocumentDescriptor dd) {
 		if (dd.docname == null) {
 			dd.docname = cutDate(dd.filename, dd.docDate);
@@ -140,18 +178,20 @@ public class FilenameMatcher {
 			}
 			dd.docname = dd.docname.replaceAll("\\(\\)", "").replaceAll("__+", "_");
 		}
-		dd.filename = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + dd.docname.trim();
-
-		int ext = dd.filename.lastIndexOf('.');
-		if (ext > -1) {
-			String base = dd.filename.substring(0, ext);
-			while (base.endsWith("-") || base.endsWith("_")) {
-				base = base.substring(0, base.length() - 1);
-			}
-			dd.filename = base + dd.filename.substring(ext).toLowerCase();
+		if (dd.sender != null) {
+			dd.docname = dd.docname.trim() + "_" + dd.sender;
 		}
 
+		dd.docname = dd.docDate.toString(TimeTool.DATE_ISO) + "_" + dd.docname.trim();
+
+		int extpos = dd.filename.lastIndexOf('.');
+		String ext = extpos == -1 ? "" : dd.filename.substring(extpos);
+		while (dd.docname.endsWith("-") || dd.docname.endsWith("_")) {
+			dd.docname = dd.docname.substring(0, dd.docname.length() - 1);
+		}
+		dd.filename = dd.docname + ext.toLowerCase();
 	}
+
 
 	/**
 	 * Extract dates from the filename. If a date is found, check if it might be a
