@@ -12,17 +12,29 @@
 
 package ch.elexis.ungrad.inbox.ui;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.preferences.inputs.MultilineFieldEditor;
+import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.inbox.model.PreferenceConstants;
 
 public class Preferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
@@ -50,6 +62,35 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		addField(new MultilineFieldEditor(PreferenceConstants.WHITELIST, "Absender", 4, SWT.V_SCROLL, false,
 				getFieldEditorParent()));
 		addField(new FileFieldEditor(PreferenceConstants.MAPPINGS, "Dateinamen-Analyse", getFieldEditorParent()));
+		Composite p=getFieldEditorParent();
+		Group cCheck=new Group(p, SWT.BORDER);
+		cCheck.setLayoutData(SWTHelper.getFillGridData(3,true,1,false));
+		cCheck.setText("Regexp-Tester");
+		cCheck.setLayout(new GridLayout(2,false));
+		Label lEnter=new Label(cCheck,SWT.NONE);
+		lEnter.setText("Regexp");
+		Text tEnter=new Text(cCheck,SWT.BORDER);
+		tEnter.setLayoutData(SWTHelper.getFillGridData());
+		Label lText=new Label(cCheck,SWT.NONE);
+		lText.setText("Zeichenfolge");
+		Text tText=new Text(cCheck,SWT.BORDER);
+		tText.setLayoutData(SWTHelper.getFillGridData());
+		Label lResult=new Label(cCheck,SWT.NONE);
+		lResult.setLayoutData(SWTHelper.getFillGridData(2,true,1,true));
+		tText.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				Pattern pattern=Pattern.compile(tEnter.getText());
+				Matcher matcher=pattern.matcher(tText.getText());
+				if(matcher.matches()) {
+					lResult.setText(matcher.group());
+				}else {
+					lResult.setText("Keine Übereinstimmung");
+				}
+			}
+		});
+
+		
 
 	}
 
