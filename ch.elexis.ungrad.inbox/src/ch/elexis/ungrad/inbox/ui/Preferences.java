@@ -15,6 +15,7 @@ package ch.elexis.ungrad.inbox.ui;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
@@ -64,6 +65,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		addField(new MultilineFieldEditor(PreferenceConstants.WHITELIST, "Absender", 4, SWT.V_SCROLL, false,
 				getFieldEditorParent()));
 		addField(new FileFieldEditor(PreferenceConstants.MAPPINGS, "Dateinamen-Analyse", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.ANALYZE_CONTENTS, "Auch Datei-Inhalt betrachten (Erfordert Lucinda)", getFieldEditorParent()));
 		Composite p = getFieldEditorParent();
 		Group cCheck = new Group(p, SWT.BORDER);
 		cCheck.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));

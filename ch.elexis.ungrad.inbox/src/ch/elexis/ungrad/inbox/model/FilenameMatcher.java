@@ -86,11 +86,12 @@ public class FilenameMatcher {
 				if (p != null) {
 					return p;
 				}
+				text=cutDate(text,tt).trim();
 			}
 			Query<Person> qbe = new Query<Person>(Person.class);
 			String[] words=text.split("[^\\wäöüÄÖÜéàè]+");
 			for(String word:words) {
-				if(word.matches("\\w+")) {
+				if(word.matches("[\\wäöüÄÖÜéàè]+")) {
 					qbe.clear();
 					qbe.add(Person.NAME, qbe.EQUALS, word);
 					List<Person> result=qbe.execute();
@@ -170,6 +171,9 @@ public class FilenameMatcher {
 		}
 		dd.concerns = findKontakt(dd.subject);
 		analyzeMappings(dd);
+		if(dd.concerns==null) {
+			dd.concerns=findKontakt(dd.filename);
+		}
 		findDates(dd);
 		makeFilename(dd);
 		return dd;
