@@ -38,6 +38,8 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.inbox.model.PreferenceConstants;
 
 public class Preferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+	Text tEnter, tText;
+	Label lResult;
 
 	public Preferences() {
 		super(GRID);
@@ -62,36 +64,47 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		addField(new MultilineFieldEditor(PreferenceConstants.WHITELIST, "Absender", 4, SWT.V_SCROLL, false,
 				getFieldEditorParent()));
 		addField(new FileFieldEditor(PreferenceConstants.MAPPINGS, "Dateinamen-Analyse", getFieldEditorParent()));
-		Composite p=getFieldEditorParent();
-		Group cCheck=new Group(p, SWT.BORDER);
-		cCheck.setLayoutData(SWTHelper.getFillGridData(3,true,1,false));
+		Composite p = getFieldEditorParent();
+		Group cCheck = new Group(p, SWT.BORDER);
+		cCheck.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
 		cCheck.setText("Regexp-Tester");
-		cCheck.setLayout(new GridLayout(2,false));
-		Label lEnter=new Label(cCheck,SWT.NONE);
+		cCheck.setLayout(new GridLayout(2, false));
+		Label lEnter = new Label(cCheck, SWT.NONE);
 		lEnter.setText("Regexp");
-		Text tEnter=new Text(cCheck,SWT.BORDER);
+		tEnter = new Text(cCheck, SWT.BORDER);
 		tEnter.setLayoutData(SWTHelper.getFillGridData());
-		Label lText=new Label(cCheck,SWT.NONE);
+		tEnter.addModifyListener(matchChecker);
+		Label lText = new Label(cCheck, SWT.NONE);
 		lText.setText("Zeichenfolge");
-		Text tText=new Text(cCheck,SWT.BORDER);
+		tText = new Text(cCheck, SWT.BORDER);
 		tText.setLayoutData(SWTHelper.getFillGridData());
-		Label lResult=new Label(cCheck,SWT.NONE);
-		lResult.setLayoutData(SWTHelper.getFillGridData(2,true,1,true));
-		tText.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent arg0) {
-				Pattern pattern=Pattern.compile(tEnter.getText());
-				Matcher matcher=pattern.matcher(tText.getText());
-				if(matcher.matches()) {
-					lResult.setText(matcher.group());
-				}else {
-					lResult.setText("Keine Übereinstimmung");
-				}
-			}
-		});
-
-		
+		lResult = new Label(cCheck, SWT.NONE);
+		lResult.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
+		tText.addModifyListener(matchChecker);
 
 	}
+
+	ModifyListener matchChecker = new ModifyListener() {
+
+		@Override
+		public void modifyText(ModifyEvent arg0) {
+			Pattern pattern = Pattern.compile(tEnter.getText());
+			Matcher matcher = pattern.matcher(tText.getText());
+			if (matcher.matches()) {
+				int num = matcher.groupCount();
+				if (num == 0) {
+					lResult.setText("Gefunden: " + matcher.group());
+				} else {
+					String res = "Treffer: ";
+					for (int i = 1; i <= num; i++) {
+						res = res + "(" + matcher.group(i) + ") ";
+					}
+					lResult.setText(res);
+				}
+			} else {
+				lResult.setText("Keine Übereinstimmung");
+			}
+		}
+	};
 
 }
