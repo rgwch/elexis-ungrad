@@ -65,7 +65,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		addField(new MultilineFieldEditor(PreferenceConstants.WHITELIST, "Absender", 4, SWT.V_SCROLL, false,
 				getFieldEditorParent()));
 		addField(new FileFieldEditor(PreferenceConstants.MAPPINGS, "Dateinamen-Analyse", getFieldEditorParent()));
-		addField(new BooleanFieldEditor(PreferenceConstants.ANALYZE_CONTENTS, "Auch Datei-Inhalt betrachten (Erfordert Lucinda)", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.ANALYZE_CONTENTS, "Auch Datei-Inhalt betrachten (Erfordert Lucinda ab v. 3.2.0)", getFieldEditorParent()));
 		Composite p = getFieldEditorParent();
 		Group cCheck = new Group(p, SWT.BORDER);
 		cCheck.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));

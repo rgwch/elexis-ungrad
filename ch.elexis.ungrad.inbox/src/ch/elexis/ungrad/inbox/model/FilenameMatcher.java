@@ -161,10 +161,12 @@ public class FilenameMatcher {
 
 				@Override
 				public boolean received(String text) {
-					Person p = findKontakt(text);
-					if (p != null) {
-						dd.concerns = p;
-						return true;
+					if (!StringTool.isNothing(text) && text.length() > 3) {
+						Person p = checkBirthdate(text, null);
+						if (p != null) {
+							dd.concerns = p;
+							return true;
+						}
 					}
 					return false;
 				}
@@ -287,6 +289,17 @@ public class FilenameMatcher {
 	 * @return the person with the given birth date or null.
 	 */
 	private Person checkBirthdate(String text, TimeTool cand) {
+		if(StringTool.isNothing(text)) {
+			return null;
+		}
+		if (cand == null) {
+			Matcher m = datePattern.matcher(text);
+			if (m.find()) {
+				cand = new TimeTool(m.group());
+			}else {
+				return null;
+			}
+		}
 		Query<Person> qbe = new Query<Person>(Person.class, Person.BIRTHDATE, cand.toString(TimeTool.DATE_COMPACT));
 		List<Person> result = qbe.execute();
 		if (result.size() == 0) {
