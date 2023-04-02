@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.data.Person;
 import ch.elexis.data.Query;
+import ch.elexis.ungrad.lucinda.Client3;
+import ch.elexis.ungrad.lucinda.Client3.INotifier;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
@@ -66,9 +68,9 @@ public class FilenameMatcher {
 	}
 
 	/**
-	 * Find a "Kontakt" from a String. Tries first to find a date. If a date is found,
-	 * find a patient with that birth date
-	 * If no date is found, try all words of the text as last name. On Match, find first name. 
+	 * Find a "Kontakt" from a String. Tries first to find a date. If a date is
+	 * found, find a patient with that birth date If no date is found, try all words
+	 * of the text as last name. On Match, find first name.
 	 * 
 	 * @param text a text to scan for first name, last name and birth date
 	 * @return The found Person or null if none was found
@@ -86,19 +88,19 @@ public class FilenameMatcher {
 				if (p != null) {
 					return p;
 				}
-				text=cutDate(text,tt).trim();
+				text = cutDate(text, tt).trim();
 			}
 			Query<Person> qbe = new Query<Person>(Person.class);
-			String[] words=text.split("[^\\wäöüÄÖÜéàè]+");
-			for(String word:words) {
-				if(word.matches("[\\wäöüÄÖÜéàè]+")) {
+			String[] words = text.split("[^\\wäöüÄÖÜéàè]+");
+			for (String word : words) {
+				if (word.matches("[\\wäöüÄÖÜéàè]+")) {
 					qbe.clear();
 					qbe.add(Person.NAME, qbe.EQUALS, word);
-					List<Person> result=qbe.execute();
-					if(result.size()>0) {
-						for(Person p:result) {
-							String vn=p.getVorname();
-							if(text.contains(vn)){
+					List<Person> result = qbe.execute();
+					if (result.size() > 0) {
+						for (Person p : result) {
+							String vn = p.getVorname();
+							if (text.contains(vn)) {
 								return p;
 							}
 						}
@@ -152,6 +154,24 @@ public class FilenameMatcher {
 		}
 	}
 
+	public void analyzeContents(DocumentDescriptor dd) throws Exception {
+		if (CoreHub.localCfg.get(PreferenceConstants.ANALYZE_CONTENTS, false)) {
+			Client3 client = new Client3();
+			client.analyzeFile(FileTool.readFile(dd.file), new INotifier() {
+
+				@Override
+				public boolean received(String text) {
+					Person p = findKontakt(text);
+					if (p != null) {
+						dd.concerns = p;
+						return true;
+					}
+					return false;
+				}
+			});
+		}
+	}
+
 	/**
 	 * Try to extract patient, title and date from a file.
 	 * 
@@ -171,10 +191,13 @@ public class FilenameMatcher {
 		}
 		dd.concerns = findKontakt(dd.subject);
 		analyzeMappings(dd);
-		if(dd.concerns==null) {
-			dd.concerns=findKontakt(dd.filename);
+		if (dd.concerns == null) {
+			dd.concerns = findKontakt(dd.filename);
 		}
 		findDates(dd);
+		if (dd.concerns == null) {
+			analyzeContents(dd);
+		}
 		makeFilename(dd);
 		return dd;
 	}

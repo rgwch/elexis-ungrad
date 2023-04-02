@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -38,15 +39,15 @@ public class Client3 {
 	private String api = "/lucinda/3.0";
 	private Logger log = LoggerFactory.getLogger("Lucinda v3 client");
 	private HttpURLConnection conn;
-	
-	private URL makeURL(final String call) throws MalformedURLException{
+
+	private URL makeURL(final String call) throws MalformedURLException {
 		String server = Preferences.get(Preferences.SERVER_ADDR, "127.0.0.1"); //$NON-NLS-1$
 		int port = Integer.parseInt(Preferences.get(Preferences.SERVER_PORT, "9997")); //$NON-NLS-1$
 		return new URL("http://" + server + ":" + port + api + call);
-		
+
 	}
-	
-	private byte[] doGet(final String api_call) throws IOException{
+
+	private byte[] doGet(final String api_call) throws IOException {
 		URL url = makeURL(api_call);
 		conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestProperty("method", "get");
@@ -64,9 +65,8 @@ public class Client3 {
 			throw new IOException("could not read " + api_call + ": Status was " + response);
 		}
 	}
-	
-	private String doPost(final String api_call, final String body, final int expectedStatus)
-		throws IOException{
+
+	private String doPost(final String api_call, final String body, final int expectedStatus) throws IOException {
 		URL url = makeURL(api_call);
 		conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("POST");
@@ -75,7 +75,7 @@ public class Client3 {
 		conn.setRequestProperty("Content-Length", String.valueOf(body.length()));
 		// conn.setConnectTimeout(5000);
 		conn.setDoOutput(true);
-		
+
 		OutputStreamWriter os = new OutputStreamWriter(conn.getOutputStream());
 		os.write(body);
 		os.flush();
@@ -95,9 +95,42 @@ public class Client3 {
 			return null;
 		}
 	}
-	
-	public Map query(final String phrase) throws Exception{
-		
+
+	public void analyzeFile(final byte[] contents, INotifier got) throws IOException {
+		URL url = makeURL("/parse");
+		conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("POST");
+		// conn.setRequestProperty("method", "post");
+		conn.setRequestProperty("Content-Type", "application/octet-stream");
+		conn.setRequestProperty("Content-Length", String.valueOf(contents.length));
+		// conn.setConnectTimeout(5000);
+		conn.setDoOutput(true);
+
+		OutputStream os = conn.getOutputStream();
+		os.write(contents);
+		os.flush();
+		int response = conn.getResponseCode();
+		if (response == 200) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String line;
+			// StringBuffer buffer = new StringBuffer();
+			while ((line = in.readLine()) != null) {
+				if (got.received(line)) {
+					break;
+				}
+				// buffer.append(line);
+			}
+			in.close();
+			conn.disconnect();
+			// return buffer.toString();
+		} else {
+			log.error("Bad answer for parse: " + response);
+			// return null;
+		}
+	}
+
+	public Map query(final String phrase) throws Exception {
+
 		HashMap<String, Object> params = new HashMap<>();
 		HashMap<String, Object> query = new HashMap<>();
 		HashMap<String, Object> edismax = new HashMap<>();
@@ -114,50 +147,46 @@ public class Client3 {
 			json.put("status", "ok");
 			return json;
 		}
-		
+
 	}
-	
-	public Map get(final String id) throws Exception{
+
+	public Map get(final String id) throws Exception {
 		Map<String, Object> json = new HashMap<String, Object>();
 		byte[] result = doGet("/get/" + id);
 		json.put("status", "ok");
 		json.put("result", result);
 		return json;
 	}
-	
-	public void rescan(){
-		
+
+	public void rescan() {
+
 	}
-	
+
 	/**
-	 * Add a document to the index. Note: The document itself will not be stored, only parsed and
-	 * added to the index. The caller must handle it by itself and make sure, that it can retrieve
-	 * the document with the given id
+	 * Add a document to the index. Note: The document itself will not be stored,
+	 * only parsed and added to the index. The caller must handle it by itself and
+	 * make sure, that it can retrieve the document with the given id
 	 *
-	 * @param id
-	 *            unique id for the document. The caller should be able to retrieve or reconstruct
-	 *            the document later with this id
-	 * @param title
-	 *            A title for the document.
-	 * @param doctype
-	 *            a random document type (this is not the mime-type but rather some application
-	 *            dependent organizational attribute)
-	 * @param metadata
-	 *            application defined metadata. These are stored with the index and can be queried
-	 *            for. Example: If there is an attribute "author: john doe", a later query can
-	 *            search for "author: john*"
-	 * @param contents
-	 *            The file contents parse. Many file types are supported and recognized by content
-	 *            (not by file extension), such as .odt, .doc, .pdf, tif. Image files are parsed
-	 *            through OCR and any found text is indexed
-	 * @param handler
-	 *            Handler to call after indexing
+	 * @param id       unique id for the document. The caller should be able to
+	 *                 retrieve or reconstruct the document later with this id
+	 * @param title    A title for the document.
+	 * @param doctype  a random document type (this is not the mime-type but rather
+	 *                 some application dependent organizational attribute)
+	 * @param metadata application defined metadata. These are stored with the index
+	 *                 and can be queried for. Example: If there is an attribute
+	 *                 "author: john doe", a later query can search for "author:
+	 *                 john*"
+	 * @param contents The file contents parse. Many file types are supported and
+	 *                 recognized by content (not by file extension), such as .odt,
+	 *                 .doc, .pdf, tif. Image files are parsed through OCR and any
+	 *                 found text is indexed
+	 * @param handler  Handler to call after indexing
 	 */
 	public Map addToIndex(final String id, final String title, final String doctype, Map metadata,
-		final byte[] contents) throws Exception{
+			final byte[] contents) throws Exception {
 		Map<String, Object> params = prepare(id, title, doctype, metadata);
 		params.put("contents", contents);
-		
+
 		String ans = doPost("/addindex", writeJson(params), HttpURLConnection.HTTP_CREATED);
 		if (StringTool.isNothing(ans)) {
 			throw (new Exception("Empty response"));
@@ -170,35 +199,31 @@ public class Client3 {
 			}
 			return result;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Add a file to the Lucinda store and index.
 	 * 
-	 * @param filename
-	 *            Name for the file to write (no path, only filename)
-	 * @param concern
-	 *            some grouping hint for the file (e.g. name of the group). The file will be stored
-	 *            in a subdirectory of that name. if concern is null, the base directory for imports
-	 *            is used.
-	 * @param doctype
-	 *            a random document type (this is not the mime-type but rather some application
-	 *            dependent organizational attribute)
-	 * @param metadata
-	 *            application defined metadata. These are stored with the index and can be queried
-	 *            for. Example: If there is an attribute "author: john doe", a later query can
-	 *            search for "author: john*"
-	 * @param contents
-	 *            The file contents to parse. Many file types are supported and recognized by
-	 *            content (not by file extension), such as .odt, .doc, .pdf, tif. Image files are
-	 *            parsed through OCR and any found text is indexed
-	 * @param handler
-	 *            Handler to call after the import
+	 * @param filename Name for the file to write (no path, only filename)
+	 * @param concern  some grouping hint for the file (e.g. name of the group). The
+	 *                 file will be stored in a subdirectory of that name. if
+	 *                 concern is null, the base directory for imports is used.
+	 * @param doctype  a random document type (this is not the mime-type but rather
+	 *                 some application dependent organizational attribute)
+	 * @param metadata application defined metadata. These are stored with the index
+	 *                 and can be queried for. Example: If there is an attribute
+	 *                 "author: john doe", a later query can search for "author:
+	 *                 john*"
+	 * @param contents The file contents to parse. Many file types are supported and
+	 *                 recognized by content (not by file extension), such as .odt,
+	 *                 .doc, .pdf, tif. Image files are parsed through OCR and any
+	 *                 found text is indexed
+	 * @param handler  Handler to call after the import
 	 * @throws IOException
 	 */
-	public Map addFile(final String uid, final String filename, final String concern,
-		final String doctype, Map<String, Object> metadata, final byte[] contents) throws Exception{
+	public Map addFile(final String uid, final String filename, final String concern, final String doctype,
+			Map<String, Object> metadata, final byte[] contents) throws Exception {
 		Map<String, Object> meta = prepare(uid, filename, doctype, metadata);
 		if (!StringTool.isNothing(concern)) {
 			meta.put("concern", concern);
@@ -214,15 +239,15 @@ public class Client3 {
 			Map<String, Object> result = (Map<String, Object>) answer.get("resultHeader");
 			return result;
 		}
-		
+
 	}
-	
+
 	/*
 	 * public void shutDown() { }
 	 */
-	
+
 	private Map<String, Object> prepare(final String id, final String title, final String doctype,
-		Map<String, Object> metadata){
+			Map<String, Object> metadata) {
 		if (metadata == null) {
 			metadata = new HashMap<String, Object>();
 		}
@@ -234,11 +259,11 @@ public class Client3 {
 		metadata.put("filename", title);
 		return metadata;
 	}
-	
+
 	/*
 	 * syntactic sugar to create and initialize a JsonObject with a single call
 	 */
-	private Map make(String... params){
+	private Map make(String... params) {
 		Map<String, Object> ret = new HashMap<>();
 		for (String param : params) {
 			String[] p = param.split(":");
@@ -246,19 +271,19 @@ public class Client3 {
 		}
 		return ret;
 	}
-	
-	public Map<String, Object> readJson(String source){
+
+	public Map<String, Object> readJson(String source) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			Map<String, Object> res =
-				mapper.readValue(source, new TypeReference<Map<String, Object>>() {});
+			Map<String, Object> res = mapper.readValue(source, new TypeReference<Map<String, Object>>() {
+			});
 			return res;
 		} catch (Exception e) {
 			return null;
 		}
 	}
-	
-	public String writeJson(Map<String, Object> source){
+
+	public String writeJson(Map<String, Object> source) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			return mapper.writeValueAsString(source);
@@ -266,7 +291,11 @@ public class Client3 {
 			ExHandler.handle(ex);
 			return null;
 		}
-		
+
 	}
-	
+
+	public interface INotifier {
+		public boolean received(String text);
+	}
+
 }
