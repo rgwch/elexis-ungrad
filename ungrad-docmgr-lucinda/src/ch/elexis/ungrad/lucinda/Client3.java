@@ -96,11 +96,16 @@ public class Client3 {
 		}
 	}
 
+	/**
+	 * Send a document to the parse-method of Lucinda. Pass the returned text content (if any) line by line to a provided INotifier
+	 * @param contents 
+	 * @param got
+	 * @throws IOException
+	 */
 	public void analyzeFile(final byte[] contents, INotifier got) throws IOException {
 		URL url = makeURL("/parse");
 		conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("POST");
-		// conn.setRequestProperty("method", "post");
 		conn.setRequestProperty("Content-Type", "application/octet-stream");
 		conn.setRequestProperty("Content-Length", String.valueOf(contents.length));
 		// conn.setConnectTimeout(5000);
@@ -113,19 +118,18 @@ public class Client3 {
 		if (response == 200) {
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String line;
-			// StringBuffer buffer = new StringBuffer();
 			while ((line = in.readLine()) != null) {
-				if (got.received(line)) {
-					break;
+				String eff = line.trim();
+				if (eff.length() > 1) {
+					if (got.received(line)) {
+						break;
+					}
 				}
-				// buffer.append(line);
 			}
 			in.close();
 			conn.disconnect();
-			// return buffer.toString();
 		} else {
 			log.error("Bad answer for parse: " + response);
-			// return null;
 		}
 	}
 

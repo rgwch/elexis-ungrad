@@ -138,6 +138,7 @@ public class FilenameMatcher {
 						qbe.endGroup();
 					}
 					if (dd.lastname != null) {
+						qbe.and();
 						qbe.startGroup();
 						qbe.add(Person.NAME, Query.EQUALS, dd.lastname);
 						qbe.or();
@@ -196,7 +197,9 @@ public class FilenameMatcher {
 		if (dd.concerns == null) {
 			dd.concerns = findKontakt(dd.filename);
 		}
-		findDates(dd);
+		if (dd.docDate == null) {
+			findDates(dd);
+		}
 		if (dd.concerns == null) {
 			analyzeContents(dd);
 		}
@@ -289,14 +292,14 @@ public class FilenameMatcher {
 	 * @return the person with the given birth date or null.
 	 */
 	private Person checkBirthdate(String text, TimeTool cand) {
-		if(StringTool.isNothing(text)) {
+		if (StringTool.isNothing(text)) {
 			return null;
 		}
 		if (cand == null) {
 			Matcher m = datePattern.matcher(text);
 			if (m.find()) {
 				cand = new TimeTool(m.group());
-			}else {
+			} else {
 				return null;
 			}
 		}

@@ -93,6 +93,7 @@ public class FilenameMapper {
 						dd.docname += r.substring(7);
 					}
 				}
+				break;
 			}
 		}
 	}
