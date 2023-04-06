@@ -15,10 +15,15 @@
 package ch.elexis.ungrad.lucinda.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.*;
@@ -370,13 +375,8 @@ public class Controller implements IProgressController {
 				InputDialog id = new InputDialog(shell, "Document title", "Please enter a title for the document", "",
 						null);
 				if (id.open() == Dialog.OK) {
-					String title = id.getValue().replaceAll("[\\/\\:\\- ]", "_");
-					/* Process proc = */ Runtime.getRuntime()
-							.exec(new String[] { command, sbConcern.toString(), title });
-					/*
-					 * int result = proc.waitFor(); if (result != 0) {
-					 * log.error("could not launch aquire script"); }
-					 */
+					String title = id.getValue().replaceAll("[\\/\\:\\-\\?\\+\\*<>, ]", "_");
+					new ScanJob(command, sbConcern.toString(), title).schedule();
 				}
 
 			}
@@ -385,6 +385,38 @@ public class Controller implements IProgressController {
 			ExHandler.handle(ex);
 			SWTHelper.showError("Could not launch script", ex.getMessage());
 		}
+	}
+
+	class ScanJob extends Job {
+		String command;
+		String concern;
+		String title;
+
+		public ScanJob(String command, String concern, String title) {
+			super("Acquire document");
+			this.command = command;
+			this.concern = concern;
+			this.title = title;
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor arg0) {
+			try {
+				Process proc = Runtime.getRuntime().exec(new String[] { command, concern, title });
+				int result = proc.waitFor();
+				if (result != 0) {
+					log.error("could not launch aquire script");
+					// SWTHelper.showError("Scan Script", "Fehler bei der Ausführung");
+					return new Status(Status.ERROR, "Acquire", "Could not execute");
+				}
+				return Status.OK_STATUS;
+			} catch (Exception ex) {
+				// SWTHelper.showError("Dokument Einlesen", ex.getMessage());
+				return new Status(Status.ERROR, "Acquire", ex.getMessage());
+
+			}
+		}
+
 	}
 
 	/**
