@@ -27,11 +27,17 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMessage.RecipientType;
 import javax.mail.internet.MimeMultipart;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.rgw.io.FileTool;
 
 /**
  * Send Mails via SMTP
+ * 
  * @author gerry
  *
  */
@@ -48,6 +54,33 @@ public class Mailer {
 		this.smtpPort = smtpPort;
 	}
 
+	class SendJob extends Job {
+		private MimeMessage msg;
+		private String address;
+
+		public SendJob(MimeMessage msg, String adr) {
+			super("Send Mail");
+			this.msg = msg;
+			address = adr;
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			try {
+				monitor.beginTask("Sending mail " + msg.getMessageID(), 1);
+				Transport.send(msg);
+				monitor.done();
+				SWTHelper.showInfo("Mail gesendet", "Die Mail wurde an " + address + " gesendet.");
+				return Status.OK_STATUS;
+			} catch (Exception ex) {
+				SWTHelper.showError("SMTP Mailer", ex.getMessage());
+				return new Status(Status.ERROR, "Mailer", ex.getMessage());
+			}
+
+		}
+
+	}
+
 	public void sendEmail(Session session, String toEmail, String subject, String body, String[] attachments)
 			throws Exception {
 		MimeMessage msg = new MimeMessage(session);
@@ -59,7 +92,7 @@ public class Mailer {
 		msg.setFrom(new InternetAddress(sender));
 		msg.addRecipient(RecipientType.BCC, msg.getFrom()[0]);
 		msg.setReplyTo(msg.getFrom());
-	
+
 		msg.setSubject(subject, "UTF-8");
 		if (attachments != null) {
 			BodyPart messageBodyPart = new MimeBodyPart();
@@ -87,12 +120,14 @@ public class Mailer {
 		}
 		msg.setSentDate(new Date());
 		msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
-		Transport.send(msg);
-		SWTHelper.showInfo("Mail gesendet", "Die Mail wurde an " + toEmail + " gesendet.");
+		SendJob sendJob = new SendJob(msg, toEmail);
+		sendJob.setUser(true);
+		sendJob.schedule();
 	}
 
 	/**
 	 * Send without security (e.g. to al local smpt server like HIN Client
+	 * 
 	 * @param to
 	 * @param subject
 	 * @param body
@@ -109,9 +144,9 @@ public class Mailer {
 		sendEmail(session, to, subject, body, attachments);
 	}
 
-
 	/**
 	 * Send via Starttls Connection
+	 * 
 	 * @param to
 	 * @param subject
 	 * @param body
@@ -123,7 +158,7 @@ public class Mailer {
 		System.out.println("TLSEmail Start");
 		Properties props = new Properties();
 		props.put("mail.smtp.host", smtpHost); // SMTP Host
-		props.put("mail.smtp.port", smtpPort /* "587" */ ); 
+		props.put("mail.smtp.port", smtpPort /* "587" */ );
 		props.put("mail.smtp.auth", "true"); // enable authentication
 		props.put("mail.smtp.starttls.enable", "true"); // enable STARTTLS
 
@@ -140,6 +175,7 @@ public class Mailer {
 
 	/**
 	 * Send via SSL Connection
+	 * 
 	 * @param to
 	 * @param subject
 	 * @param body
