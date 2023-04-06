@@ -371,12 +371,12 @@ public class Controller implements IProgressController {
 						null);
 				if (id.open() == Dialog.OK) {
 					String title = id.getValue().replaceAll("[\\/\\:\\- ]", "_");
-					Process proc = Runtime.getRuntime().exec(new String[] { command, sbConcern.toString(), title });
-					int result = proc.waitFor();
-					if (result != 0) {
-						log.error("could not launch aquire script");
-					}
-
+					/* Process proc = */ Runtime.getRuntime()
+							.exec(new String[] { command, sbConcern.toString(), title });
+					/*
+					 * int result = proc.waitFor(); if (result != 0) {
+					 * log.error("could not launch aquire script"); }
+					 */
 				}
 
 			}

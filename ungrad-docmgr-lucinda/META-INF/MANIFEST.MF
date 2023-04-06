@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Document Manager based on Lucinda
 Bundle-SymbolicName: ch.elexis.ungrad.docmgr-lucinda;singleton:=true
-Bundle-Version: 3.2.0.qualifier
+Bundle-Version: 3.2.1.qualifier
 Export-Package: ch.elexis.ungrad.lucinda
 Bundle-Activator: ch.elexis.ungrad.lucinda.Activator
 Bundle-Vendor: G. Weirich
