@@ -43,7 +43,7 @@ public class LagerhaltungArtikelstammLabelProvider extends ArtikelstammLabelProv
 	@Override
 	public String getText(Object element){
 		ArtikelstammItem ai = (ArtikelstammItem) element;
-		Integer availability = CoreHub.getStockService().getCumulatedStockForArticle(ai);
+		Integer availability = 1; //bCoreHub.getStockService().getCumulatedStockForArticle(ai);
 		if (availability != null) {
 			return ai.getLabel() + " (LB: " + availability + ")";
 		}
@@ -57,8 +57,8 @@ public class LagerhaltungArtikelstammLabelProvider extends ArtikelstammLabelProv
 	@Override
 	public Color getForeground(Object element){
 		ArtikelstammItem ai = (ArtikelstammItem) element;
-		Availability availability =
-			CoreHub.getStockService().getCumulatedAvailabilityForArticle(ai);
+		Availability availability = Availability.IN_STOCK;
+			// CoreHub.getStockService().getCumulatedAvailabilityForArticle(ai);
 		if (availability != null) {
 			switch (availability) {
 			case CRITICAL_STOCK:
