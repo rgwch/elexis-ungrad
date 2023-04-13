@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.text.model.Samdas;
+import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Konsultation;
@@ -165,8 +166,13 @@ public class Controller implements IProgressController {
 	}
 
 	public void reload() {
-		dirView.setPatient(ElexisEventDispatcher.getSelectedPatient());
-		runQuery(lucindaView.getSearchField().getText());
+		UiDesk.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				dirView.setPatient(ElexisEventDispatcher.getSelectedPatient());
+				runQuery(lucindaView.getSearchField().getText());				
+			}
+		});
 	}
 
 	public void doRescan() {
@@ -409,6 +415,7 @@ public class Controller implements IProgressController {
 					// SWTHelper.showError("Scan Script", "Fehler bei der Ausführung");
 					return new Status(Status.ERROR, "Acquire", "Could not execute");
 				}
+				reload();
 				return Status.OK_STATUS;
 			} catch (Exception ex) {
 				// SWTHelper.showError("Dokument Einlesen", ex.getMessage());
