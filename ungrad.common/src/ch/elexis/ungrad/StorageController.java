@@ -18,32 +18,43 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Person;
+import ch.rgw.io.FileTool;
 import ch.rgw.tools.TimeTool;
+
 /**
  * Manage patient related directories in docbase
+ * 
  * @author gerry
  *
  */
 public class StorageController {
 
-	public File createFile(Patient pat, String title) throws Exception {
+	public File createOutputFile(Patient pat, String title) throws Exception {
 		File dir = getOutputDirFor(pat, true);
 		String name = createOutputFilename(title);
-		return new File(dir, name);
+		File ret = new File(dir, name);
+		while (ret.exists()) {
+			String base = FileTool.getNakedFilename(name);
+			String path = FileTool.getFilepath(name);
+			String ext = FileTool.getExtension(name);
+			base = base + "_" + new TimeTool().toString(TimeTool.TIME_COMPACT);
+			ret = new File(path, base + "." + ext);
+		}
+		return ret;
 	}
 
 	/**
 	 * Find the configured output dir for a patient (highly opinionated filepath
 	 * resolution)
 	 * 
-	 * @param p  Patient whose output dir should be retrieved
+	 * @param p                  Patient whose output dir should be retrieved
 	 * @param bCreateIfNotExists create directory if it doesn't exist
 	 * @return The directory to store documents for that patient.
 	 */
 	public File getOutputDirFor(Person p, boolean bCreateIfNotExists) throws Exception {
 		if (p == null) {
 			p = ElexisEventDispatcher.getSelectedPatient();
-			if(p==null) {
+			if (p == null) {
 				return null;
 			}
 		}

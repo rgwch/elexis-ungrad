@@ -48,7 +48,7 @@ public class ODFDoc {
 	}
 
 	/**
-	 * Load a Tenplate from an Elexis "Brief", i.e. from the default ouitgoing doc
+	 * Load a Tenplate from an Elexis "Brief", i.e. from the default outgoing doc
 	 * storage
 	 * 
 	 * @param brief
@@ -210,7 +210,7 @@ public class ODFDoc {
 	public boolean doOutput() {
 		try {
 			StorageController sc = new StorageController();
-			File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), title + ".odt");
+			File output = sc.createOutputFile(ElexisEventDispatcher.getSelectedPatient(), title + ".odt");
 			if (!bExternal || !output.exists()) {
 				byte[] contents = asByteArray();
 				FileTool.writeFile(output, contents);

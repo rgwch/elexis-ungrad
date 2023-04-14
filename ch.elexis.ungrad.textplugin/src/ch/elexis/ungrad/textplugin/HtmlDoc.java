@@ -260,6 +260,10 @@ public class HtmlDoc {
 			text = text.replace(e.getKey(), getPostfilledFieldValue(e.getKey()));
 		}
 		File htmlFile = new File(dir, filename + ".html");
+		if(htmlFile.exists()) {
+			filename+=new TimeTool().toString(TimeTool.TIME_COMPACT);
+			htmlFile = new File(dir, filename + ".html");
+		}
 		FileTool.writeTextFile(htmlFile, text);
 		File pdfFile = new File(dir, filename + ".pdf");
 		pdf.createPDF(htmlFile, pdfFile);
