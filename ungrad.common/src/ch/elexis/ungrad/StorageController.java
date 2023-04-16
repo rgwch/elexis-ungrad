@@ -35,10 +35,9 @@ public class StorageController {
 		File ret = new File(dir, name);
 		while (ret.exists()) {
 			String base = FileTool.getNakedFilename(name);
-			String path = FileTool.getFilepath(name);
 			String ext = FileTool.getExtension(name);
 			base = base + "_" + new TimeTool().toString(TimeTool.TIME_COMPACT);
-			ret = new File(path, base + "." + ext);
+			ret = new File(dir, base + "." + ext);
 		}
 		return ret;
 	}
