@@ -92,8 +92,21 @@ public class Medform {
    */
   public boolean isMedform() {
     try {
-      String oid = mgr.getFieldContents(form, "topmostSubform[0].page1[0].formS1Struct[0].oid[0]");
-      return (oid != null) && oid.startsWith("medforms");
+      String oid0 = mgr.getFieldContents(form, "topmostSubform[0].page1[0].formS1Struct[0].oid[0]");
+      String oid1 = mgr.getFieldContents(form, "topmostSubform[0].page2[0].formS1Struct[0].oid[0]");
+      String oid2 = mgr.getFieldContents(form, "topmostSubform[0].page3[0].formS1Struct[0].oid[0]");
+      
+      if((oid0 != null) && oid0.startsWith("medforms")){
+    	  return true;
+      }
+      if((oid1 != null) && oid1.startsWith("medforms")){
+    	  return true;
+      }
+      if((oid2 != null) && oid2.startsWith("medforms")){
+    	  return true;
+      }
+      return false;
+      
     } catch (Exception ex) {
       ExHandler.handle(ex);
       return false;

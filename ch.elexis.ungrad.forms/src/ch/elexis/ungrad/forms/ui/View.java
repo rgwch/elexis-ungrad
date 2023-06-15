@@ -199,6 +199,9 @@ public class View extends ViewPart implements IActivationListener {
 				String raw = FileTool.readTextFile(mappingFile);
 				MappedForm mapped = new MappedForm(templateFile.getAbsolutePath());
 				mapped.create(outFile.getAbsolutePath(), raw, currentPat);
+			}else {
+				SWTHelper.alert("Schablone falsch?", "Dies scheint keine medforms-Vorlage zu sein, und es existiert auch keine Maping-Datei");
+				FileTool.copyFile(templateFile, outFile, FileTool.FAIL_IF_EXISTS);
 			}
 		}
 		controller.createLinksWithElexis(outFile.getAbsolutePath(), kRecipient);
