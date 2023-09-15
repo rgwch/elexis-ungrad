@@ -171,6 +171,7 @@ public class RechnungsDrucker implements IRnOutputter {
 
 		Result<Rechnung> ret = new Result<Rechnung>();
 		QRBillDetails bill = new QRBillDetails(rn);
+		// String iban = (String) rn.getMandant().getExtInfoStoredObjectByKey(PreferenceConstants.QRIBAN);
 		bill.qrIBAN = CoreHub.globalCfg.get(PreferenceConstants.QRIBAN + "/" + rn.getMandant().getId(), "0");
 		bill.qrReference = bill.createQRReference(
 				CoreHub.globalCfg.get(PreferenceConstants.bankClient + "/" + rn.getMandant().getId(), "0"));
