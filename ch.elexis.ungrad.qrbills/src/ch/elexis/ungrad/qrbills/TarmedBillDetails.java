@@ -17,7 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +30,6 @@ import ch.elexis.base.ch.ebanking.esr.ESR;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter.TYPE;
 import ch.elexis.data.*;
-import ch.elexis.tarmed.printer.XML44Services;
-import ch.elexis.tarmed.printer.XMLPrinterUtil;
 import ch.elexis.tarmedprefs.TarmedRequirements;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.fd.invoice440.request.*;
