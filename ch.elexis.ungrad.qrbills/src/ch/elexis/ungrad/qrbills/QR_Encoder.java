@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018-2022 by G. Weirich
+ * Copyright (c) 2018-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -21,7 +21,6 @@ import ch.codeblock.qrinvoice.model.QrInvoice;
 import ch.codeblock.qrinvoice.model.builder.QrInvoiceBuilder;
 import ch.codeblock.qrinvoice.output.QrCode;
 import ch.elexis.data.Kontakt;
-import ch.rgw.crypt.BadParameterException;
 
 /**
  * Create the QR-Code as image
@@ -31,7 +30,7 @@ import ch.rgw.crypt.BadParameterException;
  */
 public class QR_Encoder {
 	public byte[] generate(QRBillDetails bill)
-			throws BadParameterException, UnsupportedEncodingException {
+			throws UnsupportedEncodingException {
 		final QrInvoice qr = QrInvoiceBuilder.create().creditorIBAN(bill.qrIBAN)
 				.paymentAmountInformation(p -> p.chf(bill.amountTotalWithCharges.getAmount()))
 				.creditor(c -> c.combinedAddress()

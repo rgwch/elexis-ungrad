@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, G. Weirich and Elexis
+ * Copyright (c) 2022-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,12 +21,12 @@ import java.util.List;
 import ch.elexis.TarmedRechnung.TarmedACL;
 import ch.elexis.data.*;
 import ch.elexis.ungrad.pdf.Manager;
-import ch.rgw.crypt.BadParameterException;
 import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
 
 /**
  * Collect some data from different sources to create a valid QR Bill
+ * 
  * @author gerry
  *
  */
@@ -36,7 +36,7 @@ public class QRBillDetails {
 	public Patient patient;
 	public String qrIBAN = "CH000NUR00ZUR00DEMO00";
 	public String qrReference;
-	public Money amountTotalWithCharges, amountDue, //original amount before charges and payments 
+	public Money amountTotalWithCharges, amountDue, // original amount before charges and payments
 			amountPaid, amountCharges;
 	public Mandant mandator;
 	public Rechnungssteller biller;
@@ -46,15 +46,16 @@ public class QRBillDetails {
 	public List<Zahlung> charges = new ArrayList<Zahlung>(); // all charges
 	public String currency = "CHF";
 	public String dateDue;
-	
+
 	TarmedACL ta = TarmedACL.getInstance();
-	
+
 	/**
 	 * Analyze a "Rechnung" object
+	 * 
 	 * @param rn
 	 * @throws BadParameterException
 	 */
-	public QRBillDetails(Rechnung rn) throws BadParameterException{
+	public QRBillDetails(Rechnung rn) throws Exception {
 		this.rn = (Rechnung) checkNull(rn, "Rechnung");
 		fall = (Fall) checkNull(rn.getFall(), "Fall");
 		patient = (Patient) checkNull(fall.getPatient(), "Patient");
@@ -64,36 +65,36 @@ public class QRBillDetails {
 		dateDue = rn.getRnDatumFrist();
 		amountPaid = new Money();
 	}
-	
-	public String getFormatted(String orig){
+
+	public String getFormatted(String orig) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 20; i += 4) {
 			sb.append(orig.substring(i, i + 4)).append(" ");
 		}
 		return sb.append(orig.substring(20)).toString();
 	}
-	
-	public String createQRReference(String id) throws BadParameterException{
+
+	public String createQRReference(String id) throws Exception {
 		String usr = rn.getRnId();
 		int space = 26 - usr.length() - id.length();
 		if (space < 0) {
-			throw new BadParameterException("id for QR reference too long", 3);
+			throw new Exception("id for QR reference too long");
 		}
 		StringBuilder sb = new StringBuilder();
 		sb.append(id).append(StringTool.filler("0", space)).append(usr);
 		qrReference = StringTool.addModulo10(sb.toString());
 		return qrReference;
 	}
-	
-	public String combinedAddress(Kontakt k){
+
+	public String combinedAddress(Kontakt k) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(k.get(Kontakt.FLD_NAME2) + " " + k.get(Kontakt.FLD_NAME1)).append("<br />")
-			.append(k.get(Kontakt.FLD_STREET)).append("<br />")
-			.append(k.get(Kontakt.FLD_ZIP) + " " + k.get(Kontakt.FLD_PLACE));
+				.append(k.get(Kontakt.FLD_STREET)).append("<br />")
+				.append(k.get(Kontakt.FLD_ZIP) + " " + k.get(Kontakt.FLD_PLACE));
 		return sb.toString();
 	}
-	
-	public void addCharges(){
+
+	public void addCharges() {
 		amountTotalWithCharges = new Money(amountDue);
 		amountCharges = new Money();
 		for (Zahlung z : rn.getZahlungen()) {
@@ -108,18 +109,17 @@ public class QRBillDetails {
 		}
 		amountTotalWithCharges.roundTo5();
 	}
-	
-	public Object checkNull(Object o, String msg) throws BadParameterException{
+
+	public Object checkNull(Object o, String msg) throws Exception {
 		if (o == null) {
-			throw new BadParameterException(msg + " was null", 1);
+			throw new Exception(msg + " was null");
 		}
 		return o;
 	}
-	
-	public void writePDF(File inputHTML, File outputPDF)
-		throws FileNotFoundException, IOException, PrinterException{
+
+	public void writePDF(File inputHTML, File outputPDF) throws FileNotFoundException, IOException, PrinterException {
 		Manager pdfManager = new Manager();
 		pdfManager.createPDF(inputHTML, outputPDF);
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, G. Weirich and Elexis
+ * Copyright (c) 2022-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.preferences.CorePreferenceInitializer;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.rgw.tools.StringTool;
@@ -69,8 +68,7 @@ public class QR_SettingsControl extends Composite {
 			}
 		});
 		b.setText("Ändern");
-		outputDirPDF = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF,
-				CorePreferenceInitializer.getDefaultDBPath());
+		outputDirPDF = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF, CoreHub.getTempDir().getAbsolutePath());
 		tOutdirPDF.setText(outputDirPDF);
 
 		Label lx = new Label(this, SWT.NONE);
@@ -88,8 +86,7 @@ public class QR_SettingsControl extends Composite {
 			}
 		});
 		bx.setText("Ändern");
-		outputDirXML = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_XML,
-				CorePreferenceInitializer.getDefaultDBPath());
+		outputDirXML = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
 		tOutdirXML.setText(outputDirXML);
 
 		Label sep = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL);

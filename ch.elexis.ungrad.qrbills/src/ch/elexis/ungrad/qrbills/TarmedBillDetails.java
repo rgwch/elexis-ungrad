@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018-2022 by G. Weirich
+ * Copyright (c) 2018-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -35,7 +35,6 @@ import ch.elexis.tarmed.printer.XMLPrinterUtil;
 import ch.elexis.tarmedprefs.TarmedRequirements;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.fd.invoice440.request.*;
-import ch.rgw.crypt.BadParameterException;
 import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2023 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -16,6 +16,7 @@ package ch.elexis.ungrad;
 
 import java.util.Date;
 import java.util.Properties;
+
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -107,6 +108,7 @@ public class Mailer {
 			Multipart multipart = new MimeMultipart();
 			multipart.addBodyPart(messageBodyPart);
 
+
 			for (String filename : attachments) {
 				messageBodyPart = new MimeBodyPart();
 				DataSource source = new FileDataSource(filename);
@@ -114,6 +116,7 @@ public class Mailer {
 				messageBodyPart.setFileName(Util.reduceCharset(FileTool.getFilename(filename)));
 				multipart.addBodyPart(messageBodyPart);
 			}
+
 			msg.setContent(multipart);
 		} else {
 			msg.setText(body, "UTF-8");

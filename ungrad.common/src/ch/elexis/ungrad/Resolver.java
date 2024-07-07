@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2022 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.data.events.ElexisEventDispatcher;
-import ch.elexis.core.model.IPersistentObject;
+import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.ui.text.Messages;
 import ch.elexis.core.ui.text.TextContainer;
 import ch.elexis.data.Kontakt;
@@ -162,7 +162,7 @@ public class Resolver {
 	private String genderize(final String in) {
 		String inl = in.substring(1,in.length()-1);
 		boolean showErrors = true;
-		if (inl.substring(0, 1).equalsIgnoreCase(TextContainer.DONT_SHOW_REPLACEMENT_ERRORS)) {
+		if (inl.substring(0, 1).equalsIgnoreCase("*")) {
 			inl = inl.substring(1);
 			showErrors = false;
 		}

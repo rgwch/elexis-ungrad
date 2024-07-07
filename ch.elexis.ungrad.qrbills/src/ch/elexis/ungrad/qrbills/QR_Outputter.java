@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018-2022 by G. Weirich
+ * Copyright (c) 2018-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -33,9 +33,10 @@ import org.eclipse.ui.progress.IProgressService;
 
 import ch.elexis.arzttarife_schweiz.Messages;
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.data.util.PlatformHelper;
-import ch.elexis.core.model.IPersistentObject;
+import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Rechnung;
@@ -44,7 +45,6 @@ import ch.elexis.data.Zahlung;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
-import ch.rgw.crypt.BadParameterException;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Money;
@@ -52,9 +52,9 @@ import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
 
 /**
- * An Elexis-IRnOutputter for ISO 20022 conformant bills. Creates a Tarmed/4.4 conformant details
- * page and a summary page with Sqiss QR-conformant payment slip. Both are created from html
- * templates and ultimately converted to PDF.
+ * An Elexis-IRnOutputter for ISO 20022 conformant bills. Creates a Tarmed/4.4
+ * conformant details page and a summary page with Sqiss QR-conformant payment
+ * slip. Both are created from html templates and ultimately converted to PDF.
  * 
  * @author gerry
  *
@@ -65,97 +65,103 @@ public class QR_Outputter implements IRnOutputter {
 	private QR_Encoder qr;
 	private Manager pdfManager;
 	private boolean modifyInvoiceState;
-	
-	public QR_Outputter(){}
-	
+
+	public QR_Outputter() {
+	}
+
 	@Override
-	public String getDescription(){
+	public String getDescription() {
 		return "Tarmedrechnung mit QR Code";
 	}
-	
+
 	@Override
-	public boolean canStorno(final Rechnung rn){
+	public boolean canStorno(final Rechnung rn) {
 		return false;
 	}
-	
+
 	@Override
-	public boolean canBill(final Fall fall){
+	public boolean canBill(final Fall fall) {
 		return true;
 	}
-	
+
 	@Override
-	public Control createSettingsControl(final Object parent){
+	public Control createSettingsControl(final Object parent) {
 		qrs = new QR_SettingsControl((Composite) parent);
 		return qrs;
 	}
-	
+
 	@Override
-	public void saveComposite(){
+	public void saveComposite() {
 		qrs.doSave();
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@Override
-	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn,
-		final Properties props){
+	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, final Properties props) {
 		Result<Rechnung> res = new Result<Rechnung>();
 		qr = new QR_Encoder();
 		pdfManager = new Manager();
 		modifyInvoiceState = true;
-		
+
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 		try {
-			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(),
-				new IRunnableWithProgress() {
-					
-					@Override
-					public void run(final IProgressMonitor monitor){
-						monitor.beginTask("Drucke Rechnungen", rnn.size() * 3);
-						for (Rechnung rn : rnn) {
-							doPrint(rn, monitor, type, res);
-							if (modifyInvoiceState) {
-								int status_vorher = rn.getStatus();
-								if ((status_vorher == RnStatus.OFFEN)
-									|| (status_vorher == RnStatus.MAHNUNG_1)
-									|| (status_vorher == RnStatus.MAHNUNG_2)
-									|| (status_vorher == RnStatus.MAHNUNG_3)) {
-									rn.setStatus(status_vorher + 1);
-								}
-								rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
-									+ RnStatus.getStatusText(rn.getStatus()));
-							}
-							monitor.worked(1);
-							try {
-								TimeUnit.MILLISECONDS.sleep(100);
-							} catch (InterruptedException e) {
+			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {
+
+				@Override
+				public void run(final IProgressMonitor monitor) {
+					monitor.beginTask("Drucke Rechnungen", rnn.size() * 3);
+					for (Rechnung rn : rnn) {
+						doPrint(rn, monitor, type, res);
+						if (modifyInvoiceState) {
+							InvoiceState state = rn.getInvoiceState();
+							switch (state) {
+							case OPEN:
+								state = InvoiceState.BILLED;
+								break;
+							case DEMAND_NOTE_1:
+								state = InvoiceState.DEMAND_NOTE_1_PRINTED;
+								break;
+							case DEMAND_NOTE_2:
+								state = InvoiceState.DEMAND_NOTE_2_PRINTED;
+								break;
+							case DEMAND_NOTE_3:
+								state = InvoiceState.DEMAND_NOTE_3_PRINTED;
 								break;
 							}
+							rn.setStatus(state);
+							rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
+									+ RnStatus.getStatusText(rn.getStatus()));
 						}
-						monitor.done();
+						monitor.worked(1);
+						try {
+							TimeUnit.MILLISECONDS.sleep(100);
+						} catch (InterruptedException e) {
+							break;
+						}
 					}
-				}, null);
-			
+					monitor.done();
+				}
+			}, null);
+
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
 			res.add(new Result<Rechnung>(SEVERITY.ERROR, 1, ex.getMessage(), null, true));
 		}
 		if (res.isOK()) {
-			SWTHelper.showInfo("Ausgabe beendet",
-				rnn.size() + " QR-Rechnung(en) wurde(n) ausgegeben");
+			SWTHelper.showInfo("Ausgabe beendet", rnn.size() + " QR-Rechnung(en) wurde(n) ausgegeben");
 		} else {
 			SWTHelper.showError("QR-Output", "Fehler bei der Rechnungsausgabe", res.toString()
-				+ "\nSie können die fehlerhaften Rechnungen mit Status fehlerhaft in der Rechnungsliste anzeigen und korrigieren");
-			
+					+ "\nSie können die fehlerhaften Rechnungen mit Status fehlerhaft in der Rechnungsliste anzeigen und korrigieren");
+
 		}
 		return res;
 	}
-	
-	private void doPrint(final Rechnung rn, final IProgressMonitor monitor, final TYPE type,
-		Result<Rechnung> res){
+
+	private void doPrint(final Rechnung rn, final IProgressMonitor monitor, final TYPE type, Result<Rechnung> res) {
 		try {
 			monitor.subTask(rn.getNr() + " wird ausgegeben");
 			TarmedBillDetails bill = new TarmedBillDetails(rn, type,
-				CoreHub.localCfg.get(PreferenceConstants.MISSING_DATA, true));
+					CoreHub.localCfg.get(PreferenceConstants.MISSING_DATA, true));
 			if (CoreHub.localCfg.get(PreferenceConstants.FACE_DOWN, false)) {
 				printQRPage(bill);
 				monitor.worked(1);
@@ -167,19 +173,17 @@ public class QR_Outputter implements IRnOutputter {
 			}
 			res.add(new Result<Rechnung>(rn));
 			monitor.worked(1);
-			
+
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
 			res.add(new Result<Rechnung>(SEVERITY.ERROR, 2, ex.getMessage(), rn, true));
 		}
 	}
-	
-	private void printQRPage(final TarmedBillDetails bill)
-		throws IOException, Exception, BadParameterException, UnsupportedEncodingException,
-		FileNotFoundException, PrinterException{
+
+	private void printQRPage(final TarmedBillDetails bill) throws Exception {
 		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_QR, true)) {
-			String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills")
-				+ File.separator + "rsc" + File.separator + "qrbill_template_v5.html";
+			String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
+					+ File.separator + "qrbill_template_v5.html";
 			String fname = "";
 			switch (bill.rn.getStatus()) {
 			case RnStatus.OFFEN:
@@ -206,71 +210,68 @@ public class QR_Outputter implements IRnOutputter {
 				template = new File(default_template);
 			}
 			String rawHTML = FileTool.readTextFile(template);
-			
+
 			replacer.put("Adressat", bill.adressat);
 			replacer.put("Mandant", bill.biller);
 			replacer.put("Patient", bill.patient);
 			replacer.put("Rechnung", bill.rn);
 			Resolver resolver = new Resolver(replacer, true);
-			
+
 			String cookedHTML = resolver.resolve(rawHTML);
 			byte[] png = qr.generate(bill);
 			File imgFile = new File(bill.outputDirPDF, bill.rn.getRnId() + ".png");
 			FileTool.writeFile(imgFile, png);
-			
+
 			StringBuilder sbSummary = new StringBuilder();
 			sbSummary.append("<table style=\"width:100%\">");
 			if (!bill.amountTarmed.isNeglectable()) {
 				sbSummary.append("<tr><td>").append(Messages.RnPrintView_tarmedPoints)
-					.append("</td><td class=\"amount\">")
-					.append(bill.amountTarmed.getAmountAsString()).append("</td></tr>");
+						.append("</td><td class=\"amount\">").append(bill.amountTarmed.getAmountAsString())
+						.append("</td></tr>");
 			}
 			if (!bill.amountDrug.isNeglectable()) {
 				sbSummary.append("<tr><td>").append(Messages.RnPrintView_medicaments)
-					.append("</td><td class=\"amount\">")
-					.append(bill.amountDrug.getAmountAsString()).append("</td></tr>");
+						.append("</td><td class=\"amount\">").append(bill.amountDrug.getAmountAsString())
+						.append("</td></tr>");
 			}
 			if (!bill.amountLab.isNeglectable()) {
-				sbSummary.append("<tr><td>").append(Messages.RnPrintView_labpoints)
-					.append("</td><td class=\"amount\">").append(bill.amountLab.getAmountAsString())
-					.append("</td></tr>");
+				sbSummary.append("<tr><td>").append(Messages.RnPrintView_labpoints).append("</td><td class=\"amount\">")
+						.append(bill.amountLab.getAmountAsString()).append("</td></tr>");
 			}
 			if (!bill.amountMigel.isNeglectable()) {
 				sbSummary.append("<tr><td>").append(Messages.RnPrintView_migelpoints)
-					.append("</td><td class=\"amount\">")
-					.append(bill.amountMigel.getAmountAsString()).append("</td></tr>");
+						.append("</td><td class=\"amount\">").append(bill.amountMigel.getAmountAsString())
+						.append("</td></tr>");
 			}
 			if (!bill.amountPhysio.isNeglectable()) {
 				sbSummary.append("<tr><td>").append(Messages.RnPrintView_physiopoints)
-					.append("</td><td class=\"amount\">")
-					.append(bill.amountPhysio.getAmountAsString()).append("</td></tr>");
+						.append("</td><td class=\"amount\">").append(bill.amountPhysio.getAmountAsString())
+						.append("</td></tr>");
 			}
 			if (!bill.amountUnclassified.isNeglectable()) {
 				sbSummary.append("<tr><td>").append("Diverse Nicht-Pflichleistungen:")
-					.append("</td><td class=\"amount\">")
-					.append(bill.amountUnclassified.getAmountAsString()).append("</td></tr>");
+						.append("</td><td class=\"amount\">").append(bill.amountUnclassified.getAmountAsString())
+						.append("</td></tr>");
 			}
 			for (Zahlung z : bill.charges) {
 				Money betrag = new Money(z.getBetrag()).multiply(-1.0);
-				sbSummary.append("<tr><td>").append(z.getBemerkung())
-					.append(":</td><td class=\"amount\">").append(betrag.getAmountAsString())
-					.append("</td></tr>");
+				sbSummary.append("<tr><td>").append(z.getBemerkung()).append(":</td><td class=\"amount\">")
+						.append(betrag.getAmountAsString()).append("</td></tr>");
 			}
 			if (!bill.amountPaid.isNeglectable()) {
 				sbSummary.append("<tr><td>Angezahlt:</td><td class=\"amount\">")
-					.append("-" + bill.amountPaid.getAmountAsString()).append("</td></tr>");
+						.append("-" + bill.amountPaid.getAmountAsString()).append("</td></tr>");
 			}
 			sbSummary.append("</table>");
 			String finished = cookedHTML.replace("[QRIMG]", bill.rn.getRnId() + ".png")
-				.replace("[LEISTUNGEN]", sbSummary.toString()).replace("[CURRENCY]", bill.currency)
-				.replace("[AMOUNT]", bill.amountTotalWithCharges.getAmountAsString())
-				.replace("[IBAN]", bill.getFormatted(bill.qrIBAN))
-				.replace("[BILLER]", bill.combinedAddress(bill.biller))
-				.replace("[ESRLINE]", bill.getFormatted(bill.qrReference))
-				.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
-				.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat))
-				.replace("[DUE]", bill.dateDue);
-			
+					.replace("[LEISTUNGEN]", sbSummary.toString()).replace("[CURRENCY]", bill.currency)
+					.replace("[AMOUNT]", bill.amountTotalWithCharges.getAmountAsString())
+					.replace("[IBAN]", bill.getFormatted(bill.qrIBAN))
+					.replace("[BILLER]", bill.combinedAddress(bill.biller))
+					.replace("[ESRLINE]", bill.getFormatted(bill.qrReference))
+					.replace("[INFO]", Integer.toString(bill.numCons) + " Konsultationen")
+					.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);
+
 			File htmlFile = new File(bill.outputDirPDF, bill.rn.getNr() + ".html");
 			File pdfFile = new File(bill.outputDirPDF, bill.rn.getNr() + "_qr.pdf");
 			FileTool.writeTextFile(htmlFile, finished);
@@ -290,15 +291,15 @@ public class QR_Outputter implements IRnOutputter {
 			if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
 				htmlFile.delete();
 			}
-			
+
 		}
 	}
-	
+
 	private void printDetails(final TarmedBillDetails bill)
-		throws Exception, FileNotFoundException, IOException, PrinterException{
+			throws Exception, FileNotFoundException, IOException, PrinterException {
 		Tarmedprinter tp = new Tarmedprinter();
 		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true)) {
-			
+
 			File rfhtml = tp.print(bill);
 			File pdfout = new File(bill.outputDirPDF, bill.rn.getNr() + "_rf.pdf");
 			// FileOutputStream rfpdf = new FileOutputStream(pdfout);
@@ -315,11 +316,11 @@ public class QR_Outputter implements IRnOutputter {
 					}
 				}
 			}
-			
+
 			if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
 				rfhtml.delete();
 			}
 		}
 	}
-	
+
 }
