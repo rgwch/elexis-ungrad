@@ -25,7 +25,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.model.IPersistentObject;
+import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.data.Brief;
 import ch.elexis.data.Kontakt;
 import ch.elexis.ungrad.Resolver;

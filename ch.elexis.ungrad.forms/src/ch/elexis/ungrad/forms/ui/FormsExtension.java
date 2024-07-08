@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, G. Weirich and Elexis
+ * Copyright (c) 2022-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -73,7 +73,7 @@ public class FormsExtension implements IKonsExtension {
 			}
 		} catch (IOException e) {
 			ExHandler.handle(e);
-			SWTHelper.alert(Messages.BriefAuswahlErrorHeading, // $NON-NLS-1$
+			SWTHelper.alert(Messages.RezepteView_newPrescriptionError, // $NON-NLS-1$
 					Messages.BriefAuswahlCouldNotLoadText); // $NON-NLS-1$
 		}
 		return false;
