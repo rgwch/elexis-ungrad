@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2023, G. Weirich and Elexis
+ * Copyright (c) 2022-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,16 +19,23 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
+import org.osgi.service.component.annotations.Reference;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.lock.types.LockResponse;
+import ch.elexis.core.model.IContact;
+import ch.elexis.core.model.IUser;
+import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.elexis.data.Brief;
@@ -45,6 +52,8 @@ import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
+import ch.elexis.core.services.holder.LocalLockServiceHolder;
+
 
 /**
  * Handle forms
@@ -54,6 +63,9 @@ import ch.rgw.tools.TimeTool;
  */
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
 
+	@Reference
+	IContextService contextService;
+	
 	StorageController sc = new StorageController();
 
 	/* CoontentProvider */
@@ -253,8 +265,9 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		if (briefTitle.matches("A_[0-9]{4,4}-[0-1][0-9]-[0-3][0-9]_.+")) {
 			briefTitle = briefTitle.substring(13);
 		}
+		IContact actUser=contextService.getActiveUserContact().get();
 		Konsultation current = (Konsultation) ElexisEventDispatcher.getInstance().getSelected(Konsultation.class);
-		Brief metadata = new Brief(briefTitle, new TimeTool(), CoreHub.actUser, adressat, current, "Formular");
+		Brief metadata = new Brief(briefTitle, new TimeTool(), (Kontakt) actUser, adressat, current, "Formular");
 		metadata.save(FileTool.readFile(new File(filepath)), "pdf");
 		addFormToKons(metadata, current);
 		return metadata;
@@ -262,12 +275,14 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 
 	private void addFormToKons(final Brief brief, final Konsultation kons) {
 		if (kons != null) {
-			if (CoreHub.getLocalLockService().acquireLock(kons).isOk()) {
+			LockResponse lr = LocalLockServiceHolder.get().acquireLockBlocking(kons, 1, new NullProgressMonitor());
+			
+			if (lr.isOk()) {
 				String label = "[ " + brief.getLabel().replace("_", " ") + " ]"; //$NON-NLS-1$ //$NON-NLS-2$
 				// kons.addXRef(XRefExtensionConstants.providerID, brief.getId(), -1, label);
 				kons.addXRef(Activator.KonsXRef, brief.getId(), -1, label);
-				CoreHub.getLocalLockService().releaseLock(kons);
-			}
+				LocalLockServiceHolder.get().releaseLock(lr);
+			}	
 		}
 	}
 
