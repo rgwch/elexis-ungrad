@@ -277,15 +277,16 @@ public class Controller implements IProgressController {
 				SWTHelper.showError(Messages.Controller_cons_not_found_caption,
 						MessageFormat.format(Messages.Controller_cons_not_found_text, doc.get("title"))); // $NON-NLS-2$
 			}
-		} else if (doctype.equalsIgnoreCase(Preferences.OMNIVORE_NAME)) {
-			DocHandle dh = DocHandle.load((String) doc.get(Preferences.FLD_ID));
-			if (dh.exists()) {
-				dh.execute();
-			} else {
-				SWTHelper.showError(Messages.Controller_omnivore_not_found_caption,
-						Messages.Controller_omnivore_not_found_text, (String) doc.get("title")); //$NON-NLS-1$
-			}
-		} else {
+		} /*
+			 * else if (doctype.equalsIgnoreCase(Preferences.OMNIVORE_NAME)) { DocHandle dh
+			 * = DocHandle.load((String) doc.get(Preferences.FLD_ID)); if (dh.exists()) {
+			 * dh.execute(); } else {
+			 * SWTHelper.showError(Messages.Controller_omnivore_not_found_caption,
+			 * Messages.Controller_omnivore_not_found_text, (String) doc.get("title"));
+			 * //$NON-NLS-1$ }
+			 * 
+			 * }
+			 */ else {
 
 			SWTHelper.showError(Messages.Controller_unknown_type_caption,
 					MessageFormat.format(Messages.Controller_unknown_type_text, doctype));
