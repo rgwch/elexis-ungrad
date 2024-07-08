@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2023, G. Weirich and Elexis
+ * Copyright (c) 2022-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,13 +37,7 @@ public class Activator extends AbstractUIPlugin {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		// TODO Auto-generated method stub
 		super.start(context);
-		String cats = CoreHub.globalCfg.get(Preferences.DOC_CATEGORY, "Alle,Allg.,AUF-Zeugnis,Rezept,Labor");
-		if (!cats.contains(DOC_CATEGORY)) {
-			cats += "," + DOC_CATEGORY;
-			CoreHub.globalCfg.set(Preferences.DOC_CATEGORY, cats);
-		}
 		controller = new Controller();
 	}
 
