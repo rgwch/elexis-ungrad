@@ -32,7 +32,7 @@ import ch.elexis.base.ch.ebanking.esr.ESR;
 import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.interfaces.IRnOutputter.TYPE;
-import ch.elexis.core.data.util.PlatformHelper;
+import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.core.data.util.SortedList;
 import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.ui.Hub;
@@ -81,6 +81,9 @@ public class Tarmedprinter {
 		df.setDecimalFormatSymbols(custom);
 	}
 	
+	/*
+	 * Load HTML Template for the bill
+	 */
 	private String loadTemplate(String name) throws Exception{
 		String filename = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator
 			+ "rsc" + File.separator + name;
@@ -93,7 +96,7 @@ public class Tarmedprinter {
 	
 	/**
 	 * Create a HTML representation of the bill
-	 * @param bill an earlyer created Meta-Object of the bill.
+	 * @param bill an earlier created Meta-Object of the bill.
 	 * @return a file handle to an HTML file (which can span multiple pages.
 	 * @throws Exception
 	 */
