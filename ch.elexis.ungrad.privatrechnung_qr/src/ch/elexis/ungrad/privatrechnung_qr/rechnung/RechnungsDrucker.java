@@ -30,7 +30,8 @@ import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.data.interfaces.IVerrechenbar;
 import ch.elexis.core.data.util.PlatformHelper;
 import ch.elexis.core.data.util.ResultAdapter;
-import ch.elexis.core.model.IPersistentObject;
+import ch.elexis.core.model.InvoiceState;
+import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.*;
 import ch.elexis.ungrad.Resolver;
@@ -100,11 +101,23 @@ public class RechnungsDrucker implements IRnOutputter {
 					for (Rechnung rn : rnn) {
 						try {
 							result.add(doPrint(rn, monitor, type));
-							int status_vorher = rn.getStatus();
-							if ((status_vorher == RnStatus.OFFEN) || (status_vorher == RnStatus.MAHNUNG_1)
-									|| (status_vorher == RnStatus.MAHNUNG_2) || (status_vorher == RnStatus.MAHNUNG_3)) {
-								rn.setStatus(status_vorher + 1);
+							InvoiceState state = rn.getInvoiceState();
+							switch (state) {
+							case OPEN:
+								state = InvoiceState.BILLED;
+								break;
+							case DEMAND_NOTE_1:
+								state = InvoiceState.DEMAND_NOTE_1_PRINTED;
+								break;
+							case DEMAND_NOTE_2:
+								state = InvoiceState.DEMAND_NOTE_2_PRINTED;
+								break;
+							case DEMAND_NOTE_3:
+								state = InvoiceState.DEMAND_NOTE_3_PRINTED;
+								break;
 							}
+							rn.setStatus(state);
+
 							rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
 									+ RnStatus.getStatusText(rn.getStatus()));
 							monitor.worked(1);

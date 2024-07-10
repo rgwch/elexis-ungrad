@@ -25,6 +25,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.Hub;
+import ch.elexis.core.ui.preferences.ConfigServicePreferenceStore;
+import ch.elexis.core.ui.preferences.ConfigServicePreferenceStore.Scope;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.preferences.inputs.ComboFieldEditor;
 import ch.elexis.core.ui.preferences.inputs.KontaktFieldEditor;
@@ -43,6 +45,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	IntegerFieldEditor ifh1, if2nd;
 	KontaktFieldEditor kfBank;
 	Mandant selected;
+	ConfigServicePreferenceStore csp=new ConfigServicePreferenceStore(Scope.LOCAL);
 	static final String doSelect = "bitte wählen";
 	
 	public Preferences(){
@@ -75,7 +78,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 			"Verfügbare Höhe erste Seite (cm)", getFieldEditorParent());
 		if2nd = new IntegerFieldEditor(PreferenceConstants.AVAILABLE_SPACE_2,
 			"Verfügbare Höhe Folgeseiten (cm)", getFieldEditorParent());
-		kfBank = new KontaktFieldEditor(CoreHub.localCfg, PreferenceConstants.cfgBank, "Bank",
+		kfBank = new KontaktFieldEditor(csp, PreferenceConstants.cfgBank, "Bank",
 			getFieldEditorParent());
 		sfQRIban =
 			new StringFieldEditor(PreferenceConstants.QRIBAN, "QR-IBAN", getFieldEditorParent());

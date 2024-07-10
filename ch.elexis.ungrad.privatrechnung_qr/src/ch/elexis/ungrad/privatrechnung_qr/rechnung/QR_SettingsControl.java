@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.preferences.CorePreferenceInitializer;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.privatrechnung_qr.data.PreferenceConstants;
 import ch.rgw.tools.StringTool;
@@ -65,7 +64,7 @@ public class QR_SettingsControl extends Composite {
 		});
 		b.setText("Ändern");
 		outputDirPDF = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF,
-				CorePreferenceInitializer.getDefaultDBPath());
+				CoreHub.getTempDir().getAbsolutePath());
 		tOutdirPDF.setText(outputDirPDF);
 
 		Label sep = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL);
