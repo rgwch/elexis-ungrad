@@ -30,15 +30,15 @@ import ch.rgw.tools.TimeTool;
 public class DatumEingabeDialog extends TitleAreaDialog {
 	DatePicker dpVon, dpBis;
 	TimeTool ttVon, ttBis;
-	
-	public DatumEingabeDialog(Shell parentShell, TimeTool von, TimeTool bis){
+
+	public DatumEingabeDialog(Shell parentShell, TimeTool von, TimeTool bis) {
 		super(parentShell);
 		ttVon = von == null ? null : new TimeTool(von);
 		ttBis = bis == null ? null : new TimeTool(bis);
 	}
-	
+
 	@Override
-	protected Control createDialogArea(Composite parent){
+	protected Control createDialogArea(Composite parent) {
 		Composite ret = new Composite(parent, SWT.NONE);
 		ret.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 		ret.setLayout(new GridLayout(2, true));
@@ -54,24 +54,24 @@ public class DatumEingabeDialog extends TitleAreaDialog {
 		}
 		return ret;
 	}
-	
+
 	@Override
-	public void create(){
+	public void create() {
 		super.create();
 		setMessage("Bitte geben Sie den gewünschten Zeitraum ein oder drücken Sie 'Abbrechen'.");
 		setTitle("Anzeigezeitraum für Kassenbuch");
 		getShell().setText("Elexis Kassenbuch");
 	}
-	
+
 	@Override
-	protected void okPressed(){
+	protected void okPressed() {
 		ttVon = getTimeFromField(dpVon); // new TimeTool(dpVon.getDate().getTime());
-		
+
 		ttBis = getTimeFromField(dpBis); // new TimeTool(dpBis.getDate().getTime());
 		super.okPressed();
 	}
-	
-	private TimeTool getTimeFromField(DatePicker dp){
+
+	private TimeTool getTimeFromField(DatePicker dp) {
 		if (dp != null) {
 			Date dat = dp.getDate();
 			if (dat != null) {
@@ -81,5 +81,5 @@ public class DatumEingabeDialog extends TitleAreaDialog {
 		}
 		return new TimeTool();
 	}
-	
+
 }

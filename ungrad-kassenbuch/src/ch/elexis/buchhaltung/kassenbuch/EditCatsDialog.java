@@ -24,15 +24,15 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.rgw.tools.StringTool;
 
 public class EditCatsDialog extends TitleAreaDialog {
-	EditCatsDialog(Shell shell){
+	EditCatsDialog(Shell shell) {
 		super(shell);
 	}
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Text ret=new Text(parent,SWT.MULTI|SWT.BORDER);
+		Text ret = new Text(parent, SWT.MULTI | SWT.BORDER);
 		ret.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
-		ret.setText(StringTool.join(KassenbuchEintrag.getCategories(),"\n"));
+		ret.setText(StringTool.join(KassenbuchEintrag.getCategories(), "\n"));
 		return ret;
 	}
 
@@ -46,10 +46,9 @@ public class EditCatsDialog extends TitleAreaDialog {
 
 	@Override
 	protected void okPressed() {
-		String ncats=((Text)getDialogArea()).getText().replaceAll("\n", KassenbuchEintrag.CATEGORY_SEPARATOR);
+		String ncats = ((Text) getDialogArea()).getText().replaceAll("\n", KassenbuchEintrag.CATEGORY_SEPARATOR);
 		CoreHub.globalCfg.set(KassenbuchEintrag.CATEGORIES, ncats.replaceAll("\r", ""));
 		super.okPressed();
 	}
-	
-	
+
 }

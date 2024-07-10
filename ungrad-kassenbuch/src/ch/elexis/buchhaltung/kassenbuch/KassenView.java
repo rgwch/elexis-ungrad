@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2016, G. Weirich and Elexis
+ * Copyright (c) 2007-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ package ch.elexis.buchhaltung.kassenbuch;
 
 import java.util.SortedSet;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -60,24 +61,19 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 	TableViewer tv;
 	TableColumn[] tc;
 	TimeTool ttVon, ttBis;
-	String[] tableHeaders = new String[] {
-		"Beleg", "Datum", "Soll", "Haben", "Saldo", "Kategorie", "Text"
-	};
-	int[] tableCols = new int[] {
-		50, 80, 60, 60, 60, 100, 400
-	};
-	private IAction addAction, subtractAction, stornoAction, saldoAction, dateAction, printAction,
-			editCatAction;
-	
+	String[] tableHeaders = new String[] { "Beleg", "Datum", "Soll", "Haben", "Saldo", "Kategorie", "Text" };
+	int[] tableCols = new int[] { 50, 80, 60, 60, 60, 100, 400 };
+	private IAction addAction, subtractAction, stornoAction, saldoAction, dateAction, printAction, editCatAction;
+
 	@Override
-	public void createPartControl(Composite parent){
+	public void createPartControl(Composite parent) {
 		parent.setLayout(new GridLayout());
 		tk = UiDesk.getToolkit();
 		form = tk.createForm(parent);
 		Composite body = form.getBody();
 		body.setLayout(new FillLayout());
 		form.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
-		//parent.setLayout(new FillLayout());
+		// parent.setLayout(new FillLayout());
 		tc = new TableColumn[tableHeaders.length];
 		Table table = new Table(body, SWT.SINGLE | SWT.FULL_SELECTION | SWT.V_SCROLL);
 		for (int i = 0; i < tc.length; i++) {
@@ -89,11 +85,13 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 		table.setLinesVisible(true);
 		tv = new TableViewer(table);
 		tv.setContentProvider(new IStructuredContentProvider() {
-			public void dispose(){}
-			
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput){}
-			
-			public Object[] getElements(Object inputElement){
+			public void dispose() {
+			}
+
+			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			}
+
+			public Object[] getElements(Object inputElement) {
 				SortedSet<KassenbuchEintrag> set = KassenbuchEintrag.getBookings(ttVon, ttBis);
 				if (set != null) {
 					return set.toArray();
@@ -110,8 +108,8 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 		menu.createViewerContextMenu(tv, stornoAction);
 		menu.createMenu(dateAction, printAction, null, editCatAction);
 		tv.addDoubleClickListener(new IDoubleClickListener() {
-			
-			public void doubleClick(DoubleClickEvent event){
+
+			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection sel = (IStructuredSelection) tv.getSelection();
 				if (!sel.isEmpty()) {
 					KassenbuchEintrag kbe = (KassenbuchEintrag) sel.getFirstElement();
@@ -119,42 +117,42 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 						tv.refresh();
 					}
 				}
-				
+
 			}
 		});
 		tv.setInput(this);
 		GlobalEventDispatcher.addActivationListener(this, this);
 		setFormText();
 	}
-	
-	private void setFormText(){
+
+	private void setFormText() {
 		if (ttVon == null) {
 			form.setText("Anzeige: Alle Buchungen");
 		} else {
-			form.setText("Anzeige: Von " + ttVon.toString(TimeTool.DATE_GER) + " bis: "
-				+ ttBis.toString(TimeTool.DATE_GER));
+			form.setText(
+					"Anzeige: Von " + ttVon.toString(TimeTool.DATE_GER) + " bis: " + ttBis.toString(TimeTool.DATE_GER));
 		}
 	}
-	
+
 	@Override
-	public void dispose(){
+	public void dispose() {
 		GlobalEventDispatcher.removeActivationListener(this, this);
 		super.dispose();
 	}
-	
+
 	@Override
-	public void setFocus(){
+	public void setFocus() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	class KBLabelProvider implements ITableLabelProvider, ITableColorProvider {
-		
-		public Image getColumnImage(Object element, int columnIndex){
+
+		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
-		
-		public String getColumnText(Object element, int columnIndex){
+
+		public String getColumnText(Object element, int columnIndex) {
 			KassenbuchEintrag kb = (KassenbuchEintrag) element;
 			Money betrag = kb.getAmount();
 			switch (columnIndex) {
@@ -175,28 +173,28 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 			}
 			return "?";
 		}
-		
-		public void addListener(ILabelProviderListener listener){
+
+		public void addListener(ILabelProviderListener listener) {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
-		public void dispose(){
+
+		public void dispose() {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
-		public void removeListener(ILabelProviderListener listener){
+
+		public void removeListener(ILabelProviderListener listener) {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
-		public Color getBackground(Object element, int columnIndex){
+
+		public Color getBackground(Object element, int columnIndex) {
 			// TODO Auto-generated method stub
 			return null;
 		}
-		
-		public Color getForeground(Object element, int columnIndex){
+
+		public Color getForeground(Object element, int columnIndex) {
 			if (columnIndex == 4) {
 				KassenbuchEintrag kb = (KassenbuchEintrag) element;
 				if (kb.getSaldo().isNegative()) {
@@ -206,46 +204,46 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				}
 			}
 			return null;
-			
+
 		}
-		
-		public boolean isLabelProperty(Object element, String property){
+
+		public boolean isLabelProperty(Object element, String property) {
 			// TODO Auto-generated method stub
 			return false;
 		}
-		
+
 	}
-	
-	private void makeActions(){
-		addAction = new RestrictedAction(ACLContributor.BOOKING, "Einnahme") {
+
+	private void makeActions() {
+		addAction = new Action("Einnahme") {
 			{
 				setImageDescriptor(Images.IMG_ADDITEM.getImageDescriptor());
 				setToolTipText("Einnahme verbuchen");
 			}
-			
-			public void doRun(){
+
+			public void doRun() {
 				new BuchungsDialog(getSite().getShell(), true).open();
 				tv.refresh();
 			}
 		};
-		subtractAction = new RestrictedAction(ACLContributor.BOOKING, "Ausgabe") {
+		subtractAction = new Action("Ausgabe") {
 			{
 				setImageDescriptor(Images.IMG_REMOVEITEM.getImageDescriptor());
 				setToolTipText("Ausgabe verbuchen");
 			}
-			
-			public void doRun(){
+
+			public void doRun() {
 				new BuchungsDialog(getSite().getShell(), false).open();
 				tv.refresh();
 			}
 		};
-		stornoAction = new RestrictedAction(ACLContributor.STORNO, "Storno") {
+		stornoAction = new Action( "Storno") {
 			{
 				setImageDescriptor(Images.IMG_DELETE.getImageDescriptor());
 				setToolTipText("Buchung stornieren");
 			}
-			
-			public void doRun(){
+
+			public void doRun() {
 				IStructuredSelection sel = (IStructuredSelection) tv.getSelection();
 				if (!sel.isEmpty()) {
 					KassenbuchEintrag kb = (KassenbuchEintrag) sel.getFirstElement();
@@ -253,18 +251,18 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 					KassenbuchEintrag.recalc();
 					tv.refresh();
 				}
-				
+
 			}
 		};
-		saldoAction = new RestrictedAction(ACLContributor.BOOKING, "Saldo") {
+		saldoAction = new Action("Saldo") {
 			{
 				setImageDescriptor(getPluginImageDescriptor("icons/sigma.ico"));
 				setToolTipText("Zwischenbilanz erstellen");
 			}
-			
-			public void doRun(){
+
+			public void doRun() {
 				InputDialog inp = new InputDialog(getSite().getShell(), "Kassenbestand abgleichen",
-					"Geben Sie bitte den abgezählten Betrag in der Kasse ein", "0.00", null);
+						"Geben Sie bitte den abgezählten Betrag in der Kasse ein", "0.00", null);
 				if (inp.open() == Dialog.OK) {
 					try {
 						Money money = new Money(inp.getValue());
@@ -273,8 +271,8 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 							Money soll = last.getSaldo();
 							Money diff = money.subtractMoney(soll);
 							new KassenbuchEintrag(KassenbuchEintrag.nextNr(last) + " Kontrolle",
-								new TimeTool().toString(TimeTool.DATE_GER), diff,
-								diff.isNegative() ? "Fehlbetrag" : "Überschuss");
+									new TimeTool().toString(TimeTool.DATE_GER), diff,
+									diff.isNegative() ? "Fehlbetrag" : "Überschuss");
 							tv.refresh();
 						}
 					} catch (Exception ex) {
@@ -284,20 +282,19 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				}
 			}
 		};
-		
-		dateAction = new RestrictedAction(ACLContributor.VIEW, "Zeitraum") {
+
+		dateAction = new Action("Zeitraum") {
 			{
 				setImageDescriptor(getPluginImageDescriptor("icons/calendar.png"));
 				setToolTipText("Anzeigezeitraum einstellen");
 			}
-			
-			public void doRun(){
-				DatumEingabeDialog ded =
-					new DatumEingabeDialog(getViewSite().getShell(), ttVon, ttBis);
+
+			public void doRun() {
+				DatumEingabeDialog ded = new DatumEingabeDialog(getViewSite().getShell(), ttVon, ttBis);
 				if (ded.open() == Dialog.OK) {
 					ttVon = ded.ttVon;
 					ttBis = ded.ttBis;
-					
+
 				} else {
 					ttVon = null;
 					ttBis = null;
@@ -306,57 +303,56 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				tv.refresh();
 			}
 		};
-		printAction = new RestrictedAction(ACLContributor.VIEW, "Drucken") {
+		printAction = new Action("Drucken") {
 			{
 				setImageDescriptor(Images.IMG_PRINTER.getImageDescriptor());
 				setTitleToolTip("Angezeigte Buchungen ausdrucken");
 			}
-			
-			public void doRun(){
-				KassenbuchDruckDialog kbd =
-					new KassenbuchDruckDialog(getSite().getShell(), ttVon, ttBis);
+
+			public void doRun() {
+				KassenbuchDruckDialog kbd = new KassenbuchDruckDialog(getSite().getShell(), ttVon, ttBis);
 				kbd.open();
 			}
 		};
-		editCatAction = new RestrictedAction(ACLContributor.BOOKING, "Kategorien...") {
+		editCatAction = new Action("Kategorien...") {
 			{
 				setImageDescriptor(Images.IMG_EDIT.getImageDescriptor());
 				setTitleToolTip("Kategorien editieren");
 			}
-			
-			public void doRun(){
+
+			public void doRun() {
 				new EditCatsDialog(getSite().getShell()).open();
 			}
 		};
 	}
-	
+
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in relative path.
+	 * Returns an image descriptor for the image file at the given plug-in relative
+	 * path.
 	 * 
-	 * @param path
-	 *            the path
+	 * @param path the path
 	 * @return the image descriptor
 	 */
-	public static ImageDescriptor getPluginImageDescriptor(String path){
+	public static ImageDescriptor getPluginImageDescriptor(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin("ch.elexis.kassenbuch", path); //$NON-NLS-1$
 	}
-	
-	public void activation(boolean mode){
+
+	public void activation(boolean mode) {
 		// Don't mind
-		
+
 	}
-	
-	public void visible(boolean mode){
+
+	public void visible(boolean mode) {
 		if (mode) {
 			tv.refresh();
 			CoreHub.heart.addListener(this);
 		} else {
 			CoreHub.heart.removeListener(this);
 		}
-		
+
 	}
-	
-	public void heartbeat(){
+
+	public void heartbeat() {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -364,5 +360,5 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 			}
 		});
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -41,7 +41,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.slf4j.LoggerFactory;
 
-import ch.elexis.admin.AccessControlDefaults;
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.icons.Images;
@@ -71,14 +70,14 @@ public class FullViewController implements IObserver {
 	public FullViewController(Controller parent){
 		controller = parent;
 		organizeItemAction =
-			new RestrictedAction(AccessControlDefaults.DELETE_LABITEMS, "Eigenschaften") {
+			new Action("Eigenschaften") {
 				{
 					setImageDescriptor(Images.IMG_ARROWDOWNTORECT.getImageDescriptor());
 					setToolTipText("Eigenschaften des Labor Items ändern");
 				}
 				
 				@Override
-				public void doRun(){
+				public void run(){
 					IStructuredSelection sel = (IStructuredSelection) tvFull.getSelection();
 					Item item = (Item) sel.getFirstElement();
 					LabItemPropertiesDlg dlg = new LabItemPropertiesDlg(item);
@@ -90,13 +89,13 @@ public class FullViewController implements IObserver {
 				
 			};
 		toGroupAction =
-			new RestrictedAction(AccessControlDefaults.DELETE_LABITEMS, "Zu Gruppe...") {
+			new Action("Zu Gruppe...") {
 				{
 					setImageDescriptor(Images.IMG_MOVETOUPPERLIST.getImageDescriptor());
 				}
 				
 				@Override
-				public void doRun(){
+				public void run(){
 					IStructuredSelection sel = (IStructuredSelection) tvFull.getSelection();
 					int num = sel.size();
 					String[] allGroups = getLRS().getAllGroups();
@@ -149,14 +148,14 @@ public class FullViewController implements IObserver {
 				}
 			}
 		};
-		sortAction = new RestrictedAction(AccessControlDefaults.DELETE_LABITEMS, "Neu sortieren") {
+		sortAction = new Action("Neu sortieren") {
 			{
 				setImageDescriptor(Images.IMG_SORT_STAR.getImageDescriptor());
 				setToolTipText("Items dieser Gruppe neu sortieren");
 			}
 			
 			@Override
-			public void doRun(){
+			public void run(){
 				String group =
 					(String) ((IStructuredSelection) tvFull.getSelection()).getFirstElement();
 				Item[] items = getLRS().getAllItemsForGroup(group);

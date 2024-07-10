@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -31,7 +31,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
-import ch.elexis.admin.AccessControlDefaults;
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.exceptions.ElexisException;
@@ -180,7 +179,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 			}
 		};
 		removeEmptyItemsAction =
-			new RestrictedAction(AccessControlDefaults.DELETE_LABITEMS, "Aufräumen") {
+			new Action("Aufräumen") {
 				{
 					setToolTipText("Ungebrauchte Items und Gruppen löschen");
 					Bundle bundle = FrameworkUtil.getBundle(this.getClass());
@@ -189,7 +188,7 @@ public class LaborView extends ViewPart implements IActivationListener {
 				}
 				
 				@Override
-				public void doRun(){
+				public void run(){
 					if (SWTHelper.askYesNo("Laboritems aufräumen",
 						"Alle Laboritems entfernen, für die keine Resultate existieren. (Das kann sehr lange dauern)")) {
 						controller.purgeLabItems();

@@ -34,16 +34,15 @@ public class KassenbuchEintrag extends PersistentObject implements Comparable<Ka
 	public static final String VERSION = "1.2.0";
 	public static final String CATEGORIES = "ChElexisKassenbuchKategorien";
 	public static final String CATEGORY_SEPARATOR = "##";
-	private static final String createDB = "CREATE TABLE " + TABLENAME + "("
-		+ "ID			VARCHAR(25) primary key," + "deleted 	CHAR(1) default '0',"
-		+ "Nr	    	VARCHAR(25)," + "Category	VARCHAR(80)," + "Date   	CHAR(8),"
-		+ "Amount 	CHAR(8)," + "Total  	CHAR(8)," + "Entry  	VARCHAR(80)" + ");"
-		+ "INSERT INTO " + TABLENAME + " (ID,Nr,Date,Entry) VALUES ('1','-','"
-		+ new TimeTool().toString(TimeTool.DATE_COMPACT) + "','" + VERSION + "');";;
-	
+	private static final String createDB = "CREATE TABLE " + TABLENAME + "(" + "ID			VARCHAR(25) primary key,"
+			+ "deleted 	CHAR(1) default '0'," + "Nr	    	VARCHAR(25)," + "Category	VARCHAR(80),"
+			+ "Date   	CHAR(8)," + "Amount 	CHAR(8)," + "Total  	CHAR(8)," + "Entry  	VARCHAR(80)" + ");"
+			+ "INSERT INTO " + TABLENAME + " (ID,Nr,Date,Entry) VALUES ('1','-','"
+			+ new TimeTool().toString(TimeTool.DATE_COMPACT) + "','" + VERSION + "');";;
+
 	static {
-		addMapping(TABLENAME, "Betrag=Amount", "Text=Entry", "Datum=S:D:Date", "Saldo=Total",
-			"BelegNr=Nr", "Kategorie=Category", "PaymentMode");
+		addMapping(TABLENAME, "Betrag=Amount", "Text=Entry", "Datum=S:D:Date", "Saldo=Total", "BelegNr=Nr",
+				"Kategorie=Category", "PaymentMode");
 		KassenbuchEintrag version = KassenbuchEintrag.load("1");
 		if (!version.exists()) {
 			createOrModifyTable(createDB);
@@ -51,54 +50,48 @@ public class KassenbuchEintrag extends PersistentObject implements Comparable<Ka
 			VersionInfo vi = new VersionInfo(version.getText());
 			if (vi.isOlder(VERSION)) {
 				if (vi.isOlder("1.0.0")) {
-					getConnection()
-						.exec("ALTER TABLE " + TABLENAME + " ADD deleted CHAR(1) default '0';");
+					getConnection().exec("ALTER TABLE " + TABLENAME + " ADD deleted CHAR(1) default '0';");
 				}
 				if (vi.isOlder("1.1.0")) {
 					createOrModifyTable("ALTER TABLE " + TABLENAME + " ADD Category VARCHAR(80);");
 				}
-				if(vi.isOlder("1.2.0")){
-					createOrModifyTable("ALTER TABLE "+TABLENAME+" ADD lastupdate BIGINT, ADD PaymentMode VARCHAR(250)");
+				if (vi.isOlder("1.2.0")) {
+					createOrModifyTable(
+							"ALTER TABLE " + TABLENAME + " ADD lastupdate BIGINT, ADD PaymentMode VARCHAR(250)");
 				}
 				version.set("Text", VERSION);
 			}
 		}
 	}
-	
+
 	/**
 	 * Create a new entry and recalculate the whole cash journal
 	 * 
-	 * @param beleg
-	 *            identification of the new journal entry
-	 * @param date
-	 *            date of transaction
-	 * @param amount
-	 *            amount of transaction
-	 * @param text
-	 *            title for the transaction
+	 * @param beleg  identification of the new journal entry
+	 * @param date   date of transaction
+	 * @param amount amount of transaction
+	 * @param text   title for the transaction
 	 */
-	public KassenbuchEintrag(String beleg, String date, Money amount, String text){
+	public KassenbuchEintrag(String beleg, String date, Money amount, String text) {
 		create(null);
-		set(new String[] {
-			"BelegNr", "Datum", "Betrag", "Text"
-		}, beleg, date, amount.getCentsAsString(), text);
+		set(new String[] { "BelegNr", "Datum", "Betrag", "Text" }, beleg, date, amount.getCentsAsString(), text);
 		recalc();
 	}
-	
+
 	/**
-	 * create an identifier for the next journal entry. If the given previous entry kbe has an
-	 * identifier that begins with a numeric part, the next number of that numeric part will be
-	 * generated. Otherwise the previous identifier, followed ba an " a" will be returned
+	 * create an identifier for the next journal entry. If the given previous entry
+	 * kbe has an identifier that begins with a numeric part, the next number of
+	 * that numeric part will be generated. Otherwise the previous identifier,
+	 * followed ba an " a" will be returned
 	 * 
-	 * @param kbe
-	 *            the previous journal entry
+	 * @param kbe the previous journal entry
 	 * @return an identifier for the next journal entry.
 	 */
-	public static String nextNr(KassenbuchEintrag kbe){
+	public static String nextNr(KassenbuchEintrag kbe) {
 		String ret = "1";
 		if (kbe != null) {
 			String prev = kbe.getBelegNr().split("[^0-9]", 2)[0];
-			
+
 			if (prev.matches("[0-9]+")) {
 				int num = Integer.parseInt(prev);
 				ret = Integer.toString(num + 1);
@@ -108,25 +101,21 @@ public class KassenbuchEintrag extends PersistentObject implements Comparable<Ka
 		}
 		return ret;
 	}
-	
+
 	/**
-	 * create a new journal entry without recalculating the whole cash journal. Instead, take the
-	 * balance out of the given last entry.
+	 * create a new journal entry without recalculating the whole cash journal.
+	 * Instead, take the balance out of the given last entry.
 	 * 
-	 * @param beleg
-	 *            Identifier for the entry. Can be null or "", then it will be generated
-	 *            automatically
-	 * @param date
-	 *            date for the transaction. Can be null, then today will be assumed
-	 * @param amount
-	 *            sum of the transaction
-	 * @param text
-	 *            title for the transction
-	 * @param last
-	 *            previous transaction containing correct balance of the cash book
+	 * @param beleg  Identifier for the entry. Can be null or "", then it will be
+	 *               generated automatically
+	 * @param date   date for the transaction. Can be null, then today will be
+	 *               assumed
+	 * @param amount sum of the transaction
+	 * @param text   title for the transction
+	 * @param last   previous transaction containing correct balance of the cash
+	 *               book
 	 */
-	public KassenbuchEintrag(String beleg, String date, Money amount, String text,
-		KassenbuchEintrag last){
+	public KassenbuchEintrag(String beleg, String date, Money amount, String text, KassenbuchEintrag last) {
 		create(null);
 		Money sum = new Money(amount);
 		if (last != null) {
@@ -138,42 +127,41 @@ public class KassenbuchEintrag extends PersistentObject implements Comparable<Ka
 		if (StringTool.isNothing(beleg) || (!beleg.matches("[0-9]+.*"))) {
 			beleg = nextNr(last) + beleg;
 		}
-		set(new String[] {
-			"BelegNr", "Datum", "Betrag", "Text", "Saldo"
-		}, beleg, date, amount.getCentsAsString(), text, sum.getCentsAsString());
+		set(new String[] { "BelegNr", "Datum", "Betrag", "Text", "Saldo" }, beleg, date, amount.getCentsAsString(),
+				text, sum.getCentsAsString());
 	}
-	
+
 	/** return the identifier for the entry */
-	public String getBelegNr(){
+	public String getBelegNr() {
 		return checkNull(get("BelegNr"));
 	}
-	
+
 	/** return the date of the transaction */
-	public String getDate(){
+	public String getDate() {
 		return checkNull(get("Datum"));
 	}
-	
+
 	/** return the amount of the transaction (may be positive or negative) */
-	public Money getAmount(){
+	public Money getAmount() {
 		return new Money(checkZero(get("Betrag")));
 	}
-	
+
 	/** return the balance */
-	public Money getSaldo(){
+	public Money getSaldo() {
 		return new Money(checkZero(get("Saldo")));
 	}
-	
+
 	/** return the text of the transaction */
-	public String getText(){
+	public String getText() {
 		return get("Text");
 	}
-	
+
 	/**
 	 * recalculate the whole journal
 	 * 
 	 * @return the last journal entry
 	 */
-	public static KassenbuchEintrag recalc(){
+	public static KassenbuchEintrag recalc() {
 		KassenbuchEintrag ret = null;
 		Money sum = new Money();
 		SortedSet<KassenbuchEintrag> all = getBookings(null, null);
@@ -186,13 +174,13 @@ public class KassenbuchEintrag extends PersistentObject implements Comparable<Ka
 		}
 		return ret;
 	}
-	
+
 	/**
 	 * return a sorted set of all entries. The bookings are sorted by BelegNr
 	 * 
 	 * @return a set that is guaranteed to be sorted by BelegNr
 	 */
-	public static SortedSet<KassenbuchEintrag> getBookings(TimeTool from, TimeTool until){
+	public static SortedSet<KassenbuchEintrag> getBookings(TimeTool from, TimeTool until) {
 		Query<KassenbuchEintrag> qbe = new Query<KassenbuchEintrag>(KassenbuchEintrag.class);
 		qbe.add("BelegNr", "<>", "-");
 		if (from != null) {
@@ -204,48 +192,48 @@ public class KassenbuchEintrag extends PersistentObject implements Comparable<Ka
 		// qbe.orderBy(false, "BelegNr");
 		TreeSet<KassenbuchEintrag> ts = new TreeSet<KassenbuchEintrag>();
 		return (SortedSet<KassenbuchEintrag>) qbe.execute(ts);
-		
+
 	}
-	
+
 	@Override
-	public String getLabel(){
+	public String getLabel() {
 		return getAmount().getAmountAsString() + " " + getText();
 	}
-	
-	public String getKategorie(){
+
+	public String getKategorie() {
 		return get("Kategorie");
 	}
-	
-	public void setKategorie(String cat){
+
+	public void setKategorie(String cat) {
 		addKategorie(cat);
 		set("Kategorie", cat);
 	}
-	
+
 	@Override
-	protected String getTableName(){
+	protected String getTableName() {
 		return TABLENAME;
 	}
-	
-	public static KassenbuchEintrag load(String id){
+
+	public static KassenbuchEintrag load(String id) {
 		return new KassenbuchEintrag(id);
 	}
-	
-	protected KassenbuchEintrag(){
-		
+
+	protected KassenbuchEintrag() {
+
 	}
-	
-	protected KassenbuchEintrag(String id){
+
+	protected KassenbuchEintrag(String id) {
 		super(id);
-		
+
 	}
-	
-	public static String[] getCategories(){
-		
+
+	public static String[] getCategories() {
+
 		String cats = CoreHub.globalCfg.get(CATEGORIES, "");
 		return cats.split(CATEGORY_SEPARATOR);
 	}
-	
-	public static void addKategorie(String cat){
+
+	public static void addKategorie(String cat) {
 		String oldcats = CoreHub.globalCfg.get(CATEGORIES, "");
 		String[] cats = oldcats.split(CATEGORY_SEPARATOR);
 		if (StringTool.getIndex(cats, cat) == -1) {
@@ -253,13 +241,13 @@ public class KassenbuchEintrag extends PersistentObject implements Comparable<Ka
 			CoreHub.globalCfg.set(CATEGORIES, ncats);
 		}
 	}
-	
+
 	/**
-	 * The comparator is used to create a sorted set of the bookings. It scans the identifier
-	 * (BelegNr) for a numerical part and compares these numbers. If the numbers are identical or
-	 * not found, a textual comparison is used.
+	 * The comparator is used to create a sorted set of the bookings. It scans the
+	 * identifier (BelegNr) for a numerical part and compares these numbers. If the
+	 * numbers are identical or not found, a textual comparison is used.
 	 */
-	public int compareTo(KassenbuchEintrag k2){
+	public int compareTo(KassenbuchEintrag k2) {
 		// KassenbuchEintrag k2=(KassenbuchEintrag)o;
 		String[] s1 = getBelegNr().split("[^0-9]", 2);
 		String[] s2 = k2.getBelegNr().split("[^0-9]", 2);

@@ -21,6 +21,7 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +36,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.interfaces.text.ReplaceCallback;
+import ch.elexis.core.text.ReplaceCallback;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.textplugin.preferences.PreferenceConstants;
 import ch.rgw.io.FileTool;
@@ -170,7 +171,7 @@ public class HtmlDoc {
 	
 	public Object insertTextAt(int x, int y, int w, int h, String toInsert, int adjust){
 		PositionedText fld = new PositionedText(x, y, w, h, toInsert, adjust);
-		String marker = StringTool.unique("textmarker");
+		String marker = UUID.randomUUID().toString();
 		postfilled.put(marker, fld);
 		/*
 		 * StringBuffer sb = new StringBuffer(); Formatter fmt = new Formatter(sb);
@@ -185,7 +186,7 @@ public class HtmlDoc {
 	
 	public Object insertTextAt(Object marker, String toInsert, int adjust){
 		DynPositionedText dpt = new DynPositionedText(marker, toInsert, adjust);
-		String newMarker = StringTool.unique("textmarker");
+		String newMarker = UUID.randomUUID().toString();
 		postfilled.put(newMarker, dpt);
 		return newMarker;
 		

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022 by G. Weirich
+ * Copyright (c) 2022-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -16,12 +16,13 @@ package ch.elexis.ungrad.textplugin;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.swt.widgets.Composite;
 
-import ch.elexis.core.data.interfaces.text.ReplaceCallback;
+import ch.elexis.core.text.ReplaceCallback;
 import ch.elexis.core.ui.text.ITextPlugin;
 import ch.rgw.tools.ExHandler;
 
@@ -226,6 +227,24 @@ public class TextPluginImpl implements ITextPlugin {
 		throws CoreException{
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public int findCount(String text) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<String> findMatching(String pattern) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object getCurrentDocument() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
