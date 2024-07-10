@@ -186,19 +186,19 @@ public class TarmedBillDetails extends QRBillDetails {
 		lastDate = new TimeTool(rn.getDatumBis()).toString(TimeTool.DATE_GER);
 		bank = Kontakt.load(biller.getInfoString(ta.RNBANK));
 		if (!bank.isValid()) {
-			throw new BadParameterException("Bank was not valid", 2);
+			throw new Exception("Bank was not valid");
 		}
 		createReferences();
 	}
 	
-	private void createReferences() throws BadParameterException{
+	private void createReferences() throws Exception{
 		qrIBAN = (String) biller.getExtInfoStoredObjectByKey(PreferenceConstants.QRIBAN);
 		checkNull(qrIBAN, "IBAN");
 		if (qrIBAN.length() != 21) {
-			throw new BadParameterException("IBAN is not 21 Chars", 3);
+			throw new Exception("IBAN is not 21 Chars");
 		}
 		if (!(qrIBAN.toLowerCase().startsWith("ch") || qrIBAN.toLowerCase().startsWith("li"))) {
-			throw new BadParameterException("Only CH and LI IBANs allowed", 4);
+			throw new Exception("Only CH and LI IBANs allowed");
 		}
 		currency = (String) biller.getExtInfoStoredObjectByKey(Messages.XMLExporter_Currency);
 		if (StringTool.isNothing(currency)) {

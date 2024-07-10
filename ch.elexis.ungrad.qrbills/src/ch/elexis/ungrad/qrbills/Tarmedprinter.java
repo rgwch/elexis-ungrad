@@ -28,12 +28,15 @@ import org.slf4j.LoggerFactory;
 import ch.elexis.TarmedRechnung.TarmedACL;
 import ch.elexis.TarmedRechnung.XMLExporter;
 import ch.elexis.arzttarife_schweiz.Messages;
+import ch.elexis.base.ch.arzttarife.xml.exporter.VatUtil;
 import ch.elexis.base.ch.ebanking.esr.ESR;
 import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.interfaces.IRnOutputter.TYPE;
 import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.core.data.util.SortedList;
+import ch.elexis.core.model.IContact;
+import ch.elexis.core.model.IPerson;
 import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.ui.Hub;
 import ch.elexis.data.Mandant;
@@ -249,14 +252,14 @@ public class Tarmedprinter {
 		page = page.replace("[DocID]", billDetails.documentId).replace("[pagenr]",
 			Integer.toString(pagenumber));
 		if (billDetails.fallType == TarmedBillDetails.FALL_IVG) {
-			page = page.replace("[NIF]", TarmedRequirements.getNIF(billDetails.mandator)); //$NON-NLS-1$
-			String ahv = TarmedRequirements.getAHV(billDetails.patient);
+			page = page.replace("[NIF]", TarmedRequirements.getNIF((IContact)billDetails.mandator)); //$NON-NLS-1$
+			String ahv = TarmedRequirements.getAHV((IPerson)billDetails.patient);
 			if (StringTool.isNothing(ahv)) {
 				ahv = billDetails.fall.getRequiredString("AHV-Nummer");
 			}
 			page = page.replace("[F60]", ahv); //$NON-NLS-1$
 		} else {
-			page = page.replace("[NIF]", TarmedRequirements.getKSK(billDetails.mandator)); //$NON-NLS-1$
+			page = page.replace("[NIF]", TarmedRequirements.getKSK((IContact)billDetails.mandator)); //$NON-NLS-1$
 			page = page.replace("[F60]", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return page.replaceAll("\\?\\?\\??[a-zA-Z0-9 \\.]+\\?\\?\\??", "");
@@ -364,7 +367,7 @@ public class Tarmedprinter {
 		double amount = rec.getAmount();
 		double vatRate = rec.getVatRate();
 		sb.append("<td class=\"ziffer\">") //$NON-NLS-1$
-			.append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("</td>");
+			.append(Integer.toString(VatUtil.guessVatCode(vatRate))).append("</td>");
 		sb.append("<td class=\"ziffer\">").append(df.format(amount));
 		sideTotal += amount;
 		sb.append("</td></tr>"); //$NON-NLS-1$
@@ -432,7 +435,7 @@ public class Tarmedprinter {
 		double amount = tarmed.getAmount();
 		double vatRate = tarmed.getVatRate();
 		sb.append("<td class=\"ziffer\">") //$NON-NLS-1$
-			.append(Integer.toString(XMLPrinterUtil.guessVatCode(vatRate + ""))).append("</td>");
+			.append(Integer.toString(VatUtil.guessVatCode(vatRate))).append("</td>");
 		sb.append("<td class=\"ziffer\">").append(df.format(amount));
 		sideTotal += amount;
 		sb.append("</td></tr>"); //$NON-NLS-1$
