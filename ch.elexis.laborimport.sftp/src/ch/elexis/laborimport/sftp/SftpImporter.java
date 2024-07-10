@@ -1,11 +1,13 @@
 /**
- * (c) 2008-2018 by G. Weirich
+ * (c) 2008-2024 by G. Weirich
  * All rights reserved
  * 
  */
 package ch.elexis.laborimport.sftp;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -32,6 +34,7 @@ import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.UserInfo;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.data.interfaces.ILabResult;
 import ch.elexis.core.data.util.Messages;
 import ch.elexis.core.data.util.ResultAdapter;
 import ch.elexis.core.importer.div.importers.HL7Parser;
@@ -206,10 +209,10 @@ public class SftpImporter extends ImporterPage {
 	}
 
 	/**
-	 * An importer that lets the user select a file to import or directly import
-	 * the data from the lab. The chosen type (file or direct import) is stored
-	 * in results[0] (FILE or DIRECT). If FILE is chosen, the file path is
-	 * stored in results[1].
+	 * An importer that lets the user select a file to import or directly import the
+	 * data from the lab. The chosen type (file or direct import) is stored in
+	 * results[0] (FILE or DIRECT). If FILE is chosen, the file path is stored in
+	 * results[1].
 	 * 
 	 * @author gerry, danlutz
 	 * 
@@ -309,7 +312,7 @@ public class SftpImporter extends ImporterPage {
 
 					FileDialog fdl = new FileDialog(parent.getShell(), SWT.OPEN);
 					fdl.setFilterExtensions(new String[] { "*" }); //$NON-NLS-1$
-					fdl.setFilterNames(new String[] { Messages.ImporterPage_allFiles }); // $NON-NLS-1$
+					fdl.setFilterNames(new String[] { "*.*" }); // $NON-NLS-1$
 					String filename = fdl.open();
 					if (filename == null) {
 						filename = "";
@@ -324,5 +327,10 @@ public class SftpImporter extends ImporterPage {
 
 			});
 		}
+	}
+
+	@Override
+	public List<String> getObjectClass() {
+		return Collections.singletonList(ILabResult.class.getName());
 	}
 }

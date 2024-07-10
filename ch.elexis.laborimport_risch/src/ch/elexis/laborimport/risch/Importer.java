@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007-2016, G. Weirich and Elexis
+ * Copyright (c) 2007-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,6 +38,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.data.interfaces.ILabResult;
 import ch.elexis.core.data.util.ResultAdapter;
 import ch.elexis.core.importer.div.importers.HL7Parser;
 import ch.elexis.core.ui.importer.div.importers.DefaultHL7Parser;
@@ -161,8 +164,7 @@ public class Importer extends ImporterPage {
 				try {
 					rs = hlp.importFile(f, archiveDir, false);
 				} catch (IOException e) {
-					SWTHelper.showError("Import error",
-							e.getMessage());
+					SWTHelper.showError("Import error", e.getMessage());
 				}
 			}
 			SWTHelper.showInfo("Verbindung mit Labor " + MY_LAB + " erfolgreich",
@@ -223,10 +225,10 @@ public class Importer extends ImporterPage {
 	}
 
 	/**
-	 * An importer that lets the user select a file to import or directly import
-	 * the data from the lab. The chosen type (file or direct import) is stored
-	 * in results[0] (FILE or DIRECT). If FILE is chosen, the file path is
-	 * stored in results[1].
+	 * An importer that lets the user select a file to import or directly import the
+	 * data from the lab. The chosen type (file or direct import) is stored in
+	 * results[0] (FILE or DIRECT). If FILE is chosen, the file path is stored in
+	 * results[1].
 	 * 
 	 * @author gerry, danlutz
 	 * 
@@ -367,5 +369,10 @@ public class Importer extends ImporterPage {
 
 			});
 		}
+	}
+
+	@Override
+	public List<String> getObjectClass() {
+		return Collections.singletonList(ILabResult.class.getName());
 	}
 }
