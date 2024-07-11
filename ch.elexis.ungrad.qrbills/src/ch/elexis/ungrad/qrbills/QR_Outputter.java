@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -30,18 +32,23 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
+import org.eclipse.ui.services.IServiceLocator;
+import org.osgi.service.component.annotations.Reference;
 
 import ch.elexis.arzttarife_schweiz.Messages;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.data.interfaces.IRnOutputter;
-import ch.elexis.core.data.util.PlatformHelper;
+import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.core.model.InvoiceState;
+import ch.elexis.core.services.IConfigService;
+import ch.elexis.core.ui.util.Log;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Rechnung;
 import ch.elexis.data.RnStatus;
 import ch.elexis.data.Zahlung;
+import ch.elexis.pdfBills.QrRnOutputter;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
@@ -53,7 +60,7 @@ import ch.rgw.tools.Result.SEVERITY;
 
 /**
  * An Elexis-IRnOutputter for ISO 20022 conformant bills. Creates a Tarmed/4.4
- * conformant details page and a summary page with Sqiss QR-conformant payment
+ * conformant details page and a summary page with Swiss QR-conformant payment
  * slip. Both are created from html templates and ultimately converted to PDF.
  * 
  * @author gerry
@@ -65,8 +72,11 @@ public class QR_Outputter implements IRnOutputter {
 	private QR_Encoder qr;
 	private Manager pdfManager;
 	private boolean modifyInvoiceState;
+	@Reference
+	IConfigService config;
 
 	public QR_Outputter() {
+
 	}
 
 	@Override
@@ -95,9 +105,15 @@ public class QR_Outputter implements IRnOutputter {
 		qrs.doSave();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, final Properties props) {
+	public Result<Rechnung> doOutput(final TYPE type,final Collection<Rechnung> rnn, Properties props){
+		QrRnOutputter legacyOutputter=new QrRnOutputter();
+		props.put(IRnOutputter.PROP_OUTPUT_NOUI, "true");
+		props.put(IRnOutputter.PROP_OUTPUT_NOPRINT, "true");
+		return legacyOutputter.doOutput(type, rnn, props);
+	}	
+	@SuppressWarnings("deprecation")
+		public Result<Rechnung> doOutputOld(final TYPE type, final Collection<Rechnung> rnn, final Properties props) {
 		Result<Rechnung> res = new Result<Rechnung>();
 		qr = new QR_Encoder();
 		pdfManager = new Manager();
@@ -127,11 +143,13 @@ public class QR_Outputter implements IRnOutputter {
 							case DEMAND_NOTE_3:
 								state = InvoiceState.DEMAND_NOTE_3_PRINTED;
 								break;
-							}
+							default:
+								Logger.getGlobal().log(Level.INFO, "Bad bill state "+state.toString());
+							}	
 							rn.setStatus(state);
 							rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
-									+ RnStatus.getStatusText(rn.getStatus()));
-						}
+									+ (rn.getInvoiceState().name()));
+						}	
 						monitor.worked(1);
 						try {
 							TimeUnit.MILLISECONDS.sleep(100);
@@ -161,8 +179,8 @@ public class QR_Outputter implements IRnOutputter {
 		try {
 			monitor.subTask(rn.getNr() + " wird ausgegeben");
 			TarmedBillDetails bill = new TarmedBillDetails(rn, type,
-					CoreHub.localCfg.get(PreferenceConstants.MISSING_DATA, true));
-			if (CoreHub.localCfg.get(PreferenceConstants.FACE_DOWN, false)) {
+					config.getLocal(PreferenceConstants.MISSING_DATA, true));
+			if (config.getLocal(PreferenceConstants.FACE_DOWN, false)) {
 				printQRPage(bill);
 				monitor.worked(1);
 				printDetails(bill);
@@ -181,25 +199,25 @@ public class QR_Outputter implements IRnOutputter {
 	}
 
 	private void printQRPage(final TarmedBillDetails bill) throws Exception {
-		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_QR, true)) {
+		if (config.getLocal(PreferenceConstants.PRINT_QR, true)) {
 			String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 					+ File.separator + "qrbill_template_v5.html";
 			String fname = "";
-			switch (bill.rn.getStatus()) {
-			case RnStatus.OFFEN:
-			case RnStatus.OFFEN_UND_GEDRUCKT:
+			switch (bill.rn.getInvoiceState()) {
+			case OPEN:
+			case OPEN_AND_PRINTED:
 				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL, "");
 				break;
-			case RnStatus.MAHNUNG_1:
-			case RnStatus.MAHNUNG_1_GEDRUCKT:
+			case DEMAND_NOTE_1:
+			case DEMAND_NOTE_1_PRINTED:
 				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1, "");
 				break;
-			case RnStatus.MAHNUNG_2:
-			case RnStatus.MAHNUNG_2_GEDRUCKT:
+			case DEMAND_NOTE_2:
+			case DEMAND_NOTE_2_PRINTED:
 				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2, "");
 				break;
-			case RnStatus.MAHNUNG_3:
-			case RnStatus.MAHNUNG_3_GEDRUCKT:
+			case DEMAND_NOTE_3:
+			case DEMAND_NOTE_3_PRINTED:
 				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3, "");
 				break;
 			default:
