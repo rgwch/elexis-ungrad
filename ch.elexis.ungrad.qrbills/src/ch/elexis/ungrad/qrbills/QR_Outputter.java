@@ -110,6 +110,11 @@ public class QR_Outputter implements IRnOutputter {
 		QrRnOutputter legacyOutputter=new QrRnOutputter();
 		props.put(IRnOutputter.PROP_OUTPUT_NOUI, "true");
 		props.put(IRnOutputter.PROP_OUTPUT_NOPRINT, "true");
+		// config.setLocal(QrRnOutputter.CFG_ROOT+QrRnOutputter.CFG_PRINT_BESR, false);
+		// config.setLocal(QrRnOutputter.CFG_ROOT+QrRnOutputter.CFG_PRINT_RF, true);
+		CoreHub.localCfg.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR, false);
+		CoreHub.localCfg.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
+
 		return legacyOutputter.doOutput(type, rnn, props);
 	}	
 	@SuppressWarnings("deprecation")
@@ -198,7 +203,7 @@ public class QR_Outputter implements IRnOutputter {
 		}
 	}
 
-	private void printQRPage(final TarmedBillDetails bill) throws Exception {
+	private void printQRPage(final TarmedBillDetails45 bill) throws Exception {
 		if (config.getLocal(PreferenceConstants.PRINT_QR, true)) {
 			String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 					+ File.separator + "qrbill_template_v5.html";
