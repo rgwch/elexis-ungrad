@@ -24,15 +24,10 @@ import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.services.holder.VirtualFilesystemServiceHolder;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Rechnung;
-import ch.elexis.data.RnStatus;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
-import ch.fd.invoice440.request.BalanceType;
-import ch.fd.invoice440.request.BodyType;
-import ch.fd.invoice440.request.InvoiceType;
-import ch.fd.invoice440.request.ReminderType;
-import ch.fd.invoice440.request.RequestType;
-import ch.fd.invoice440.request.ServicesType;
-import ch.fd.invoice440.request.TreatmentType;
+import ch.fd.invoice450.request.ReminderType;
+import ch.fd.invoice450.request.RequestType;
+import ch.fd.invoice450.request.TreatmentType;
 import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
@@ -67,7 +62,6 @@ public class TarmedBillDetails45 extends QRBillDetails {
 	String remarks;
 	int numCons;
 	ch.fd.invoice450.request.ServicesType services;
-	BalanceType balance;
 	Document xmldom;
 	private static Logger logger = LoggerFactory.getLogger(TarmedBillDetails45.class);
 
@@ -89,6 +83,7 @@ public class TarmedBillDetails45 extends QRBillDetails {
 		}
 		ch.fd.invoice450.request.BodyType body = request.getPayload().getBody();
 		services = body.getServices();
+		XML45Services xmlservices=new XML45Services(services);
 		ch.fd.invoice450.request.InvoiceType invoice = request.getPayload().getInvoice();
 		TimeTool date = new TimeTool(invoice.getRequestDate().toString());
 		documentId = invoice.getRequestId() + " - " + date.toString(TimeTool.DATE_GER) + " "

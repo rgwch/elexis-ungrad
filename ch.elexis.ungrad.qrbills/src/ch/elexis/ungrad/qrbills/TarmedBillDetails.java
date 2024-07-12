@@ -114,7 +114,7 @@ public class TarmedBillDetails extends QRBillDetails {
 		if (body.getTiersGarant() != null) {
 			paymentMode = XMLExporter.TIERS_GARANT;
 		}
-		XML44Services xmlservices = new XML44Services(services);
+		XML45Services xmlservices = new XML45Services(services);
 		amountDue = new Money();
 		amountTarmed = xmlservices.getTarmedMoney();
 		amountDue.addMoney(amountTarmed);
