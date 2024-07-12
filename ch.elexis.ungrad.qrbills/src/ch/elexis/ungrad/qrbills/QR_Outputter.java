@@ -183,14 +183,14 @@ public class QR_Outputter implements IRnOutputter {
 	private void doPrint(final Rechnung rn, final IProgressMonitor monitor, final TYPE type, Result<Rechnung> res) {
 		try {
 			monitor.subTask(rn.getNr() + " wird ausgegeben");
-			TarmedBillDetails bill = new TarmedBillDetails(rn, type,
+			TarmedBillDetails45 bill = new TarmedBillDetails45(rn, type,
 					config.getLocal(PreferenceConstants.MISSING_DATA, true));
 			if (config.getLocal(PreferenceConstants.FACE_DOWN, false)) {
 				printQRPage(bill);
 				monitor.worked(1);
-				printDetails(bill);
+				//printDetails(bill);
 			} else {
-				printDetails(bill);
+				//printDetails(bill);
 				monitor.worked(1);
 				printQRPage(bill);
 			}
