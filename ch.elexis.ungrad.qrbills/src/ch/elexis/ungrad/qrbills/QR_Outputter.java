@@ -40,10 +40,12 @@ import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.LocalConfigService;
+import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Rechnung;
 import ch.elexis.data.Zahlung;
+import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.QrRnOutputter;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.pdf.Manager;
@@ -68,11 +70,12 @@ public class QR_Outputter implements IRnOutputter {
 	private QR_Encoder qr;
 	private Manager pdfManager;
 	private boolean modifyInvoiceState;
+	private IConfigService cfg;
 	
 	public QR_Outputter() {
-
+		cfg=ConfigServiceHolder.get();
 	}
-
+	
 	@Override
 	public String getDescription() {
 		return "Tarmedrechnung mit QR Code";
@@ -101,14 +104,18 @@ public class QR_Outputter implements IRnOutputter {
 
 	@Override
 	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, Properties props) {
+		String outputDirPDF = cfg.getLocal(PreferenceConstants.RNN_DIR_PDF, CoreHub.getTempDir().getAbsolutePath());
+		String outputDirXML = cfg.getLocal(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
+		String pdfoutout=cfg.getLocal(OutputterUtil.CFG_PRINT_GLOBALPDFDIR, outputDirXML)
+		boolean useGlobal=cfg.getLocal(OutputterUtil.CFG_PRINT_GLOBALOUTPUTDIRS, false);
+		// LocalConfigService.set(outputDirXML, modifyInvoiceState);
 		QrRnOutputter legacyOutputter = new QrRnOutputter();
 		props.put(IRnOutputter.PROP_OUTPUT_NOUI, "true");
 		props.put(IRnOutputter.PROP_OUTPUT_NOPRINT, "true");
-		// config.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR,
-		// false);
-		// config.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
-		LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR, false);
-		LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
+		cfg.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR,false);
+		cfg.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
+		// LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR, false);
+		// LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
 
 		Result<Rechnung> result = legacyOutputter.doOutput(type, rnn, props);
 		if (result.isOK()) {
