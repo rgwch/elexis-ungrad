@@ -13,9 +13,7 @@
  *********************************************************************************/
 package ch.elexis.ungrad.qrbills;
 
-import java.awt.print.PrinterException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
@@ -32,7 +30,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
-import org.eclipse.ui.services.IServiceLocator;
 import org.osgi.service.component.annotations.Reference;
 
 import ch.elexis.arzttarife_schweiz.Messages;
@@ -42,11 +39,10 @@ import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.services.IConfigService;
-import ch.elexis.core.ui.util.Log;
+import ch.elexis.core.services.LocalConfigService;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Rechnung;
-import ch.elexis.data.RnStatus;
 import ch.elexis.data.Zahlung;
 import ch.elexis.pdfBills.QrRnOutputter;
 import ch.elexis.ungrad.Resolver;
@@ -72,9 +68,7 @@ public class QR_Outputter implements IRnOutputter {
 	private QR_Encoder qr;
 	private Manager pdfManager;
 	private boolean modifyInvoiceState;
-	@Reference
-	IConfigService config;
-
+	
 	public QR_Outputter() {
 
 	}
@@ -106,19 +100,40 @@ public class QR_Outputter implements IRnOutputter {
 	}
 
 	@Override
-	public Result<Rechnung> doOutput(final TYPE type,final Collection<Rechnung> rnn, Properties props){
-		QrRnOutputter legacyOutputter=new QrRnOutputter();
+	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, Properties props) {
+		QrRnOutputter legacyOutputter = new QrRnOutputter();
 		props.put(IRnOutputter.PROP_OUTPUT_NOUI, "true");
 		props.put(IRnOutputter.PROP_OUTPUT_NOPRINT, "true");
-		// config.setLocal(QrRnOutputter.CFG_ROOT+QrRnOutputter.CFG_PRINT_BESR, false);
-		// config.setLocal(QrRnOutputter.CFG_ROOT+QrRnOutputter.CFG_PRINT_RF, true);
-		CoreHub.localCfg.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR, false);
-		CoreHub.localCfg.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
+		// config.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR,
+		// false);
+		// config.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
+		LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR, false);
+		LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
 
-		return legacyOutputter.doOutput(type, rnn, props);
-	}	
+		Result<Rechnung> result = legacyOutputter.doOutput(type, rnn, props);
+		if (result.isOK()) {
+			IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+			try {
+				progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {
+
+					@Override
+					public void run(final IProgressMonitor monitor) {
+						for (Rechnung rn : rnn) {
+							doPrint(rn, monitor, type, result);
+						}
+
+					}
+				}, null);
+
+			} catch (Exception ex) {
+
+			}
+		}
+		return result;
+	}
+
 	@SuppressWarnings("deprecation")
-		public Result<Rechnung> doOutputOld(final TYPE type, final Collection<Rechnung> rnn, final Properties props) {
+	public Result<Rechnung> doOutputOld(final TYPE type, final Collection<Rechnung> rnn, final Properties props) {
 		Result<Rechnung> res = new Result<Rechnung>();
 		qr = new QR_Encoder();
 		pdfManager = new Manager();
@@ -149,12 +164,12 @@ public class QR_Outputter implements IRnOutputter {
 								state = InvoiceState.DEMAND_NOTE_3_PRINTED;
 								break;
 							default:
-								Logger.getGlobal().log(Level.INFO, "Bad bill state "+state.toString());
-							}	
+								Logger.getGlobal().log(Level.INFO, "Bad bill state " + state.toString());
+							}
 							rn.setStatus(state);
 							rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
 									+ (rn.getInvoiceState().name()));
-						}	
+						}
 						monitor.worked(1);
 						try {
 							TimeUnit.MILLISECONDS.sleep(100);
@@ -184,13 +199,13 @@ public class QR_Outputter implements IRnOutputter {
 		try {
 			monitor.subTask(rn.getNr() + " wird ausgegeben");
 			TarmedBillDetails45 bill = new TarmedBillDetails45(rn, type,
-					config.getLocal(PreferenceConstants.MISSING_DATA, true));
-			if (config.getLocal(PreferenceConstants.FACE_DOWN, false)) {
+					LocalConfigService.get(PreferenceConstants.MISSING_DATA, true));
+			if (LocalConfigService.get(PreferenceConstants.FACE_DOWN, false)) {
 				printQRPage(bill);
 				monitor.worked(1);
-				//printDetails(bill);
+				// printDetails(bill);
 			} else {
-				//printDetails(bill);
+				// printDetails(bill);
 				monitor.worked(1);
 				printQRPage(bill);
 			}
@@ -204,7 +219,7 @@ public class QR_Outputter implements IRnOutputter {
 	}
 
 	private void printQRPage(final TarmedBillDetails45 bill) throws Exception {
-		if (config.getLocal(PreferenceConstants.PRINT_QR, true)) {
+		if (LocalConfigService.get(PreferenceConstants.PRINT_QR, true)) {
 			String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 					+ File.separator + "qrbill_template_v5.html";
 			String fname = "";
@@ -315,34 +330,6 @@ public class QR_Outputter implements IRnOutputter {
 				htmlFile.delete();
 			}
 
-		}
-	}
-
-	private void printDetails(final TarmedBillDetails bill)
-			throws Exception, FileNotFoundException, IOException, PrinterException {
-		Tarmedprinter tp = new Tarmedprinter();
-		if (CoreHub.localCfg.get(PreferenceConstants.PRINT_TARMED, true)) {
-
-			File rfhtml = tp.print(bill);
-			File pdfout = new File(bill.outputDirPDF, bill.rn.getNr() + "_rf.pdf");
-			// FileOutputStream rfpdf = new FileOutputStream(pdfout);
-			Manager pdfBuilder = new Manager();
-			pdfBuilder.createPDF(rfhtml, pdfout);
-			if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
-				String defaultPrinter = null;
-				if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
-					defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
-				}
-				if (pdfBuilder.printFromPDF(pdfout, defaultPrinter)) {
-					if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
-						pdfout.delete();
-					}
-				}
-			}
-
-			if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
-				rfhtml.delete();
-			}
 		}
 	}
 
