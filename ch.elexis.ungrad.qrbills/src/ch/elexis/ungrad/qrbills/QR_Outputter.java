@@ -14,8 +14,6 @@
 package ch.elexis.ungrad.qrbills;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,18 +28,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
-import org.osgi.service.component.annotations.Reference;
 
 import ch.elexis.arzttarife_schweiz.Messages;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.data.interfaces.IRnOutputter;
-import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.LocalConfigService;
 import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Rechnung;
 import ch.elexis.data.Zahlung;
@@ -71,11 +68,11 @@ public class QR_Outputter implements IRnOutputter {
 	private Manager pdfManager;
 	private boolean modifyInvoiceState;
 	private IConfigService cfg;
-	
+
 	public QR_Outputter() {
-		cfg=ConfigServiceHolder.get();
+		cfg = ConfigServiceHolder.get();
 	}
-	
+
 	@Override
 	public String getDescription() {
 		return "Tarmedrechnung mit QR Code";
@@ -108,18 +105,23 @@ public class QR_Outputter implements IRnOutputter {
 		pdfManager = new Manager();
 		modifyInvoiceState = true;
 
-		String outputDirPDF = cfg.getLocal(PreferenceConstants.RNN_DIR_PDF, CoreHub.getTempDir().getAbsolutePath());
-		String outputDirXML = cfg.getLocal(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
-		// String pdfoutout=cfg.getLocal(OutputterUtil.CFG_PRINT_GLOBALPDFDIR, outputDirXML)
-		boolean useGlobal=OutputterUtil.useGlobalOutputDirs();
+		// String outputDirPDF = cfg.getLocal(PreferenceConstants.RNN_DIR_PDF,
+		// CoreHub.getTempDir().getAbsolutePath());
+		// String outputDirXML = cfg.getLocal(PreferenceConstants.RNN_DIR_XML,
+		// CoreHub.getTempDir().getAbsolutePath());
+		// String pdfoutout=cfg.getLocal(OutputterUtil.CFG_PRINT_GLOBALPDFDIR,
+		// outputDirXML)
+		// boolean useGlobal=OutputterUtil.useGlobalOutputDirs();
 		// LocalConfigService.set(outputDirXML, modifyInvoiceState);
 		QrRnOutputter legacyOutputter = new QrRnOutputter();
 		props.put(IRnOutputter.PROP_OUTPUT_NOUI, "true");
 		props.put(IRnOutputter.PROP_OUTPUT_NOPRINT, "true");
-		cfg.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR,false);
+		cfg.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR, false);
 		cfg.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
-		// LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR, false);
-		// LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
+		// LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR,
+		// false);
+		// LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF,
+		// true);
 
 		Result<Rechnung> result = legacyOutputter.doOutput(type, rnn, props);
 		if (result.isOK()) {
@@ -137,13 +139,12 @@ public class QR_Outputter implements IRnOutputter {
 				}, null);
 
 			} catch (Exception ex) {
-
+				ExHandler.handle(ex);
 			}
 		}
 		return result;
 	}
 
-	@SuppressWarnings("deprecation")
 	public Result<Rechnung> doOutputOld(final TYPE type, final Collection<Rechnung> rnn, final Properties props) {
 		Result<Rechnung> res = new Result<Rechnung>();
 		qr = new QR_Encoder();
@@ -237,19 +238,19 @@ public class QR_Outputter implements IRnOutputter {
 			switch (bill.rn.getInvoiceState()) {
 			case OPEN:
 			case OPEN_AND_PRINTED:
-				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL, "");
+				fname = cfg.get(PreferenceConstants.TEMPLATE_BILL, "");
 				break;
 			case DEMAND_NOTE_1:
 			case DEMAND_NOTE_1_PRINTED:
-				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1, "");
+				fname = cfg.get(PreferenceConstants.TEMPLATE_REMINDER1, "");
 				break;
 			case DEMAND_NOTE_2:
 			case DEMAND_NOTE_2_PRINTED:
-				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2, "");
+				fname = cfg.get(PreferenceConstants.TEMPLATE_REMINDER2, "");
 				break;
 			case DEMAND_NOTE_3:
 			case DEMAND_NOTE_3_PRINTED:
-				fname = CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3, "");
+				fname = cfg.get(PreferenceConstants.TEMPLATE_REMINDER3, "");
 				break;
 			default:
 				fname = default_template;
@@ -325,19 +326,19 @@ public class QR_Outputter implements IRnOutputter {
 			File pdfFile = new File(bill.outputDirPDF, bill.rn.getNr() + "_qr.pdf");
 			FileTool.writeTextFile(htmlFile, finished);
 			bill.writePDF(htmlFile, pdfFile);
-			if (CoreHub.localCfg.get(PreferenceConstants.DO_PRINT, false)) {
+			if (cfg.getLocal(PreferenceConstants.DO_PRINT, false)) {
 				String defaultPrinter = null;
-				if (CoreHub.localCfg.get(PreferenceConstants.DIRECT_PRINT, false)) {
-					defaultPrinter = CoreHub.localCfg.get(PreferenceConstants.DEFAULT_PRINTER, "");
+				if (cfg.getLocal(PreferenceConstants.DIRECT_PRINT, false)) {
+					defaultPrinter = cfg.getLocal(PreferenceConstants.DEFAULT_PRINTER, "");
 				}
 				if (pdfManager.printFromPDF(pdfFile, defaultPrinter)) {
-					if (CoreHub.localCfg.get(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
+					if (cfg.getLocal(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
 						pdfFile.delete();
 					}
 				}
 			}
 			imgFile.delete();
-			if (!CoreHub.localCfg.get(PreferenceConstants.DEBUGFILES, false)) {
+			if (!cfg.getLocal(PreferenceConstants.DEBUGFILES, false)) {
 				htmlFile.delete();
 			}
 

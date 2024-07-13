@@ -1,27 +1,39 @@
+/*******************************************************************************
+ * Copyright (c) 2024 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
 package ch.elexis.ungrad.qrbills;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+
+import at.medevit.elexis.tarmed.model.TarmedJaxbUtil;
 import ch.elexis.TarmedRechnung.Messages;
 import ch.elexis.TarmedRechnung.XMLExporter;
 import ch.elexis.base.ch.ebanking.esr.ESR;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter.TYPE;
+import ch.elexis.core.model.IContact;
 import ch.elexis.core.model.InvoiceState;
-import ch.elexis.core.services.holder.VirtualFilesystemServiceHolder;
+import ch.elexis.core.services.IConfigService;
+import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Rechnung;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
@@ -31,21 +43,20 @@ import ch.fd.invoice450.request.TreatmentType;
 import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
-import at.medevit.elexis.tarmed.model.TarmedJaxbUtil;
-import at.medevit.elexis.tarmed.model.Constants;
 
 public class TarmedBillDetails45 extends QRBillDetails {
 	public static int FALL_UVG = 1;
 	public static int FALL_IVG = 2;
 	public static int FALL_KVG = 3;
 	public static int FALL_MVG = 4;
+	IConfigService cfg;
 	String outputDirPDF, outputDirXML;
 	RequestType request;
 	String paymentMode = XMLExporter.TIERS_PAYANT;
 	String documentId;
 
-	Kontakt guarantor;
-	Kontakt zuweiser;
+	IContact guarantor;
+	IContact zuweiser;
 	Kontakt bank;
 	TYPE type;
 	int fallType = FALL_KVG;
@@ -65,17 +76,19 @@ public class TarmedBillDetails45 extends QRBillDetails {
 	Document xmldom;
 	private static Logger logger = LoggerFactory.getLogger(TarmedBillDetails45.class);
 
+	@SuppressWarnings("deprecation")
 	public TarmedBillDetails45(Rechnung rn, TYPE type, boolean bStrict) throws Exception {
 		super(rn);
 		this.type = type;
-		outputDirPDF = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_PDF, CoreHub.getTempDir().getAbsolutePath());
-		outputDirXML = CoreHub.localCfg.get(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
+		cfg = ConfigServiceHolder.get();
+		outputDirPDF = cfg.getLocal(PreferenceConstants.RNN_DIR_PDF, CoreHub.getTempDir().getAbsolutePath());
+		outputDirXML = cfg.getLocal(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
 		if (rn.getInvoiceState() == InvoiceState.DEFECTIVE) {
 			throw new Exception("Fehler in Rechnung " + rn.getNr());
 		}
 		File xmlfile = new File(outputDirXML, rn.getNr() + ".xml");
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		xmldom=dbf.newDocumentBuilder().parse(new FileInputStream(xmlfile));
+		xmldom = dbf.newDocumentBuilder().parse(new FileInputStream(xmlfile));
 		ch.fd.invoice450.request.RequestType request = TarmedJaxbUtil
 				.unmarshalInvoiceRequest450(new FileInputStream(xmlfile));
 		if (request == null) {
@@ -84,11 +97,22 @@ public class TarmedBillDetails45 extends QRBillDetails {
 		}
 		ch.fd.invoice450.request.BodyType body = request.getPayload().getBody();
 		services = body.getServices();
-		XML45Services xmlservices=new XML45Services(services);
-		amountTarmed=xmlservices.getTarmedMoney();
-		amountDrug=xmlservices.getDrugMoney();
-		amountLab=xmlservices.getLabMoney();
-		amountMigel=xmlservices.getMigelMoney();
+		XML45Services xmlservices = new XML45Services(services);
+		amountDue = new Money();
+		amountTarmed = xmlservices.getTarmedMoney();
+		amountDue.addMoney(amountTarmed);
+		amountDrug = xmlservices.getDrugMoney();
+		amountDue.addMoney(amountDrug);
+		amountLab = xmlservices.getLabMoney();
+		amountDue.addMoney(amountLab);
+		amountMigel = xmlservices.getMigelMoney();
+		amountDue.addMoney(amountMigel);
+		amountPhysio = xmlservices.getParamedMoney();
+		amountDue.addMoney(amountPhysio);
+		amountUnclassified = xmlservices.getOtherMoney();
+		amountDue.addMoney(amountUnclassified);
+		amountPaid = new Money();
+		addCharges();
 		ch.fd.invoice450.request.InvoiceType invoice = request.getPayload().getInvoice();
 		TimeTool date = new TimeTool(invoice.getRequestDate().toString());
 		documentId = invoice.getRequestId() + " - " + date.toString(TimeTool.DATE_GER) + " "
@@ -99,6 +123,30 @@ public class TarmedBillDetails45 extends QRBillDetails {
 		if (body.getTiersGarant() != null) {
 			paymentMode = XMLExporter.TIERS_GARANT;
 		}
+		caseDate = getFDatum();
+		caseNumber = getFNummer();
+		zuweiser = (IContact) fall.getRequiredContact("Zuweiser");
+		treatments = body.getTreatment();
+		reminders = request.getPayload().getReminder();
+		// String patnr = (String) checkNull(patient.getPatCode(), "PatientNr.");
+		checkNull(rn.getNr(), "Bill Number");
+		checkNull(biller.getPostAnschrift(), "Postanschrift");
+		biller_address = biller.getPostAnschrift(true).trim().replaceAll("\\r", "").replaceAll("\\n+", "<br />");
+		checkNull(biller_address, "Absender");
+		checkNull(adressat.getPostAnschrift(), "Postanschrift");
+		addressee = adressat.getPostAnschrift(true).trim().replaceAll("\\r", "").replaceAll("\\n+", "<br />");
+		checkNull(addressee, "Anschrift");
+		TimeTool now = new TimeTool();
+		now.addDays(30);
+		dateDue = now.toString(TimeTool.DATE_GER);
+		checkNull(rn.getDatumVon(), "From date");
+		checkNull(rn.getDatumBis(), "Until date");
+		checkNull(rn.getKonsultationen(), "Consultations list");
+		firstDate = new TimeTool(rn.getDatumVon()).toString(TimeTool.DATE_GER);
+		numCons = rn.getKonsultationen().size();
+		lastDate = new TimeTool(rn.getDatumBis()).toString(TimeTool.DATE_GER);
+		bank = Kontakt.load(biller.getInfoString(ta.RNBANK));
+	
 		createReferences();
 	}
 
@@ -160,16 +208,6 @@ public class TarmedBillDetails45 extends QRBillDetails {
 			}
 		}
 		return fall.getFallNummer();
-	}
-
-	private Document readDom(File xmlFile) {
-		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			return dbf.newDocumentBuilder().parse(VirtualFilesystemServiceHolder.get().of(xmlFile).openInputStream());
-		} catch (ParserConfigurationException | SAXException | IOException e) {
-			LoggerFactory.getLogger(getClass()).error("Error parsing XML", e); //$NON-NLS-1$
-		}
-		return null;
 	}
 
 	protected String getXmlVersion() {
