@@ -32,18 +32,21 @@ import org.osgi.service.component.annotations.Reference;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.lock.types.LockResponse;
 import ch.elexis.core.model.IContact;
 import ch.elexis.core.model.IUser;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
+import ch.elexis.data.Anwender;
 import ch.elexis.data.Brief;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Person;
 import ch.elexis.data.Query;
+import ch.elexis.data.User;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.pdf.Manager;
@@ -63,9 +66,8 @@ import ch.elexis.core.services.holder.LocalLockServiceHolder;
  */
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
 
-	@Reference
-	IContextService contextService;
 	
+	IContextService contextService=ContextServiceHolder.get();
 	StorageController sc = new StorageController();
 
 	/* CoontentProvider */
@@ -265,9 +267,11 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		if (briefTitle.matches("A_[0-9]{4,4}-[0-1][0-9]-[0-3][0-9]_.+")) {
 			briefTitle = briefTitle.substring(13);
 		}
-		IContact actUser=contextService.getActiveUserContact().get();
+		IUser user=contextService.getActiveUser().get();
+		User u=User.load(user.getId());
+		Anwender actUser=u.getAssignedContact();
 		Konsultation current = (Konsultation) ElexisEventDispatcher.getInstance().getSelected(Konsultation.class);
-		Brief metadata = new Brief(briefTitle, new TimeTool(), (Kontakt) actUser, adressat, current, "Formular");
+		Brief metadata = new Brief(briefTitle, new TimeTool(), actUser, adressat, current, "Formular");
 		metadata.save(FileTool.readFile(new File(filepath)), "pdf");
 		addFormToKons(metadata, current);
 		return metadata;

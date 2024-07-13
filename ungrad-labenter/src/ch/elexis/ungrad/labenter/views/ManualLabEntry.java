@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 by G. Weirich
+ * Copyright (c) 2018-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -37,6 +37,8 @@ import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
@@ -78,6 +80,7 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 	private Form form;
 	private Patient pat;
 	private LabEntryTable let;
+	private IContextService ctx=ContextServiceHolder.get();
 	
 	private final ElexisUiEventListenerImpl eeli_pat =
 		new ElexisUiEventListenerImpl(Patient.class, ElexisEvent.EVENT_SELECTED) {
@@ -116,7 +119,8 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 	}
 	
 	private void setLabel(){
-		pat = ElexisEventDispatcher.getSelectedPatient();
+		pat=(Patient) ctx.getActivePatient().orElseGet(null);
+		// pat = ElexisEventDispatcher.getSelectedPatient();
 		String lab = pat == null ? "Kein Patient gewählt" : pat.getLabel();
 		form.setText("Labor von " + lab + ", vom " + actDate.toString(TimeTool.DATE_GER));
 	}
