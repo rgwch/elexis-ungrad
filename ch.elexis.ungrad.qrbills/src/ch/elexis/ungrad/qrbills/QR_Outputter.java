@@ -104,10 +104,14 @@ public class QR_Outputter implements IRnOutputter {
 
 	@Override
 	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, Properties props) {
+		qr = new QR_Encoder();
+		pdfManager = new Manager();
+		modifyInvoiceState = true;
+
 		String outputDirPDF = cfg.getLocal(PreferenceConstants.RNN_DIR_PDF, CoreHub.getTempDir().getAbsolutePath());
 		String outputDirXML = cfg.getLocal(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
-		String pdfoutout=cfg.getLocal(OutputterUtil.CFG_PRINT_GLOBALPDFDIR, outputDirXML)
-		boolean useGlobal=cfg.getLocal(OutputterUtil.CFG_PRINT_GLOBALOUTPUTDIRS, false);
+		// String pdfoutout=cfg.getLocal(OutputterUtil.CFG_PRINT_GLOBALPDFDIR, outputDirXML)
+		boolean useGlobal=OutputterUtil.useGlobalOutputDirs();
 		// LocalConfigService.set(outputDirXML, modifyInvoiceState);
 		QrRnOutputter legacyOutputter = new QrRnOutputter();
 		props.put(IRnOutputter.PROP_OUTPUT_NOUI, "true");

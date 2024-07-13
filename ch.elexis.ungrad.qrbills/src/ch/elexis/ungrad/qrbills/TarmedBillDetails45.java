@@ -74,7 +74,8 @@ public class TarmedBillDetails45 extends QRBillDetails {
 			throw new Exception("Fehler in Rechnung " + rn.getNr());
 		}
 		File xmlfile = new File(outputDirXML, rn.getNr() + ".xml");
-		xmldom = readDom(xmlfile);
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		xmldom=dbf.newDocumentBuilder().parse(new FileInputStream(xmlfile));
 		ch.fd.invoice450.request.RequestType request = TarmedJaxbUtil
 				.unmarshalInvoiceRequest450(new FileInputStream(xmlfile));
 		if (request == null) {
@@ -84,6 +85,10 @@ public class TarmedBillDetails45 extends QRBillDetails {
 		ch.fd.invoice450.request.BodyType body = request.getPayload().getBody();
 		services = body.getServices();
 		XML45Services xmlservices=new XML45Services(services);
+		amountTarmed=xmlservices.getTarmedMoney();
+		amountDrug=xmlservices.getDrugMoney();
+		amountLab=xmlservices.getLabMoney();
+		amountMigel=xmlservices.getMigelMoney();
 		ch.fd.invoice450.request.InvoiceType invoice = request.getPayload().getInvoice();
 		TimeTool date = new TimeTool(invoice.getRequestDate().toString());
 		documentId = invoice.getRequestId() + " - " + date.toString(TimeTool.DATE_GER) + " "
