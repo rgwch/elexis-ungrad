@@ -15,6 +15,7 @@ package ch.elexis.ungrad.qrbills;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -34,11 +35,15 @@ import ch.elexis.core.model.IContact;
 import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.holder.ConfigServiceHolder;
+import ch.elexis.data.Fall;
+import ch.elexis.data.Fall.Tiers;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Rechnung;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
 import ch.fd.invoice450.request.ReminderType;
 import ch.fd.invoice450.request.RequestType;
+import ch.fd.invoice450.request.ServiceExType;
+import ch.fd.invoice450.request.ServiceType;
 import ch.fd.invoice450.request.TreatmentType;
 import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
@@ -54,13 +59,19 @@ public class TarmedBillDetails45 extends QRBillDetails {
 	RequestType request;
 	String paymentMode = XMLExporter.TIERS_PAYANT;
 	String documentId;
-
 	IContact guarantor;
 	IContact zuweiser;
 	Kontakt bank;
 	TYPE type;
 	int fallType = FALL_KVG;
-	Money amountTarmed, amountDrug, amountLab, amountMigel, amountPhysio, amountUnclassified;
+	Money amountTarmed = new Money();
+	Money amountDrug = new Money();
+	Money amountLab = new Money();
+	Money amountMigel = new Money();
+	Money amountPhysio = new Money();
+	Money amountUnclassified = new Money();
+	Money amountComplementary = new Money();
+	Money amountParamed = new Money();
 
 	TreatmentType treatments;
 	ReminderType reminders;
@@ -72,7 +83,7 @@ public class TarmedBillDetails45 extends QRBillDetails {
 	String tcCode;
 	String remarks;
 	int numCons;
-	ch.fd.invoice450.request.ServicesType services;
+	List<Object> services;
 	Document xmldom;
 	private static Logger logger = LoggerFactory.getLogger(TarmedBillDetails45.class);
 
@@ -96,33 +107,18 @@ public class TarmedBillDetails45 extends QRBillDetails {
 			throw new Exception("Bad xml structure in " + rn.getNr());
 		}
 		ch.fd.invoice450.request.BodyType body = request.getPayload().getBody();
-		services = body.getServices();
-		XML45Services xmlservices = new XML45Services(services);
-		amountDue = new Money();
-		amountTarmed = xmlservices.getTarmedMoney();
-		amountDue.addMoney(amountTarmed);
-		amountDrug = xmlservices.getDrugMoney();
-		amountDue.addMoney(amountDrug);
-		amountLab = xmlservices.getLabMoney();
-		amountDue.addMoney(amountLab);
-		amountMigel = xmlservices.getMigelMoney();
-		amountDue.addMoney(amountMigel);
-		amountPhysio = xmlservices.getParamedMoney();
-		amountDue.addMoney(amountPhysio);
-		amountUnclassified = xmlservices.getOtherMoney();
-		amountDue.addMoney(amountUnclassified);
-		amountPaid = new Money();
+		ch.fd.invoice450.request.ServicesType xmlservices = body.getServices();
+		services = xmlservices.getServiceExOrService();
+		initMoneyAmounts();
 		addCharges();
 		ch.fd.invoice450.request.InvoiceType invoice = request.getPayload().getInvoice();
 		TimeTool date = new TimeTool(invoice.getRequestDate().toString());
 		documentId = invoice.getRequestId() + " - " + date.toString(TimeTool.DATE_GER) + " "
 				+ date.toString(TimeTool.TIME_FULL);
 		remarks = body.getRemark();
-
-		paymentMode = XMLExporter.TIERS_PAYANT;
-		if (body.getTiersGarant() != null) {
-			paymentMode = XMLExporter.TIERS_GARANT;
-		}
+		fall = rn.getFall();
+		checkNull(fall, "Fall");
+		paymentMode = fall.getTiersType() == Tiers.GARANT ? "TG" : "TP";
 		caseDate = getFDatum();
 		caseNumber = getFNummer();
 		zuweiser = (IContact) fall.getRequiredContact("Zuweiser");
@@ -146,7 +142,7 @@ public class TarmedBillDetails45 extends QRBillDetails {
 		numCons = rn.getKonsultationen().size();
 		lastDate = new TimeTool(rn.getDatumBis()).toString(TimeTool.DATE_GER);
 		bank = Kontakt.load(biller.getInfoString(ta.RNBANK));
-	
+
 		createReferences();
 	}
 
@@ -208,6 +204,43 @@ public class TarmedBillDetails45 extends QRBillDetails {
 			}
 		}
 		return fall.getFallNummer();
+	}
+
+	private void initMoneyAmounts() {
+		for (Object rec : services) {
+
+			if (rec instanceof ServiceExType) {
+				double amount=((ServiceExType) rec).getAmount();
+				amountTarmed.addAmount(amount);
+				amountDue.addAmount(amount);
+			} else {
+				ServiceType sr = (ServiceType) rec;
+				amountDue.addAmount(sr.getAmount());
+				String type = sr.getTariffType();
+				switch (type) {
+				case "317":
+					amountLab.addAmount(sr.getAmount());
+					break;
+				case "452":
+				case "454":
+					amountMigel.addAmount(sr.getAmount());
+					break;
+				case "402":
+				case "403":
+					amountDrug.addAmount(sr.getAmount());
+					break;
+				case "401":
+					amountParamed.addAmount(sr.getAmount());
+					break;
+				case "590":
+					amountComplementary.addAmount(sr.getAmount());
+					break;
+				default:
+					amountUnclassified.addAmount(sr.getAmount());
+				}
+			}
+
+		}
 	}
 
 	protected String getXmlVersion() {

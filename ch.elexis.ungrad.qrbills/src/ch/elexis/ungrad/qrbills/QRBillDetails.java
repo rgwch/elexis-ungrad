@@ -63,6 +63,7 @@ public class QRBillDetails {
 		biller = (Rechnungssteller) checkNull(mandator.getRechnungssteller(), "Rechnungssteller");
 		adressat = (Kontakt) checkNull(fall.getInvoiceRecipient(), "Adressat");
 		dateDue = rn.getRnDatumFrist();
+		amountDue=new Money();
 		amountPaid = new Money();
 	}
 
