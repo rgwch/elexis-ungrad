@@ -4,11 +4,13 @@
    <extension
          point="ch.elexis.core.ui.Verrechnungscode">
       <Leistung
+      		system="Privatrechnung"
             CodeDetailDisplay="ch.elexis.ungrad.privatrechnung_qr.views.Leistungsdetail"
             CodeSelectorFactory="ch.elexis.ungrad.privatrechnung_qr.views.Leistungsselektor"
             ElementFactory="ch.elexis.ungrad.privatrechnung_qr.data.LeistungsFactory"
             ImporterClass="ch.elexis.ungrad.privatrechnung_qr.data.Importer"
             name="ch.elexis.ungrad.privatrechnung_qr.Leistung1">
+            
       </Leistung>
    </extension>
    <extension

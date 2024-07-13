@@ -13,7 +13,9 @@
  *********************************************************************************/
 package ch.elexis.ungrad.qrbills;
 
+import java.awt.print.PrinterException;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +32,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
 
 import ch.elexis.arzttarife_schweiz.Messages;
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.model.InvoiceState;
@@ -42,7 +43,6 @@ import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Rechnung;
 import ch.elexis.data.Zahlung;
-import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.QrRnOutputter;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.pdf.Manager;
@@ -131,9 +131,11 @@ public class QR_Outputter implements IRnOutputter {
 
 					@Override
 					public void run(final IProgressMonitor monitor) {
+						monitor.beginTask("Drucke Rechnungen", rnn.size() * 3);
 						for (Rechnung rn : rnn) {
 							doPrint(rn, monitor, type, result);
 						}
+						monitor.done();
 
 					}
 				}, null);
@@ -142,6 +144,14 @@ public class QR_Outputter implements IRnOutputter {
 				ExHandler.handle(ex);
 			}
 		}
+		if (result.isOK()) {
+			SWTHelper.showInfo("Ausgabe beendet", rnn.size() + " QR-Rechnung(en) wurde(n) ausgegeben");
+		} else {
+			SWTHelper.showError("QR-Output", "Fehler bei der Rechnungsausgabe", result.toString()
+					+ "\nSie können die fehlerhaften Rechnungen mit Status fehlerhaft in der Rechnungsliste anzeigen und korrigieren");
+
+		}
+
 		return result;
 	}
 
@@ -212,12 +222,14 @@ public class QR_Outputter implements IRnOutputter {
 			monitor.subTask(rn.getNr() + " wird ausgegeben");
 			TarmedBillDetails45 bill = new TarmedBillDetails45(rn, type,
 					LocalConfigService.get(PreferenceConstants.MISSING_DATA, true));
+			File rfFile = new File(bill.outputDirPDF, bill.rn.getNr() + "_rf.pdf");
+
 			if (LocalConfigService.get(PreferenceConstants.FACE_DOWN, false)) {
 				printQRPage(bill);
 				monitor.worked(1);
-				// printDetails(bill);
+				sendToPrinter(rfFile);
 			} else {
-				// printDetails(bill);
+				sendToPrinter(rfFile);
 				monitor.worked(1);
 				printQRPage(bill);
 			}
@@ -326,23 +338,28 @@ public class QR_Outputter implements IRnOutputter {
 			File pdfFile = new File(bill.outputDirPDF, bill.rn.getNr() + "_qr.pdf");
 			FileTool.writeTextFile(htmlFile, finished);
 			bill.writePDF(htmlFile, pdfFile);
-			if (cfg.getLocal(PreferenceConstants.DO_PRINT, false)) {
-				String defaultPrinter = null;
-				if (cfg.getLocal(PreferenceConstants.DIRECT_PRINT, false)) {
-					defaultPrinter = cfg.getLocal(PreferenceConstants.DEFAULT_PRINTER, "");
-				}
-				if (pdfManager.printFromPDF(pdfFile, defaultPrinter)) {
-					if (cfg.getLocal(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
-						pdfFile.delete();
-					}
-				}
-			}
+			sendToPrinter(pdfFile);
 			imgFile.delete();
 			if (!cfg.getLocal(PreferenceConstants.DEBUGFILES, false)) {
 				htmlFile.delete();
 			}
 
 		}
+	}
+
+	private void sendToPrinter(File pdfFile) throws PrinterException, IOException {
+		if (cfg.getLocal(PreferenceConstants.DO_PRINT, false)) {
+			String defaultPrinter = null;
+			if (cfg.getLocal(PreferenceConstants.DIRECT_PRINT, false)) {
+				defaultPrinter = cfg.getLocal(PreferenceConstants.DEFAULT_PRINTER, "");
+			}
+			if (pdfManager.printFromPDF(pdfFile, defaultPrinter)) {
+				if (cfg.getLocal(PreferenceConstants.DELETE_AFTER_PRINT, false)) {
+					pdfFile.delete();
+				}
+			}
+		}
+
 	}
 
 }
