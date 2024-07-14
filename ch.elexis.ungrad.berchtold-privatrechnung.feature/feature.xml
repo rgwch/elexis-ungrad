@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="ch.berchtold.privatrechnung.feature"
+      id="ch.elexis.ungrad.berchtold.privatrechnung.feature"
       label="Privatrechnung E. Berchtold"
       version="1.0.0.qualifier"
       provider-name="weirich@elexis.ch">
@@ -32,7 +32,7 @@ Sponsoring: Dr. med. Emanuel Berchtold, Bern
    </requires>
 
    <plugin
-         id="ch.berchtold.privatrechnung"
+         id="ch.elexis.ungrad.berchtold.privatrechnung"
          download-size="0"
          install-size="0"
          version="0.0.0"

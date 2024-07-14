@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="ch.elexis.ungrad.common.feature"
+      id="ch.elexis.ungrad-common.feature"
       label="Ungrad-common-feature"
       version="1.0.0.qualifier"
       provider-name="G. Weirich">
@@ -18,7 +18,7 @@
    </license>
 
    <plugin
-         id="ch.elexis.ungrad.common"
+         id="ch.elexis.ungrad-common"
          download-size="0"
          install-size="0"
          version="0.0.0"
