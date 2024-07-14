@@ -4,11 +4,12 @@
    <extension
          point="org.eclipse.ui.views">
          <view
-            class="ch.elexis.ungrad.inbox.ui.View"
-            id="ch.rgw.elexis.ungrad.inbox.ui.View"
-            name="Eingangsfach"
-            icon="icons/inbox.jpg"
-            restorable="true">
+               category="ch.elexis.textKategorie"
+               class="ch.elexis.ungrad.inbox.ui.View"
+               icon="icons/inbox.jpg"
+               id="ch.rgw.elexis.ungrad.inbox.ui.View"
+               name="Ungrad-Inbox"
+               restorable="true">
       </view>
    </extension>
    <extension
