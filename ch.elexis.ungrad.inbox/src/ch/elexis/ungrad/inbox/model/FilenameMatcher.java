@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, G. Weirich and Elexis
+ * Copyright (c) 2023-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -125,7 +125,7 @@ public class FilenameMatcher {
 			if (mapfile.exists() && mapfile.canRead()) {
 				FilenameMapper fmap = new FilenameMapper(mapfile);
 				fmap.map(dd);
-				if (dd.concerns == null) {
+				if (dd.concerns() == false) {
 					Query<Person> qbe = new Query<Person>(Person.class);
 					if (dd.dob != null) {
 						qbe.add(Person.BIRTHDATE, qbe.EQUALS, dd.dob.toString(TimeTool.DATE_COMPACT));
@@ -148,7 +148,7 @@ public class FilenameMatcher {
 					}
 					List<Person> result = qbe.execute();
 					if (result.size() == 1) {
-						dd.concerns = result.get(0);
+						dd.concern(result.get(0));
 					}
 				}
 			}
@@ -165,7 +165,7 @@ public class FilenameMatcher {
 					if (!StringTool.isNothing(text) && text.length() > 3) {
 						Person p = checkBirthdate(text, null);
 						if (p != null) {
-							dd.concerns = p;
+							dd.concern(p);
 							return true;
 						}
 					}
@@ -183,7 +183,7 @@ public class FilenameMatcher {
 	 * @throws Exception
 	 */
 	public DocumentDescriptor analyze(final File file) throws Exception {
-		DocumentDescriptor dd = new DocumentDescriptor(null, new TimeTool(), file, file.getName());
+		DocumentDescriptor dd = new DocumentDescriptor(new TimeTool(), file, file.getName());
 		File meta = new File(file.getAbsolutePath() + ".meta");
 		if (meta.exists() && meta.canRead()) {
 			String[] metadata = FileTool.readTextFile(meta).split(",", 2);
@@ -192,15 +192,15 @@ public class FilenameMatcher {
 				dd.subject = metadata[1];
 			}
 		}
-		dd.concerns = findKontakt(dd.subject);
+		dd.concern(findKontakt(dd.subject));
 		analyzeMappings(dd);
-		if (dd.concerns == null) {
-			dd.concerns = findKontakt(dd.filename);
+		if (dd.concerns() == false) {
+			dd.concern(findKontakt(dd.filename));
 		}
 		if (dd.docDate == null) {
 			findDates(dd);
 		}
-		if (dd.concerns == null) {
+		if (dd.concerns() == false) {
 			analyzeContents(dd);
 		}
 		makeFilename(dd);
@@ -221,10 +221,11 @@ public class FilenameMatcher {
 				dd.filename = dd.filename.substring(0, extpos);
 			}
 			dd.docname = cutDate(dd.filename, dd.docDate);
-			if (dd.concerns != null) {
-				dd.docname = cutDate(dd.docname, new TimeTool(dd.concerns.getGeburtsdatum()));
-				dd.docname = cut(dd.docname, dd.concerns.get(Person.NAME));
-				dd.docname = cut(dd.docname, dd.concerns.get(Person.FIRSTNAME));
+			if (dd.concerns()) {
+				Person p = Person.load(dd.concerns_id);
+				dd.docname = cutDate(dd.docname, new TimeTool(p.getGeburtsdatum()));
+				dd.docname = cut(dd.docname, p.get(Person.NAME));
+				dd.docname = cut(dd.docname, p.get(Person.FIRSTNAME));
 			}
 			dd.docname = dd.docname.replaceAll("[,':;]", " ");
 			dd.docname = dd.docname.replaceAll("\\s+", "_");
@@ -272,10 +273,10 @@ public class FilenameMatcher {
 	}
 
 	private boolean checkBirthdate(DocumentDescriptor dd, TimeTool cand) {
-		if (dd.concerns == null) {
-			dd.concerns = checkBirthdate(dd.filename, cand);
-			if (dd.concerns != null) {
-				dd.dob = new TimeTool(dd.concerns.getGeburtsdatum());
+		if (dd.concerns() == false) {
+			dd.concern(checkBirthdate(dd.filename, cand));
+			if (dd.concerns()) {
+				dd.dob = new TimeTool(Person.load(dd.concerns_id).getGeburtsdatum());
 			}
 		}
 		return dd.dob != null ? cand.isEqual(dd.dob) : false;

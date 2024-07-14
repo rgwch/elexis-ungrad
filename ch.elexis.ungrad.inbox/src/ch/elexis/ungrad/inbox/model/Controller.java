@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, G. Weirich and Elexis
+ * Copyright (c) 2023-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import java.io.FilenameFilter;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
+import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.elexis.data.Person;
 import ch.elexis.ungrad.StorageController;
@@ -52,11 +53,11 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return ((File) element).getName();
 	}
 
-	public void moveFileToDocbase(Person p, File f, String destName) throws Exception {
-		File dir = sc.getOutputDirFor(p, true);
+	public void moveFileToDocbase(String concerns_id, File f, String destName) throws Exception {
+		File dir = sc.getOutputDirFor(concerns_id, true);
 		FileTool.copyFile(f, new File(dir, destName), FileTool.FAIL_IF_EXISTS);
-		File meta=new File(f.getAbsolutePath()+".meta");
-		if(meta.exists()) {
+		File meta = new File(f.getAbsolutePath() + ".meta");
+		if (meta.exists()) {
 			meta.delete();
 		}
 		f.delete();

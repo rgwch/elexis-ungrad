@@ -81,7 +81,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		IPatient pat = (IPatient) inputElement;
 		File dir;
 		try {
-			dir = sc.getOutputDirFor(pat, true);
+			dir = sc.getOutputDirFor(pat.getId(), true);
 			String[] files = dir.list(new FilenameFilter() {
 				@Override
 				public boolean accept(File dir, String name) {
@@ -183,7 +183,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			}
 			IPatient pat = contextService.getActivePatient().get();
 
-			File dir = sc.getOutputDirFor(pat, true);
+			File dir = sc.getOutputDirFor(pat.getId(), true);
 			if (!dir.exists()) {
 				if (!dir.mkdirs()) {
 					throw new Exception(Messages.Controller_CouldNotCreateDir + dir.getAbsolutePath());
@@ -242,7 +242,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		if (pat == null) {
 			pat = contextService.getActivePatient().get();
 		}
-		File dir = sc.getOutputDirFor(pat, false);
+		File dir = sc.getOutputDirFor(pat.getId(), false);
 		if (dir.exists()) {
 			File outfile = new File(dir, title + ".pdf");
 			if (outfile.exists()) {
@@ -340,7 +340,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	 * @throws Exception
 	 */
 	public void delete(String item, IPatient pat) throws Exception {
-		File dir = sc.getOutputDirFor(pat, false);
+		File dir = sc.getOutputDirFor(pat.getId(), false);
 		if (dir.exists()) {
 			File htmlFile = new File(dir, item + ".html");
 			File pdfFile = new File(dir, item + ".pdf");

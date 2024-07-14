@@ -188,7 +188,7 @@ public class View extends ViewPart implements IActivationListener {
 	 * @return full path of the resulting file in the output dir.
 	 */
 	private String fillPdf(File templateFile) throws Error, Exception, IOException {
-		File outDir = controller.getStorageController().getOutputDirFor(currentPatient, true);
+		File outDir = controller.getStorageController().getOutputDirFor(currentPatient.getId(), true);
 		if (!outDir.exists()) {
 			if (!outDir.mkdirs()) {
 				throw new Error(Messages.View_CantCreateOutputDir + outDir.getAbsolutePath());
@@ -349,62 +349,6 @@ public class View extends ViewPart implements IActivationListener {
 				}
 			}
 
-		};
-		signAction = new Action("Unterschreiben") {
-			{
-				setText("Dokument signieren");
-				setImageDescriptor(Images.IMG_PERSON_OK.getImageDescriptor());
-				setToolTipText("Das ausgewählte DOkument unterschreiben");
-			}
-
-			@Override
-			public void run() {
-				if (stack.topControl.equals(docList)) {
-					docList.sign();
-				}
-			}
-		};
-		signAction = new Action("Unterschreiben") {
-			{
-				setText("Dokument signieren");
-				setImageDescriptor(Images.IMG_PERSON_OK.getImageDescriptor());
-				setToolTipText("Das ausgewählte DOkument unterschreiben");
-			}
-
-			@Override
-			public void run() {
-				if (stack.topControl.equals(docList)) {
-					docList.sign();
-				}
-			}
-		};
-		signAction = new Action("Unterschreiben") {
-			{
-				setText("Dokument signieren");
-				setImageDescriptor(Images.IMG_PERSON_OK.getImageDescriptor());
-				setToolTipText("Das ausgewählte DOkument unterschreiben");
-			}
-
-			@Override
-			public void run() {
-				if (stack.topControl.equals(docList)) {
-					docList.sign();
-				}
-			}
-		};
-		signAction = new Action("Unterschreiben") {
-			{
-				setText("Dokument signieren");
-				setImageDescriptor(Images.IMG_PERSON_OK.getImageDescriptor());
-				setToolTipText("Das ausgewählte DOkument unterschreiben");
-			}
-
-			@Override
-			public void run() {
-				if (stack.topControl.equals(docList)) {
-					docList.sign();
-				}
-			}
 		};
 		signAction = new Action("Unterschreiben") {
 			{

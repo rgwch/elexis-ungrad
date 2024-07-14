@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2023 by G. Weirich
+ * Copyright (c) 2022-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -134,7 +134,7 @@ public class DirectoryViewPane extends Composite {
 	public void setPatient(Patient pat) {
 		File dir;
 		try {
-			dir = sc.getOutputDirFor(pat, true);
+			dir = sc.getOutputDirFor(pat.getId(), true);
 			tv.setInput(dir);
 		} catch (Exception e) {
 			ExHandler.handle(e);

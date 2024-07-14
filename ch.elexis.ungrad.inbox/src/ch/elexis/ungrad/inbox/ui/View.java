@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, G. Weirich and Elexis
+ * Copyright (c) 2023-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,10 +31,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
+import ch.elexis.data.Patient;
 import ch.elexis.ungrad.IMAPMail;
 import ch.elexis.ungrad.MBox;
 import ch.elexis.ungrad.inbox.model.Controller;
@@ -47,6 +49,7 @@ import ch.rgw.tools.StringTool;
 
 /**
  * The Main View of Ungrad Inbox
+ * 
  * @author gerry
  *
  */
@@ -136,6 +139,7 @@ public class View extends ViewPart {
 
 	/**
 	 * Display the currently selected file with its associated viewer
+	 * 
 	 * @param sel
 	 */
 	void launchViewer(File sel) {
@@ -200,9 +204,9 @@ public class View extends ViewPart {
 				}
 			}
 		};
-		
+
 		/**
-		 * Associate selected faile with patient and optional change filename
+		 * Associate selected file with patient and optional change filename
 		 */
 		addAction = new Action("Zuweisen") {
 			{
@@ -219,8 +223,8 @@ public class View extends ViewPart {
 						ImportDocumentDialog idlg = new ImportDocumentDialog(View.this, dd);
 						if (idlg.open() == Dialog.OK) {
 							System.out.print(idlg.getValue());
-							if (dd.concerns != null) {
-								controller.moveFileToDocbase(dd.concerns, sel, idlg.getValue());
+							if (dd.concerns()) {
+								controller.moveFileToDocbase(dd.concerns_id, sel, idlg.getValue());
 								reload();
 							} else {
 								SWTHelper.alert("Kein Patient zugewiesen",
@@ -233,7 +237,7 @@ public class View extends ViewPart {
 				}
 			}
 		};
-		
+
 		/**
 		 * Delete currently selected file
 		 */
@@ -256,7 +260,7 @@ public class View extends ViewPart {
 				}
 			}
 		};
-		
+
 		/**
 		 * Display currently selected file
 		 */
@@ -271,7 +275,7 @@ public class View extends ViewPart {
 				launchViewer(getSelection());
 			}
 		};
-		
+
 		/**
 		 * Refresh contents of the inbox view
 		 * 

@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Text;
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.data.Patient;
 import ch.elexis.data.Person;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
 
@@ -59,15 +60,15 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 					Person pat = (Person) ksl.getSelection();
 					setErrorMessage(null);
 					setMessage(pat.getLabel());
-					dd.concerns = pat;
+					dd.concern(pat);
 				}
 			}
 
 		});
-		if (dd.concerns == null) {
+		if (dd.concerns() == false) {
 			setErrorMessage("Bitte weisen Sie eine Patientin oder einen Patienten zu");
 		} else {
-			setMessage(dd.concerns.getLabel());
+			setMessage(Patient.load(dd.concerns_id).getLabel());
 		}
 		Composite cText=new Composite(ret,SWT.NONE);
 		cText.setLayoutData(SWTHelper.getFillGridData(2,true,1,false));

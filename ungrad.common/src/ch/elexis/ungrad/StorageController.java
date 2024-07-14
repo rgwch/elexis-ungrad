@@ -13,23 +13,26 @@
 package ch.elexis.ungrad;
 
 import java.io.File;
-import java.time.LocalDateTime;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.model.IPatient;
-import ch.elexis.data.Patient;
+import ch.elexis.core.services.IContextService;
 import ch.elexis.data.Person;
 import ch.rgw.tools.TimeTool;
+
 /**
  * Manage patient related directories in docbase
+ * 
  * @author gerry
  *
  */
 public class StorageController {
 
-	public File createFile(IPatient pat, String title) throws Exception {
-		File dir = getOutputDirFor(pat, true);
+	IContextService contextService = ContextServiceHolder.get();
+
+	public File createFileFor(String id, String title) throws Exception {
+		File dir = getOutputDirFor(id, true);
 		String name = createOutputFilename(title);
 		return new File(dir, name);
 	}
@@ -38,22 +41,25 @@ public class StorageController {
 	 * Find the configured output dir for a patient (highly opinionated filepath
 	 * resolution)
 	 * 
-	 * @param p  Patient whose output dir should be retrieved
+	 * @param p                  Patient whose output dir should be retrieved
 	 * @param bCreateIfNotExists create directory if it doesn't exist
 	 * @return The directory to store documents for that patient.
 	 */
-	public File getOutputDirFor(IPatient p, boolean bCreateIfNotExists) throws Exception {
-		if (p == null) {
-			// p = ElexisEventDispatcher.getSelectedPatient();
-			if(p==null) {
+	public File getOutputDirFor(String id, boolean bCreateIfNotExists) throws Exception {
+
+		if (id == null) {
+			IPatient pat = contextService.getActivePatient().get();
+			if (pat == null) {
 				return null;
+			} else {
+				id = pat.getId();
 			}
 		}
-		String name = p.getLastName();
-		String fname = p.getFirstName();
-		LocalDateTime ldt=p.getDateOfBirth();
-		TimeTool tt=new TimeTool(ldt.toString());
-		String birthdate =  tt.toString(TimeTool.DATE_GER);
+		Person p = Person.load(id);
+
+		String name = p.getName();
+		String fname = p.getVorname();
+		String birthdate = p.getGeburtsdatum();
 		File superdir = new File(CoreHub.localCfg.get(ch.elexis.ungrad.PreferenceConstants.DOCBASE, ""),
 				name.substring(0, 1).toLowerCase());
 		File dir = new File(superdir, name + "_" + fname + "_" + birthdate);
