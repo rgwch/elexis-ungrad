@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.common.ui.MailUI;
@@ -144,7 +145,7 @@ public class DocumentList extends Composite {
 		return null;
 	}
 
-	void setPatient(Patient pat) {
+	void setPatient(IPatient pat) {
 		tv.setInput(pat);
 	}
 }

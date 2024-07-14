@@ -35,9 +35,13 @@ import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.lock.types.LockResponse;
 import ch.elexis.core.model.IContact;
+import ch.elexis.core.model.IPatient;
+import ch.elexis.core.model.IPerson;
 import ch.elexis.core.model.IUser;
 import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.IContextService;
+import ch.elexis.core.services.holder.ConfigServiceHolder;
+import ch.elexis.core.services.holder.LocalLockServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
 import ch.elexis.data.Anwender;
@@ -56,8 +60,6 @@ import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
-import ch.elexis.core.services.holder.ConfigServiceHolder;
-import ch.elexis.core.services.holder.LocalLockServiceHolder;
 
 
 /**
@@ -76,7 +78,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	/* CoontentProvider */
 	@Override
 	public Object[] getElements(Object inputElement) {
-		Patient pat = (Patient) inputElement;
+		IPatient pat = (IPatient) inputElement;
 		File dir;
 		try {
 			dir = sc.getOutputDirFor(pat, true);
@@ -125,7 +127,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	 * @param patient Patient concerned
 	 * @return The Brief or null if no such Brief was found.
 	 */
-	public Brief getCorrespondingBrief(String item, Person patient) {
+	public Brief getCorrespondingBrief(String item, IPatient patient) {
 		Pattern pat = Pattern.compile("A_([0-9]{4,4}-[0-1][0-9]-[0-3][0-9])_(.+)");
 		Matcher m = pat.matcher(item);
 		if (m.matches()) {
@@ -179,7 +181,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 				String name = Messages.Controller_Output;
 				filename = prefix + name;
 			}
-			Patient pat = ElexisEventDispatcher.getSelectedPatient();
+			IPatient pat = contextService.getActivePatient().get();
 
 			File dir = sc.getOutputDirFor(pat, true);
 			if (!dir.exists()) {
@@ -236,9 +238,9 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	 * @return The full filepath of the displayed file or null
 	 * @throws Exception
 	 */
-	public String showPDF(Patient pat, String title) throws Exception {
+	public String showPDF(IPatient pat, String title) throws Exception {
 		if (pat == null) {
-			pat = ElexisEventDispatcher.getSelectedPatient();
+			pat = contextService.getActivePatient().get();
 		}
 		File dir = sc.getOutputDirFor(pat, false);
 		if (dir.exists()) {
@@ -337,7 +339,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	 * @param pat
 	 * @throws Exception
 	 */
-	public void delete(String item, Person pat) throws Exception {
+	public void delete(String item, IPatient pat) throws Exception {
 		File dir = sc.getOutputDirFor(pat, false);
 		if (dir.exists()) {
 			File htmlFile = new File(dir, item + ".html");
@@ -362,7 +364,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	public void delete(Brief brief) throws Exception {
 		TimeTool tt = new TimeTool(brief.getDatum());
 		String basename = "A_" + tt.toString(TimeTool.DATE_ISO) + "_" + brief.getBetreff();
-		delete(basename, brief.getPatient());
+		delete(basename, (IPatient) brief.getPatient());
 	}
 
 	void asyncRunViewer(String viewer, File pdf, Brief brief) {

@@ -15,7 +15,6 @@ package ch.elexis.ungrad.pdf;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.elexis.data.Patient;
 import ch.elexis.ungrad.Resolver;
 import ch.rgw.tools.StringTool;
 
@@ -34,7 +33,7 @@ public class MappedForm {
 		fp = filepath;
 	}
 	
-	public String create(String outPath, String map, Patient pat) throws Exception{
+	public String create(String outPath, String map) throws Exception{
 		Resolver resolver = new Resolver();
 		String raw = resolver.resolve(map);
 		String[] lines = raw.split("\\R");

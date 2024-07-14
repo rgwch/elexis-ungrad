@@ -16,6 +16,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -35,15 +38,15 @@ import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEvent;
-import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
+import ch.elexis.core.ui.e4.util.CoreUiUtil;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;
-import ch.elexis.data.Patient;
 import ch.elexis.data.Query;
 import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.forms.model.Controller;
@@ -70,16 +73,26 @@ public class View extends ViewPart implements IActivationListener {
 	private StackLayout stack;
 	private Template currentTemplate;
 	private boolean bHasSignature;
+	private IPatient currentPatient;
 
-	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
-			ElexisEvent.EVENT_SELECTED) {
+	@Inject
+	void activePatient(@Optional IPatient patient) {
+		CoreUiUtil.runAsyncIfActive(() -> {
+			if (patient != null) {
+				setPatient(patient);
+			}
+		}, container);
+	}
 
-		@Override
-		public void runInUi(ElexisEvent ev) {
-			setPatient((Patient) ev.getObject());
-		}
-
-	};
+	/*
+	 * private final ElexisUiEventListenerImpl eeli_pat = new
+	 * ElexisUiEventListenerImpl(Patient.class, ElexisEvent.EVENT_SELECTED) {
+	 * 
+	 * @Override public void runInUi(ElexisEvent ev) { setPatient((Patient)
+	 * ev.getObject()); }
+	 * 
+	 * };
+	 */
 
 	public View() {
 		controller = Activator.getController();
@@ -90,13 +103,15 @@ public class View extends ViewPart implements IActivationListener {
 		}
 	}
 
-	void setPatient(Patient pat) {
+	void setPatient(IPatient pat) {
 		// controller.changePatient((Patient) ev.getObject());
+		currentPatient = pat;
 		docList.setPatient(pat);
 		stack.topControl = docList;
 		detail.clear();
 		container.layout();
 		setItemActions(docList.getSelection() != null);
+
 	}
 
 	private void setItemActions(boolean bMode) {
@@ -173,8 +188,7 @@ public class View extends ViewPart implements IActivationListener {
 	 * @return full path of the resulting file in the output dir.
 	 */
 	private String fillPdf(File templateFile) throws Error, Exception, IOException {
-		Patient currentPat = ElexisEventDispatcher.getSelectedPatient();
-		File outDir = controller.getStorageController().getOutputDirFor(currentPat, true);
+		File outDir = controller.getStorageController().getOutputDirFor(currentPatient, true);
 		if (!outDir.exists()) {
 			if (!outDir.mkdirs()) {
 				throw new Error(Messages.View_CantCreateOutputDir + outDir.getAbsolutePath());
@@ -185,7 +199,7 @@ public class View extends ViewPart implements IActivationListener {
 		Medform medform = new Medform(templateFile.getAbsolutePath());
 		Kontakt kRecipient = null;
 		if (medform.isMedform()) {
-			medform.create(outFile.getAbsolutePath(), currentPat);
+			medform.create(outFile.getAbsolutePath(), currentPatient);
 			String recipient = medform.getFieldValue("receiverMail");
 			Query<Kontakt> qbe = new Query<Kontakt>(Kontakt.class, Kontakt.FLD_E_MAIL, recipient);
 			List<Kontakt> found = qbe.execute();
@@ -198,7 +212,7 @@ public class View extends ViewPart implements IActivationListener {
 			if (mappingFile.exists()) {
 				String raw = FileTool.readTextFile(mappingFile);
 				MappedForm mapped = new MappedForm(templateFile.getAbsolutePath());
-				mapped.create(outFile.getAbsolutePath(), raw, currentPat);
+				mapped.create(outFile.getAbsolutePath(), raw);
 			}
 		}
 		controller.createLinksWithElexis(outFile.getAbsolutePath(), kRecipient);
@@ -247,7 +261,7 @@ public class View extends ViewPart implements IActivationListener {
 							stack.topControl = detail;
 							container.layout();
 						}
-						docList.setPatient(ElexisEventDispatcher.getSelectedPatient());
+						docList.setPatient(currentPatient);
 
 					} catch (Exception e) {
 						ExHandler.handle(e);
@@ -418,9 +432,8 @@ public class View extends ViewPart implements IActivationListener {
 				try {
 					String sel = docList.getSelection();
 					if (SWTHelper.askYesNo(Messages.View_PleaseConfirm, sel + Messages.View_ReallyDelete)) {
-						Patient pat = ElexisEventDispatcher.getSelectedPatient();
-						controller.delete(sel, pat);
-						docList.setPatient(pat);
+						controller.delete(sel, currentPatient);
+						docList.setPatient(currentPatient);
 					}
 				} catch (Exception e) {
 					ExHandler.handle(e);
@@ -451,13 +464,11 @@ public class View extends ViewPart implements IActivationListener {
 
 	@Override
 	public void visible(boolean mode) {
-		if (mode) {
-			setPatient(ElexisEventDispatcher.getSelectedPatient());
-			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
-		} else {
-			ElexisEventDispatcher.getInstance().removeListeners(eeli_pat);
-		}
-
+		/*
+		 * if (mode) { setPatient(ElexisEventDispatcher.getSelectedPatient());
+		 * ElexisEventDispatcher.getInstance().addListeners(eeli_pat); } else {
+		 * ElexisEventDispatcher.getInstance().removeListeners(eeli_pat); }
+		 */
 	}
 
 }

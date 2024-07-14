@@ -16,8 +16,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.29.0",
  ch.elexis.ungrad.common;bundle-version="2.0.0",
  ch.elexis.ungrad.pdf;bundle-version="1.2.0"
 Import-Package: javax.inject;version="[1.0.0,2.0.0)",
- javax.mail;version="[1.6.0,2.0.0)",
- org.eclipse.ui.forms.widgets
+ javax.mail;version="[1.6.0,2.0.0)"
 Bundle-ClassPath: lib/jsoup-1.15.3.jar,
  .
 Bundle-Activator: ch.elexis.ungrad.forms.Activator

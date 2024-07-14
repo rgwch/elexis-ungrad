@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018-2023, G. Weirich and Elexis
+ * Copyright (c) 2018-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,9 +13,11 @@
 package ch.elexis.ungrad;
 
 import java.io.File;
+import java.time.LocalDateTime;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.model.IPatient;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Person;
 import ch.rgw.tools.TimeTool;
@@ -26,7 +28,7 @@ import ch.rgw.tools.TimeTool;
  */
 public class StorageController {
 
-	public File createFile(Patient pat, String title) throws Exception {
+	public File createFile(IPatient pat, String title) throws Exception {
 		File dir = getOutputDirFor(pat, true);
 		String name = createOutputFilename(title);
 		return new File(dir, name);
@@ -40,16 +42,18 @@ public class StorageController {
 	 * @param bCreateIfNotExists create directory if it doesn't exist
 	 * @return The directory to store documents for that patient.
 	 */
-	public File getOutputDirFor(Person p, boolean bCreateIfNotExists) throws Exception {
+	public File getOutputDirFor(IPatient p, boolean bCreateIfNotExists) throws Exception {
 		if (p == null) {
-			p = ElexisEventDispatcher.getSelectedPatient();
+			// p = ElexisEventDispatcher.getSelectedPatient();
 			if(p==null) {
 				return null;
 			}
 		}
-		String name = p.getName();
-		String fname = p.getVorname();
-		String birthdate = p.getGeburtsdatum();
+		String name = p.getLastName();
+		String fname = p.getFirstName();
+		LocalDateTime ldt=p.getDateOfBirth();
+		TimeTool tt=new TimeTool(ldt.toString());
+		String birthdate =  tt.toString(TimeTool.DATE_GER);
 		File superdir = new File(CoreHub.localCfg.get(ch.elexis.ungrad.PreferenceConstants.DOCBASE, ""),
 				name.substring(0, 1).toLowerCase());
 		File dir = new File(superdir, name + "_" + fname + "_" + birthdate);
