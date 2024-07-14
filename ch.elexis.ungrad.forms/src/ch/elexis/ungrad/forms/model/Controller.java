@@ -36,6 +36,7 @@ import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.lock.types.LockResponse;
 import ch.elexis.core.model.IContact;
 import ch.elexis.core.model.IUser;
+import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
@@ -55,6 +56,7 @@ import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
+import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.services.holder.LocalLockServiceHolder;
 
 
@@ -69,6 +71,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	
 	IContextService contextService=ContextServiceHolder.get();
 	StorageController sc = new StorageController();
+	IConfigService cfg=ConfigServiceHolder.get();
 
 	/* CoontentProvider */
 	@Override
@@ -285,7 +288,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 				String label = "[ " + brief.getLabel().replace("_", " ") + " ]"; //$NON-NLS-1$ //$NON-NLS-2$
 				// kons.addXRef(XRefExtensionConstants.providerID, brief.getId(), -1, label);
 				kons.addXRef(Activator.KonsXRef, brief.getId(), -1, label);
-				LocalLockServiceHolder.get().releaseLock(lr);
+				LocalLockServiceHolder.get().releaseLock(kons);
 			}	
 		}
 	}
@@ -293,13 +296,13 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	/**
 	 * Launch the configured pug compiler with a pug template to process
 	 * @param pug The pug template
-	 * @param dirthe working directory
+	 * @param the working directory
 	 * @return the html as created by the pug compiler
 	 * @throws Exception
 	 */
 	public String convertPug(String pug, String dir) throws Exception {
 		dir += File.separator + "x";
-		String pugbin = CoreHub.localCfg.get(PreferenceConstants.PUG, "pug");
+		String pugbin = cfg.getLocal(PreferenceConstants.PUG, "pug");
 
 		Process process = new ProcessBuilder(pugbin, "-p", dir).start();
 		InputStreamReader err = new InputStreamReader(process.getErrorStream());
@@ -308,8 +311,8 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		BufferedReader br = new BufferedReader(ir);
 		OutputStreamWriter ow = new OutputStreamWriter(process.getOutputStream());
 		ow.write(pug);
-		ow.flush();
-		ow.close();
+//		ow.flush();
+ 		ow.close();
 		String line;
 		StringBuilder sb = new StringBuilder();
 		StringBuilder serr = new StringBuilder();
