@@ -37,6 +37,11 @@
     </modules>
     <repositories>
         <repository>
+            <id>elexis.3.target</id>
+            <url>https://download.elexis.info/elexis/target/${elexis.target}/</url>
+            <layout>p2</layout>
+        </repository>
+        <repository>
             <id>elexis-ungrad</id>
             <url>http://www.elexis.ch/ungrad2023/ungrad-target</url>
             <layout>p2</layout>
