@@ -11,9 +11,10 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <modules>
+        <module>ch.elexis.ungrad.pdf.feature</module>
         <module>ch.elexis.ungrad.common.feature</module>
         <module>ch.elexis.ungrad.forms.feature</module>
-        <module>ch.elexis.ungrad.inbox.feature</module>
+        <!-- module>ch.elexis.ungrad.inbox.feature</module -->
         <module>ch.elexis.ungrad.qrbills.feature</module>
 
     </modules>
