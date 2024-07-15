@@ -20,4 +20,6 @@
 **/dependency-reduced-pom.xml
 /lib/
 **/.vscode/
+.polyglot.META-INF
+.polyglot.feature.xml
 

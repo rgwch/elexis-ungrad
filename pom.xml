@@ -33,7 +33,7 @@
     <modules>
         <module>bundles</module>
         <module>features</module>
-        <!-- module>ch.elexis.ungrad.p2site</module -->
+        <module>ch.elexis.ungrad.p2site</module>
     </modules>
     <repositories>
         <repository>
