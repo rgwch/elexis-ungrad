@@ -14,13 +14,29 @@
 
 package ch.elexis.ungrad.lucinda.view;
 
-import static ch.elexis.ungrad.lucinda.Preferences.*;
+import static ch.elexis.ungrad.lucinda.Preferences.COLUMN_WIDTHS;
+import static ch.elexis.ungrad.lucinda.Preferences.RESTRICT_CURRENT;
+import static ch.elexis.ungrad.lucinda.Preferences.SHOW_CONS;
+import static ch.elexis.ungrad.lucinda.Preferences.SHOW_INBOX;
+import static ch.elexis.ungrad.lucinda.Preferences.SHOW_OMNIVORE;
+import static ch.elexis.ungrad.lucinda.Preferences.USE_COMMON_DIRECTORY;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.action.*;
+import javax.inject.Inject;
+
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -29,19 +45,18 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.model.IPatient;
+import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.actions.RestrictedAction;
-import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
+import ch.elexis.core.ui.e4.util.CoreUiUtil;
 import ch.elexis.core.ui.icons.Images;
-import ch.elexis.data.Patient;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.IDocumentHandler;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.Controller;
-import ch.rgw.tools.StringTool;
 
 /**
  * Main Window with the action buttons
@@ -57,15 +72,15 @@ public class GlobalView extends ViewPart implements IActivationListener {
 	private List<IDocumentHandler> addons;
 	private List<IAction> addonActions = new ArrayList<IAction>();
 
-	private final ElexisUiEventListenerImpl eeli_pat = new ElexisUiEventListenerImpl(Patient.class,
-			ElexisEvent.EVENT_SELECTED) {
+	@Inject
+	private IConfigService cfg;
 
-		@Override
-		public void runInUi(ElexisEvent ev) {
-			controller.changePatient((Patient) ev.getObject());
-		}
-
-	};
+	@Inject
+	void selectedPatient(@Optional IPatient pat) {
+		CoreUiUtil.runAsyncIfActive(() -> {
+			controller.changePatient(java.util.Optional.of(pat));
+		}, this);
+	}
 
 	public GlobalView() {
 		controller = new Controller();
@@ -95,10 +110,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 
 	public void visible(final boolean mode) {
 		controller.reload();
-		if (mode) {
-			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
-		} else {
-			ElexisEventDispatcher.getInstance().removeListeners(eeli_pat);
+		if (!mode) {
 			save(COLUMN_WIDTHS, controller.getColumnWidths());
 		}
 	}
@@ -263,14 +275,11 @@ public class GlobalView extends ViewPart implements IActivationListener {
 			// aquireAction.setEnabled(false);
 		}
 		/*
-		String actionScript = Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT, null);
-		if (!StringTool.isNothing(actionScript)) {
-			File ac = new File(actionScript);
-			if (ac.exists() && ac.canExecute()) {
-				aquireAction.setEnabled(true);
-			}
-		}
-		*/
+		 * String actionScript = Preferences.get(Preferences.AQUIRE_ACTION_SCRIPT,
+		 * null); if (!StringTool.isNothing(actionScript)) { File ac = new
+		 * File(actionScript); if (ac.exists() && ac.canExecute()) {
+		 * aquireAction.setEnabled(true); } }
+		 */
 	}
 
 	@Override

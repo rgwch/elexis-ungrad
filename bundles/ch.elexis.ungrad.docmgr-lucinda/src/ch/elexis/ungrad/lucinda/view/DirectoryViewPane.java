@@ -16,6 +16,7 @@ package ch.elexis.ungrad.lucinda.view;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Optional;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -39,6 +40,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.StorageController;
@@ -131,11 +133,13 @@ public class DirectoryViewPane extends Composite {
 
 	}
 
-	public void setPatient(Patient pat) {
+	public void setPatient(Optional<IPatient> pat) {
 		File dir;
 		try {
-			dir = sc.getOutputDirFor(pat.getId(), true);
-			tv.setInput(dir);
+			if (pat.isPresent()) {
+				dir = sc.getOutputDirFor(pat.get().getId(), true);
+				tv.setInput(dir);
+			}
 		} catch (Exception e) {
 			ExHandler.handle(e);
 			SWTHelper.showError("Can't set Patient", e.getMessage());

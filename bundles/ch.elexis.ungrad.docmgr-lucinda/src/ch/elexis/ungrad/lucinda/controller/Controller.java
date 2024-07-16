@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2022 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -31,11 +31,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.*;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.model.IEncounter;
+import ch.elexis.core.model.IPatient;
+import ch.elexis.core.services.IContextService;
 import ch.elexis.core.text.model.Samdas;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
@@ -73,6 +76,10 @@ public class Controller implements IProgressController {
 	private Logger log = LoggerFactory.getLogger(Controller.class);
 	Composite envelope;
 	StackLayout stack = new StackLayout();
+	
+	@Reference
+	private IContextService contextService;
+	
 
 	public Controller() {
 		lucinda = new Lucinda();
@@ -107,7 +114,8 @@ public class Controller implements IProgressController {
 					if (Preferences.KONSULTATION_NAME.equals(doctype)) {
 						Konsultation kons = Konsultation.load((String) doc.get(Preferences.FLD_ID));
 						if (kons.exists()) {
-							ElexisEventDispatcher.fireSelectionEvent(kons);
+							contextService.setTyped(kons);
+							// ElexisEventDispatcher.fireSelectionEvent(kons);
 						}
 					}
 				}
@@ -120,7 +128,7 @@ public class Controller implements IProgressController {
 		} else {
 			stack.topControl = lucindaView;
 		}
-		changePatient(ElexisEventDispatcher.getSelectedPatient());
+		changePatient(contextService.getActivePatient());
 		return envelope;
 	}
 
@@ -164,7 +172,7 @@ public class Controller implements IProgressController {
 	}
 
 	public void reload() {
-		dirView.setPatient(ElexisEventDispatcher.getSelectedPatient());
+		dirView.setPatient(contextService.getActivePatient());
 		runQuery(lucindaView.getSearchField().getText());
 	}
 
@@ -214,11 +222,12 @@ public class Controller implements IProgressController {
 	protected String buildQuery(String input) {
 		StringBuilder q = new StringBuilder();
 		if (bRestrictCurrentPatient) {
-			Patient pat = ElexisEventDispatcher.getSelectedPatient();
-			if (pat != null) {
-				q.append("+concern:").append(pat.getName().replaceAll(" ", "_")).append("_")
-						.append(pat.getVorname().replaceAll(" ", "_")).append("_")
-						.append(new TimeTool(pat.getGeburtsdatum()).toString((TimeTool.DATE_GER)));
+			Optional<IPatient> oPat = contextService.getActivePatient();
+			if (oPat.isPresent()) {
+				IPatient pat=oPat.get();
+				q.append("+concern:").append(pat.getLastName().replaceAll(" ", "_")).append("_")
+						.append(pat.getFirstName().replaceAll(" ", "_")).append("_")
+						.append(pat.getDateOfBirth().toLocalDate().toString());
 				/*
 				 * q.append("+lastname:").append(pat.getName()).append(" +firstname:")
 				 * //$NON-NLS-1$//$NON-NLS-2$ .append(pat.getVorname()).append(" +birthdate:")
@@ -272,7 +281,11 @@ public class Controller implements IProgressController {
 				// launchViewerForDocument(entry.getBytes(), "txt"); //$NON-NLS-1$
 				Fall fall = kons.getFall();
 				Patient pat = fall.getPatient();
-				ElexisEventDispatcher.fireSelectionEvents(pat, fall, kons);
+				contextService.setTyped(pat);
+				contextService.setTyped(fall);
+				contextService.setTyped(kons);
+				
+				// ElexisEventDispatcher.fireSelectionEvents(pat, fall, kons);
 			} else {
 				SWTHelper.showError(Messages.Controller_cons_not_found_caption,
 						MessageFormat.format(Messages.Controller_cons_not_found_text, doc.get("title"))); // $NON-NLS-2$
@@ -361,13 +374,14 @@ public class Controller implements IProgressController {
 	 */
 	public void launchAquireScript(String command, Shell shell) {
 		try {
-			Patient pat = ElexisEventDispatcher.getSelectedPatient();
-			if (pat == null) {
+			Optional<IPatient> oPat = contextService.getActivePatient();
+			if (oPat.isEmpty()) {
 				throw new Exception("No patient selected");
 			} else {
-				String[] name = pat.getName().split("[ -]+");
-				String[] fname = pat.getVorname().split("[ -]+");
-				TimeTool bdate = new TimeTool(pat.getGeburtsdatum());
+				IPatient pat=oPat.get();
+				String[] name = pat.getLastName().split("[ -]+");
+				String[] fname = pat.getFirstName().split("[ -]+");
+				TimeTool bdate = new TimeTool(pat.getDateOfBirth());
 				StringBuilder sbConcern = new StringBuilder();
 				String bdatec = bdate.toString(TimeTool.DATE_COMPACT);
 				sbConcern.append(name[0]).append("_").append(fname[0]).append("_").append(bdatec.substring(6, 8))
@@ -486,7 +500,7 @@ public class Controller implements IProgressController {
 		reload();
 	}
 
-	public void changePatient(Patient object) {
+	public void changePatient(Optional<IPatient> object) {
 		if (bRestrictCurrentPatient) {
 			Text text = lucindaView.getSearchField();
 			String q = text.getText();
