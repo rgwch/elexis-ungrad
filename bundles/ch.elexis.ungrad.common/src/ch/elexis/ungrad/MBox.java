@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, G. Weirich and Elexis
+ * Copyright (c) 2023-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,6 +37,7 @@ import ch.rgw.tools.TimeTool;
 
 /**
  * Read Messages from an MBox file
+ * 
  * @author gerry
  *
  */

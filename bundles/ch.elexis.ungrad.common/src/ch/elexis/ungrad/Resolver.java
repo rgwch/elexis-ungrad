@@ -15,14 +15,16 @@ package ch.elexis.ungrad;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.interfaces.IPersistentObject;
+import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.text.Messages;
 import ch.elexis.core.ui.text.TextContainer;
 import ch.elexis.data.Kontakt;
@@ -39,7 +41,9 @@ import ch.rgw.tools.TimeTool;
  */
 public class Resolver {
 	private static Logger log = LoggerFactory.getLogger(Resolver.class);
-
+	@Reference
+	private IContextService contextService;
+	
 	Map<String, IPersistentObject> replmap;
 	boolean bAsHtml = false;
 
@@ -143,16 +147,17 @@ public class Resolver {
 	}
 
 	private IPersistentObject resolveObject(String name) {
-		IPersistentObject po = replmap.get(name);
-		if (po == null) {
+		Optional<?> po = Optional.of(replmap.get(name));
+		if (po.isEmpty()) {
 			String fqname = "ch.elexis.data." + name; //$NON-NLS-1$
 			try {
-				po = ElexisEventDispatcher.getSelected(Class.forName(fqname));
+				po = contextService.getTyped(Class.forName(fqname));
+						// ElexisEventDispatcher.getSelected(Class.forName(fqname));
 			} catch (ClassNotFoundException cfe) {
 				return null;
 			}
 		}
-		return po;
+		return (IPersistentObject) po.get();
 	}
 
 	/**

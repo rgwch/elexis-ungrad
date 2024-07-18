@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2023 by G. Weirich
+ * Copyright (c) 2022-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -40,6 +40,7 @@ import ch.rgw.tools.StringTool;
 
 /**
  * Show the user a mail templkate to edit, attach files and send
+ * 
  * @author gerry
  *
  */

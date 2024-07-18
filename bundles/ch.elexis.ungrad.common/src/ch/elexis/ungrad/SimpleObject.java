@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2023, G. Weirich and Elexis
+ * Copyright (c) 2016-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,16 +20,15 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.elexis.core.jdt.NonNull;
 import ch.rgw.tools.StringTool;
 
 public abstract class SimpleObject {
 	public abstract String[] getFields();
-	
+
 	protected Map<String, String> props = new HashMap<>();
 	protected Logger log = LoggerFactory.getLogger(getClass().getName());
-	
-	protected void load( ResultSet res){
+
+	protected void load(ResultSet res) {
 		Util.require(res != null, "ResultSet must not be null");
 		for (String field : getFields()) {
 			try {
@@ -38,18 +37,18 @@ public abstract class SimpleObject {
 				log.error("Illegal field name " + field);
 			}
 		}
-		
+
 	}
-	
-	public String dump(){
+
+	public String dump() {
 		StringBuilder sb = new StringBuilder();
 		for (String field : getFields()) {
 			sb.append(field).append(":").append(get(field)).append(",");
 		}
 		return sb.substring(0, sb.length() - 1);
 	}
-	
-	public String get(String field){
+
+	public String get(String field) {
 		Util.require(field != null, "field name must not be null");
 		for (String f : getFields()) {
 			if (f.equalsIgnoreCase(field)) {
@@ -59,15 +58,15 @@ public abstract class SimpleObject {
 		}
 		throw new Error("Internal error: Bad field requested " + field);
 	}
-	
+
 	@SuppressWarnings("null")
-	public void set(String field, String value){
+	public void set(String field, String value) {
 		Util.require(field != null, "field name must not be null");
 		Util.require(value != null, "value must not be null");
 		props.put(field.toLowerCase(), value);
 	}
-	
-	protected int compare(SimpleObject other, String field){
+
+	protected int compare(SimpleObject other, String field) {
 		if (get(field) == null) {
 			if (other.get(field) == null) {
 				return 0;
@@ -90,21 +89,21 @@ public abstract class SimpleObject {
 			}
 		}
 	}
-	
+
 	/**
-	 * Make a positive float from a string. We don't use just Float.parseFloat(), because we want to
-	 * handle:
+	 * Make a positive float from a string. We don't use just Float.parseFloat(),
+	 * because we want to handle:
 	 * <ul>
 	 * <li>, or . as dezimal separator</li>
 	 * <li>leading &lt; or &gt; symbols</li>
 	 * <li>whitespace</li>
 	 * </ul>
 	 * 
-	 * @param s
-	 *            the String to parse
-	 * @return the float (which is 0.0 or higher) or -1f if the String could not be parsed
+	 * @param s the String to parse
+	 * @return the float (which is 0.0 or higher) or -1f if the String could not be
+	 *         parsed
 	 */
-	public static float makeFloat(String raw){
+	public static float makeFloat(String raw) {
 		Util.require(raw != null, "Raw must not be null");
 		String s = raw.replaceAll("[\\s]", "");
 		if (s.startsWith("<")) {
@@ -115,8 +114,8 @@ public abstract class SimpleObject {
 			return makeFloatInternal(s);
 		}
 	}
-	
-	private static float makeFloatInternal(String s){
+
+	private static float makeFloatInternal(String s) {
 		if (s == null || s.length() == 0) {
 			return 0f;
 		} else {
