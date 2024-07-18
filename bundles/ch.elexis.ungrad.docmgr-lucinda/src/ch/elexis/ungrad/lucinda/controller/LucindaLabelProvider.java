@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -15,6 +15,8 @@
 package ch.elexis.ungrad.lucinda.controller;
 
 import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,9 +25,6 @@ import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.model.DateParser;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
-
-import java.util.List;
-import java.util.Map;
 
 public class LucindaLabelProvider extends TableLabelProvider {
 
@@ -45,7 +44,7 @@ public class LucindaLabelProvider extends TableLabelProvider {
 				cat = (String) e.get("Kategorie");//$NON-NLS-1$
 			}
 			if (StringTool.isNothing(cat)) {
-				String title = (String)e.get("title");
+				String title = (String) e.get("title");
 				if (StringTool.isNothing(title)) {
 					title = "Ohne Titel";
 				}

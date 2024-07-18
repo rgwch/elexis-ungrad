@@ -12,17 +12,17 @@ import ch.elexis.core.ui.util.SWTHelper;
 public class ChangeNameDialog extends Dialog {
 	String inputText;
 	Text input;
-	
+
 	protected ChangeNameDialog(Shell parentShell, String name) {
 		super(parentShell);
-		inputText=name;
-		
+		inputText = name;
+
 	}
 
 	@Override
 	protected void buttonPressed(int buttonId) {
-		if(buttonId==0) {
-			inputText=input.getText();
+		if (buttonId == 0) {
+			inputText = input.getText();
 		}
 		super.buttonPressed(buttonId);
 	}
@@ -35,7 +35,7 @@ public class ChangeNameDialog extends Dialog {
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		input=new Text(parent,SWT.BORDER);
+		input = new Text(parent, SWT.BORDER);
 		input.setLayoutData(SWTHelper.getFillGridData());
 		input.setText(inputText);
 		return input;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2022 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -45,7 +45,6 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;

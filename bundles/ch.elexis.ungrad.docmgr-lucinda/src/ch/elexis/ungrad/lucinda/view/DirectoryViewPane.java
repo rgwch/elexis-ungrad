@@ -42,7 +42,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.util.SWTHelper;
-import ch.elexis.data.Patient;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.common.ui.MailUI;
 import ch.elexis.ungrad.lucinda.Preferences;

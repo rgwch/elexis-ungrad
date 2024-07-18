@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -16,7 +16,6 @@ package ch.elexis.ungrad.lucinda.view;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
@@ -48,17 +47,22 @@ public class LucindaPrefs extends FieldEditorPreferencePage implements IWorkbenc
 		addField(new StringFieldEditor(Preferences.SERVER_PORT, Messages.LucindaPrefs_serverPort,
 				getFieldEditorParent()));
 		addField(new IntegerFieldEditor(Preferences.MAXIMUM_HITS, "maximum hit count", getFieldEditorParent()));
-		// addField(new FileFieldEditor(Preferences.AQUIRE_ACTION_SCRIPT, "Aquire script", getFieldEditorParent()));
-		addField(new MultilineFieldEditor(Preferences.AQUIRE_ACTION_SCRIPTS, "Einlese-Scripts", getFieldEditorParent()));
-		/* addField(new StringFieldEditor(Preferences.DOCUMENT_STORE, Messages.LucindaPrefs_documentStore,
-				getFieldEditorParent())); */
+		// addField(new FileFieldEditor(Preferences.AQUIRE_ACTION_SCRIPT, "Aquire
+		// script", getFieldEditorParent()));
+		addField(
+				new MultilineFieldEditor(Preferences.AQUIRE_ACTION_SCRIPTS, "Einlese-Scripts", getFieldEditorParent()));
+		/*
+		 * addField(new StringFieldEditor(Preferences.DOCUMENT_STORE,
+		 * Messages.LucindaPrefs_documentStore, getFieldEditorParent()));
+		 */
 		addField(new MultilineFieldEditor(Preferences.EXCLUDEMETA, Messages.LucindaPrefs_exclude_Metadata, 5, 0, true,
 				getFieldEditorParent()));
 		// addField(new MultilineFieldEditor(Preferences.MACROS, "Makros für das
 		// Suchfeld", 5,0,true,getFieldEditorParent()));
-		addField(new StringFieldEditor(Preferences.DEFAULT_MAILSUBJECT,"Mail Betreff", getFieldEditorParent()));
+		addField(new StringFieldEditor(Preferences.DEFAULT_MAILSUBJECT, "Mail Betreff", getFieldEditorParent()));
 		addField(new MultilineFieldEditor(Preferences.DEFAULT_MAILBODY, "Mail Text", getFieldEditorParent()));
-		addField(new BooleanFieldEditor(Preferences.COMMON_DIRECTORY, "Ungrad-Dokumenten-Verzeichnis verwenden (Neustart nötig)", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(Preferences.COMMON_DIRECTORY,
+				"Ungrad-Dokumenten-Verzeichnis verwenden (Neustart nötig)", getFieldEditorParent()));
 
 	}
 

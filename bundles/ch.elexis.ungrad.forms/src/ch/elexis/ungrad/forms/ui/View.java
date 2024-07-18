@@ -37,13 +37,11 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.e4.util.CoreUiUtil;
-import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;

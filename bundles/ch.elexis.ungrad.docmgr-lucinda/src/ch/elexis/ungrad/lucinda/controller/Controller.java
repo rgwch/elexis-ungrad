@@ -15,10 +15,15 @@
 package ch.elexis.ungrad.lucinda.controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -26,17 +31,25 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.program.Program;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.text.model.Samdas;
@@ -76,10 +89,9 @@ public class Controller implements IProgressController {
 	private Logger log = LoggerFactory.getLogger(Controller.class);
 	Composite envelope;
 	StackLayout stack = new StackLayout();
-	
+
 	@Reference
 	private IContextService contextService;
-	
 
 	public Controller() {
 		lucinda = new Lucinda();
@@ -224,7 +236,7 @@ public class Controller implements IProgressController {
 		if (bRestrictCurrentPatient) {
 			Optional<IPatient> oPat = contextService.getActivePatient();
 			if (oPat.isPresent()) {
-				IPatient pat=oPat.get();
+				IPatient pat = oPat.get();
 				q.append("+concern:").append(pat.getLastName().replaceAll(" ", "_")).append("_")
 						.append(pat.getFirstName().replaceAll(" ", "_")).append("_")
 						.append(pat.getDateOfBirth().toLocalDate().toString());
@@ -284,7 +296,7 @@ public class Controller implements IProgressController {
 				contextService.setTyped(pat);
 				contextService.setTyped(fall);
 				contextService.setTyped(kons);
-				
+
 				// ElexisEventDispatcher.fireSelectionEvents(pat, fall, kons);
 			} else {
 				SWTHelper.showError(Messages.Controller_cons_not_found_caption,
@@ -378,7 +390,7 @@ public class Controller implements IProgressController {
 			if (oPat.isEmpty()) {
 				throw new Exception("No patient selected");
 			} else {
-				IPatient pat=oPat.get();
+				IPatient pat = oPat.get();
 				String[] name = pat.getLastName().split("[ -]+");
 				String[] fname = pat.getFirstName().split("[ -]+");
 				TimeTool bdate = new TimeTool(pat.getDateOfBirth());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-
 
 public class ContentProvider implements IStructuredContentProvider {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2022 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -105,11 +105,11 @@ public class GlobalViewPane extends Composite {
 			detail.setInput(element);
 		}
 	}
-/*
-	public void setConnected(boolean bConnected) {
-		master.setConnected(bConnected);
-	}
-*/
+
+	/*
+	 * public void setConnected(boolean bConnected) {
+	 * master.setConnected(bConnected); }
+	 */
 	public Text getSearchField() {
 		return master.getSearchField();
 	}

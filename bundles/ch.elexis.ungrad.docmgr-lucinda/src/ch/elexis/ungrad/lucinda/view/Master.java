@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2022 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -61,8 +61,8 @@ public class Detail extends Composite {
 
 		tv.setContentProvider(new IStructuredContentProvider() {
 			/*
-			 * We'll recheck exclusions on every changed object, in case the
-			 * user edited the list
+			 * We'll recheck exclusions on every changed object, in case the user edited the
+			 * list
 			 */
 			@Override
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
@@ -76,7 +76,7 @@ public class Detail extends Composite {
 			@SuppressWarnings("unchecked")
 			@Override
 			public Object[] getElements(Object inputElement) {
-				Map<String,Object> el = (Map<String,Object>) inputElement;
+				Map<String, Object> el = (Map<String, Object>) inputElement;
 				Stream<Entry<String, Object>> filtered = el.entrySet().stream().filter(e -> isNotExcluded(e));
 				return filtered.toArray();
 			}

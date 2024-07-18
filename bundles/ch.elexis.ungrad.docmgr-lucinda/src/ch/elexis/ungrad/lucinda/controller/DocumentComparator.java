@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2022 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -25,19 +25,19 @@ public class DocumentComparator extends ViewerComparator {
 	int index;
 	boolean bIncreasing;
 	boolean isDate;
-	
-	public DocumentComparator(int index, boolean bIncreasing, boolean isDate){
+
+	public DocumentComparator(int index, boolean bIncreasing, boolean isDate) {
 		this.index = index;
 		this.bIncreasing = bIncreasing;
 		this.isDate = isDate;
 	}
-	
+
 	@Override
-	public int compare(Viewer viewer, Object e1, Object e2){
-		String s1 = ((TableLabelProvider) ((TableViewer) viewer).getLabelProvider())
-			.getColumnText(e1, index).toLowerCase();
-		String s2 = ((TableLabelProvider) ((TableViewer) viewer).getLabelProvider())
-			.getColumnText(e2, index).toLowerCase();
+	public int compare(Viewer viewer, Object e1, Object e2) {
+		String s1 = ((TableLabelProvider) ((TableViewer) viewer).getLabelProvider()).getColumnText(e1, index)
+				.toLowerCase();
+		String s2 = ((TableLabelProvider) ((TableViewer) viewer).getLabelProvider()).getColumnText(e2, index)
+				.toLowerCase();
 		if (isDate) {
 			TimeTool t1 = new TimeTool(s1);
 			TimeTool t2 = new TimeTool(s2);
@@ -54,5 +54,5 @@ public class DocumentComparator extends ViewerComparator {
 			}
 		}
 	}
-	
+
 }
