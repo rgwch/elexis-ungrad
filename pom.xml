@@ -92,5 +92,6 @@
     <modules>
         <module>features</module>
         <module>bundles</module>
+        <module>ch.elexis.ungrad.p2site</module>
     </modules>
 </project>
