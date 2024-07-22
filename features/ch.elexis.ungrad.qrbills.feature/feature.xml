@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature
-      id="ch.elexis.ungrad.qrbills.feature"
-      label="Tarmed Bills with QR"
-      version="1.0.2.qualifier"
-      provider-name="weirich@elexis.ch">
+<feature id="ch.elexis.ungrad.qrbills.feature" label="Tarmed Bills with QR" version="1.0.2.qualifier" provider-name="weirich@elexis.ch">
 
    <description url="http://www.example.com/description">
       Print Bills conforming to the iso 20022 QR-Standard
@@ -20,22 +16,15 @@
    <requires>
       <import plugin="ch.elexis.core.data" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="ch.rgw.utility" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="ch.elexis.ungrad.branding" version="0.1.0" match="greaterOrEqual"/>
       <import plugin="ch.elexis.base.ch.arzttarife" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui" version="3.108.1" match="greaterOrEqual"/>
       <import plugin="ch.elexis.core.ui" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.ui.forms" version="3.7.1" match="greaterOrEqual"/>
       <import plugin="ch.elexis.base.ch.ebanking" version="3.2.0" match="greaterOrEqual"/>
-      <import feature="ch.elexis.ungrad.branding.feature" version="1.0.0.qualifier"/>
       <import plugin="ch.elexis.ungrad.pdf"/>
    </requires>
 
-   <plugin
-         id="ch.elexis.ungrad.qrbills"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+   <plugin id="ch.elexis.ungrad.qrbills" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
 </feature>

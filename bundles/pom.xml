@@ -12,5 +12,12 @@
     </parent>
     <modules>
         <module>ch.elexis.ungrad.common</module>
+        <module>ch.elexis.ungrad.pdf</module>
+        <module>ch.elexis.ungrad.forms</module>
+        <module>ch.elexis.ungrad.labview</module>
+        <module>ch.elexis.ungrad.qrbills</module>
+        <module>ch.elexis.ungrad.docmgr-lucinda</module>
+        <module>ch.elexis.ungrad.inbox</module>
+        <module>ch.elexis.ungrad.labenter</module>
     </modules>
 </project>

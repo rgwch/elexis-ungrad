@@ -12,6 +12,12 @@
     </parent>
     <modules>
         <module>ch.elexis.ungrad.common.feature</module>
-
+        <module>ch.elexis.ungrad.pdf.feature</module>
+        <module>ch.elexis.ungrad.forms.feature</module>
+        <module>ch.elexis.ungrad.labview.feature</module>
+        <module>ch.elexis.ungrad.qrbills.feature</module>
+        <module>ch.elexis.ungrad.docmgr-lucinda.feature</module>
+        <module>ch.elexis.ungrad.inbox.feature</module>
+        <module>ch.elexis.ungrad.labenter.feature</module>
     </modules>
 </project>

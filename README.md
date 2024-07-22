@@ -1,10 +1,12 @@
-# elexis-ungrad
+# elexis-ungrad 2024
 
-Some more experimental and strictly OpenSource'd extensions from the original creator of Elexis. More informations at [www.elexis.ch/ungrad](http://www.elexis.ch/ungrad) 
+Some more experimental and strictly OpenSource'd extensions from the original creator of Elexis. 
+
+Note st
 
 ## Current branches:
 
-* ungrad2022 - Latest stable branch. Will always compile and work
+* ungrad2023 - Latest stable branch. Will always compile and work
 * master - Development branch. Will not always compile and mostly not work flawless
 
 
