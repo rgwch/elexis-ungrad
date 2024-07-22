@@ -6,10 +6,22 @@
     <packaging>pom</packaging>
 
     <properties>
-        <tycho.version>4.0.8</tycho.version>
+        <tycho.version>3.0.5</tycho.version>
+        <elexis.target>2023-09-java17</elexis.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
+    <repositories>
+        <repository>
+            <id>elexis.3.target</id>
+            <url>https://download.elexis.info/elexis/target/${elexis.target}/</url>
+            <layout>p2</layout>
+        </repository>
+        <repository>
+            <id>elexis-3-core</id>
+            <url>file:../elexis-3-core/ch.elexis.core.p2site/target/repository</url>
+            <layout>p2</layout>
+        </repository>
+    </repositories>
     <build>
         <pluginManagement>
             <plugins>
@@ -48,9 +60,6 @@
                 <artifactId>target-platform-configuration</artifactId>
                 <version>${tycho.version}</version>
                 <configuration>
-                    <target>
-                        <file>../elexis-3-core/ch.elexis.target/ide.target</file>
-                    </target>
                     <!-- Optional set the Java version you are using-->
                     <executionEnvironment>JavaSE-17</executionEnvironment>
                     <environments>
@@ -75,7 +84,7 @@
         </plugins>
     </build>
     <modules>
-        <!-- module>features</module>
-        <module>bundles</module -->
+        <!-- module>features</module -->
+        <module>bundles</module>
     </modules>
 </project>
