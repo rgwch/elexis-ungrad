@@ -1,0 +1,1 @@
+mvn clean verify -Dpolyglot.dump.pom=pom-for-review.xml
