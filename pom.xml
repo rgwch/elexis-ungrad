@@ -84,7 +84,7 @@
         </plugins>
     </build>
     <modules>
-        <!-- module>features</module -->
+        <module>features</module>
         <module>bundles</module>
     </modules>
 </project>

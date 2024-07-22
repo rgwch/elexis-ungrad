@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature
-      id="ch.elexis.ungrad-common.feature"
-      label="Ungrad-common-feature"
-      version="1.0.0.qualifier"
-      provider-name="G. Weirich">
+<feature id="ch.elexis.ungrad-common.feature" label="Ungrad-common-feature" version="1.0.0.qualifier" provider-name="G. Weirich">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
@@ -17,11 +13,6 @@
       [Enter License Description here.]
    </license>
 
-   <plugin
-         id="ch.elexis.ungrad-common"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+   <plugin id="ch.elexis.ungrad.common" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
 </feature>
