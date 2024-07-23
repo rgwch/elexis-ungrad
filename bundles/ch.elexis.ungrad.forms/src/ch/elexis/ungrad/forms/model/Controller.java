@@ -28,15 +28,11 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
-import org.osgi.service.component.annotations.Reference;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.lock.types.LockResponse;
-import ch.elexis.core.model.IContact;
 import ch.elexis.core.model.IPatient;
-import ch.elexis.core.model.IPerson;
 import ch.elexis.core.model.IUser;
 import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.IContextService;
@@ -48,8 +44,6 @@ import ch.elexis.data.Anwender;
 import ch.elexis.data.Brief;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Kontakt;
-import ch.elexis.data.Patient;
-import ch.elexis.data.Person;
 import ch.elexis.data.Query;
 import ch.elexis.data.User;
 import ch.elexis.ungrad.StorageController;
@@ -61,7 +55,6 @@ import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
-
 /**
  * Handle forms
  * 
@@ -70,10 +63,9 @@ import ch.rgw.tools.TimeTool;
  */
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
 
-	
-	IContextService contextService=ContextServiceHolder.get();
+	IContextService contextService = ContextServiceHolder.get();
 	StorageController sc = new StorageController();
-	IConfigService cfg=ConfigServiceHolder.get();
+	IConfigService cfg = ConfigServiceHolder.get();
 
 	/* CoontentProvider */
 	@Override
@@ -272,31 +264,32 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		if (briefTitle.matches("A_[0-9]{4,4}-[0-1][0-9]-[0-3][0-9]_.+")) {
 			briefTitle = briefTitle.substring(13);
 		}
-		IUser user=contextService.getActiveUser().get();
-		User u=User.load(user.getId());
-		Anwender actUser=u.getAssignedContact();
-		Konsultation current = (Konsultation) ElexisEventDispatcher.getInstance().getSelected(Konsultation.class);
-		Brief metadata = new Brief(briefTitle, new TimeTool(), actUser, adressat, current, "Formular");
+		IUser user = contextService.getActiveUser().get();
+		User u = User.load(user.getId());
+		Anwender actUser = u.getAssignedContact();
+		Optional<Konsultation> current = contextService.getTyped(Konsultation.class);
+		Brief metadata = new Brief(briefTitle, new TimeTool(), actUser, adressat, current.get(), "Formular");
 		metadata.save(FileTool.readFile(new File(filepath)), "pdf");
-		addFormToKons(metadata, current);
+		addFormToKons(metadata, current.get());
 		return metadata;
 	}
 
 	private void addFormToKons(final Brief brief, final Konsultation kons) {
 		if (kons != null) {
 			LockResponse lr = LocalLockServiceHolder.get().acquireLockBlocking(kons, 1, new NullProgressMonitor());
-			
+
 			if (lr.isOk()) {
 				String label = "[ " + brief.getLabel().replace("_", " ") + " ]"; //$NON-NLS-1$ //$NON-NLS-2$
 				// kons.addXRef(XRefExtensionConstants.providerID, brief.getId(), -1, label);
 				kons.addXRef(Activator.KonsXRef, brief.getId(), -1, label);
 				LocalLockServiceHolder.get().releaseLock(kons);
-			}	
+			}
 		}
 	}
 
 	/**
 	 * Launch the configured pug compiler with a pug template to process
+	 * 
 	 * @param pug The pug template
 	 * @param the working directory
 	 * @return the html as created by the pug compiler
@@ -314,7 +307,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		OutputStreamWriter ow = new OutputStreamWriter(process.getOutputStream());
 		ow.write(pug);
 //		ow.flush();
- 		ow.close();
+		ow.close();
 		String line;
 		StringBuilder sb = new StringBuilder();
 		StringBuilder serr = new StringBuilder();
@@ -392,11 +385,11 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 
 		});
 	}
-	
-	public void signPDF(File pdfFile) throws Exception{
-		Signer signer=new Signer();
-		String imgFile=CoreHub.localCfg.get(PreferenceConstants.SIGNATURE, null);
-		if(imgFile!=null) {
+
+	public void signPDF(File pdfFile) throws Exception {
+		Signer signer = new Signer();
+		String imgFile = CoreHub.localCfg.get(PreferenceConstants.SIGNATURE, null);
+		if (imgFile != null) {
 			signer.sign(pdfFile.getAbsolutePath(), imgFile, 10, 10);
 		}
 	}

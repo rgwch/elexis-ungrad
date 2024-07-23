@@ -25,8 +25,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.model.IPatient;
+import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.common.ui.MailUI;
@@ -40,7 +41,8 @@ import ch.rgw.tools.ExHandler;
 public class DocumentList extends Composite {
 	private TableViewer tv;
 	private Controller controller;
-
+	private IContextService contextService=ContextServiceHolder.get();
+	
 	public DocumentList(Composite parent, Controller controller) {
 		super(parent, SWT.NONE);
 		this.controller = controller;
@@ -57,7 +59,7 @@ public class DocumentList extends Composite {
 			}
 
 		});
-		tv.setInput(ElexisEventDispatcher.getSelectedPatient());
+		tv.setInput(contextService.getActivePatient());
 		tv.getControl().setLayoutData(SWTHelper.getFillGridData());
 
 	}
