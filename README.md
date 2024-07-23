@@ -3,34 +3,23 @@
 Some more experimental and strictly OpenSource'd extensions from the original creator of Elexis. 
 
 Beginning with this branch, ungrad-2024, The Elexis Ungrad pkugins are built against Branch 3.12 of https://github.com/elexis/elexis-3-core and https://github.com/elexis/elexis-3-base.
+
 The repositories https://github.com/rgwch/elexis-3-core and https://github.com/rgwch/elexis-3-base are obsolete.
-
-## Current branches:
-
-* ungrad2023 - Latest stable branch. Will always compile and work
-* master - Development branch. Will not always compile and mostly not work flawless
-
 
 
 ## Build:
 
-Prerequisites: Git, Java-sdk8, Maven 3.6.x; Linux or Windows recommended. MacOS will be a bit tricky,
-You'll need also the [elexis-3-core](https://github.com/rgwch/elexis-3-core) and [elexis-3-base](https://github.com/rgwch/elexis-3-core) already built.
+Prerequisites: Git, jdk17, Maven 3.6.x; Linux or Windows recommended. MacOS will be a bit tricky,
+You'll need also the [elexis-3-core](https://github.com/elexis/elexis-3-core) and [elexis-3-base](https://github.com/elexis/elexis-3-core) already built.
 
 i.e._
 
 ```bash
-git clone -b ungrad2022 elexis-3-core
-cd elexis-3-core
-./build.sh
-cd ..
-git clone -b ungrad2022 elexis-3-base
-cd elexis-3-base
-./build.sh
-cd ..
-git clone -b ungrad2022 elexis-ungrad
+git clone -b 3.12 https://github.com/elexis/elexis-3-core
+git clone -b 3.12 https://github.com/elexis/elexis-3-base
+git clone -b ungrad-2024 https://github.com/rgwch/elexis-ungrad
 cd elexis-ungrad
-./build.sh
+./build-all.sh
 
 ```
 
