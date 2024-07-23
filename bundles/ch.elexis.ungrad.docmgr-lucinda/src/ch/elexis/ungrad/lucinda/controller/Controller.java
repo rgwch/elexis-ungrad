@@ -41,6 +41,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
@@ -94,8 +95,8 @@ public class Controller implements IProgressController {
 	@Reference
 	private IContextService contextService=ContextServiceHolder.get();
 
-	public TableViewer getViewer() {
-		return viewer;
+	public Control getTopControl() {
+		return envelope;
 	}
 	public Controller() {
 		lucinda = new Lucinda();

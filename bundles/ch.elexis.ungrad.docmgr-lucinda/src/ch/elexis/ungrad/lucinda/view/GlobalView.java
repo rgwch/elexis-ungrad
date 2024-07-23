@@ -47,7 +47,6 @@ import org.eclipse.ui.part.ViewPart;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IConfigService;
-import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.e4.util.CoreUiUtil;
 import ch.elexis.core.ui.icons.Images;
@@ -73,7 +72,13 @@ public class GlobalView extends ViewPart {
 	@Inject
 	private IConfigService cfg;
 
-	
+	@Inject
+	void selectedPatient(@Optional IPatient pat) {
+		CoreUiUtil.runAsyncIfActive(() -> {
+			controller.changePatient(java.util.Optional.of(pat));
+		}, controller.getTopControl());
+	}
+
 	public GlobalView() {
 		controller = new Controller();
 		addons = Activator.getDefault().getAddons();
