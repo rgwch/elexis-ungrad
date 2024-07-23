@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.text.model.Samdas;
@@ -91,8 +92,11 @@ public class Controller implements IProgressController {
 	StackLayout stack = new StackLayout();
 
 	@Reference
-	private IContextService contextService;
+	private IContextService contextService=ContextServiceHolder.get();
 
+	public TableViewer getViewer() {
+		return viewer;
+	}
 	public Controller() {
 		lucinda = new Lucinda();
 		bRestrictCurrentPatient = Boolean

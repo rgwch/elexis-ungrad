@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -41,6 +43,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.model.IPatient;
+import ch.elexis.core.ui.e4.util.CoreUiUtil;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.common.ui.MailUI;
@@ -65,6 +68,14 @@ public class DirectoryViewPane extends Composite {
 	private TableViewer tv;
 	private DirectoryContentProvider dcp = new DirectoryContentProvider();
 	private StorageController sc = new StorageController();
+	
+	@Inject
+	void selectedPatient(Optional<IPatient> pat) {
+		CoreUiUtil.runAsyncIfActive(() -> {
+			setPatient(pat);
+		}, table);
+	}
+
 
 	public DirectoryViewPane(Composite parent) {
 		super(parent, SWT.NONE);

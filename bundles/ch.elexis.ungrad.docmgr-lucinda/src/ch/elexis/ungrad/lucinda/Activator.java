@@ -23,6 +23,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import ch.elexis.core.data.util.Extensions;
+import ch.elexis.core.ui.e4.util.CoreUiUtil;
 
 
 /**
@@ -43,6 +44,7 @@ public class Activator extends AbstractUIPlugin {
 	 * The constructor
 	 */
 	public Activator() {
+		
 	}
 
 	/*
