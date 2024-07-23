@@ -2,7 +2,8 @@
 
 Some more experimental and strictly OpenSource'd extensions from the original creator of Elexis. 
 
-Note st
+Beginning with this branch, ungrad-2024, The Elexis Ungrad pkugins are built against Branch 3.12 of https://github.com/elexis/elexis-3-core and https://github.com/elexis/elexis-3-base.
+The repositories https://github.com/rgwch/elexis-3-core and https://github.com/rgwch/elexis-3-base are obsolete.
 
 ## Current branches:
 
