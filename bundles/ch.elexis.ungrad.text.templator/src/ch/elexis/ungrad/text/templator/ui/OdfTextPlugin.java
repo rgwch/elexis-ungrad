@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2022, G. Weirich and Elexis
+ * Copyright (c) 2022-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,20 +14,16 @@ package ch.elexis.ungrad.text.templator.ui;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Map;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.swt.widgets.Composite;
-
-import ch.elexis.core.data.interfaces.text.ReplaceCallback;
-import ch.elexis.core.ui.text.ITextPlugin2;
-import ch.elexis.core.ui.text.MimeTypeUtil;
+import ch.elexis.core.text.ITextPlugin;
+import ch.elexis.core.text.MimeTypeUtil;
+import ch.elexis.core.text.ReplaceCallback;
+import ch.elexis.core.ui.text.ITextPlugin.ICallback;
 import ch.elexis.core.ui.util.SWTHelper;
-import ch.elexis.data.Brief;
 import ch.elexis.ungrad.text.templator.model.ODFDoc;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
@@ -39,29 +35,20 @@ import ch.rgw.tools.ExHandler;
  * @author gerry
  *
  */
-public class OdfTextPlugin implements ITextPlugin2 {
+public class OdfTextPlugin implements ITextPlugin {
 	// private Map<String, String> fields;
 	private ODFDoc doc = new ODFDoc();
 	private OdfTemplateFieldsDisplay display;
 	private ICallback saveHandler;
 
+	/*
 	@Override
 	public Composite createContainer(Composite parent, ICallback handler) {
 		display = new OdfTemplateFieldsDisplay(parent, handler);
 		saveHandler = handler;
 		return display;
 	}
-
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void dispose() {
-		clear();
-	}
+*/
 
 	@Override
 	public boolean createEmptyDocument() {
@@ -85,7 +72,7 @@ public class OdfTextPlugin implements ITextPlugin2 {
 	/**
 	 * Load a letter or a template. Since we get a reference to a "Brief", wie have
 	 * access to informations like title and recipient
-	 */
+	 
 	@Override
 	public boolean loadFromBrief(Brief brief, boolean asTemplate) {
 		try {
@@ -106,7 +93,7 @@ public class OdfTextPlugin implements ITextPlugin2 {
 		}
 		return false;
 	}
-
+*/
 	@Override
 	public boolean loadFromStream(InputStream is, boolean asTemplate) {
 		try {
@@ -154,11 +141,6 @@ public class OdfTextPlugin implements ITextPlugin2 {
 		}
 	}
 
-	@Override
-	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished) {
-		// doc.doOutput();
-		return false;
-	}
 
 	@Override
 	public boolean insertTable(String place, int properties, String[][] contents, int[] columnSizes) {
@@ -222,12 +204,7 @@ public class OdfTextPlugin implements ITextPlugin2 {
 		return MimeTypeUtil.MIME_TYPE_OPENOFFICE;
 	}
 
-	@Override
-	public boolean isDirectOutput() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
+	
 	@Override
 	public PageFormat getFormat() {
 		return PageFormat.A4;
@@ -245,34 +222,23 @@ public class OdfTextPlugin implements ITextPlugin2 {
 
 	}
 
-	@Override
-	public void initTemplatePrintSettings(String template) {
+	
+		@Override
+	public int findCount(String text) {
 		// TODO Auto-generated method stub
-
+		return 0;
 	}
 
 	@Override
-	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2) throws CoreException {
+	public List<String> findMatching(String pattern) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 	@Override
-	public void showMenu(boolean b) {
+	public Object getCurrentDocument() {
 		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void showToolbar(boolean b) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setSaveOnFocusLost(boolean bSave) {
-		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2022, G. Weirich and Elexis
+ * Copyright (c) 2022-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ package ch.elexis.ungrad.text.templator.model;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +26,8 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Brief;
 import ch.elexis.data.Kontakt;
@@ -42,13 +42,14 @@ public class ODFDoc {
 	private byte[] template;
 	private String title;
 	private boolean bExternal = false;
+	private IContextService ctx = ContextServiceHolder.get();
 
 	public void clear() {
 		fields.clear();
 	}
 
 	/**
-	 * Load a Tenplate from an Elexis "Brief", i.e. from the default ouitgoing doc
+	 * Load a Tenplate from an Elexis "Brief", i.e. from the default outgoing doc
 	 * storage
 	 * 
 	 * @param brief
@@ -135,7 +136,7 @@ public class ODFDoc {
 	public void setTemplate(byte[] template, String title) {
 		this.template = template;
 		fields.clear();
-		this.title=title;
+		this.title = title;
 		bExternal = true;
 	}
 
@@ -210,7 +211,7 @@ public class ODFDoc {
 	public boolean doOutput() {
 		try {
 			StorageController sc = new StorageController();
-			File output = sc.createFile(ElexisEventDispatcher.getSelectedPatient(), title + ".odt");
+			File output = sc.createFileFor(ctx.getActivePatient().get().getId(), title + ".odt");
 			if (!bExternal || !output.exists()) {
 				byte[] contents = asByteArray();
 				FileTool.writeFile(output, contents);
