@@ -15,6 +15,8 @@ package ch.elexis.ungrad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.elexis.core.model.IPerson;
+import ch.elexis.core.types.Gender;
 import ch.elexis.data.Person;
 
 public class Util {
@@ -28,8 +30,8 @@ public class Util {
 		}
 	}
 
-	public static final boolean isFemale(Person p) {
-		if (p.getGeschlecht().equalsIgnoreCase("m")) {
+	public static final boolean isFemale(IPerson p) {
+		if (p.getGender().equals(Gender.MALE)) {
 			return false;
 		}
 		return true;

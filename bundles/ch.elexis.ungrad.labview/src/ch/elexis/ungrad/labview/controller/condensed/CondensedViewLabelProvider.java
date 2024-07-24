@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -13,6 +13,8 @@
  *********************************************************************************/
 package ch.elexis.ungrad.labview.controller.condensed;
 
+import java.util.Optional;
+
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -23,6 +25,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.model.IPatient;
+import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.labview.model.Bucket;
@@ -45,6 +50,7 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 	LabSummaryTreeColumns ltc;
 	int columnIndex;
 	Color black, red;
+	private IContextService contextService=ContextServiceHolder.get();
 	
 	public CondensedViewLabelProvider(LabSummaryTreeColumns ltc, int column){
 		// standard = ltc.getDefaultFont();
@@ -64,7 +70,7 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 	
 	@Override
 	protected void paint(Event event, Object element){
-		Patient actPat = ElexisEventDispatcher.getSelectedPatient();
+		Optional<IPatient> actPat = contextService.getActivePatient();
 		if (element instanceof LabResultsRow) {
 			LabResultsSheet sheet = ltc.getLabResultsSheet();
 			LabResultsRow results = (LabResultsRow) element;
@@ -85,14 +91,14 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 				event.gc.drawText("??", ct.x, ct.y);
 				return;
 			}
-			if (bucket != null) {
+			if (bucket != null && actPat.isPresent()) {
 				GC gc = event.gc;
 				Rectangle bounds = event.getBounds();
 				bounds.width = ltc.getColumnWidth(columnIndex);
 				String avg = bucket.getAverageResult();
 				gc.setFont(ltc.getDefaultFont());
 				Rectangle rCenter = centerText(gc, bounds, avg);
-				gc.setForeground(item.isPathologic(actPat, avg) ? red : black);
+				gc.setForeground(item.isPathologic(actPat.get(), avg) ? red : black);
 				//gc.setBackground(((TreeItem)event.item)..getBackground(columnIndex));
 				
 				gc.drawText(avg, bounds.x + rCenter.x, bounds.y + rCenter.y);
@@ -107,13 +113,13 @@ public class CondensedViewLabelProvider extends OwnerDrawLabelProvider {
 					float remainingSpace = trailingSpace - (float) ptRight.x;
 					float xOffset = (float) bounds.x + (float) rCenter.x + (float) rCenter.width
 						+ (remainingSpace / 2f);
-					gc.setForeground(item.isPathologic(actPat, right) ? red : black);
+					gc.setForeground(item.isPathologic(actPat.get(), right) ? red : black);
 					gc.drawText(right, Math.round(xOffset), bounds.y + rCenter.y + yOffset);
 					String left = bucket.getMinResult();
 					Point ptLeft = gc.stringExtent(left);
 					float leadingSpace = rCenter.x - ptLeft.x;
 					xOffset = leadingSpace / 2;
-					gc.setForeground(item.isPathologic(actPat, left) ? red : black);
+					gc.setForeground(item.isPathologic(actPat.get(), left) ? red : black);
 					gc.drawText(left, Math.round((float) bounds.x + xOffset),
 						bounds.y + rCenter.y + yOffset);
 				}

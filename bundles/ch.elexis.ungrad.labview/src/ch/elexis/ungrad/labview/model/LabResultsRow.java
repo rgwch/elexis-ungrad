@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -16,15 +16,16 @@ package ch.elexis.ungrad.labview.model;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import ch.elexis.core.model.IPatient;
 import ch.elexis.data.Patient;
 import ch.rgw.tools.TimeTool;
 
 public class LabResultsRow implements Comparable<LabResultsRow> {
 	Item item;
-	Patient patient;
+	IPatient patient;
 	SortedSet<Result> results;
 	
-	public LabResultsRow(Item item, Patient pat){
+	public LabResultsRow(Item item, IPatient pat){
 		this.item = item;
 		results = new TreeSet<>();
 		this.patient = pat;
@@ -59,7 +60,7 @@ public class LabResultsRow implements Comparable<LabResultsRow> {
 		return item;
 	}
 	
-	public Patient getPatient(){
+	public IPatient getPatient(){
 		return patient;
 	}
 	

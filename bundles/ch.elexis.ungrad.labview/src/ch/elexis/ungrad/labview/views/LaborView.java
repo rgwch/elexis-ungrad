@@ -15,8 +15,11 @@ package ch.elexis.ungrad.labview.views;
 
 import java.net.URL;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -33,11 +36,15 @@ import org.osgi.framework.FrameworkUtil;
 
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.exceptions.ElexisException;
+import ch.elexis.core.model.IPatient;
+import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.constants.ExtensionPointConstantsUi;
+import ch.elexis.core.ui.e4.util.CoreUiUtil;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.Importer;
@@ -49,25 +56,37 @@ import ch.elexis.ungrad.labview.controller.Controller;
 public class LaborView extends ViewPart implements IActivationListener {
 	Controller controller = new Controller(this);
 	Log log = Log.get("LaborView");
+	CTabFolder cTabFolder;
+	private IContextService ctx = ContextServiceHolder.get();
 	private Action exportHtmlAction, viewInBrowserAction, importAction, removeEmptyItemsAction;
-	
-	private final ElexisUiEventListenerImpl eeli_pat =
-		new ElexisUiEventListenerImpl(Patient.class, ElexisEvent.EVENT_SELECTED) {
-			
-			@Override
-			public void runInUi(ElexisEvent ev){
+
+	@Inject
+	void activePatient(@Optional IPatient patient) {
+		CoreUiUtil.runAsyncIfActive(() -> {
+			if (patient != null) {
 				try {
-					controller.setPatient((Patient) ev.getObject());
+					controller.setPatient(patient);
 				} catch (ElexisException e) {
-					log.log(e, "error loading patient data", Log.ERRORS);
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
-			
-		};
-	
+		}, cTabFolder);
+	}
+
+	/*
+	 * private final ElexisUiEventListenerImpl eeli_pat = new
+	 * ElexisUiEventListenerImpl(Patient.class, ElexisEvent.EVENT_SELECTED) {
+	 * 
+	 * @Override public void runInUi(ElexisEvent ev){ try {
+	 * controller.setPatient((Patient) ev.getObject()); } catch (ElexisException e)
+	 * { log.log(e, "error loading patient data", Log.ERRORS); } }
+	 * 
+	 * };
+	 */
 	@Override
-	public void createPartControl(Composite parent){
-		CTabFolder cTabFolder = new CTabFolder(parent, SWT.BOTTOM);
+	public void createPartControl(Composite parent) {
+		cTabFolder = new CTabFolder(parent, SWT.BOTTOM);
 		cTabFolder.setLayoutData(SWTHelper.getFillGridData());
 		CTabItem ctSmart = new CTabItem(cTabFolder, SWT.NONE);
 		ctSmart.setText("Kompakt");
@@ -87,77 +106,74 @@ public class LaborView extends ViewPart implements IActivationListener {
 		GlobalEventDispatcher.addActivationListener(this, this);
 		controller.loadState();
 	}
-	
-	private void contributeToActionBars(){
+
+	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
 		fillLocalToolBar(bars.getToolBarManager());
 	}
-	
-	private void fillLocalToolBar(IToolBarManager manager){
+
+	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(exportHtmlAction);
 		manager.add(viewInBrowserAction);
 		manager.add(importAction);
-		//manager.add(removeEmptyItemsAction);
+		// manager.add(removeEmptyItemsAction);
 	}
-	
-	private void fillLocalPullDown(IMenuManager manager){
+
+	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(exportHtmlAction);
 		manager.add(removeEmptyItemsAction);
 	}
-	
+
 	@Override
-	public void setFocus(){
+	public void setFocus() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	public void visible(final boolean mode){
+
+	public void visible(final boolean mode) {
 		try {
-			controller.setPatient(ElexisEventDispatcher.getSelectedPatient());
+			controller.setPatient(ctx.getActivePatient().orElseGet(() -> null));
 		} catch (ElexisException e) {
 			log.log(e, "error loading patient data", Log.ERRORS);
 		}
-		if (mode) {
-			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
-		} else {
-			ElexisEventDispatcher.getInstance().removeListeners(eeli_pat);
+		if (!mode) {
 			controller.saveState();
 		}
 	}
-	
+
 	@Override
-	public void activation(boolean mode){
+	public void activation(boolean mode) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
-	public void dispose(){
+	public void dispose() {
 		controller.dispose();
 	}
-	
-	private void makeActions(){
+
+	private void makeActions() {
 		exportHtmlAction = new Action() {
 			{
 				setImageDescriptor(Images.IMG_WEB.getImageDescriptor());
 				setToolTipText("Laborblatt exportieren");
 			}
-			
+
 			@Override
-			public void run(){
+			public void run() {
 				controller.getExporter().createHTML(LaborView.this.getSite().getShell());
 			}
-			
+
 		};
 		viewInBrowserAction = new Action() {
 			{
 				setImageDescriptor(Images.IMG_EYE_WO_SHADOW.getImageDescriptor());
 				setToolTipText("In Browser ansehen");
 			}
-			
+
 			@Override
-			public void run(){
+			public void run() {
 				controller.getExporter().runInBrowser();
 			}
 		};
@@ -166,11 +182,10 @@ public class LaborView extends ViewPart implements IActivationListener {
 				setImageDescriptor(Images.IMG_IMPORT.getImageDescriptor());
 				setToolTipText("Resultate importieren");
 			}
-			
+
 			@Override
-			public void run(){
-				Importer imp = new Importer(getViewSite().getShell(),
-					ExtensionPointConstantsUi.LABORDATENIMPORT); // $NON-NLS-1$
+			public void run() {
+				Importer imp = new Importer(getViewSite().getShell(), ExtensionPointConstantsUi.LABORDATENIMPORT); // $NON-NLS-1$
 				imp.create();
 				imp.setMessage("Bitte Datenquelle auswählen");
 				imp.getShell().setText("Labordaten import");
@@ -178,23 +193,22 @@ public class LaborView extends ViewPart implements IActivationListener {
 				imp.open();
 			}
 		};
-		removeEmptyItemsAction =
-			new Action("Aufräumen") {
-				{
-					setToolTipText("Ungebrauchte Items und Gruppen löschen");
-					Bundle bundle = FrameworkUtil.getBundle(this.getClass());
-					URL url = FileLocator.find(bundle, new Path("icons/edit-clear24.png"), null);
-					setImageDescriptor(ImageDescriptor.createFromURL(url));
-				}
-				
-				@Override
-				public void run(){
-					if (SWTHelper.askYesNo("Laboritems aufräumen",
+		removeEmptyItemsAction = new Action("Aufräumen") {
+			{
+				setToolTipText("Ungebrauchte Items und Gruppen löschen");
+				Bundle bundle = FrameworkUtil.getBundle(this.getClass());
+				URL url = FileLocator.find(bundle, new Path("icons/edit-clear24.png"), null);
+				setImageDescriptor(ImageDescriptor.createFromURL(url));
+			}
+
+			@Override
+			public void run() {
+				if (SWTHelper.askYesNo("Laboritems aufräumen",
 						"Alle Laboritems entfernen, für die keine Resultate existieren. (Das kann sehr lange dauern)")) {
-						controller.purgeLabItems();
-					}
-					
+					controller.purgeLabItems();
 				}
-			};
+
+			}
+		};
 	}
 }

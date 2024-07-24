@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -28,6 +29,8 @@ import java.util.TreeSet;
 
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.jdt.NonNull;
+import ch.elexis.core.model.IPatient;
+import ch.elexis.core.types.Gender;
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.data.Patient;
 import ch.elexis.data.PersistentObject;
@@ -49,7 +52,7 @@ public class LabResultsSheet {
 	Log log = Log.get("LabResultSheet");
 	private static final String queryItems = "SELECT ID, titel,kuerzel,Gruppe,prio,RefMann,RefFrauOrTx,Typ, Einheit FROM LABORITEMS WHERE deleted='0'";
 	private static final String queryResults = "SELECT ID, ItemID, Datum, Zeit, Resultat, Kommentar FROM LABORWERTE where PatientID=? AND deleted='0'";
-	Patient pat;
+	IPatient pat;
 
 	TimeTool[] dateArray;
 	Map<Item, Bucket> recently;
@@ -75,11 +78,10 @@ public class LabResultsSheet {
 	/**
 	 * Set the Patient.
 	 * 
-	 * @param pat
-	 *            patient or null
+	 * @param pat patient or null
 	 * @throws ElexisException
 	 */
-	public void setPatient(Patient pat) throws ElexisException {
+	public void setPatient(IPatient pat) throws ElexisException {
 		this.pat = pat;
 		loadItems(false);
 		if (pat == null) {
@@ -105,8 +107,7 @@ public class LabResultsSheet {
 	/**
 	 * Fetch all Items that belong to a group
 	 * 
-	 * @param group
-	 *            the group to query
+	 * @param group the group to query
 	 * @return An Item[] which may be empty but is never null
 	 */
 	public Item[] getAllItemsForGroup(String group) {
@@ -121,11 +122,9 @@ public class LabResultsSheet {
 	}
 
 	/**
-	 * Register an Observer that will be notified when the LabResultSheet
-	 * reloads
+	 * Register an Observer that will be notified when the LabResultSheet reloads
 	 * 
-	 * @param obs
-	 *            The Observer to register
+	 * @param obs The Observer to register
 	 */
 	public void addObserver(IObserver obs) {
 		Util.require(obs != null, "Observer must not be null");
@@ -166,8 +165,7 @@ public class LabResultsSheet {
 	/**
 	 * Get all LabResults of the current patient
 	 * 
-	 * @return an Array with all LabResultsRows or null if no Patient is
-	 *         selected.
+	 * @return an Array with all LabResultsRows or null if no Patient is selected.
 	 * @see LabResultsRow
 	 */
 	public LabResultsRow[] getLabResults() {
@@ -177,8 +175,7 @@ public class LabResultsSheet {
 	/**
 	 * Fetch the Bucket with the latest results (less than a month old)
 	 * 
-	 * @param item
-	 *            The Item whose bucket is to retrieve
+	 * @param item The Item whose bucket is to retrieve
 	 * @return the Bucket
 	 * @see Bucket
 	 */
@@ -187,11 +184,10 @@ public class LabResultsSheet {
 	}
 
 	/**
-	 * Fetch the Bucket with the somewhat older Results (more than a month but
-	 * less than a year old)
+	 * Fetch the Bucket with the somewhat older Results (more than a month but less
+	 * than a year old)
 	 * 
-	 * @param item
-	 *            the Item whose Bucket is to retrieve
+	 * @param item the Item whose Bucket is to retrieve
 	 * @return the Bucket
 	 * @see Bucket
 	 */
@@ -202,8 +198,7 @@ public class LabResultsSheet {
 	/**
 	 * Fetch the Bucket with the older Results (more than a year old)
 	 * 
-	 * @param item
-	 *            The Item whose Bucket is to retrieve
+	 * @param item The Item whose Bucket is to retrieve
 	 * @return the Bucket
 	 */
 	public Bucket getOlderBucket(Item item) {
@@ -236,11 +231,9 @@ public class LabResultsSheet {
 	/**
 	 * load all LabItems defined in the system
 	 * 
-	 * @param bReload
-	 *            force reload from the database even if Items are loaded
-	 *            already
-	 * @throws ElexisException
-	 *             database errors
+	 * @param bReload force reload from the database even if Items are loaded
+	 *                already
+	 * @throws ElexisException database errors
 	 */
 	private void loadItems(boolean bReload) throws ElexisException {
 		if (bReload) {
@@ -275,8 +268,7 @@ public class LabResultsSheet {
 	/**
 	 * Load all LabResults of the current patient
 	 * 
-	 * @throws ElexisException
-	 *             database errors
+	 * @throws ElexisException database errors
 	 */
 	private void fetch() throws ElexisException {
 		loadItems(false);
@@ -286,19 +278,21 @@ public class LabResultsSheet {
 		recently = new TreeMap<Item, Bucket>();
 		lastYear = new TreeMap<Item, Bucket>();
 		older = new TreeMap<Item, Bucket>();
-		try {
-			ps.setString(1, pat.getId());
-			ResultSet res = ps.executeQuery();
-			while (res.next()) {
-				Result result = new Result(res);
-				addResult(result);
+		if (pat != null) {
+			try {
+				ps.setString(1, pat.getId());
+				ResultSet res = ps.executeQuery();
+				while (res.next()) {
+					Result result = new Result(res);
+					addResult(result);
+				}
+				dateArray = (TimeTool[]) resultDates.toArray(new TimeTool[0]);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new ElexisException("error reading database", e);
+			} finally {
+				j.releasePreparedStatement(ps);
 			}
-			dateArray = (TimeTool[]) resultDates.toArray(new TimeTool[0]);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new ElexisException("error reading database", e);
-		} finally {
-			j.releasePreparedStatement(ps);
 		}
 
 	}
@@ -332,7 +326,7 @@ public class LabResultsSheet {
 		}
 		bucket.addResult(result);
 		LabResultsRow row = itemsWithResults.get(item);
-		if (row == null) {
+		if (row == null && pat!= null) {
 			row = new LabResultsRow(item, pat);
 			itemsWithResults.put(item, row);
 		}
@@ -347,7 +341,7 @@ public class LabResultsSheet {
 		SortedSet<String> groups = new TreeSet<String>();
 		itemsWithResults.keySet().forEach(key -> {
 			String grp = key.get("gruppe");
-			groups.add(grp!=null ? grp:"-");
+			groups.add(grp != null ? grp : "-");
 		});
 		return groups.toArray();
 	}
@@ -377,7 +371,7 @@ public class LabResultsSheet {
 	}
 
 	public String getNormRange(Item item) {
-		if (!pat.getGeschlecht().equals("m")) {
+		if (!pat.getGender().equals(Gender.MALE)) {
 			return item.get("refFrauOrTx");
 		} else {
 			return item.get("refMann");
@@ -385,7 +379,7 @@ public class LabResultsSheet {
 	}
 
 	public boolean isPathologic(Item item, Result result) {
-		if (item == null || result == null) {
+		if (item == null || result == null || pat ==null) {
 			return false;
 		}
 		return item.isPathologic(pat, result.get("resultat"));

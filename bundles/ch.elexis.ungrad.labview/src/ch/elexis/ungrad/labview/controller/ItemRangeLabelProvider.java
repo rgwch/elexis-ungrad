@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 
+import ch.elexis.core.model.IPatient;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.Util;
 import ch.elexis.ungrad.labview.model.Item;
@@ -45,7 +46,7 @@ public class ItemRangeLabelProvider extends CellLabelProvider {
 		if (cell.getElement() instanceof LabResultsRow) {
 			LabResultsRow results = (LabResultsRow) cell.getElement();
 			Item item = results.getItem();
-			Patient pat = results.getPatient();
+			IPatient pat = results.getPatient();
 			if (Util.isFemale(pat)) {
 				cell.setText(item.get("RefFrauOrTx"));
 			} else {

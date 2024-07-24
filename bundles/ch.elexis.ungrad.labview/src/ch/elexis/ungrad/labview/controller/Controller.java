@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -14,6 +14,7 @@
 package ch.elexis.ungrad.labview.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.exceptions.ElexisException;
+import ch.elexis.core.model.IPatient;
 import ch.elexis.data.LabItem;
 import ch.elexis.data.LabResult;
 import ch.elexis.data.Patient;
@@ -92,7 +94,7 @@ public class Controller {
 		ctlSmart.dispose();
 	}
 
-	public void setPatient(Patient pat) throws ElexisException {
+	public void setPatient(IPatient pat) throws ElexisException {
 		lrs.setPatient(pat);
 		/*
 		 * lcp.setPatient(pat); colsSummary.reload(lcp);

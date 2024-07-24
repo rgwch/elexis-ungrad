@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.data.interfaces.IPersistentObject;
+import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.text.Messages;
 import ch.elexis.core.ui.text.TextContainer;
@@ -42,7 +43,7 @@ import ch.rgw.tools.TimeTool;
 public class Resolver {
 	private static Logger log = LoggerFactory.getLogger(Resolver.class);
 	@Reference
-	private IContextService contextService;
+	private IContextService contextService=ContextServiceHolder.get();
 	
 	Map<String, IPersistentObject> replmap;
 	boolean bAsHtml = false;
@@ -130,11 +131,11 @@ public class Resolver {
 			if (rooted[0].equals("Datum")) {
 				return new TimeTool().toString(TimeTool.DATE_GER);
 			} else {
-				IPersistentObject po = resolveObject(rooted[0]);
-				if (po == null) {
+				Optional<IPersistentObject> po = resolveObject(rooted[0]);
+				if (po.isEmpty()) {
 					return "";
 				}
-				String r = po.get(rooted[1]);
+				String r = po.get().get(rooted[1]);
 				String replacement = StringTool.unNull(r);
 				if (bAsHtml) {
 					replacement = replacement.replaceAll("\\R", "<br />");
@@ -146,18 +147,20 @@ public class Resolver {
 		}
 	}
 
-	private IPersistentObject resolveObject(String name) {
-		Optional<?> po = Optional.of(replmap.get(name));
+	private Optional<IPersistentObject> resolveObject(String name) {
+		IPersistentObject rep=replmap.get(name);
+		Optional<IPersistentObject> po = Optional.ofNullable(rep);
 		if (po.isEmpty()) {
 			String fqname = "ch.elexis.data." + name; //$NON-NLS-1$
 			try {
-				po = contextService.getTyped(Class.forName(fqname));
+				Class clazz=Class.forName(fqname);
+				po = contextService.getTyped(clazz);
 						// ElexisEventDispatcher.getSelected(Class.forName(fqname));
 			} catch (ClassNotFoundException cfe) {
 				return null;
 			}
 		}
-		return (IPersistentObject) po.get();
+		return po;
 	}
 
 	/**
@@ -172,8 +175,8 @@ public class Resolver {
 			showErrors = false;
 		}
 		String[] q = inl.split(":"); //$NON-NLS-1$
-		IPersistentObject o = resolveObject(q[0]);
-		if (o == null) {
+		Optional<IPersistentObject> o = resolveObject(q[0]);
+		if (o.isEmpty()) {
 			if (showErrors) {
 				return "???";
 			} else {
@@ -184,14 +187,14 @@ public class Resolver {
 			log.error("falsches genderize Format " + inl); //$NON-NLS-1$
 			return null;
 		}
-		if (!(o instanceof Kontakt)) {
+		if (!(o.get() instanceof Kontakt)) {
 			if (showErrors) {
 				return Messages.TextContainer_FieldTypeForContactsOnly;
 			} else {
 				return "";
 			}
 		}
-		Kontakt k = (Kontakt) o;
+		Kontakt k = (Kontakt) o.get();
 		String[] g = q[2].split("/"); //$NON-NLS-1$
 		if (g.length < 2) {
 			if (showErrors) {

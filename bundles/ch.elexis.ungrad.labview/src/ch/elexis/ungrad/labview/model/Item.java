@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -15,6 +15,8 @@ package ch.elexis.ungrad.labview.model;
 
 import java.sql.ResultSet;
 
+import ch.elexis.core.model.IPatient;
+import ch.elexis.core.types.Gender;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.SimpleObject;
 import ch.rgw.tools.StringTool;
@@ -89,7 +91,7 @@ public class Item extends SimpleObject implements Comparable<Item> {
 	 * @return true if the value is pathologic (with respect to the norm range of the Item and the
 	 *         gender of the Patient)
 	 */
-	public boolean isPathologic(Patient pat, String value){
+	public boolean isPathologic(IPatient pat, String value){
 		if (value == null) {
 			return false;
 		}
@@ -103,7 +105,7 @@ public class Item extends SimpleObject implements Comparable<Item> {
 			val = makeFloat(chopped);
 		}
 		int index = LOWER_BOUND_MALE;
-		if (!pat.getGeschlecht().equals("m")) {
+		if (!pat.getGender().equals(Gender.MALE)) {
 			index = LOWER_BOUND_FEMALE;
 		}
 		if ((val < refBounds[index]) || (val > refBounds[index + 1])) {
