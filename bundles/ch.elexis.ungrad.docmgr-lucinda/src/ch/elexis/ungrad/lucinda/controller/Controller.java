@@ -244,7 +244,8 @@ public class Controller implements IProgressController {
 				IPatient pat = oPat.get();
 				q.append("+concern:").append(pat.getLastName().replaceAll(" ", "_")).append("_")
 						.append(pat.getFirstName().replaceAll(" ", "_")).append("_")
-						.append(pat.getDateOfBirth().toLocalDate().toString());
+						//.append(pat.getDateOfBirth().toLocalDate().toString());
+						.append(new TimeTool(pat.getDateOfBirth()).toString(TimeTool.DATE_GER));
 				/*
 				 * q.append("+lastname:").append(pat.getName()).append(" +firstname:")
 				 * //$NON-NLS-1$//$NON-NLS-2$ .append(pat.getVorname()).append(" +birthdate:")
