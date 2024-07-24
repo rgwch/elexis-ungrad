@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
 
+import ch.elexis.core.model.IPatient;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.IObserver;
 import ch.elexis.ungrad.labview.controller.Controller;
@@ -84,7 +85,7 @@ public class CondensedViewController implements IObserver {
 
 	@Override
 	public void signal(Object message) {
-		if(message instanceof Patient){
+		if(message instanceof IPatient){
 			colsSummary.reload(lcp);
 			tvSummary.setInput(message);
 		}

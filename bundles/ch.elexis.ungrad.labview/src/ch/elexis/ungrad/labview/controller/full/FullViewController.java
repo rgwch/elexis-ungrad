@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.exceptions.ElexisException;
+import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -317,7 +318,7 @@ public class FullViewController implements IObserver {
 	
 	@Override
 	public void signal(Object message){
-		if (message instanceof Patient) {
+		if (message instanceof IPatient) {
 			fdtc.reload();
 			tvFull.setInput(message);
 		}

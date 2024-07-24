@@ -13,10 +13,12 @@
 <extension
          point="org.eclipse.ui.views">
       <view
+            allowMultiple="false"
             class="ch.elexis.ungrad.forms.ui.View"
-            id="ch.rgw.elexis.ungrad.forms.ui.View"
-            name="Ungrad-Formulare"
             icon="icons/form.png"
+            id="ch.rgw.elexis.ungrad.forms.ui.View"
+            inject="true"
+            name="Ungrad-Formulare"
             restorable="true">
       </view>
    </extension>

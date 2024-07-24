@@ -34,32 +34,29 @@ import org.eclipse.ui.part.ViewPart;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
-import ch.elexis.core.data.events.ElexisEvent;
-import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IContextService;
-import ch.elexis.core.ui.actions.GlobalEventDispatcher;
-import ch.elexis.core.ui.actions.IActivationListener;
-import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.constants.ExtensionPointConstantsUi;
 import ch.elexis.core.ui.e4.util.CoreUiUtil;
-import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
+import ch.elexis.core.ui.events.RefreshingPartListener;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.Importer;
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.core.ui.util.SWTHelper;
-import ch.elexis.data.Patient;
+import ch.elexis.core.ui.views.IRefreshable;
 import ch.elexis.ungrad.labview.controller.Controller;
 
-public class LaborView extends ViewPart implements IActivationListener {
+public class LaborView extends ViewPart implements IRefreshable {
 	Controller controller = new Controller(this);
 	Log log = Log.get("LaborView");
 	CTabFolder cTabFolder;
-	private IContextService ctx = ContextServiceHolder.get();
+	private IContextService ctx=ContextServiceHolder.get();
 	private Action exportHtmlAction, viewInBrowserAction, importAction, removeEmptyItemsAction;
+	private RefreshingPartListener udpateOnVisible = new RefreshingPartListener(this);
 
+	
 	@Inject
 	void activePatient(@Optional IPatient patient) {
 		CoreUiUtil.runAsyncIfActive(() -> {
@@ -103,7 +100,8 @@ public class LaborView extends ViewPart implements IActivationListener {
 		cTabFolder.setSelection(ctSmart);
 		makeActions();
 		contributeToActionBars();
-		GlobalEventDispatcher.addActivationListener(this, this);
+		// GlobalEventDispatcher.addActivationListener(this, this);
+		getSite().getPage().addPartListener(udpateOnVisible);
 		controller.loadState();
 	}
 
@@ -132,24 +130,37 @@ public class LaborView extends ViewPart implements IActivationListener {
 	}
 
 	public void visible(final boolean mode) {
-		try {
-			controller.setPatient(ctx.getActivePatient().orElseGet(() -> null));
-		} catch (ElexisException e) {
-			log.log(e, "error loading patient data", Log.ERRORS);
-		}
-		if (!mode) {
-			controller.saveState();
-		}
+
 	}
 
+	/*
 	@Override
 	public void activation(boolean mode) {
-		// TODO Auto-generated method stub
+		if (mode == true) {
+			try {
+				controller.setPatient(ctx.getActivePatient().orElse(null));
+			} catch (ElexisException e) {
+				log.log(e, "error loading patient data", Log.ERRORS);
+			}
+		} else {
+			controller.saveState();
+		}
 
 	}
+	*/
 
 	@Override
+	public void refresh() {
+		try {
+			controller.setPatient(ctx.getActivePatient().orElse(null));
+		} catch (ElexisException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	@Override
 	public void dispose() {
+		getSite().getPage().removePartListener(udpateOnVisible);
 		controller.dispose();
 	}
 

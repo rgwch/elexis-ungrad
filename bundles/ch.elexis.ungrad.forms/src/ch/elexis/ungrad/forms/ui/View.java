@@ -37,7 +37,9 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.model.IPatient;
+import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
@@ -72,6 +74,9 @@ public class View extends ViewPart implements IActivationListener {
 	private Template currentTemplate;
 	private boolean bHasSignature;
 	private IPatient currentPatient;
+	
+	@Inject
+	private IContextService ctx; // = ContextServiceHolder.get();
 
 	@Inject
 	void activePatient(@Optional IPatient patient) {
@@ -132,6 +137,11 @@ public class View extends ViewPart implements IActivationListener {
 		container.layout();
 		GlobalEventDispatcher.addActivationListener(this, this);
 
+	}
+	
+	@Override
+	public void dispose() {
+		GlobalEventDispatcher.removeActivationListener(this, this);
 	}
 
 	private void contributeToActionBars() {
@@ -393,7 +403,9 @@ public class View extends ViewPart implements IActivationListener {
 
 	@Override
 	public void activation(boolean mode) {
-		if (!mode) {
+		if (mode==true) {
+			setPatient(ctx.getActivePatient().orElse(null));
+		} else {
 			try {
 				if (stack.topControl.equals(detail)) {
 					detail.saveHtml();
@@ -406,6 +418,7 @@ public class View extends ViewPart implements IActivationListener {
 
 	@Override
 	public void visible(boolean mode) {
+		System.out.print("Visible "+mode);
 		/*
 		 * if (mode) { setPatient(ElexisEventDispatcher.getSelectedPatient());
 		 * ElexisEventDispatcher.getInstance().addListeners(eeli_pat); } else {

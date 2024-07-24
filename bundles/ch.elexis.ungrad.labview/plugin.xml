@@ -4,10 +4,12 @@
    <extension
          point="org.eclipse.ui.views">
       <view
+            allowMultiple="false"
             class="ch.elexis.ungrad.labview.views.LaborView"
             icon="icons/lab24.png"
             id="ch.elexis.ungrad.labview.display"
-            name="LabView"
+            inject="true"
+            name="Ungrad-LabView"
             restorable="true">
       </view>
    </extension>

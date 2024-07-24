@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -32,7 +31,6 @@ import ch.elexis.core.jdt.NonNull;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.types.Gender;
 import ch.elexis.core.ui.util.Log;
-import ch.elexis.data.Patient;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.ungrad.IObserver;
 import ch.elexis.ungrad.Util;
@@ -326,7 +324,7 @@ public class LabResultsSheet {
 		}
 		bucket.addResult(result);
 		LabResultsRow row = itemsWithResults.get(item);
-		if (row == null && pat!= null) {
+		if (row == null && pat != null) {
 			row = new LabResultsRow(item, pat);
 			itemsWithResults.put(item, row);
 		}
@@ -379,7 +377,7 @@ public class LabResultsSheet {
 	}
 
 	public boolean isPathologic(Item item, Result result) {
-		if (item == null || result == null || pat ==null) {
+		if (item == null || result == null || pat == null) {
 			return false;
 		}
 		return item.isPathologic(pat, result.get("resultat"));
