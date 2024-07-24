@@ -20,7 +20,7 @@
         <module>ch.elexis.ungrad.docmgr-lucinda</module>
         <module>ch.elexis.ungrad.inbox</module>
         <module>ch.elexis.ungrad.labenter</module>
-        <module>ch.elexis.ungrad.text.templator</module>
-        <module>ch.elexis.ungrad.textplugin</module>
+        <!-- module>ch.elexis.ungrad.text.templator</module>
+        <module>ch.elexis.ungrad.textplugin</module -->
     </modules>
 </project>
