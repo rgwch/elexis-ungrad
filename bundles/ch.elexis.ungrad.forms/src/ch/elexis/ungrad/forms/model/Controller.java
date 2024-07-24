@@ -71,6 +71,9 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	@Override
 	public Object[] getElements(Object inputElement) {
 		IPatient pat = (IPatient) inputElement;
+		if (pat == null) {
+			return new String[0];
+		}
 		File dir;
 		try {
 			dir = sc.getOutputDirFor(pat.getId(), true);

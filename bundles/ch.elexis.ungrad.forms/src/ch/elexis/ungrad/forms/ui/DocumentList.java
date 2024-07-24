@@ -41,8 +41,8 @@ import ch.rgw.tools.ExHandler;
 public class DocumentList extends Composite {
 	private TableViewer tv;
 	private Controller controller;
-	private IContextService contextService=ContextServiceHolder.get();
-	
+	private IContextService contextService = ContextServiceHolder.get();
+
 	public DocumentList(Composite parent, Controller controller) {
 		super(parent, SWT.NONE);
 		this.controller = controller;
@@ -59,7 +59,9 @@ public class DocumentList extends Composite {
 			}
 
 		});
-		tv.setInput(contextService.getActivePatient());
+		if (contextService.getActivePatient().isPresent()) {
+			tv.setInput(contextService.getActivePatient().get());
+		}
 		tv.getControl().setLayoutData(SWTHelper.getFillGridData());
 
 	}
