@@ -60,11 +60,17 @@
 			<url>https://download.elexis.info/elexis/${git.core.branch}/p2/elexis-3-core</url>
 			<layout>p2</layout>
 		</repository>
+		<repository>
+			<id>elexis-3-base</id>
+			<url>file:../elexis-3-base/ch.elexis.base.p2site/target/repository</url>
+			<layout>p2</layout>
+		</repository>
+
 	</repositories>
 	<modules>
 		<module>bundles</module>
 		<module>features</module>
-		<module>ch.elexis.base.p2site</module>
+		<module>ch.elexis.ungrad.p2site</module>
 	</modules>
 	<profiles>
 		<profile>

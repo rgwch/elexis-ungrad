@@ -15,9 +15,9 @@
    <feature url="features/ch.elexis.ungrad.inbox.feature_1.0.0.jar" id="ch.elexis.ungrad.inbox.feature" version="1.0.0">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
-   <feature url="features/ch.elexis.ungrad.docmgr-lucinda.feature_2.0.1.jar" id="ch.elexis.ungrad.docmgr-lucinda.feature" version="2.0.1" os="linux,macosx,win32" ws="cocoa,gtk,win32">
+   <!-- feature url="features/ch.elexis.ungrad.docmgr-lucinda.feature_0.0.0.jar" id="ch.elexis.ungrad.docmgr-lucinda.feature" version="0.0.0" os="linux,macosx,win32" ws="cocoa,gtk,win32">
       <category name="ch.elexis.ungrad.docmgr"/>
-   </feature>
+   </feature -->
    <feature url="features/ch.elexis.ungrad-common.feature_1.0.0.jar" id="ch.elexis.ungrad-common.feature" version="1.0.0">
       <category name="ch.elexis.ungrad.common"/>
    </feature>
