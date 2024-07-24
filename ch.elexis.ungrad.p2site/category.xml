@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/ch.elexis.ungrad.labview.feature_1.0.1.jar" id="ch.elexis.ungrad.labview.feature" version="1.0.1">
+   <feature url="features/ch.elexis.ungrad.labview.feature_0.0.0.jar" id="ch.elexis.ungrad.labview.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.findings"/>
    </feature>
-   <feature url="features/ch.elexis.ungrad.qrbills.feature_1.0.2.jar" id="ch.elexis.ungrad.qrbills.feature" version="1.0.2">
+   <feature url="features/ch.elexis.ungrad.qrbills.feature_0.0.0.jar" id="ch.elexis.ungrad.qrbills.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.financial"/>
    </feature>
-   <feature url="features/ch.elexis.ungrad.forms.feature_1.1.0.jar" id="ch.elexis.ungrad.forms.feature" version="1.1.0">
+   <feature url="features/ch.elexis.ungrad.forms.feature_0.0.0.jar" id="ch.elexis.ungrad.forms.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
-   <feature url="features/ch.elexis.ungrad.pdf.feature_1.2.0.jar" id="ch.elexis.ungrad.pdf.feature" version="1.2.0">
+   <feature url="features/ch.elexis.ungrad.pdf.feature_0.0.0.jar" id="ch.elexis.ungrad.pdf.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.common"/>
    </feature>
-   <feature url="features/ch.elexis.ungrad.inbox.feature_1.0.0.jar" id="ch.elexis.ungrad.inbox.feature" version="1.0.0">
+   <feature url="features/ch.elexis.ungrad.inbox.feature_0.0.0.jar" id="ch.elexis.ungrad.inbox.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
-   <!-- feature url="features/ch.elexis.ungrad.docmgr-lucinda.feature_0.0.0.jar" id="ch.elexis.ungrad.docmgr-lucinda.feature" version="0.0.0" os="linux,macosx,win32" ws="cocoa,gtk,win32">
+   <feature url="features/ch.elexis.ungrad.docmgr-lucinda.feature_0.0.0.jar" id="ch.elexis.ungrad.docmgr-lucinda.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.docmgr"/>
-   </feature -->
-   <feature url="features/ch.elexis.ungrad-common.feature_1.0.0.jar" id="ch.elexis.ungrad-common.feature" version="1.0.0">
+   </feature>
+   <feature url="features/ch.elexis.ungrad-common.feature_0.0.0.jar" id="ch.elexis.ungrad-common.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.common"/>
    </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
