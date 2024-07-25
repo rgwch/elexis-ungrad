@@ -19,11 +19,15 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ch.elexis.core.text.ITextPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.swt.widgets.Composite;
+
 import ch.elexis.core.text.MimeTypeUtil;
 import ch.elexis.core.text.ReplaceCallback;
-import ch.elexis.core.ui.text.ITextPlugin.ICallback;
+import ch.elexis.core.ui.text.ITextPlugin;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.data.Brief;
 import ch.elexis.ungrad.text.templator.model.ODFDoc;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
@@ -41,14 +45,23 @@ public class OdfTextPlugin implements ITextPlugin {
 	private OdfTemplateFieldsDisplay display;
 	private ICallback saveHandler;
 
-	/*
 	@Override
 	public Composite createContainer(Composite parent, ICallback handler) {
 		display = new OdfTemplateFieldsDisplay(parent, handler);
 		saveHandler = handler;
 		return display;
 	}
-*/
+
+	@Override
+	public void setFocus() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void dispose() {
+		clear();
+	}
 
 	@Override
 	public boolean createEmptyDocument() {
@@ -63,17 +76,17 @@ public class OdfTextPlugin implements ITextPlugin {
 			ByteArrayInputStream bais = new ByteArrayInputStream(bs);
 			return loadFromStream(bais, asTemplate);
 		} else {
-			doc.setTemplate(bs,"");
+			doc.setTemplate(bs, "");
 			display.set(doc);
 			return true;
 		}
 	}
 
 	/**
-	 * Load a letter or a template. Since we get a reference to a "Brief", wie have
+	 * Load a letter or a template. Since we get a reference to a "Brief", we have
 	 * access to informations like title and recipient
-	 
-	@Override
+	 */
+
 	public boolean loadFromBrief(Brief brief, boolean asTemplate) {
 		try {
 			if (asTemplate) {
@@ -82,8 +95,8 @@ public class OdfTextPlugin implements ITextPlugin {
 				if (fields != null) {
 					return true;
 				}
-			}else {
-				doc.setTemplate(brief.loadBinary(),brief.getBetreff());
+			} else {
+				doc.setTemplate(brief.loadBinary(), brief.getBetreff());
 				display.set(doc);
 				return true;
 			}
@@ -93,7 +106,7 @@ public class OdfTextPlugin implements ITextPlugin {
 		}
 		return false;
 	}
-*/
+
 	@Override
 	public boolean loadFromStream(InputStream is, boolean asTemplate) {
 		try {
@@ -104,7 +117,7 @@ public class OdfTextPlugin implements ITextPlugin {
 					return true;
 				}
 			} else {
-				ByteArrayOutputStream baos=new ByteArrayOutputStream();
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				FileTool.copyStreams(is, baos);
 				display.set(null);
 				return loadFromByteArray(baos.toByteArray(), false);
@@ -141,6 +154,11 @@ public class OdfTextPlugin implements ITextPlugin {
 		}
 	}
 
+	@Override
+	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished) {
+		// doc.doOutput();
+		return false;
+	}
 
 	@Override
 	public boolean insertTable(String place, int properties, String[][] contents, int[] columnSizes) {
@@ -204,7 +222,12 @@ public class OdfTextPlugin implements ITextPlugin {
 		return MimeTypeUtil.MIME_TYPE_OPENOFFICE;
 	}
 
-	
+	@Override
+	public boolean isDirectOutput() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	@Override
 	public PageFormat getFormat() {
 		return PageFormat.A4;
@@ -222,8 +245,37 @@ public class OdfTextPlugin implements ITextPlugin {
 
 	}
 
-	
-		@Override
+	@Override
+	public void initTemplatePrintSettings(String template) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2) throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void showMenu(boolean b) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void showToolbar(boolean b) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setSaveOnFocusLost(boolean bSave) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public int findCount(String text) {
 		// TODO Auto-generated method stub
 		return 0;
