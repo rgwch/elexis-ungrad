@@ -2,7 +2,7 @@
 
 A Plugin to simplify the task of entering lab values manually.
 
-Background: Most lab devices in medical practises can send their results automatically to Elexis. But not all pracrises do connect all their devices directly. Sometimes, it's just not practical, sometimes, it would be to expensive, some times, there even doesn't exist an adapter for elexis. In such cases, entering lab values was quite tedious.
+Background: Most lab devices in medical practices can send their results automatically to Elexis. But not all practices do connect all their devices directly. Sometimes, it's just not practical, sometimes, it would be to expensive, some times, there even doesn't exist an adapter for Elexis. In such cases, entering lab values was quite tedious.
 
 Now it's simple:
 
