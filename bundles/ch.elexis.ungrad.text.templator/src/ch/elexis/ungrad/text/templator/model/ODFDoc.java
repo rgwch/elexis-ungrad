@@ -51,7 +51,7 @@ public class ODFDoc {
 	}
 
 	/**
-	 * Load a Tenplate from an Elexis "Brief", i.e. from the default outgoing doc
+	 * Load a Template from an Elexis "Brief", i.e. from the default outgoing doc
 	 * storage
 	 * 
 	 * @param brief

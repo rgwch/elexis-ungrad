@@ -33,8 +33,7 @@ import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 
 /**
- * The ITextPlugin. We implement ITextPlugin2, because we want more informations
- * on about the documents we handle
+ * The ITextPlugin. 
  * 
  * @author gerry
  *
