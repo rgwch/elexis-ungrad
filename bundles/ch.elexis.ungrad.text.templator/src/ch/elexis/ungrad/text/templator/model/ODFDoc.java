@@ -25,9 +25,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.IContextService;
+import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Brief;
 import ch.elexis.data.Kontakt;
@@ -43,6 +44,7 @@ public class ODFDoc {
 	private String title;
 	private boolean bExternal = false;
 	private IContextService ctx = ContextServiceHolder.get();
+	private IConfigService cfg = ConfigServiceHolder.get();
 
 	public void clear() {
 		fields.clear();
@@ -99,7 +101,7 @@ public class ODFDoc {
 			if (ze.getName().equals("content.xml") || ze.getName().equals("styles.xml")) {
 				byte[] cnt = readStream(zis);
 				Pattern pFields = Pattern.compile("\\[[\\s\\w\\.:\\/0-9]+\\]");
-				String text = new String(cnt, "utf-8");
+				// String text = new String(cnt, "utf-8");
 				Matcher matcher = pFields.matcher(new String(cnt, "utf-8"));
 				while (matcher.find()) {
 					String found = matcher.group();
@@ -216,14 +218,16 @@ public class ODFDoc {
 				byte[] contents = asByteArray();
 				FileTool.writeFile(output, contents);
 			}
-			String cmd = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "cmd", "soffice");
-			String param = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH + "param", "%");
+			String cmd = cfg.getLocal(OOOProcessorPrefs.PREFERENCE_BRANCH + "cmd", "soffice");
+			// String cmd = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH +
+			// "cmd", "soffice");
+			String param = cfg.getLocal(OOOProcessorPrefs.PREFERENCE_BRANCH + "param", "%");
 			int i = param.indexOf('%');
 			if (i != -1) {
 				param = param.substring(0, i) + output.getAbsolutePath() + param.substring(i + 1);
 			}
 
-			Process process = Runtime.getRuntime().exec(new String[] { cmd, param });
+			/* Process process = */ Runtime.getRuntime().exec(new String[] { cmd, param });
 			// process.waitFor();
 
 			return true;

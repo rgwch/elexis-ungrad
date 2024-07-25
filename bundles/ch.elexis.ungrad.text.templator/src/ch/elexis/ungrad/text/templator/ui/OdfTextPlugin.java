@@ -19,6 +19,10 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.swt.widgets.Composite;
+
 import ch.elexis.core.text.ITextPlugin;
 import ch.elexis.core.text.MimeTypeUtil;
 import ch.elexis.core.text.ReplaceCallback;
@@ -35,20 +39,18 @@ import ch.rgw.tools.ExHandler;
  * @author gerry
  *
  */
-public class OdfTextPlugin implements ITextPlugin {
+public class OdfTextPlugin implements ITextPlugin, ch.elexis.core.ui.text.ITextPlugin {
 	// private Map<String, String> fields;
 	private ODFDoc doc = new ODFDoc();
 	private OdfTemplateFieldsDisplay display;
 	private ICallback saveHandler;
 
-	/*
 	@Override
 	public Composite createContainer(Composite parent, ICallback handler) {
 		display = new OdfTemplateFieldsDisplay(parent, handler);
 		saveHandler = handler;
 		return display;
 	}
-*/
 
 	@Override
 	public boolean createEmptyDocument() {
@@ -63,7 +65,7 @@ public class OdfTextPlugin implements ITextPlugin {
 			ByteArrayInputStream bais = new ByteArrayInputStream(bs);
 			return loadFromStream(bais, asTemplate);
 		} else {
-			doc.setTemplate(bs,"");
+			doc.setTemplate(bs, "");
 			display.set(doc);
 			return true;
 		}
@@ -72,28 +74,15 @@ public class OdfTextPlugin implements ITextPlugin {
 	/**
 	 * Load a letter or a template. Since we get a reference to a "Brief", wie have
 	 * access to informations like title and recipient
-	 
-	@Override
-	public boolean loadFromBrief(Brief brief, boolean asTemplate) {
-		try {
-			if (asTemplate) {
-				Object fields = doc.parseTemplate(brief);
-				display.set(doc);
-				if (fields != null) {
-					return true;
-				}
-			}else {
-				doc.setTemplate(brief.loadBinary(),brief.getBetreff());
-				display.set(doc);
-				return true;
-			}
-		} catch (Exception ex) {
-			ExHandler.handle(ex);
-			SWTHelper.showError("Fehler beim Laden", ex.getMessage());
-		}
-		return false;
-	}
-*/
+	 * 
+	 * @Override public boolean loadFromBrief(Brief brief, boolean asTemplate) { try
+	 *           { if (asTemplate) { Object fields = doc.parseTemplate(brief);
+	 *           display.set(doc); if (fields != null) { return true; } }else {
+	 *           doc.setTemplate(brief.loadBinary(),brief.getBetreff());
+	 *           display.set(doc); return true; } } catch (Exception ex) {
+	 *           ExHandler.handle(ex); SWTHelper.showError("Fehler beim Laden",
+	 *           ex.getMessage()); } return false; }
+	 */
 	@Override
 	public boolean loadFromStream(InputStream is, boolean asTemplate) {
 		try {
@@ -104,7 +93,7 @@ public class OdfTextPlugin implements ITextPlugin {
 					return true;
 				}
 			} else {
-				ByteArrayOutputStream baos=new ByteArrayOutputStream();
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				FileTool.copyStreams(is, baos);
 				display.set(null);
 				return loadFromByteArray(baos.toByteArray(), false);
@@ -140,7 +129,6 @@ public class OdfTextPlugin implements ITextPlugin {
 			return new byte[0];
 		}
 	}
-
 
 	@Override
 	public boolean insertTable(String place, int properties, String[][] contents, int[] columnSizes) {
@@ -204,7 +192,6 @@ public class OdfTextPlugin implements ITextPlugin {
 		return MimeTypeUtil.MIME_TYPE_OPENOFFICE;
 	}
 
-	
 	@Override
 	public PageFormat getFormat() {
 		return PageFormat.A4;
@@ -222,8 +209,7 @@ public class OdfTextPlugin implements ITextPlugin {
 
 	}
 
-	
-		@Override
+	@Override
 	public int findCount(String text) {
 		// TODO Auto-generated method stub
 		return 0;
@@ -239,6 +225,61 @@ public class OdfTextPlugin implements ITextPlugin {
 	public Object getCurrentDocument() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
+			throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setFocus() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void showMenu(boolean b) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void showToolbar(boolean b) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setSaveOnFocusLost(boolean bSave) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isDirectOutput() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void initTemplatePrintSettings(String template) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
