@@ -12,22 +12,24 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tycho-groupid>org.eclipse.tycho</tycho-groupid>
         <buildplan.plugin.version>1.5</buildplan.plugin.version>
-
+        <CORE>file:../elexis-3-core/ch.elexis.core.p2site/target/repository</CORE>
+        <BASE>file:../elexis-3-base/ch.elexis.base.p2site/target/repository</BASE>
+        <TARGET>https://download.elexis.info/elexis/target/2023-09-java17/</TARGET>
     </properties>
     <repositories>
         <repository>
             <id>elexis.3.target</id>
-            <url>https://download.elexis.info/elexis/target/${elexis.target}/</url>
+            <url>${TARGET}</url>
             <layout>p2</layout>
         </repository>
         <repository>
             <id>elexis-3-core</id>
-            <url>file:../elexis-3-core/ch.elexis.core.p2site/target/repository</url>
+            <url>${CORE}</url>
             <layout>p2</layout>
         </repository>
         <repository>
             <id>elexis-3-base</id>
-            <url>file:../elexis-3-base/ch.elexis.base.p2site/target/repository</url>
+            <url>${BASE}</url>
             <layout>p2</layout>
         </repository>
 
