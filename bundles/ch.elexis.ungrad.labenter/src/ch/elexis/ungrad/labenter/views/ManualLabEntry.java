@@ -38,6 +38,7 @@ import org.eclipse.ui.part.ViewPart;
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
@@ -78,7 +79,7 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 	private TimeTool actDate = new TimeTool();
 	private FormToolkit tk;
 	private Form form;
-	private Patient pat;
+	private IPatient pat;
 	private LabEntryTable let;
 	private IContextService ctx=ContextServiceHolder.get();
 	
@@ -119,7 +120,7 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 	}
 	
 	private void setLabel(){
-		pat=(Patient) ctx.getActivePatient().orElseGet(null);
+		pat=(IPatient) ctx.getActivePatient().orElseGet(()->null);
 		// pat = ElexisEventDispatcher.getSelectedPatient();
 		String lab = pat == null ? "Kein Patient gewählt" : pat.getLabel();
 		form.setText("Labor von " + lab + ", vom " + actDate.toString(TimeTool.DATE_GER));
@@ -216,7 +217,7 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 							public void run(){
 								for (Element el : let.elements) {
 									if (!el.value.isEmpty()) {
-										new LabResult(pat, actDate, el.item, el.value, "");
+										new LabResult(Patient.load(pat.getId()), actDate, el.item, el.value, "");
 									}
 								}
 								showMessage("ok");
