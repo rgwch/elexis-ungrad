@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2022, G. Weirich and Elexis
+ * Copyright (c) 2022-2024, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ package ch.elexis.ungrad.text.templator.model;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,14 +43,9 @@ public class ODFDoc {
 	private byte[] template;
 	private String title;
 	private boolean bExternal = false;
-<<<<<<< HEAD
-	private IContextService ctx=ContextServiceHolder.get();
-	
-=======
 	private IContextService ctx = ContextServiceHolder.get();
 	private IConfigService cfg = ConfigServiceHolder.get();
 
->>>>>>> branch 'ungrad-2024' of ssh://pinas:/git/elexis-ungrad-plugins
 	public void clear() {
 		fields.clear();
 	}
@@ -144,7 +138,7 @@ public class ODFDoc {
 	public void setTemplate(byte[] template, String title) {
 		this.template = template;
 		fields.clear();
-		this.title=title;
+		this.title = title;
 		bExternal = true;
 	}
 

@@ -23,15 +23,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.swt.widgets.Composite;
 
-<<<<<<< HEAD
-=======
 import ch.elexis.core.text.ITextPlugin;
->>>>>>> branch 'ungrad-2024' of ssh://pinas:/git/elexis-ungrad-plugins
 import ch.elexis.core.text.MimeTypeUtil;
 import ch.elexis.core.text.ReplaceCallback;
-import ch.elexis.core.ui.text.ITextPlugin;
+import ch.elexis.core.ui.text.ITextPlugin.ICallback;
 import ch.elexis.core.ui.util.SWTHelper;
-import ch.elexis.data.Brief;
 import ch.elexis.ungrad.text.templator.model.ODFDoc;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
@@ -54,20 +50,6 @@ public class OdfTextPlugin implements ITextPlugin, ch.elexis.core.ui.text.ITextP
 		saveHandler = handler;
 		return display;
 	}
-<<<<<<< HEAD
-
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void dispose() {
-		clear();
-	}
-=======
->>>>>>> branch 'ungrad-2024' of ssh://pinas:/git/elexis-ungrad-plugins
 
 	@Override
 	public boolean createEmptyDocument() {
@@ -89,32 +71,8 @@ public class OdfTextPlugin implements ITextPlugin, ch.elexis.core.ui.text.ITextP
 	}
 
 	/**
-	 * Load a letter or a template. Since we get a reference to a "Brief", we have
+	 * Load a letter or a template. Since we get a reference to a "Brief", wie have
 	 * access to informations like title and recipient
-<<<<<<< HEAD
-	 */
-
-	public boolean loadFromBrief(Brief brief, boolean asTemplate) {
-		try {
-			if (asTemplate) {
-				Object fields = doc.parseTemplate(brief);
-				display.set(doc);
-				if (fields != null) {
-					return true;
-				}
-			} else {
-				doc.setTemplate(brief.loadBinary(), brief.getBetreff());
-				display.set(doc);
-				return true;
-			}
-		} catch (Exception ex) {
-			ExHandler.handle(ex);
-			SWTHelper.showError("Fehler beim Laden", ex.getMessage());
-		}
-		return false;
-	}
-
-=======
 	 * 
 	 * @Override public boolean loadFromBrief(Brief brief, boolean asTemplate) { try
 	 *           { if (asTemplate) { Object fields = doc.parseTemplate(brief);
@@ -124,7 +82,6 @@ public class OdfTextPlugin implements ITextPlugin, ch.elexis.core.ui.text.ITextP
 	 *           ExHandler.handle(ex); SWTHelper.showError("Fehler beim Laden",
 	 *           ex.getMessage()); } return false; }
 	 */
->>>>>>> branch 'ungrad-2024' of ssh://pinas:/git/elexis-ungrad-plugins
 	@Override
 	public boolean loadFromStream(InputStream is, boolean asTemplate) {
 		try {
@@ -172,15 +129,6 @@ public class OdfTextPlugin implements ITextPlugin, ch.elexis.core.ui.text.ITextP
 		}
 	}
 
-<<<<<<< HEAD
-	@Override
-	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished) {
-		// doc.doOutput();
-		return false;
-	}
-
-=======
->>>>>>> branch 'ungrad-2024' of ssh://pinas:/git/elexis-ungrad-plugins
 	@Override
 	public boolean insertTable(String place, int properties, String[][] contents, int[] columnSizes) {
 		StringBuffer sbu = new StringBuffer();
@@ -243,15 +191,6 @@ public class OdfTextPlugin implements ITextPlugin, ch.elexis.core.ui.text.ITextP
 		return MimeTypeUtil.MIME_TYPE_OPENOFFICE;
 	}
 
-<<<<<<< HEAD
-	@Override
-	public boolean isDirectOutput() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-=======
->>>>>>> branch 'ungrad-2024' of ssh://pinas:/git/elexis-ungrad-plugins
 	@Override
 	public PageFormat getFormat() {
 		return PageFormat.A4;
@@ -270,39 +209,6 @@ public class OdfTextPlugin implements ITextPlugin, ch.elexis.core.ui.text.ITextP
 	}
 
 	@Override
-<<<<<<< HEAD
-	public void initTemplatePrintSettings(String template) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2) throws CoreException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void showMenu(boolean b) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void showToolbar(boolean b) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setSaveOnFocusLost(boolean bSave) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-=======
->>>>>>> branch 'ungrad-2024' of ssh://pinas:/git/elexis-ungrad-plugins
 	public int findCount(String text) {
 		// TODO Auto-generated method stub
 		return 0;
