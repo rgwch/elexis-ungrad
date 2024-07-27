@@ -18,6 +18,10 @@
    <feature url="features/ch.elexis.ungrad.docmgr-lucinda.feature_0.0.0.jar" id="ch.elexis.ungrad.docmgr-lucinda.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
+   <feature url="features/ch.elexis.ungrad.text.templator.feature_0.0.0.jar" id="ch.elexis.ungrad.text.templator.feature" version="0.0.0">
+      <category name="ch.elexis.ungrad.docmgr"/>
+   </feature>
+   
    <feature url="features/ch.elexis.ungrad-common.feature_0.0.0.jar" id="ch.elexis.ungrad-common.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.common"/>
    </feature>
