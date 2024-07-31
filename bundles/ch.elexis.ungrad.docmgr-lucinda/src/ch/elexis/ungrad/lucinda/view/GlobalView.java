@@ -47,6 +47,9 @@ import org.eclipse.ui.part.ViewPart;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IConfigService;
+import ch.elexis.core.services.IContextService;
+import ch.elexis.core.ui.actions.GlobalEventDispatcher;
+import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.e4.util.CoreUiUtil;
 import ch.elexis.core.ui.icons.Images;
@@ -61,7 +64,7 @@ import ch.elexis.ungrad.lucinda.controller.Controller;
  * @author gerry
  *
  */
-public class GlobalView extends ViewPart {
+public class GlobalView extends ViewPart implements IActivationListener {
 
 	private Controller controller;
 	private Action doubleClickAction, filterCurrentPatAction, showInboxAction, rescanAction, showDirectoryAction;
@@ -71,6 +74,8 @@ public class GlobalView extends ViewPart {
 
 	@Inject
 	private IConfigService cfg;
+	@Inject
+	private IContextService ctx;
 
 	@Inject
 	void selectedPatient(@Optional IPatient pat) {
@@ -101,7 +106,7 @@ public class GlobalView extends ViewPart {
 		contributeToActionBars();
 		String colWidths = load(COLUMN_WIDTHS);
 		controller.setColumnWidths(colWidths);
-		// GlobalEventDispatcher.addActivationListener(this, this);
+		GlobalEventDispatcher.addActivationListener(this, this);
 		visible(true);
 	}
 
@@ -293,6 +298,14 @@ public class GlobalView extends ViewPart {
 
 	private boolean is(String name) {
 		return Boolean.parseBoolean(Preferences.get(name, Boolean.toString(false)));
+	}
+
+	@Override
+	public void activation(boolean mode) {
+		if (mode == true) {
+			controller.changePatient(ctx.getActivePatient());
+		}
+
 	}
 
 }
