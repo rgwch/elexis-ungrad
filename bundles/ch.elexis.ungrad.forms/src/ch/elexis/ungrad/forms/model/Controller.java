@@ -329,7 +329,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	}
 
 	/**
-	 * Revove documents from output dir (not from database)
+	 * Remove documents from output dir (not from database)
 	 * 
 	 * @param item
 	 * @param pat
