@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
@@ -55,19 +56,21 @@ public class DetailDisplay extends Composite {
 		body.setBackground(new Color(getDisplay(), 100, 100, 100));
 		inlay.setBackground(new Color(getDisplay(), 200, 200, 200));
 		inlay.setLayout(new GridLayout());
+
 	}
 
 	void clear() {
 		for (Control c : inlay.getChildren()) {
 			c.dispose();
 		}
-		form.setText(StringConstants.EMPTY); 
+		form.setText(StringConstants.EMPTY);
 	}
 
 	void show(Template template) {
 		this.template = template;
-		form.setText(template.getTitle());
+
 		clear();
+		form.setText(template.getTitle());
 		for (Entry<String, String> e : template.getInputs().entrySet()) {
 			Label label = new Label(inlay, SWT.NONE);
 			label.setText(e.getKey());
@@ -78,7 +81,8 @@ public class DetailDisplay extends Composite {
 			val = val.replace("<br />", StringConstants.LF); //$NON-NLS-1$
 			text.setText(val);
 			text.setData("input", e.getKey());
-		}
+		} // inlay.pack();
+
 		inlay.layout();
 	}
 

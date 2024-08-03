@@ -73,7 +73,7 @@ public class View extends ViewPart implements IActivationListener {
 	private Template currentTemplate;
 	private boolean bHasSignature;
 	private IPatient currentPatient;
-	
+
 	@Inject
 	private IContextService ctx; // = ContextServiceHolder.get();
 
@@ -137,7 +137,7 @@ public class View extends ViewPart implements IActivationListener {
 		GlobalEventDispatcher.addActivationListener(this, this);
 
 	}
-	
+
 	@Override
 	public void dispose() {
 		GlobalEventDispatcher.removeActivationListener(this, this);
@@ -402,8 +402,11 @@ public class View extends ViewPart implements IActivationListener {
 
 	@Override
 	public void activation(boolean mode) {
-		if (mode==true) {
-			setPatient(ctx.getActivePatient().orElse(null));
+		if (mode == true) {
+			IPatient sel = ctx.getActivePatient().orElse(null);
+			if (sel == null || sel.getId() != currentPatient.getId()) {
+				setPatient(sel);
+			}
 		} else {
 			try {
 				if (stack.topControl.equals(detail)) {
@@ -417,7 +420,7 @@ public class View extends ViewPart implements IActivationListener {
 
 	@Override
 	public void visible(boolean mode) {
-		System.out.print("Visible "+mode);
+		System.out.print("Visible " + mode);
 		/*
 		 * if (mode) { setPatient(ElexisEventDispatcher.getSelectedPatient());
 		 * ElexisEventDispatcher.getInstance().addListeners(eeli_pat); } else {

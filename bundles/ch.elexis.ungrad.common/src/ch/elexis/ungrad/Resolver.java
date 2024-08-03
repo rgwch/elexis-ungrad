@@ -23,6 +23,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.services.IContextService;
@@ -43,8 +44,8 @@ import ch.rgw.tools.TimeTool;
 public class Resolver {
 	private static Logger log = LoggerFactory.getLogger(Resolver.class);
 	@Reference
-	private IContextService contextService=ContextServiceHolder.get();
-	
+	private IContextService contextService = ContextServiceHolder.get();
+
 	Map<String, IPersistentObject> replmap;
 	boolean bAsHtml = false;
 
@@ -148,14 +149,23 @@ public class Resolver {
 	}
 
 	private Optional<IPersistentObject> resolveObject(String name) {
-		IPersistentObject rep=replmap.get(name);
+		IPersistentObject rep = replmap.get(name);
 		Optional<IPersistentObject> po = Optional.ofNullable(rep);
 		if (po.isEmpty()) {
 			String fqname = "ch.elexis.data." + name; //$NON-NLS-1$
 			try {
-				Class clazz=Class.forName(fqname);
+				Class clazz = Class.forName(fqname);
 				po = contextService.getTyped(clazz);
-						// ElexisEventDispatcher.getSelected(Class.forName(fqname));
+				// ElexisEventDispatcher.getSelected(Class.forName(fqname));
+				if (po.isEmpty()) {
+					Class[] interfaces = clazz.getInterfaces();
+					for (Class c : interfaces) {
+						po = contextService.getTyped(c);
+						if (po.isPresent()) {
+							return po;
+						}
+					}
+				}
 			} catch (ClassNotFoundException cfe) {
 				return null;
 			}
@@ -168,7 +178,7 @@ public class Resolver {
 	 * [Feld:mwn:mann/frau/neutral]
 	 */
 	private String genderize(final String in) {
-		String inl = in.substring(1,in.length()-1);
+		String inl = in.substring(1, in.length() - 1);
 		boolean showErrors = true;
 		if (inl.substring(0, 1).equalsIgnoreCase("*")) {
 			inl = inl.substring(1);

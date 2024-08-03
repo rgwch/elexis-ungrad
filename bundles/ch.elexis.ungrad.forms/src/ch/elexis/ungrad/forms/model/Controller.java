@@ -28,10 +28,12 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.commands.ExecutionException;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.lock.types.LockResponse;
+import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.model.IUser;
 import ch.elexis.core.services.IConfigService;
@@ -270,11 +272,17 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		IUser user = contextService.getActiveUser().get();
 		User u = User.load(user.getId());
 		Anwender actUser = u.getAssignedContact();
-		Optional<Konsultation> current = contextService.getTyped(Konsultation.class);
-		Brief metadata = new Brief(briefTitle, new TimeTool(), actUser, adressat, current.get(), "Formular");
-		metadata.save(FileTool.readFile(new File(filepath)), "pdf");
-		addFormToKons(metadata, current.get());
-		return metadata;
+		Optional<IEncounter> current = contextService.getTyped(IEncounter.class);
+		if (current.isEmpty()) {
+			throw new Exception("Konsultation wählen, zu der dieses Formular gehört");
+		} else {
+			Konsultation kons=Konsultation.load(current.get().getId());
+			Brief metadata = new Brief(briefTitle, new TimeTool(), actUser, adressat, kons, "Formular");
+			metadata.save(FileTool.readFile(new File(filepath)), "pdf");
+			addFormToKons(metadata, kons);
+			return metadata;
+		}
+
 	}
 
 	private void addFormToKons(final Brief brief, final Konsultation kons) {
