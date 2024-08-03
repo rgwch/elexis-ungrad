@@ -1,10 +1,13 @@
 # elexis-ungrad 2024
 
+**Note**: Beginning with this branch, ungrad-2024, The Elexis Ungrad plugins are built against Branch 3.12 of https://github.com/elexis/elexis-3-core and https://github.com/elexis/elexis-3-base. This branch is considered highly experimental as of now. For produktive use, continue with the ungrad2023 branch for now.
+
+
+The repositories https://github.com/rgwch/elexis-3-core and https://github.com/rgwch/elexis-3-base are obsolete. 
+
+## What it is
 Some more experimental and strictly OpenSource'd extensions from the original creator of Elexis. 
 
-Beginning with this branch, ungrad-2024, The Elexis Ungrad pkugins are built against Branch 3.12 of https://github.com/elexis/elexis-3-core and https://github.com/elexis/elexis-3-base.
-
-The repositories https://github.com/rgwch/elexis-3-core and https://github.com/rgwch/elexis-3-base are obsolete.
 
 
 ## Build:
@@ -26,8 +29,6 @@ cd elexis-ungrad
 You'll find the created repository in `ungrad-p2site/target/repository`. You can use this repository from a running Elexis core via 'Help-Install new Software'.
 
 ## Develop
-
-Please follow the instructions [here](https://github.com/rgwch/elexis-3-core/blob/develop/readme.md).
 
 Import the elexis-ungrad projects just the same way you did for the elexis-3-core and elexis-3-base projects in the same workspace. I recommend to create a separate working set "ungrad" for the ungrad projects.
 
