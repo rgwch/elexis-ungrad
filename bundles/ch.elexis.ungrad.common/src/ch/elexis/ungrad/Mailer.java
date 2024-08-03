@@ -168,6 +168,8 @@ public class Mailer {
 		props.put("mail.smtp.port", smtpPort /* "587" */ );
 		props.put("mail.smtp.auth", "true"); // enable authentication
 		props.put("mail.smtp.starttls.enable", "true"); // enable STARTTLS
+	    // props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+
 
 		// create Authenticator object to pass in Session.getInstance argument
 		Authenticator auth = new Authenticator() {
