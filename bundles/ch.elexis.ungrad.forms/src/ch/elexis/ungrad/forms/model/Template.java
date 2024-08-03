@@ -28,6 +28,7 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.data.Brief;
 import ch.elexis.data.Kontakt;
+import ch.elexis.data.PersistentObject;
 import ch.elexis.ungrad.Resolver;
 import ch.rgw.tools.StringTool;
 
@@ -58,7 +59,7 @@ public class Template {
 	 * @throws Exception
 	 */
 	public Template(String rawhtml, Kontakt adressat) throws Exception {
-		Map<String, IPersistentObject> replacer = new HashMap<>();
+		Map<String, PersistentObject> replacer = new HashMap<>();
 		if (adressat != null) {
 			this.adressat = adressat;
 			replacer.put("Adressat", adressat);

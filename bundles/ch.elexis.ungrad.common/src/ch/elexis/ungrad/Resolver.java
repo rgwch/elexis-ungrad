@@ -26,10 +26,12 @@ import org.slf4j.LoggerFactory;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.model.IMandator;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.text.Messages;
 import ch.elexis.core.ui.text.TextContainer;
 import ch.elexis.data.Kontakt;
+import ch.elexis.data.PersistentObject;
 import ch.elexis.data.Person;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
@@ -46,7 +48,7 @@ public class Resolver {
 	@Reference
 	private IContextService contextService = ContextServiceHolder.get();
 
-	Map<String, IPersistentObject> replmap;
+	Map<String, PersistentObject> replmap;
 	boolean bAsHtml = false;
 
 	/**
@@ -57,7 +59,7 @@ public class Resolver {
 	 * @param asHTML if true replace linefeeds (\n) with html linebreaks (<br />
 	 *               )
 	 */
-	public Resolver(Map<String, IPersistentObject> fld, boolean asHTML) {
+	public Resolver(Map<String, PersistentObject> fld, boolean asHTML) {
 		replmap = fld;
 		bAsHtml = asHTML;
 	}
@@ -132,11 +134,11 @@ public class Resolver {
 			if (rooted[0].equals("Datum")) {
 				return new TimeTool().toString(TimeTool.DATE_GER);
 			} else {
-				Optional<IPersistentObject> po = resolveObject(rooted[0]);
-				if (po.isEmpty()) {
+				PersistentObject po = resolveObject(rooted[0]);
+				if (po == null) {
 					return "";
 				}
-				String r = po.get().get(rooted[1]);
+				String r = po.get(rooted[1]);
 				String replacement = StringTool.unNull(r);
 				if (bAsHtml) {
 					replacement = replacement.replaceAll("\\R", "<br />");
@@ -148,24 +150,13 @@ public class Resolver {
 		}
 	}
 
-	private Optional<IPersistentObject> resolveObject(String name) {
-		IPersistentObject rep = replmap.get(name);
-		Optional<IPersistentObject> po = Optional.ofNullable(rep);
-		if (po.isEmpty()) {
+	private PersistentObject resolveObject(String name) {
+		PersistentObject po = replmap.get(name);
+		if (po == null) {
 			String fqname = "ch.elexis.data." + name; //$NON-NLS-1$
 			try {
 				Class clazz = Class.forName(fqname);
-				po = contextService.getTyped(clazz);
-				// ElexisEventDispatcher.getSelected(Class.forName(fqname));
-				if (po.isEmpty()) {
-					Class[] interfaces = clazz.getInterfaces();
-					for (Class c : interfaces) {
-						po = contextService.getTyped(c);
-						if (po.isPresent()) {
-							return po;
-						}
-					}
-				}
+				po = (PersistentObject) ElexisEventDispatcher.getSelected(Class.forName(fqname));
 			} catch (ClassNotFoundException cfe) {
 				return null;
 			}
@@ -185,8 +176,8 @@ public class Resolver {
 			showErrors = false;
 		}
 		String[] q = inl.split(":"); //$NON-NLS-1$
-		Optional<IPersistentObject> o = resolveObject(q[0]);
-		if (o.isEmpty()) {
+		PersistentObject po = resolveObject(q[0]);
+		if (po == null) {
 			if (showErrors) {
 				return "???";
 			} else {
@@ -197,14 +188,14 @@ public class Resolver {
 			log.error("falsches genderize Format " + inl); //$NON-NLS-1$
 			return null;
 		}
-		if (!(o.get() instanceof Kontakt)) {
+		if (!(po instanceof Kontakt)) {
 			if (showErrors) {
 				return Messages.TextContainer_FieldTypeForContactsOnly;
 			} else {
 				return "";
 			}
 		}
-		Kontakt k = (Kontakt) o.get();
+		Kontakt k = (Kontakt) po;
 		String[] g = q[2].split("/"); //$NON-NLS-1$
 		if (g.length < 2) {
 			if (showErrors) {

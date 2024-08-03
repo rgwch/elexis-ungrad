@@ -41,6 +41,7 @@ import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.data.Fall;
+import ch.elexis.data.PersistentObject;
 import ch.elexis.data.Rechnung;
 import ch.elexis.data.Zahlung;
 import ch.elexis.pdfBills.QrRnOutputter;
@@ -62,7 +63,7 @@ import ch.rgw.tools.Result.SEVERITY;
  *
  */
 public class QR_Outputter implements IRnOutputter {
-	private Map<String, IPersistentObject> replacer = new HashMap<>();
+	private Map<String, PersistentObject> replacer = new HashMap<>();
 	private QR_SettingsControl qrs;
 	private QR_Encoder qr;
 	private Manager pdfManager;
