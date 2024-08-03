@@ -1,3 +1,5 @@
+**Note:** This branch ist discontinued. Please refer to the [Ungrad-2024](https://github.com/rgwch/elexis-ungrad/tree/ungrad-2024) branch for more informations.
+
 # elexis-ungrad
 
 Some more experimental and strictly OpenSource'd extensions from the original creator of Elexis. More informations at [www.elexis.ch/ungrad](http://www.elexis.ch/ungrad) 
