@@ -17,7 +17,6 @@ import java.util.Map.Entry;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
@@ -101,7 +100,8 @@ public class DetailDisplay extends Composite {
 		try {
 			File htmlFile = saveHtml();
 			String pdffile = controller.createPDF(htmlFile, template);
-			Program.launch(pdffile);
+			controller.launchPDFViewerFor(pdffile);
+	//		** Program.launch(pdffile);
 			return pdffile;
 		} catch (Exception e) {
 			SWTHelper.showError(Messages.DetailDisplay_OutputError, e.getMessage());

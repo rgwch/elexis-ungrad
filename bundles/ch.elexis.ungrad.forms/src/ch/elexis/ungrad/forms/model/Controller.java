@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.commands.ExecutionException;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.service.ContextServiceHolder;
@@ -252,7 +251,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 					}
 				}
 				String filepath = outfile.getAbsolutePath();
-				String viewer = CoreHub.localCfg.get(PreferenceConstants.PDF_VIEWER, Messages.Controller_21);
+				String viewer = cfg.getLocal(PreferenceConstants.PDF_VIEWER, Messages.Controller_21);
 				if (!StringTool.isNothing(viewer)) {
 					asyncRunViewer(viewer, outfile, brief);
 				} else {
@@ -276,7 +275,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		if (current.isEmpty()) {
 			throw new Exception("Konsultation wählen, zu der dieses Formular gehört");
 		} else {
-			Konsultation kons=Konsultation.load(current.get().getId());
+			Konsultation kons = Konsultation.load(current.get().getId());
 			Brief metadata = new Brief(briefTitle, new TimeTool(), actUser, adressat, kons, "Formular");
 			metadata.save(FileTool.readFile(new File(filepath)), "pdf");
 			addFormToKons(metadata, kons);
@@ -395,6 +394,27 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			}
 
 		});
+	}
+
+	public int launchPDFViewerFor(String pdf) throws Exception {
+		try {
+			String viewer = cfg.getLocal(PreferenceConstants.PDF_VIEWER, Messages.Controller_21);
+			if (!StringTool.isNothing(viewer)) {
+				Process process = Runtime.getRuntime().exec(new String[] { viewer, pdf});
+				process.waitFor();
+				return process.exitValue();
+			} else {
+				if (Program.launch(pdf)) {
+					return 0;
+				} else {
+					return -1;
+				}
+			}
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+			SWTHelper.showError(Messages.Controller_CouldNotCreateFile, ex.getMessage());
+			return -1;
+		}
 	}
 
 	public void signPDF(File pdfFile) throws Exception {

@@ -31,7 +31,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
@@ -242,7 +241,8 @@ public class View extends ViewPart implements IActivationListener {
 					try {
 						if (templateFile.getName().endsWith("pdf")) {
 							String outFile = fillPdf(templateFile);
-							Program.launch(outFile);
+							//Program.launch(outFile);
+							controller.launchPDFViewerFor(outFile);
 
 						} else {
 							Kontakt adressat = null;
