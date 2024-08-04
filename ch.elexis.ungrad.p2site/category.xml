@@ -21,13 +21,19 @@
    <feature url="features/ch.elexis.ungrad.text.templator.feature_0.0.0.jar" id="ch.elexis.ungrad.text.templator.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.docmgr"/>
    </feature>
-   
    <feature url="features/ch.elexis.ungrad-common.feature_0.0.0.jar" id="ch.elexis.ungrad-common.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.common"/>
+   </feature>
+   <feature url="features/ch.elexis.laborimport_sftp.feature_0.0.0.jar" id="ch.elexis.laborimport_sftp.feature" version="0.0.0">
+      <category name="ch.elexis.ungrad.importers"/>
+   </feature>
+   <feature url="features/ch.elexis.ungrad.laborimport_risch.feature_0.0.0.jar" id="ch.elexis.ungrad.laborimport_risch.feature" version="0.0.0">
+      <category name="ch.elexis.ungrad.importers"/>
    </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>
    <category-def name="ch.elexis.ungrad.financial" label="Finanzen"/>
    <category-def name="ch.elexis.ungrad.articles" label="Artikel"/>
+   <category-def name="ch.elexis.ungrad.importers" label="Importer"/>
 </site>
