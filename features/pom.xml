@@ -21,5 +21,8 @@
         <module>ch.elexis.ungrad.inbox.feature</module>
         <module>ch.elexis.ungrad.labenter.feature</module>
         <module>ch.elexis.ungrad.text.templator.feature</module>
+        <module>ch.elexis.ungrad.laborimport_risch.feature</module>
+        <module>ch.elexis.ungrad.laborimport_sftp.feature</module>
+      
     </modules>
 </project>
