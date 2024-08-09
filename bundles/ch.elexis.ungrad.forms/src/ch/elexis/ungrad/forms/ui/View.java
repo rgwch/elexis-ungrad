@@ -241,7 +241,7 @@ public class View extends ViewPart implements IActivationListener {
 					try {
 						if (templateFile.getName().endsWith("pdf")) {
 							String outFile = fillPdf(templateFile);
-							//Program.launch(outFile);
+							// Program.launch(outFile);
 							controller.launchPDFViewerFor(outFile);
 
 						} else {
@@ -404,7 +404,7 @@ public class View extends ViewPart implements IActivationListener {
 	public void activation(boolean mode) {
 		if (mode == true) {
 			IPatient sel = ctx.getActivePatient().orElse(null);
-			if (sel == null || sel.getId() != currentPatient.getId()) {
+			if (sel == null || currentPatient == null || sel.getId() != currentPatient.getId()) {
 				setPatient(sel);
 			}
 		} else {
