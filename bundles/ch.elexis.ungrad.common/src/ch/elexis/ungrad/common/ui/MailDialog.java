@@ -64,7 +64,7 @@ public class MailDialog extends TitleAreaDialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite ret = new Composite(parent, SWT.NONE);
-		ret.setLayoutData(SWTHelper.getFillGridData());
+		ret.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		ret.setLayout(new GridLayout(2, false));
 		Label lbTo = new Label(ret, SWT.NONE);
 		lbTo.setLayoutData(SWTHelper.getFillGridData(1, false, 1, false));
@@ -143,7 +143,7 @@ public class MailDialog extends TitleAreaDialog {
 			}
 
 		});
-		GridData lgd = new GridData(SWT.DEFAULT, 50);
+		GridData lgd = new GridData(SWT.DEFAULT, 100);
 		lgd.horizontalSpan = 1;
 		lgd.horizontalAlignment = GridData.FILL;
 		lAttachments = new List(ret, SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER);
@@ -171,5 +171,9 @@ public class MailDialog extends TitleAreaDialog {
 		attachments = lAttachments.getItems();
 		super.okPressed();
 	}
+	@Override
+    protected boolean isResizable() {
+        return true;
+    }
 
 }
