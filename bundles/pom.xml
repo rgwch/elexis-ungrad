@@ -23,6 +23,6 @@
         <module>ch.elexis.ungrad.text.templator</module>
         <module>ch.elexis.ungrad.laborimport_risch</module>
         <module>ch.elexis.ungrad.laborimport_sftp</module>
-
+        <module>ch.elexis.ungrad.kassenbuch</module>
     </modules>
 </project>
