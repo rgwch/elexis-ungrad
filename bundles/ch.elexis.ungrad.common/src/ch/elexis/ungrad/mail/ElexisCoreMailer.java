@@ -7,6 +7,9 @@ import java.util.Optional;
 import ch.elexis.core.mail.MailAccount;
 import ch.elexis.core.mail.MailAccount.TYPE;
 
+/**
+ * Trying to use elexis's core mail system. But doesn't work at all until now. 
+ */
 
 public class ElexisCoreMailer {
 	public List<String> getSendMailAccounts() {
