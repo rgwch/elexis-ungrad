@@ -6,7 +6,8 @@ Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: G. Weirich
 Automatic-Module-Name: ch.elexis.ungrad-common
 Bundle-ClassPath: .,
- javax.mail-1.6.2.jar
+ javax.mail-1.6.2.jar,
+ activation-1.1.1.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: ch.elexis.core;bundle-version="3.12.0",
  ch.elexis.core.data;bundle-version="3.12.0",
@@ -18,4 +19,3 @@ Require-Bundle: ch.elexis.core;bundle-version="3.12.0",
  ch.elexis.core.mail;bundle-version="3.12.0"
 Export-Package: ch.elexis.ungrad,
  ch.elexis.ungrad.common.ui
-Import-Package: javax.activation;version="1.2.2"

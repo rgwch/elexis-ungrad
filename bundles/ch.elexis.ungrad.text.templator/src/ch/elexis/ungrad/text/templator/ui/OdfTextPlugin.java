@@ -71,7 +71,7 @@ public class OdfTextPlugin implements ITextPlugin, ch.elexis.core.ui.text.ITextP
 	}
 
 	/**
-	 * Load a letter or a template. Since we get a reference to a "Brief", wie have
+	 * Load a letter or a template. Since we get a reference to a "Brief", we have
 	 * access to informations like title and recipient
 	 * 
 	 * @Override public boolean loadFromBrief(Brief brief, boolean asTemplate) { try

@@ -41,7 +41,7 @@ import ch.rgw.tools.StringTool;
 public class ODFDoc {
 	private Map<String, String> fields = new HashMap<String, String>();
 	private byte[] template;
-	private String title;
+	private String title="Ausgang";
 	private boolean bExternal = false;
 	private IContextService ctx = ContextServiceHolder.get();
 	private IConfigService cfg = ConfigServiceHolder.get();
