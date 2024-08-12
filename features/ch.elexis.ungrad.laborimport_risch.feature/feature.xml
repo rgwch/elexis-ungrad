@@ -2,7 +2,7 @@
 <feature
       id="ch.elexis.ungrad.laborimport_risch.feature"
       label="Laborimport Risch HL7"
-      version="1.0.0.qualifier"
+      version="1.1.0.qualifier"
       provider-name="weirich.ch">
 
    <description>
@@ -19,9 +19,6 @@
 
    <plugin
          id="ch.elexis.ungrad.laborimport_risch"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
 </feature>
