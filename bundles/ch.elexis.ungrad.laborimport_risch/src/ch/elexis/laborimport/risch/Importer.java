@@ -42,6 +42,7 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.model.ILabResult;
 import ch.elexis.core.data.util.ResultAdapter;
 import ch.elexis.core.importer.div.importers.HL7Parser;
+import ch.elexis.core.model.ILabItem;
 import ch.elexis.core.ui.importer.div.importers.DefaultHL7Parser;
 import ch.elexis.core.ui.util.ImporterPage;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -376,10 +377,5 @@ public class Importer extends ImporterPage {
 	public List<java.lang.String> getObjectClass() {
 		return Arrays.asList(ILabResult.class.getName(), "ch.elexis.omnivore.model.IDocumentHandle");
 	}
-/*
-	@Override
-	public List<String> getObjectClass() {
-		return Collections.singletonList(ILabResult.class.getName());
-	}
-	*/
+
 }
