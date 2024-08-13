@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,9 +39,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.interfaces.ILabResult;
+import ch.elexis.core.model.ILabResult;
 import ch.elexis.core.data.util.ResultAdapter;
 import ch.elexis.core.importer.div.importers.HL7Parser;
+import ch.elexis.core.model.ILabItem;
 import ch.elexis.core.ui.importer.div.importers.DefaultHL7Parser;
 import ch.elexis.core.ui.util.ImporterPage;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -372,7 +374,18 @@ public class Importer extends ImporterPage {
 	}
 
 	@Override
-	public List<String> getObjectClass() {
-		return Collections.singletonList(ILabResult.class.getName());
+	public List<java.lang.String> getObjectClass() {
+		return Arrays.asList(ILabResult.class.getName());
 	}
+
+	/*
+	@Override
+	public List<String> getObjectClass() {
+		return Arrays.asList(ILabResult.class.getName(), ILabItem.class.getName());
+	}
+	*/
+	/*
+	 * @Override public List<String> getObjectClass() { return
+	 * Collections.singletonList(ILabResult.class.getName()); }
+	 */
 }
