@@ -8,5 +8,11 @@
             id="ch.elexis.ungrad.common.prefs"
             name="Elexis Ungrad">
       </page>
+         <page
+               category="ch.elexis.ungrad.common.prefs"
+               class="ch.elexis.ungrad.common.ui.ExtIdPrefe3rences"
+               id="ch.elexis.ungrad.extid.prefs"
+               name="ExtInfo">
+         </page>
    </extension>
 </plugin>

@@ -134,11 +134,18 @@ public class Resolver {
 			if (rooted[0].equals("Datum")) {
 				return new TimeTool().toString(TimeTool.DATE_GER);
 			} else {
+				if(rooted[1].equals("EAN") || rooted[1].equals("ZSR") || rooted[1].equals("GLN")) {
+					System.out.println(rooted[0]);
+				}
 				PersistentObject po = resolveObject(rooted[0]);
 				if (po == null) {
 					return "";
 				}
 				String r = po.get(rooted[1]);
+				if(r.startsWith("**ERROR")) {
+					System.out.print(po.get("Bezeichnung1")+" "+po.get("Bezeichnung2")+" "+po.get("Bezeichnung3"));
+					r=(String) po.getExtInfoStoredObjectByKey(rooted[1]);
+				}
 				String replacement = StringTool.unNull(r);
 				if (bAsHtml) {
 					replacement = replacement.replaceAll("\\R", "<br />");
