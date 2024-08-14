@@ -10,7 +10,7 @@
       </page>
          <page
                category="ch.elexis.ungrad.common.prefs"
-               class="ch.elexis.ungrad.common.ui.ExtIdPrefe3rences"
+               class="ch.elexis.ungrad.common.ui.ExtIdPreferences"
                id="ch.elexis.ungrad.extid.prefs"
                name="ExtInfo">
          </page>
