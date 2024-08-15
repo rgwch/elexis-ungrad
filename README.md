@@ -8,7 +8,8 @@ The repositories https://github.com/rgwch/elexis-3-core and https://github.com/r
 ## What it is
 Some more experimental and strictly OpenSource'd extensions from the original creator of Elexis. 
 
-
+## Download
+Link the Repository with the elexis [ungrad plugins](https://elexis.ch/ungrad2024/3.12/ungrad/) with your Elexis installation ("Help/Install new Software"/"Hilfe/Neue Software installieren")
 
 ## Build:
 
