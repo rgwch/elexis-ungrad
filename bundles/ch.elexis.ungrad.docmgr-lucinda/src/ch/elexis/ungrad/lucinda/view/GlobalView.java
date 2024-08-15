@@ -45,6 +45,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.IContextService;
@@ -75,7 +76,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 	@Inject
 	private IConfigService cfg;
 	@Inject
-	private IContextService ctx;
+	private IContextService ctx=ContextServiceHolder.get();
 
 	@Inject
 	void selectedPatient(@Optional IPatient pat) {
