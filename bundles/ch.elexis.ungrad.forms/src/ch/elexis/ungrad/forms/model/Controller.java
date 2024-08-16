@@ -378,13 +378,16 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 				try {
 					long ftime = pdf.lastModified();
 					Process process = Runtime.getRuntime().exec(new String[] { viewer, pdf.getAbsolutePath() });
-					process.waitFor();
-					int val = process.exitValue();
-					if (val == 0 && brief != null) {
-						long atime = pdf.lastModified();
-						if ((atime - ftime) > 100) {
-							brief.save(FileTool.readFile(pdf), "pdf");
-						}
+					// process.waitFor();
+					// int val = process.exitValue();
+					if (brief != null && brief.isValid()) {
+						/*
+						 * TODO How update "brief" after doc was modified? long atime =
+						 * pdf.lastModified(); if ((atime - ftime) > 100) {
+						 * brief.save(FileTool.readFile(pdf), "pdf"); }
+						 */
+						brief.save(FileTool.readFile(pdf), "pdf");
+
 					}
 
 				} catch (Exception ex) {
@@ -396,27 +399,24 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		});
 	}
 
-	public int launchPDFViewerFor(String pdf) throws Exception {
-		try {
-			String viewer = cfg.getLocal(PreferenceConstants.PDF_VIEWER, Messages.Controller_21);
-			if (!StringTool.isNothing(viewer)) {
-				Process process = Runtime.getRuntime().exec(new String[] { viewer, pdf});
-				process.waitFor();
-				return process.exitValue();
-			} else {
-				if (Program.launch(pdf)) {
-					return 0;
-				} else {
-					return -1;
-				}
-			}
-		} catch (Exception ex) {
-			ExHandler.handle(ex);
-			SWTHelper.showError(Messages.Controller_CouldNotCreateFile, ex.getMessage());
-			return -1;
+	public void launchPDFViewerFor(String pdf) throws Exception {
+		String viewer = cfg.getLocal(PreferenceConstants.PDF_VIEWER, Messages.Controller_21);
+		if (!StringTool.isNothing(viewer)) {
+			asyncRunViewer(viewer, new File(pdf), null);
 		}
+
 	}
 
+	/*
+	 * public int launchPDFViewerFor(String pdf) throws Exception { try { String
+	 * viewer = cfg.getLocal(PreferenceConstants.PDF_VIEWER,
+	 * Messages.Controller_21); if (!StringTool.isNothing(viewer)) { Process process
+	 * = Runtime.getRuntime().exec(new String[] { viewer, pdf}); process.waitFor();
+	 * return process.exitValue(); } else { if (Program.launch(pdf)) { return 0; }
+	 * else { return -1; } } } catch (Exception ex) { ExHandler.handle(ex);
+	 * SWTHelper.showError(Messages.Controller_CouldNotCreateFile, ex.getMessage());
+	 * return -1; } }
+	 */
 	public void signPDF(File pdfFile) throws Exception {
 		Signer signer = new Signer();
 		String imgFile = CoreHub.localCfg.get(PreferenceConstants.SIGNATURE, null);
