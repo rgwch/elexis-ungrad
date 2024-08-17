@@ -27,6 +27,7 @@ import ch.elexis.core.model.IPatient;
 
 import ch.elexis.core.model.ch.BillingLaw;
 import ch.elexis.core.services.IContextService;
+import ch.elexis.core.types.Gender;
 import ch.elexis.data.Kontakt;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
@@ -119,8 +120,8 @@ public class Medform {
       m.put(get("patAddress"), pat.getPostalAddress());  // .getPostAnschrift(true));
       m.put(get("patFirstname"), pat.getFirstName());
       m.put(get("patLastname"), pat.getLastName());
-      m.put(get("patBirthdate"), pat.getDateOfBirth().toLocalDate().toString());
-      m.put(get("patSex"), pat.getGender().toString());
+      m.put(get("patBirthdate"), new TimeTool(pat.getDateOfBirth()).toString(TimeTool.DATE_GER));
+      m.put(get("patSex"), (pat.getGender()==Gender.FEMALE) ? "F" : "M");
       m.put(get("patStreet"), pat.getStreet());
       m.put(get("patZip"), pat.getZip());
       m.put(get("patCity"), pat.getCity());
