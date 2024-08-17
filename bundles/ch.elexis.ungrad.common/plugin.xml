@@ -15,4 +15,14 @@
                name="ExtInfo">
          </page>
    </extension>
+    <extension
+          point="org.eclipse.ui.views">
+       <view
+             allowMultiple="false"
+             class="ch.elexis.ungrad.common.ui.KonsZumVerrechnen"
+             id="ch.elexis.ungrad.common.KonsZumVerrechnen"
+             name="Offene Kons"
+             restorable="true">
+       </view>
+    </extension>
 </plugin>
