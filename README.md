@@ -1,9 +1,8 @@
 # elexis-ungrad 2024
 
-**Note**: Beginning with this branch, ungrad-2024, The Elexis Ungrad plugins are built against Branch 3.12 of https://github.com/elexis/elexis-3-core and https://github.com/elexis/elexis-3-base. This branch is considered highly experimental as of now. For produktive use, continue with the ungrad2023 branch for now.
+**Note**: Beginning with this branch, ungrad-2024, The Elexis Ungrad plugins are built against Branch 3.12 of elexis-3-core and elexis-3-base. 
 
-
-The repositories https://github.com/rgwch/elexis-3-core and https://github.com/rgwch/elexis-3-base are obsolete. 
+The repositories https://github.com/rgwch/elexis-3-core and https://github.com/rgwch/elexis-3-base can still have some differences to their respective https://github.com/elexis/elexis-3-xx equivalents, but these are rather some small quick fixes and adaptations.  
 
 ## What it is
 Some more experimental and strictly OpenSource'd extensions from the original creator of Elexis. 
@@ -14,24 +13,24 @@ Link the Repository with the elexis [ungrad plugins](https://elexis.ch/ungrad202
 ## Build:
 
 Prerequisites: Git, jdk17, Maven 3.6.x; Linux or Windows recommended. MacOS will be a bit tricky,
-You'll need also the [elexis-3-core](https://github.com/elexis/elexis-3-core) and [elexis-3-base](https://github.com/elexis/elexis-3-core) already built.
 
-i.e._
+Full build:
 
 ```bash
-git clone -b 3.12 https://github.com/elexis/elexis-3-core
-git clone -b 3.12 https://github.com/elexis/elexis-3-base
+git clone -b 3.12 https://github.com/rgwch/elexis-3-core
+git clone -b 3.12 https://github.com/rgwch/elexis-3-base
 git clone -b ungrad-2024 https://github.com/rgwch/elexis-ungrad
 cd elexis-ungrad
 ./build-all.sh
 
 ```
-
-You'll find the created repository in `ungrad-p2site/target/repository`. You can use this repository from a running Elexis core via 'Help-Install new Software'.
+You'll find the Elexis programs für Linux, Mac and Windows in `./elexis-3-core/ch.elexis.core.p2site/target/products`. The core repository will be in `./elexis-3-core/ch.elexis.core.p2site/target/repository`, the base repository in `./elexis-3-base/ch.elexis.base.p2site/target/repository`, and the ungrad repository in `./elexis-ungrad/ch.elexis.ungrad.p2site/target/repository`.
+(You can use these repoitories from within the running Elexis core instance via 'Help-Install new Software').
 
 ## Develop
 
-Import the elexis-ungrad projects just the same way you did for the elexis-3-core and elexis-3-base projects in the same workspace. I recommend to create a separate working set "ungrad" for the ungrad projects.
+Elexis 3.12 builds well with Eclipse 2024-06. First, set the compiler and JRE to Java 17. Then, import elexis-3-core into the workspace.Wait until build is finished, then load ch.elexis.target/ide.target. Again, eait until the target is resolved. Then click "Set as current target". Now, the build should complete without errors.
+Next, import elexis-3-core and elexis-ungrad into the workspace. I would recommend to create separate workings sets for each import. 
 
 ## Contributing
 
