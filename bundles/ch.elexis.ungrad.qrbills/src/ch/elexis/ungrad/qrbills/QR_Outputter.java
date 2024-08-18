@@ -32,6 +32,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
 
 import ch.elexis.arzttarife_schweiz.Messages;
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.model.InvoiceState;
@@ -44,6 +45,7 @@ import ch.elexis.data.Fall;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.data.Rechnung;
 import ch.elexis.data.Zahlung;
+import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.QrRnOutputter;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.pdf.Manager;
@@ -55,8 +57,8 @@ import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
 
 /**
- * An Elexis-IRnOutputter for ISO 20022 conformant bills. Creates a Tarmed/4.4
- * conformant details page and a summary page with Swiss QR-conformant payment
+ * An Elexis-IRnOutputter for ISO 20022 conformant bills. Creates a Tarmed/4.5
+ * conforming details page and a summary page with Swiss QR-conformant payment
  * slip. Both are created from html templates and ultimately converted to PDF.
  * 
  * @author gerry
@@ -68,7 +70,7 @@ public class QR_Outputter implements IRnOutputter {
 	private QR_Encoder qr;
 	private Manager pdfManager;
 	private boolean modifyInvoiceState;
-	private IConfigService cfg;
+	private IConfigService cfg=ConfigServiceHolder.get();
 
 	public QR_Outputter() {
 		cfg = ConfigServiceHolder.get();
@@ -100,20 +102,25 @@ public class QR_Outputter implements IRnOutputter {
 		qrs.doSave();
 	}
 
+	/**
+	 * To keep things easier, we ask the legacy outputter to produce the tarmedbill-page for us.
+	 * After that, we do the QR-Page and the printing from here.
+	 */
 	@Override
 	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, Properties props) {
 		qr = new QR_Encoder();
 		pdfManager = new Manager();
 		modifyInvoiceState = true;
-
-		// String outputDirPDF = cfg.getLocal(PreferenceConstants.RNN_DIR_PDF,
-		// CoreHub.getTempDir().getAbsolutePath());
-		// String outputDirXML = cfg.getLocal(PreferenceConstants.RNN_DIR_XML,
-		// CoreHub.getTempDir().getAbsolutePath());
-		// String pdfoutout=cfg.getLocal(OutputterUtil.CFG_PRINT_GLOBALPDFDIR,
-		// outputDirXML)
-		// boolean useGlobal=OutputterUtil.useGlobalOutputDirs();
-		// LocalConfigService.set(outputDirXML, modifyInvoiceState);
+		boolean legacy_useGlobalDirs=OutputterUtil.useGlobalOutputDirs();
+		cfg.setLocal(OutputterUtil.CFG_PRINT_GLOBALOUTPUTDIRS, false);
+		String legacy_root=QrRnOutputter.CFG_ROOT;
+		String legacy_xmlDir=cfg.getLocal(legacy_root+QrRnOutputter.XMLDIR, "");
+		String legacy_pdfDir=cfg.getLocal(legacy_root+QrRnOutputter.PDFDIR,"");
+		
+		String outputDirPDF = cfg.getLocal(PreferenceConstants.RNN_DIR_PDF, CoreHub.getTempDir().getAbsolutePath());
+		String outputDirXML = cfg.getLocal(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
+		cfg.setLocal(legacy_root+QrRnOutputter.XMLDIR,outputDirXML);
+		cfg.setLocal(legacy_root+QrRnOutputter.PDFDIR, outputDirPDF);
 		QrRnOutputter legacyOutputter = new QrRnOutputter();
 		props.put(IRnOutputter.PROP_OUTPUT_NOUI, "true");
 		props.put(IRnOutputter.PROP_OUTPUT_NOPRINT, "true");
