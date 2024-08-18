@@ -19,12 +19,12 @@ Full build:
 ```bash
 git clone -b 3.12 https://github.com/rgwch/elexis-3-core
 git clone -b 3.12 https://github.com/rgwch/elexis-3-base
-git clone -b ungrad-2024 https://github.com/rgwch/elexis-ungrad
-cd elexis-ungrad
+git clone -b ungrad-2024 https://github.com/rgwch/elexis-ungrad elexis-ungrad-plugins
+cd elexis-ungrad-plugins
 ./build-all.sh
 
 ```
-You'll find the Elexis programs für Linux, Mac and Windows in `./elexis-3-core/ch.elexis.core.p2site/target/products`. The core repository will be in `./elexis-3-core/ch.elexis.core.p2site/target/repository`, the base repository in `./elexis-3-base/ch.elexis.base.p2site/target/repository`, and the ungrad repository in `./elexis-ungrad/ch.elexis.ungrad.p2site/target/repository`.
+You'll find the Elexis programs für Linux, Mac and Windows in `./elexis-3-core/ch.elexis.core.p2site/target/products`. The core repository will be in `./elexis-3-core/ch.elexis.core.p2site/target/repository`, the base repository in `./elexis-3-base/ch.elexis.base.p2site/target/repository`, and the ungrad repository in `./elexis-ungrad-plugins/ch.elexis.ungrad.p2site/target/repository`.
 (You can use these repoitories from within the running Elexis core instance via 'Help-Install new Software').
 
 ## Develop
