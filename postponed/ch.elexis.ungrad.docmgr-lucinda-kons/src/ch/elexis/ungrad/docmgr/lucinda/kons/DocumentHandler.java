@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2022 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -22,7 +22,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
-import ch.elexis.admin.AccessControlDefaults;
+// import ch.elexis.admin.AccessControlDefaults;
 import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.ungrad.lucinda.IDocumentHandler;
@@ -31,27 +31,31 @@ import ch.elexis.ungrad.lucinda.controller.Controller;
 import ch.elexis.ungrad.lucinda.view.Messages;
 
 public class DocumentHandler implements IDocumentHandler {
-	//ch.elexis.core.ui.icons/icons/16x16/book_open_view.png
+	// ch.elexis.core.ui.icons/icons/16x16/book_open_view.png
 	private ConsultationIndexer indexer = new ConsultationIndexer();
 	private ImageDescriptor icon;
-	
-	public DocumentHandler(){
+
+	public DocumentHandler() {
 		icon = AbstractUIPlugin.imageDescriptorFromPlugin("ch.elexis.core.ui.icons", //$NON-NLS-1$
-			"/icons/16x16/book_open_view.png");
-		
+				"/icons/16x16/book_open_view.png");
+
 	}
-	
+
 	@Override
-	public IAction getSyncAction(Controller controller){
-		IAction indexKonsAction = new RestrictedAction(AccessControlDefaults.DOCUMENT_CREATE,
-			Messages.GlobalView_synckons_Name, Action.AS_CHECK_BOX) {
+	public IAction getSyncAction(Controller controller) {
+		// IAction indexKonsAction = new
+		// RestrictedAction(AccessControlDefaults.DOCUMENT_CREATE,
+		IAction indexKonsAction = new Action(
+
+				Messages.GlobalView_synckons_Name, Action.AS_CHECK_BOX) {
 			{
 				setToolTipText(Messages.GlobalView_synckons_tooltip);
 				setImageDescriptor(Images.IMG_GEAR.getImageDescriptor());
 			}
-			
+
 			@Override
-			public void doRun(){
+			public void run() {
+			// public void doRun() {
 				if (this.isChecked()) {
 					indexer.start(controller);
 				} else {
@@ -64,28 +68,27 @@ public class DocumentHandler implements IDocumentHandler {
 			indexer.start(controller);
 			indexKonsAction.setChecked(true);
 		}
-		
+
 		return indexKonsAction;
-		
+
 	}
-	
+
 	@Override
-	public IAction getFilterAction(Controller controller){
-		IAction showConsAction =
-			new Action(Messages.GlobalView_filterKons_name, Action.AS_CHECK_BOX) {
-				{
-					setToolTipText(Messages.GlobalView_filterKons_tooltip);
-					setImageDescriptor(icon);
-				}
-				
-				@Override
-				public void run(){
-					controller.toggleDoctypeFilter(isChecked(), Preferences.KONSULTATION_NAME);
-					Preferences.set(SHOW_CONS, isChecked());
-				}
-			};
+	public IAction getFilterAction(Controller controller) {
+		IAction showConsAction = new Action(Messages.GlobalView_filterKons_name, Action.AS_CHECK_BOX) {
+			{
+				setToolTipText(Messages.GlobalView_filterKons_tooltip);
+				setImageDescriptor(icon);
+			}
+
+			@Override
+			public void run() {
+				controller.toggleDoctypeFilter(isChecked(), Preferences.KONSULTATION_NAME);
+				Preferences.set(SHOW_CONS, isChecked());
+			}
+		};
 		showConsAction.setChecked(Preferences.is(SHOW_CONS));
 		return showConsAction;
 	}
-	
+
 }

@@ -70,7 +70,7 @@ public class QR_Outputter implements IRnOutputter {
 	private QR_Encoder qr;
 	private Manager pdfManager;
 	private boolean modifyInvoiceState;
-	private IConfigService cfg=ConfigServiceHolder.get();
+	private IConfigService cfg = ConfigServiceHolder.get();
 
 	public QR_Outputter() {
 		cfg = ConfigServiceHolder.get();
@@ -103,36 +103,41 @@ public class QR_Outputter implements IRnOutputter {
 	}
 
 	/**
-	 * To keep things easier, we ask the legacy outputter to produce the tarmedbill-page for us.
-	 * After that, we do the QR-Page and the printing from here.
+	 * To keep things easier, we ask the legacy outputter to produce the
+	 * tarmedbill-page for us. After that, we do the QR-Page and the printing from
+	 * here.
 	 */
 	@Override
 	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, Properties props) {
 		qr = new QR_Encoder();
 		pdfManager = new Manager();
 		modifyInvoiceState = true;
-		boolean legacy_useGlobalDirs=OutputterUtil.useGlobalOutputDirs();
-		cfg.setLocal(OutputterUtil.CFG_PRINT_GLOBALOUTPUTDIRS, false);
-		String legacy_root=QrRnOutputter.CFG_ROOT;
-		String legacy_xmlDir=cfg.getLocal(legacy_root+QrRnOutputter.XMLDIR, "");
-		String legacy_pdfDir=cfg.getLocal(legacy_root+QrRnOutputter.PDFDIR,"");
+		// hack: save original config and set our paths. Then let the medeleix outputter create the Tarmed-Form
 		
+		boolean legacy_useGlobalDirs = OutputterUtil.useGlobalOutputDirs();
+		cfg.setLocal(OutputterUtil.CFG_PRINT_GLOBALOUTPUTDIRS, false);
+		String legacy_root = QrRnOutputter.CFG_ROOT;
+		String legacy_xmlDir = cfg.getLocal(legacy_root + QrRnOutputter.XMLDIR, "");
+		String legacy_pdfDir = cfg.getLocal(legacy_root + QrRnOutputter.PDFDIR, "");
+
 		String outputDirPDF = cfg.getLocal(PreferenceConstants.RNN_DIR_PDF, CoreHub.getTempDir().getAbsolutePath());
 		String outputDirXML = cfg.getLocal(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
-		cfg.setLocal(legacy_root+QrRnOutputter.XMLDIR,outputDirXML);
-		cfg.setLocal(legacy_root+QrRnOutputter.PDFDIR, outputDirPDF);
+		cfg.setLocal(legacy_root + QrRnOutputter.XMLDIR, outputDirXML);
+		cfg.setLocal(legacy_root + QrRnOutputter.PDFDIR, outputDirPDF);
 		QrRnOutputter legacyOutputter = new QrRnOutputter();
 		props.put(IRnOutputter.PROP_OUTPUT_NOUI, "true");
 		props.put(IRnOutputter.PROP_OUTPUT_NOPRINT, "true");
 		cfg.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR, false);
 		cfg.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
-		// LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR,
-		// false);
-		// LocalConfigService.set(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF,
-		// true);
-
+		
 		Result<Rechnung> result = legacyOutputter.doOutput(type, rnn, props);
+		// reset original config
+		cfg.setLocal(legacy_root + QrRnOutputter.XMLDIR, legacy_xmlDir);
+		cfg.setLocal(legacy_root + QrRnOutputter.PDFDIR, legacy_pdfDir);
+		cfg.setLocal(OutputterUtil.CFG_PRINT_GLOBALOUTPUTDIRS, legacy_useGlobalDirs);
+
 		if (result.isOK()) {
+			// If tarmed-forms are ok, create QR-Forms and print both (doPrint)
 			IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 			try {
 				progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {

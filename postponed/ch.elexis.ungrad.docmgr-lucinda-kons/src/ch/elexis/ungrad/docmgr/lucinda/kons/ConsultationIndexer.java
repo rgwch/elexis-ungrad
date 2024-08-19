@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -24,8 +24,8 @@ import java.util.Map;
 
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import ch.elexis.data.Fall;
 import ch.elexis.data.Konsultation;
@@ -41,8 +41,11 @@ import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.TimeTool;
 import ch.rgw.tools.VersionedResource;
 
+
 public class ConsultationIndexer implements Customer {
-	Logger log = LoggerFactory.getLogger(ConsultationIndexer.class);
+	static final String TABLENAME="BEHANDLUNGEN"; //Konsultation.TABLENAME
+
+	// Logger log = LoggerFactory.getLogger(ConsultationIndexer.class);
 	private boolean cont = false;
 	private IProgressController pc;
 	Long progressHandle;
@@ -72,7 +75,7 @@ public class ConsultationIndexer implements Customer {
 		} catch (NumberFormatException nex) {
 			lastCheck = 0L;
 		}
-		StringBuilder querySQL = new StringBuilder("SELECT ID FROM ").append(Konsultation.TABLENAME)
+		StringBuilder querySQL = new StringBuilder("SELECT ID FROM ").append(TABLENAME)
 			.append(" WHERE lastupdate >=").append(lastCheck).append(" AND deleted='0' ORDER BY ")
 			.append("lastupdate");
 		
@@ -153,7 +156,8 @@ public class ConsultationIndexer implements Customer {
 				meta.put("type", Preferences.KONSULTATION_NAME); //$NON-NLS-1$
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
-				log.error("error indexing " + kons.getLabel(), e); //$NON-NLS-1$
+				// log.error("error indexing " + kons.getLabel(), e); //$NON-NLS-1$
+				ExHandler.handle(e);
 			}
 			if (kons.getLastUpdate() > lastCheck) {
 				lastCheck = kons.getLastUpdate();
