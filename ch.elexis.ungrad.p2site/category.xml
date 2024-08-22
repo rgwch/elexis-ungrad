@@ -30,6 +30,9 @@
    <feature url="features/ch.elexis.ungrad.laborimport_risch.feature_0.0.0.jar" id="ch.elexis.ungrad.laborimport_risch.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.importers"/>
    </feature>
+   <feature url="features/ch.elexis.ungrad.privatrechnung_qr.feature_0.0.0.jar" id="ch.elexis.ungrad.privatrechnung_qr.feature" version="0.0.0">
+      <category name="ch.elexis.ungrad.financial"/>
+   </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>
