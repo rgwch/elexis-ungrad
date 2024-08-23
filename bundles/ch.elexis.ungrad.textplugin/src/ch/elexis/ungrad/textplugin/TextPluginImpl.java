@@ -23,10 +23,10 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.swt.widgets.Composite;
 
 import ch.elexis.core.text.ReplaceCallback;
-import ch.elexis.core.ui.text.ITextPlugin;
+import ch.elexis.core.text.ITextPlugin;
 import ch.rgw.tools.ExHandler;
 
-public class TextPluginImpl implements ITextPlugin {
+public class TextPluginImpl implements ITextPlugin, ch.elexis.core.ui.text.ITextPlugin {
 	
 	private PageFormat format = PageFormat.A4;
 	private Parameter param;
@@ -48,40 +48,11 @@ public class TextPluginImpl implements ITextPlugin {
 		param = parameter;
 	}
 	
-	@Override
-	public void setFocus(){
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void dispose(){
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void showMenu(boolean b){
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void showToolbar(boolean b){
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void setSaveOnFocusLost(boolean bSave){
-		// TODO Auto-generated method stub
-		
-	}
 	
 	@Override
 	public boolean createEmptyDocument(){
 		try {
-			// doc.loadTemplate("frame.html", "");
+			doc=new HtmlDoc();
 			return true;
 		} catch (Exception e) {
 			ExHandler.handle(e);
@@ -187,6 +158,7 @@ public class TextPluginImpl implements ITextPlugin {
 		return true;
 	}
 	
+
 	@Override
 	public boolean print(String toPrinter, String toTray, boolean waitUntilFinished){
 		try {
@@ -204,17 +176,6 @@ public class TextPluginImpl implements ITextPlugin {
 		return "text/html";
 	}
 	
-	@Override
-	public boolean isDirectOutput(){
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public void initTemplatePrintSettings(String template){
-		// TODO Auto-generated method stub
-		
-	}
 	
 	@Override
 	public Composite createContainer(Composite parent, ICallback handler){
@@ -222,13 +183,7 @@ public class TextPluginImpl implements ITextPlugin {
 		return display;
 	}
 	
-	@Override
-	public void setInitializationData(IConfigurationElement arg0, String arg1, Object arg2)
-		throws CoreException{
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public int findCount(String text) {
 		// TODO Auto-generated method stub
@@ -243,8 +198,56 @@ public class TextPluginImpl implements ITextPlugin {
 
 	@Override
 	public Object getCurrentDocument() {
+		return doc;
+	}
+
+	@Override
+	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
+			throws CoreException {
 		// TODO Auto-generated method stub
-		return null;
+		
+	}
+
+	@Override
+	public void setFocus() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showMenu(boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showToolbar(boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setSaveOnFocusLost(boolean bSave) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isDirectOutput() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void initTemplatePrintSettings(String template) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

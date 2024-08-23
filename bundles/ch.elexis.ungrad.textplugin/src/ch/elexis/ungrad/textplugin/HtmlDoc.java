@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022 by G. Weirich
+ * Copyright (c) 2022-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -45,7 +45,7 @@ import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
 
 public class HtmlDoc {
-	final static String VERSION = "1.0.1";
+	final static String VERSION = "1.1.0";
 	String template;
 	private String outputFile;
 	private Map<String, String> prefilled = new HashMap<String, String>();
