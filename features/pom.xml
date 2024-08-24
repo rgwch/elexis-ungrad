@@ -24,5 +24,7 @@
         <module>ch.elexis.ungrad.laborimport_risch.feature</module>
         <module>ch.elexis.ungrad.laborimport_sftp.feature</module>
         <module>ch.elexis.ungrad.kassenbuch.feature</module>
+        <module>ch.elexis.ungrad.privatrechnung_qr.feature</module>
+ 
     </modules>
 </project>

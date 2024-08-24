@@ -2,7 +2,7 @@
 <feature
       id="ch.elexis.ungrad.privatrechnung_qr.feature"
       label="Privatrechnung mit QR-Code"
-      version="1.0.1.qualifier"
+      version="1.2.0.qualifier"
       provider-name="weirich@elexis.ch">
 
    <description url="http://www.example.com/description">
@@ -24,9 +24,6 @@
 
    <plugin
          id="ch.elexis.ungrad.privatrechnung_qr"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
 </feature>

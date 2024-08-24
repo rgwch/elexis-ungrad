@@ -5,6 +5,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ch.elexis.omnivore"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ch.elexis.omnivore.data"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ch.elexis.omnivore.ui"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
