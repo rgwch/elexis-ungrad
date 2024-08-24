@@ -30,24 +30,28 @@ import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
-import ch.elexis.data.Brief;
-import ch.elexis.data.Kontakt;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.text.templator.ui.OOOProcessorPrefs;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
-import ch.rgw.tools.StringTool;
 
+/**
+ * Representation of an OpenDocument file.
+ */
 public class ODFDoc {
 	private Map<String, String> fields = new HashMap<String, String>();
 	private byte[] template;
-	private String title="Ausgang";
+	private String title = "Ausgang";
 	private boolean bExternal = false;
 	private IContextService ctx = ContextServiceHolder.get();
 	private IConfigService cfg = ConfigServiceHolder.get();
 
 	public void clear() {
 		fields.clear();
+	}
+	public void setTitle(String t) {
+		title=t;
+		
 	}
 
 	/**
@@ -57,31 +61,20 @@ public class ODFDoc {
 	 * @param brief
 	 * @return All Text variables found in the content of the Brief
 	 * @throws Exception
+	 * 
+	 *                   public Map<String, String> parseTemplate(Brief brief)
+	 *                   throws Exception { ByteArrayInputStream bais = new
+	 *                   ByteArrayInputStream(brief.loadBinary());
+	 *                   parseTemplate(bais); String nt = brief.getBetreff(); if
+	 *                   (StringTool.isNothing(nt)) { title = "Brief"; } else {
+	 *                   title = nt; }
+	 * 
+	 *                   Kontakt k = brief.getAdressat(); if (k != null) { String n1
+	 *                   = k.get(Kontakt.FLD_NAME1); if (n1 != null) { title += "_"
+	 *                   + n1; } String n2 = k.get(Kontakt.FLD_NAME2); if (n2 !=
+	 *                   null) { title += "_" + n2; } } bExternal = false; return
+	 *                   fields; }
 	 */
-	public Map<String, String> parseTemplate(Brief brief) throws Exception {
-		ByteArrayInputStream bais = new ByteArrayInputStream(brief.loadBinary());
-		parseTemplate(bais);
-		String nt = brief.getBetreff();
-		if (StringTool.isNothing(nt)) {
-			title = "Brief";
-		} else {
-			title = nt;
-		}
-
-		Kontakt k = brief.getAdressat();
-		if (k != null) {
-			String n1 = k.get(Kontakt.FLD_NAME1);
-			if (n1 != null) {
-				title += "_" + n1;
-			}
-			String n2 = k.get(Kontakt.FLD_NAME2);
-			if (n2 != null) {
-				title += "_" + n2;
-			}
-		}
-		bExternal = false;
-		return fields;
-	}
 
 	/**
 	 * Analyze an ODT-Stream for text variables and collect such variables in
@@ -101,7 +94,6 @@ public class ODFDoc {
 			if (ze.getName().equals("content.xml") || ze.getName().equals("styles.xml")) {
 				byte[] cnt = readStream(zis);
 				Pattern pFields = Pattern.compile("\\[[\\s\\w\\.:\\/0-9]+\\]");
-				// String text = new String(cnt, "utf-8");
 				Matcher matcher = pFields.matcher(new String(cnt, "utf-8"));
 				while (matcher.find()) {
 					String found = matcher.group();
@@ -109,6 +101,7 @@ public class ODFDoc {
 				}
 				zos.write(cnt);
 			} else if (ze.getName().equals("meta.xml")) {
+				/* Look for the document title also in document metadata */
 				byte[] meta = readStream(zis);
 				String s = new String(meta);
 				Pattern pTitle = Pattern.compile("<dc:title>(.+)</dc:title>");
@@ -250,5 +243,7 @@ public class ODFDoc {
 
 		return buffer.toByteArray();
 	}
+
+	
 
 }

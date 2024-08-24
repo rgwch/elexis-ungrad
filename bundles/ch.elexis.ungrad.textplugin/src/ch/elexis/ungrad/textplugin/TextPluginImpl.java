@@ -53,6 +53,7 @@ public class TextPluginImpl implements ITextPlugin, ch.elexis.core.ui.text.IText
 	public boolean createEmptyDocument(){
 		try {
 			doc=new HtmlDoc();
+		
 			return true;
 		} catch (Exception e) {
 			ExHandler.handle(e);

@@ -17,6 +17,9 @@ import java.io.OutputStream;
 
 import ch.rgw.tools.StringTool;
 
+/**
+ * A Filter Stream that looks for [variables] and replaces them with their computed values 
+ */
 public class OdfTemplateFilterStream extends FilterOutputStream {
 	private StringBuilder sb;
 	private static final int AWAIT_START = 0;
@@ -43,6 +46,10 @@ public class OdfTemplateFilterStream extends FilterOutputStream {
 		super.flush();
 	}
 
+	/**
+	 * We wait for the character '['. If found, collect all characters until a ']' is found.
+	 * Then, find the field in the document matching the found variable name and write its content into the stream.
+	 */
 	@Override
 	public void write(int b) throws IOException {
 		switch (state) {

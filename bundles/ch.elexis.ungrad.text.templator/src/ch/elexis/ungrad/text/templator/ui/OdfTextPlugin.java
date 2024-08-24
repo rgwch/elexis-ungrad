@@ -26,14 +26,13 @@ import org.eclipse.swt.widgets.Composite;
 import ch.elexis.core.text.ITextPlugin;
 import ch.elexis.core.text.MimeTypeUtil;
 import ch.elexis.core.text.ReplaceCallback;
-import ch.elexis.core.ui.text.ITextPlugin.ICallback;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.text.templator.model.ODFDoc;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 
 /**
- * The ITextPlugin. 
+ * The ITextPlugin.
  * 
  * @author gerry
  *
@@ -277,7 +276,7 @@ public class OdfTextPlugin implements ITextPlugin, ch.elexis.core.ui.text.ITextP
 
 	@Override
 	public void initTemplatePrintSettings(String template) {
-		// TODO Auto-generated method stub
+		doc.setTitle(template);
 
 	}
 
