@@ -25,6 +25,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.IContextService;
@@ -45,13 +46,15 @@ public class ODFDoc {
 	private boolean bExternal = false;
 	private IContextService ctx = ContextServiceHolder.get();
 	private IConfigService cfg = ConfigServiceHolder.get();
+	private StorageController storageController = new StorageController();
 
 	public void clear() {
 		fields.clear();
 	}
+
 	public void setTitle(String t) {
-		title=t;
-		
+		title = t;
+
 	}
 
 	/**
@@ -205,23 +208,29 @@ public class ODFDoc {
 	 */
 	public boolean doOutput() {
 		try {
-			StorageController sc = new StorageController();
-			File output = sc.createFileFor(ctx.getActivePatient().get().getId(), title + ".odt");
+			File output = storageController.createFileFor(ctx.getActivePatient().get().getId(), title + ".odt");
 			if (!bExternal || !output.exists()) {
 				byte[] contents = asByteArray();
 				FileTool.writeFile(output, contents);
 			}
+			return editFile(output.getAbsolutePath());
+		} catch (Exception e) {
+			ExHandler.handle(e);
+			SWTHelper.alert("OpenOffice Processor", "Problem mit dem Erstellen des Dokuments " + e.getMessage());
+		}
+		return false;
+	}
+
+	public boolean editFile(String file) {
+		try {
 			String cmd = cfg.getLocal(OOOProcessorPrefs.PREFERENCE_BRANCH + "cmd", "soffice");
-			// String cmd = CoreHub.localCfg.get(OOOProcessorPrefs.PREFERENCE_BRANCH +
-			// "cmd", "soffice");
 			String param = cfg.getLocal(OOOProcessorPrefs.PREFERENCE_BRANCH + "param", "%");
 			int i = param.indexOf('%');
 			if (i != -1) {
-				param = param.substring(0, i) + output.getAbsolutePath() + param.substring(i + 1);
+				param = param.substring(0, i) + file + param.substring(i + 1);
 			}
 
-			/* Process process = */ Runtime.getRuntime().exec(new String[] { cmd, param });
-			// process.waitFor();
+			Runtime.getRuntime().exec(new String[] { cmd, param });
 
 			return true;
 		} catch (Exception e) {
@@ -229,6 +238,16 @@ public class ODFDoc {
 			SWTHelper.alert("OpenOffice Processor", "Problem mit dem Erstellen des Dokuments " + e.getMessage());
 		}
 		return false;
+
+	}
+
+	public File getDocumentDirectory() {
+		try {
+			return storageController.getOutputDirFor(ctx.getActivePatient().get().getId(), true);
+		} catch (Exception ex) {
+			ExHandler.handle(ex);
+			return CoreHub.getTempDir();
+		}
 	}
 
 	private byte[] readStream(InputStream is) throws Exception {
@@ -243,7 +262,5 @@ public class ODFDoc {
 
 		return buffer.toByteArray();
 	}
-
-	
 
 }

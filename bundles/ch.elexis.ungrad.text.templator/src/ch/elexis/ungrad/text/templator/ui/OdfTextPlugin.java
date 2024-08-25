@@ -13,6 +13,8 @@ package ch.elexis.ungrad.text.templator.ui;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map.Entry;
@@ -21,12 +23,16 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Dialog;
+import org.eclipse.swt.widgets.FileDialog;
 
 import ch.elexis.core.text.ITextPlugin;
 import ch.elexis.core.text.MimeTypeUtil;
 import ch.elexis.core.text.ReplaceCallback;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.text.templator.model.ODFDoc;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
@@ -63,7 +69,13 @@ public class OdfTextPlugin implements ITextPlugin, ch.elexis.core.ui.text.ITextP
 			ByteArrayInputStream bais = new ByteArrayInputStream(bs);
 			return loadFromStream(bais, asTemplate);
 		} else {
-			doc.setTemplate(bs, "");
+			FileDialog fd = new FileDialog(display.getShell());
+			fd.setFilterPath(doc.getDocumentDirectory().getAbsolutePath());
+			String result = fd.open();
+			if (result != null) {
+				System.out.print(result);
+				doc.editFile(result);
+			}
 			display.set(doc);
 			return true;
 		}
