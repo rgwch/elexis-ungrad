@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="ch.elexis.ungrad.qrbills.feature" label="Tarmed Bills with QR" version="1.0.2.qualifier" provider-name="weirich@elexis.ch">
+<feature
+      id="ch.elexis.ungrad.qrbills.feature"
+      label="Tarmed Bills with QR"
+      version="2.4.1.qualifier"
+      provider-name="weirich@elexis.ch">
 
    <description url="http://www.example.com/description">
       Print Bills conforming to the iso 20022 QR-Standard
@@ -25,6 +29,8 @@
       <import plugin="ch.elexis.ungrad.pdf"/>
    </requires>
 
-   <plugin id="ch.elexis.ungrad.qrbills" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+   <plugin
+         id="ch.elexis.ungrad.qrbills"
+         version="0.0.0"/>
 
 </feature>
