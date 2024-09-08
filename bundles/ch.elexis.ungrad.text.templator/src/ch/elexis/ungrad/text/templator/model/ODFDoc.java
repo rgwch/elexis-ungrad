@@ -208,7 +208,7 @@ public class ODFDoc {
 	 */
 	public boolean doOutput() {
 		try {
-			File output = storageController.createFileFor(ctx.getActivePatient().get().getId(), title + ".odt");
+			File output = storageController.createFileFor(ctx.getActivePatient().get().getId(), title, ".odt", false);
 			if (!bExternal || !output.exists()) {
 				byte[] contents = asByteArray();
 				FileTool.writeFile(output, contents);

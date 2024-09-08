@@ -31,10 +31,15 @@ public class StorageController {
 
 	IContextService contextService = ContextServiceHolder.get();
 
-	public File createFileFor(String id, String title) throws Exception {
+	public File createFileFor(String id, String title, String extension, boolean bOverwrite) throws Exception {
 		File dir = getOutputDirFor(id, true);
 		String name = createOutputFilename(title);
-		return new File(dir, name);
+		File ret = new File(dir, name + extension);
+		if (ret.exists() && !bOverwrite) {
+			String suffix = new TimeTool().toString(TimeTool.TIME_COMPACT);
+			ret = createFileFor(id, title + "_" + suffix, extension, false);
+		}
+		return ret;
 	}
 
 	/**
