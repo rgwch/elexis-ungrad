@@ -33,7 +33,6 @@ import org.eclipse.ui.progress.IProgressService;
 
 import ch.elexis.arzttarife_schweiz.Messages;
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.services.IConfigService;
@@ -112,8 +111,9 @@ public class QR_Outputter implements IRnOutputter {
 		qr = new QR_Encoder();
 		pdfManager = new Manager();
 		modifyInvoiceState = true;
-		// hack: save original config and set our paths. Then let the medeleix outputter create the Tarmed-Form
-		
+		// hack: save original config and set our paths. Then let the medeleix outputter
+		// create the Tarmed-Form
+
 		boolean legacy_useGlobalDirs = OutputterUtil.useGlobalOutputDirs();
 		cfg.setLocal(OutputterUtil.CFG_PRINT_GLOBALOUTPUTDIRS, false);
 		String legacy_root = QrRnOutputter.CFG_ROOT;
@@ -129,7 +129,7 @@ public class QR_Outputter implements IRnOutputter {
 		props.put(IRnOutputter.PROP_OUTPUT_NOPRINT, "true");
 		cfg.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_BESR, false);
 		cfg.setLocal(QrRnOutputter.CFG_ROOT + QrRnOutputter.CFG_PRINT_RF, true);
-		
+
 		Result<Rechnung> result = legacyOutputter.doOutput(type, rnn, props);
 		// reset original config
 		cfg.setLocal(legacy_root + QrRnOutputter.XMLDIR, legacy_xmlDir);
@@ -240,9 +240,17 @@ public class QR_Outputter implements IRnOutputter {
 			if (LocalConfigService.get(PreferenceConstants.FACE_DOWN, false)) {
 				printQRPage(bill);
 				monitor.worked(1);
-				sendToPrinter(rfFile);
+				if (LocalConfigService.get(PreferenceConstants.PRINT_TARMED, true)) {
+					sendToPrinter(rfFile);
+				}else {
+					rfFile.delete();
+				}
 			} else {
-				sendToPrinter(rfFile);
+				if (LocalConfigService.get(PreferenceConstants.PRINT_TARMED, false)) {
+					sendToPrinter(rfFile);
+				}else {
+					rfFile.delete();
+				}
 				monitor.worked(1);
 				printQRPage(bill);
 			}
