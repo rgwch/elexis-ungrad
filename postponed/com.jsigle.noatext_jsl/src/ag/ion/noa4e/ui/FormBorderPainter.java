@@ -39,8 +39,6 @@ package ag.ion.noa4e.ui;
 import org.eclipse.swt.SWT;
 
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.custom.TableTree;
-
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 
@@ -67,7 +65,7 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
  * the paintBordersFor(...) method of the FormToolkit. Use the paintBordersFor(...)
  * method of this border painter. 
  * 
- * @author Andreas Bröker
+ * @author Andreas Brï¿½ker
  * @version $Revision: 9195 $
  * @date 25.02.2006
  */
@@ -81,7 +79,7 @@ public class FormBorderPainter implements PaintListener {
 	 * 
 	 * @param composite composite to be used
 	 * 
-	 * @author Andreas Bröker
+	 * @author Andreas Brï¿½ker
 	 * @date 25.02.2006
 	 */
 	public static void paintBordersFor(Composite composite) {
@@ -98,7 +96,7 @@ public class FormBorderPainter implements PaintListener {
 	 *
 	 * @param paintEvent an event containing information about the paint
 	 * 
-	 * @author Andreas Bröker
+	 * @author Andreas Brï¿½ker
 	 * @date 25.02.2006
 	 */
 	public void paintControl(PaintEvent paintEvent) {
@@ -128,7 +126,7 @@ public class FormBorderPainter implements PaintListener {
 					continue;
 				}
 				if (control instanceof Text || control instanceof Table
-						|| control instanceof Tree || control instanceof TableTree)
+						|| control instanceof Tree)
 					continue;
 			}
 			if (!inactiveBorder
@@ -149,7 +147,7 @@ public class FormBorderPainter implements PaintListener {
 							b.height + 3);
 			} 
 			else if (inactiveBorder || control instanceof Table
-					|| control instanceof Tree || control instanceof TableTree) {
+					|| control instanceof Tree) {
 				Rectangle b = control.getBounds();
 				GC gc = paintEvent.gc;
 				gc.setForeground(NOAUIPlugin.getFormToolkit().getColors().getBorderColor());
@@ -164,7 +162,7 @@ public class FormBorderPainter implements PaintListener {
 	/**
 	 * Prevents instantiation.
 	 *
-	 * @author Andreas Bröker
+	 * @author Andreas Brï¿½ker
 	 * @date 25.02.2006
 	 */
 	private FormBorderPainter() {

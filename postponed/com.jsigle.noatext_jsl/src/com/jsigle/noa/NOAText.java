@@ -101,6 +101,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -162,7 +163,7 @@ import ag.ion.noa4e.internal.ui.preferences.LocalOfficeApplicationPreferencesPag
 import ag.ion.noa4e.ui.widgets.OfficePanel;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
-import ch.elexis.core.data.interfaces.text.ReplaceCallback;
+import ch.elexis.core.text.ReplaceCallback;
 import ch.elexis.core.ui.text.ITextPlugin;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
@@ -1436,5 +1437,23 @@ public class NOAText implements ITextPlugin {
 	public void initTemplatePrintSettings(String template) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public int findCount(String text) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<String> findMatching(String pattern) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object getCurrentDocument() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
