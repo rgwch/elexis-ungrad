@@ -25,6 +25,6 @@
         <module>ch.elexis.ungrad.laborimport_sftp</module>
         <module>ch.elexis.ungrad.kassenbuch</module>
         <module>ch.elexis.ungrad.privatrechnung_qr</module>
-  
+        <module>com.jsigle.noatext_jsl</module>
     </modules>
 </project>
