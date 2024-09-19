@@ -24,7 +24,6 @@ Bundle-ClassPath: .,
  lib/ridl.jar,
  lib/sandbox.jar,
  lib/unoil.jar,
- bin/,
  lib/
 Eclipse-LazyStart: true
 Bundle-Activator: ag.ion.bion.workbench.office.editor.core.EditorCorePlugin
