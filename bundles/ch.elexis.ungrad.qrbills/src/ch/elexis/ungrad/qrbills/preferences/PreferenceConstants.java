@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018-2022 by G. Weirich
+ * Copyright (c) 2018-2024 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -32,6 +32,7 @@ public class PreferenceConstants {
 	public static final String PRINT_TARMED = BASE + "/print_tarmed";
 	public static final String DEBUGFILES = BASE + "/debugfiles";
 	public static final String MISSING_DATA = BASE + "/missing_data";
+	public static final String BY_MAIL_IF_STICKER = BASE + "/sendByMailSticker";
 	// Extinfo entries
 	public static final String QRBANK = BASE + "/bank";
 	public static final String QRIBAN = BASE + "/iban";

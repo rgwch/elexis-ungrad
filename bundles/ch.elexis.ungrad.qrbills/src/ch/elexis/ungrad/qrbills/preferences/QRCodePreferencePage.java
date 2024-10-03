@@ -13,6 +13,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -27,20 +28,25 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.UiDesk;
+import ch.elexis.core.ui.dialogs.EtiketteDruckenDialog;
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Mandant;
+import ch.elexis.data.Patient;
 import ch.elexis.data.Query;
+import ch.elexis.data.Sticker;
+import ch.rgw.tools.StringTool;
 
 public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 	private Combo cbMandanten;
+	private Combo cbMailSticker;
 	private Hyperlink hlBank;
 	private Text txBank;
 	private Label lbIban;
 	private Text txIban;
-	private FileFieldEditor ffe1,ffe2,ffe3,ffe4;
+	private FileFieldEditor ffe1, ffe2, ffe3, ffe4;
 	private Mandant currentMandator;
 	private static final String ERRMSG_BAD_IBAN = "Eine zulässige QR-IBAN muss genau 21 Zeichen lang sein und mit CH oder LI beginnen.";
 	private static final String ERRMSG_BAD_BANK = "Die gewählte Bank ist nicht gültig.";
@@ -134,15 +140,50 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 				applyFields();
 			}
 		});
-		ffe1=new FileFieldEditor(PreferenceConstants.TEMPLATE_BILL, "Vorlage für Rechnung", ret);
-		ffe2=new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER1, "Vorlage für Mahnung 1", ret);
-		ffe3=new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER2, "Vorlage für Mahnung 2", ret);
-		ffe4=new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER3, "Vorlage für Mahnung 3", ret);
-		ffe1.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL,""));
-		ffe2.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1,""));
-		ffe3.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2,""));
-		ffe4.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3,""));
+		ffe1 = new FileFieldEditor(PreferenceConstants.TEMPLATE_BILL, "Vorlage für Rechnung", ret);
+		ffe2 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER1, "Vorlage für Mahnung 1", ret);
+		ffe3 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER2, "Vorlage für Mahnung 2", ret);
+		ffe4 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER3, "Vorlage für Mahnung 3", ret);
+		ffe1.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL, ""));
+		ffe2.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1, ""));
+		ffe3.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2, ""));
+		ffe4.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3, ""));
+		Button bSticker = new Button(ret, SWT.CHECK);
+		bSticker.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
+		bSticker.setText("Rechnungen an Patienten mit folgendem Sticker per Mail senden");
+		cbMailSticker = new Combo(ret, SWT.READ_ONLY);
+		cbMailSticker.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
+		List<Sticker> stickers = Sticker.getStickersForClass(Patient.class);
+		for (Sticker sticker : stickers) {
+			cbMailSticker.add(sticker.getLabel());
+		}
+		String mailStickerId=CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_IF_STICKER, "");
+		Sticker mailSticker=Sticker.load(mailStickerId);
+		if(mailSticker.isValid()) {
+			bSticker.setSelection(true);
+			cbMailSticker.setText(mailSticker.getLabel());
+		}else {
+			bSticker.setSelection(false);
+			cbMailSticker.setText("");
+		}
 		
+		bSticker.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				int idx = cbMailSticker.getSelectionIndex();
+				if (bSticker.getSelection() && idx != -1) {
+					System.out.print(stickers.get(idx).getId());
+					CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_IF_STICKER, stickers.get(idx).getId());
+				} else {
+					System.out.println("deselected");
+					CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_IF_STICKER, "");
+				}
+
+			}
+
+		});
+
 		return ret;
 	}
 

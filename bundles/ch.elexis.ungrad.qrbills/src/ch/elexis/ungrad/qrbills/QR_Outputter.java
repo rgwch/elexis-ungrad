@@ -34,6 +34,7 @@ import org.eclipse.ui.progress.IProgressService;
 import ch.elexis.arzttarife_schweiz.Messages;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter;
+import ch.elexis.core.model.IPatient;
 import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.LocalConfigService;
@@ -41,8 +42,10 @@ import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.data.Fall;
+import ch.elexis.data.Kontakt;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.data.Rechnung;
+import ch.elexis.data.Sticker;
 import ch.elexis.data.Zahlung;
 import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.QrRnOutputter;
@@ -235,24 +238,33 @@ public class QR_Outputter implements IRnOutputter {
 			monitor.subTask(rn.getNr() + " wird ausgegeben");
 			TarmedBillDetails45 bill = new TarmedBillDetails45(rn, type,
 					LocalConfigService.get(PreferenceConstants.MISSING_DATA, true));
+			// the rfFile was already created at this point (by doOutput-legacyOutputter).
+			// We just reference it by name here
 			File rfFile = new File(bill.outputDirPDF, bill.rn.getNr() + "_rf.pdf");
-
-			if (LocalConfigService.get(PreferenceConstants.FACE_DOWN, false)) {
-				printQRPage(bill);
-				monitor.worked(1);
-				if (LocalConfigService.get(PreferenceConstants.PRINT_TARMED, true)) {
-					sendToPrinter(rfFile);
-				}else {
-					rfFile.delete();
-				}
+			File qrFile = outputQRPage(bill);
+			String mailStickerID = CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_IF_STICKER, "");
+			Sticker mailSticker = Sticker.load(mailStickerID);
+			if (mailSticker.isValid()) {
+				doMail(bill.adressat,rfFile,qrFile);
 			} else {
-				if (LocalConfigService.get(PreferenceConstants.PRINT_TARMED, false)) {
-					sendToPrinter(rfFile);
-				}else {
-					rfFile.delete();
+
+				if (LocalConfigService.get(PreferenceConstants.FACE_DOWN, false)) {
+					monitor.worked(1);
+					sendToPrinter(qrFile);
+					if (LocalConfigService.get(PreferenceConstants.PRINT_TARMED, true)) {
+						sendToPrinter(rfFile);
+					} else {
+						rfFile.delete();
+					}
+				} else {
+					if (LocalConfigService.get(PreferenceConstants.PRINT_TARMED, false)) {
+						sendToPrinter(rfFile);
+					} else {
+						rfFile.delete();
+					}
+					monitor.worked(1);
+					sendToPrinter(qrFile);
 				}
-				monitor.worked(1);
-				printQRPage(bill);
 			}
 			res.add(new Result<Rechnung>(rn));
 			monitor.worked(1);
@@ -261,9 +273,15 @@ public class QR_Outputter implements IRnOutputter {
 			ExHandler.handle(ex);
 			res.add(new Result<Rechnung>(SEVERITY.ERROR, 2, ex.getMessage(), rn, true));
 		}
+
 	}
 
-	private void printQRPage(final TarmedBillDetails45 bill) throws Exception {
+	private void doMail(Kontakt adressee, File rfFile, File QRFile) {
+
+	}
+
+	private File outputQRPage(final TarmedBillDetails45 bill) throws Exception {
+		File pdfFile = null;
 		if (LocalConfigService.get(PreferenceConstants.PRINT_QR, true)) {
 			String default_template = PlatformHelper.getBasePath("ch.elexis.ungrad.qrbills") + File.separator + "rsc"
 					+ File.separator + "qrbill_template_v5.html";
@@ -356,16 +374,16 @@ public class QR_Outputter implements IRnOutputter {
 					.replace("[ADDRESSEE]", bill.combinedAddress(bill.adressat)).replace("[DUE]", bill.dateDue);
 
 			File htmlFile = new File(bill.outputDirPDF, bill.rn.getNr() + ".html");
-			File pdfFile = new File(bill.outputDirPDF, bill.rn.getNr() + "_qr.pdf");
+			pdfFile = new File(bill.outputDirPDF, bill.rn.getNr() + "_qr.pdf");
 			FileTool.writeTextFile(htmlFile, finished);
 			bill.writePDF(htmlFile, pdfFile);
-			sendToPrinter(pdfFile);
+			// sendToPrinter(pdfFile);
 			imgFile.delete();
 			if (!cfg.getLocal(PreferenceConstants.DEBUGFILES, false)) {
 				htmlFile.delete();
 			}
-
 		}
+		return pdfFile;
 	}
 
 	private void sendToPrinter(File pdfFile) throws PrinterException, IOException {
