@@ -28,7 +28,6 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.ui.UiDesk;
-import ch.elexis.core.ui.dialogs.EtiketteDruckenDialog;
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -37,7 +36,6 @@ import ch.elexis.data.Mandant;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Query;
 import ch.elexis.data.Sticker;
-import ch.rgw.tools.StringTool;
 
 public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 	private Combo cbMandanten;
@@ -45,7 +43,7 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 	private Hyperlink hlBank;
 	private Text txBank;
 	private Label lbIban;
-	private Text txIban;
+	private Text txIban, txSubject, txBody;
 	private FileFieldEditor ffe1, ffe2, ffe3, ffe4;
 	private Mandant currentMandator;
 	private static final String ERRMSG_BAD_IBAN = "Eine zulässige QR-IBAN muss genau 21 Zeichen lang sein und mit CH oder LI beginnen.";
@@ -157,16 +155,16 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 		for (Sticker sticker : stickers) {
 			cbMailSticker.add(sticker.getLabel());
 		}
-		String mailStickerId=CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_IF_STICKER, "");
-		Sticker mailSticker=Sticker.load(mailStickerId);
-		if(mailSticker.isValid()) {
+		String mailStickerId = CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_IF_STICKER, "");
+		Sticker mailSticker = Sticker.load(mailStickerId);
+		if (mailSticker.isValid()) {
 			bSticker.setSelection(true);
 			cbMailSticker.setText(mailSticker.getLabel());
-		}else {
+		} else {
 			bSticker.setSelection(false);
 			cbMailSticker.setText("");
 		}
-		
+
 		bSticker.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -183,7 +181,18 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 			}
 
 		});
-
+		Label lbSubject = new Label(ret, SWT.NONE);
+		lbSubject.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		lbSubject.setText("Nachrichtentitel");
+		txSubject = new Text(ret, SWT.NONE);
+		txSubject.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
+		txSubject.setText(CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_SUBJECT, ""));
+		Label lbBody = new Label(ret, SWT.NONE);
+		lbBody.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		lbBody.setText("Nachrichtentext");
+		txBody = new Text(ret, SWT.MULTI);
+		txBody.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
+		txBody.setText(CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_BODY, ""));
 		return ret;
 	}
 
@@ -204,6 +213,8 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 		CoreHub.globalCfg.set(PreferenceConstants.TEMPLATE_REMINDER1, ffe2.getStringValue());
 		CoreHub.globalCfg.set(PreferenceConstants.TEMPLATE_REMINDER2, ffe3.getStringValue());
 		CoreHub.globalCfg.set(PreferenceConstants.TEMPLATE_REMINDER3, ffe4.getStringValue());
+		CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_SUBJECT, txSubject.getText());
+		CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_BODY, txBody.getText());
 		return applyFields() && super.performOk();
 	}
 

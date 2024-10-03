@@ -3,6 +3,8 @@ package ch.elexis.ungrad;
 import java.util.ArrayList;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.rgw.tools.Result;
+import ch.rgw.tools.Result.SEVERITY;
 
 public class MailQueue {
 	static private class Mail {
@@ -28,5 +30,12 @@ public class MailQueue {
 
 	public void addMail(String subject, String body, String recipient, String[] attachments) {
 		mails.add(new Mail(subject, body, recipient, attachments));
+	}
+	public Result<String> sendMails(){
+		Result<String>ret=new Result<String>();
+		for(Mail mail:mails) {
+			ret.addMessage(SEVERITY.OK, mail.recipient);
+		}
+		return ret;
 	}
 }

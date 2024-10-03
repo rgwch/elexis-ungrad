@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +35,7 @@ import org.eclipse.ui.progress.IProgressService;
 import ch.elexis.arzttarife_schweiz.Messages;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter;
+import ch.elexis.core.data.interfaces.ISticker;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.services.IConfigService;
@@ -49,6 +51,7 @@ import ch.elexis.data.Sticker;
 import ch.elexis.data.Zahlung;
 import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.QrRnOutputter;
+import ch.elexis.ungrad.MailQueue;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
@@ -57,6 +60,7 @@ import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Money;
 import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
+import ch.rgw.tools.StringTool;
 
 /**
  * An Elexis-IRnOutputter for ISO 20022 conformant bills. Creates a Tarmed/4.5
@@ -73,9 +77,32 @@ public class QR_Outputter implements IRnOutputter {
 	private Manager pdfManager;
 	private boolean modifyInvoiceState;
 	private IConfigService cfg = ConfigServiceHolder.get();
+	private boolean handleMails = false;
+	String mailSticker;
+	MailQueue mq;
+
+	private String shouldMail(TarmedBillDetails45 bill) {
+		if (mq != null) {
+			Kontakt k = bill.adressat;
+			String mail = k.getMailAddress();
+			if (StringTool.isMailAddress(mail)) {
+				List<ISticker> stickers = k.getStickers();
+				for (ISticker sticker : stickers) {
+					if (sticker.getId().equals(mailSticker)) {
+						return mail;
+					}
+				}
+			}
+		}
+		return null;
+	}
 
 	public QR_Outputter() {
 		cfg = ConfigServiceHolder.get();
+		mailSticker = cfg.get(PreferenceConstants.BY_MAIL_IF_STICKER, "");
+		if (!StringTool.isNothing(mailSticker)) {
+			mq = new MailQueue();
+		}
 	}
 
 	@Override
@@ -242,10 +269,10 @@ public class QR_Outputter implements IRnOutputter {
 			// We just reference it by name here
 			File rfFile = new File(bill.outputDirPDF, bill.rn.getNr() + "_rf.pdf");
 			File qrFile = outputQRPage(bill);
-			String mailStickerID = CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_IF_STICKER, "");
-			Sticker mailSticker = Sticker.load(mailStickerID);
-			if (mailSticker.isValid()) {
-				doMail(bill.adressat,rfFile,qrFile);
+			String mailAddress = shouldMail(bill);
+			if (mailAddress != null) {
+				mq.addMail(mailAddress, mailAddress, mailAddress, null);
+				doMail(mailAddress, rfFile, qrFile);
 			} else {
 
 				if (LocalConfigService.get(PreferenceConstants.FACE_DOWN, false)) {
@@ -276,7 +303,7 @@ public class QR_Outputter implements IRnOutputter {
 
 	}
 
-	private void doMail(Kontakt adressee, File rfFile, File QRFile) {
+	private void doMail(String mailAddress, File rfFile, File QRFile) {
 
 	}
 

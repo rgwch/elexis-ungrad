@@ -33,6 +33,9 @@ public class PreferenceConstants {
 	public static final String DEBUGFILES = BASE + "/debugfiles";
 	public static final String MISSING_DATA = BASE + "/missing_data";
 	public static final String BY_MAIL_IF_STICKER = BASE + "/sendByMailSticker";
+	public static final String BY_MAIL_SUBJECT = BASE + "/mailsubject";
+	public static final String BY_MAIL_BODY = BASE + "/mailbody";
+
 	// Extinfo entries
 	public static final String QRBANK = BASE + "/bank";
 	public static final String QRIBAN = BASE + "/iban";
