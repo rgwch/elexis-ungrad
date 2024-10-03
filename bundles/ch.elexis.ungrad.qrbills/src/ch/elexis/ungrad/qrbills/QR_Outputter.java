@@ -178,6 +178,9 @@ public class QR_Outputter implements IRnOutputter {
 						for (Rechnung rn : rnn) {
 							doPrint(rn, monitor, type, result);
 						}
+						if(mq!=null) {
+							mq.sendMails();
+						}
 						monitor.done();
 
 					}
@@ -272,7 +275,6 @@ public class QR_Outputter implements IRnOutputter {
 			String mailAddress = shouldMail(bill);
 			if (mailAddress != null) {
 				mq.addMail(mailAddress, mailAddress, mailAddress, null);
-				doMail(mailAddress, rfFile, qrFile);
 			} else {
 
 				if (LocalConfigService.get(PreferenceConstants.FACE_DOWN, false)) {
@@ -303,9 +305,6 @@ public class QR_Outputter implements IRnOutputter {
 
 	}
 
-	private void doMail(String mailAddress, File rfFile, File QRFile) {
-
-	}
 
 	private File outputQRPage(final TarmedBillDetails45 bill) throws Exception {
 		File pdfFile = null;
