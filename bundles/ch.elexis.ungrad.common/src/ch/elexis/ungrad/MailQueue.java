@@ -53,9 +53,9 @@ public class MailQueue {
 		Result<String> ret = new Result<String>();
 		String user = CoreHub.localCfg.get(PreferenceConstants.SMTP_USER, "");
 		String sender = CoreHub.localCfg.get(PreferenceConstants.MAIL_SENDER, user);
-		String smtpserver = CoreHub.localCfg.get(PreferenceConstants.SMTP_HOST, "localhost");
-		String smtppwd = CoreHub.localCfg.get(PreferenceConstants.SMTP_PWD, "doesntMatter");
-		String smtpport = CoreHub.localCfg.get(PreferenceConstants.SMTP_PORT, "53");
+		String smtpHost = CoreHub.localCfg.get(PreferenceConstants.SMTP_HOST, "localhost");
+		String smtpPassword = CoreHub.localCfg.get(PreferenceConstants.SMTP_PWD, "doesntMatter");
+		String smtpPort = CoreHub.localCfg.get(PreferenceConstants.SMTP_PORT, "53");
 
 		SendJob() {
 			super("send invoices");
@@ -82,22 +82,27 @@ public class MailQueue {
 		}
 
 		private void sendMail(Mail mail) throws MessagingException {
+			System.out.println("TLSEmail Start");
 			Properties props = new Properties();
-			props.put("mail.smtp.host", smtpserver); // SMTP Host
-			props.put("mail.smtp.socketFactory.port", smtpport /* "465" */); // SSL Port
-			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); // SSL Factory Class
-			props.put("mail.smtp.auth", "true"); // Enabling SMTP Authentication
-			props.put("mail.smtp.port", smtpport /* "465" */); // SMTP Port
+			props.put("mail.smtp.host", smtpHost); // SMTP Host
+			props.put("mail.smtp.port", smtpPort /* "587" */ );
+			props.put("mail.smtp.auth", "true"); // enable authentication
+			props.put("mail.smtp.starttls.enable", "true"); // enable STARTTLS
+		    props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+			props.put("mail.smtp.ssl.trust", smtpHost);
 
+
+
+
+			// create Authenticator object to pass in Session.getInstance argument
 			Authenticator auth = new Authenticator() {
 				// override the getPasswordAuthentication method
 				protected PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(user, smtppwd);
+					return new PasswordAuthentication(user, smtpPassword);
 				}
 			};
-
-			Session session = Session.getDefaultInstance(props, auth);
-
+			Session session = Session.getInstance(props, auth);
+	
 			MimeMessage msg = new MimeMessage(session);
 			// set message headers
 			msg.addHeader("Content-type", "text/html; charset=UTF-8");

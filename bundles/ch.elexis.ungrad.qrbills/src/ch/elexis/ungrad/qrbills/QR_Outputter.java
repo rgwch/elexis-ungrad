@@ -77,7 +77,6 @@ public class QR_Outputter implements IRnOutputter {
 	private Manager pdfManager;
 	private boolean modifyInvoiceState;
 	private IConfigService cfg = ConfigServiceHolder.get();
-	private boolean handleMails = false;
 	String mailSticker;
 	MailQueue mq;
 
@@ -178,7 +177,7 @@ public class QR_Outputter implements IRnOutputter {
 						for (Rechnung rn : rnn) {
 							doPrint(rn, monitor, type, result);
 						}
-						if(mq!=null) {
+						if (mq != null) {
 							mq.sendMails();
 						}
 						monitor.done();
@@ -274,7 +273,10 @@ public class QR_Outputter implements IRnOutputter {
 			File qrFile = outputQRPage(bill);
 			String mailAddress = shouldMail(bill);
 			if (mailAddress != null) {
-				mq.addMail(mailAddress, mailAddress, mailAddress, null);
+				String subject = cfg.get(PreferenceConstants.BY_MAIL_SUBJECT, "Rechnung");
+				String body = cfg.get(PreferenceConstants.BY_MAIL_BODY, "Ihre Rechnung");
+				mq.addMail(subject, body, mailAddress,
+						new String[] { rfFile.getAbsolutePath(), qrFile.getAbsolutePath() });
 			} else {
 
 				if (LocalConfigService.get(PreferenceConstants.FACE_DOWN, false)) {
@@ -304,7 +306,6 @@ public class QR_Outputter implements IRnOutputter {
 		}
 
 	}
-
 
 	private File outputQRPage(final TarmedBillDetails45 bill) throws Exception {
 		File pdfFile = null;

@@ -134,7 +134,7 @@ public class MailDialog extends TitleAreaDialog {
 				if (attachments.length > 0) {
 					fld.setFilterPath(FileTool.getFilepath(attachments[0]));
 				}
-				fld.setFilterExtensions(new String[] { "*.pdf;*.doc;*.odt", "*.*" });
+				fld.setFilterExtensions(new String[] { "*.pdf;*.doc;*.odt;*.jpg;*.png;*.txt", "*.*" });
 				String result = fld.open();
 				if (result != null) {
 					lAttachments.add(result);
