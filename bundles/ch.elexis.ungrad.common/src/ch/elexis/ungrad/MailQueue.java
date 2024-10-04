@@ -82,7 +82,7 @@ public class MailQueue {
 		}
 
 		private void sendMail(Mail mail) throws MessagingException {
-			System.out.println("TLSEmail Start");
+			// System.out.println("TLSEmail Start");
 			Properties props = new Properties();
 			props.put("mail.smtp.host", smtpHost); // SMTP Host
 			props.put("mail.smtp.port", smtpPort /* "587" */ );
