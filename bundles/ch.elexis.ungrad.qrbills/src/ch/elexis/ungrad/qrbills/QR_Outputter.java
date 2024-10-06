@@ -65,7 +65,7 @@ import ch.rgw.tools.Result.SEVERITY;
 import ch.rgw.tools.StringTool;
 
 /**
- * An Elexis-IRnOutputter for ISO 20022 conformant bills. Creates a Tarmed/4.5
+ * An Elexis-IRnOutputter for ISO 20022 conforming bills. Creates a Tarmed/4.5
  * conforming details page and a summary page with Swiss QR-conformant payment
  * slip. Both are created from html templates and ultimately converted to PDF.
  * 
@@ -74,6 +74,7 @@ import ch.rgw.tools.StringTool;
  */
 public class QR_Outputter implements IRnOutputter {
 	private Map<String, PersistentObject> replacer = new HashMap<>();
+	Resolver resolver;
 	private QR_SettingsControl qrs;
 	private QR_Encoder qr;
 	private Manager pdfManager;
@@ -203,68 +204,6 @@ public class QR_Outputter implements IRnOutputter {
 		return result;
 	}
 
-	public Result<Rechnung> doOutputOld(final TYPE type, final Collection<Rechnung> rnn, final Properties props) {
-		Result<Rechnung> res = new Result<Rechnung>();
-		qr = new QR_Encoder();
-		pdfManager = new Manager();
-		modifyInvoiceState = true;
-
-		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-		try {
-			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {
-
-				@Override
-				public void run(final IProgressMonitor monitor) {
-					monitor.beginTask("Drucke Rechnungen", rnn.size() * 3);
-					for (Rechnung rn : rnn) {
-						doPrint(rn, monitor, type, res);
-						if (modifyInvoiceState) {
-							InvoiceState state = rn.getInvoiceState();
-							switch (state) {
-							case OPEN:
-								state = InvoiceState.BILLED;
-								break;
-							case DEMAND_NOTE_1:
-								state = InvoiceState.DEMAND_NOTE_1_PRINTED;
-								break;
-							case DEMAND_NOTE_2:
-								state = InvoiceState.DEMAND_NOTE_2_PRINTED;
-								break;
-							case DEMAND_NOTE_3:
-								state = InvoiceState.DEMAND_NOTE_3_PRINTED;
-								break;
-							default:
-								Logger.getGlobal().log(Level.INFO, "Bad bill state " + state.toString());
-							}
-							rn.setStatus(state);
-							rn.addTrace(Rechnung.OUTPUT, getDescription() + ": " //$NON-NLS-1$
-									+ (rn.getInvoiceState().name()));
-						}
-						monitor.worked(1);
-						try {
-							TimeUnit.MILLISECONDS.sleep(100);
-						} catch (InterruptedException e) {
-							break;
-						}
-					}
-					monitor.done();
-				}
-			}, null);
-
-		} catch (Exception ex) {
-			ExHandler.handle(ex);
-			res.add(new Result<Rechnung>(SEVERITY.ERROR, 1, ex.getMessage(), null, true));
-		}
-		if (res.isOK()) {
-			SWTHelper.showInfo("Ausgabe beendet", rnn.size() + " QR-Rechnung(en) wurde(n) ausgegeben");
-		} else {
-			SWTHelper.showError("QR-Output", "Fehler bei der Rechnungsausgabe", res.toString()
-					+ "\nSie können die fehlerhaften Rechnungen mit Status fehlerhaft in der Rechnungsliste anzeigen und korrigieren");
-
-		}
-		return res;
-	}
-
 	private void doPrint(final Rechnung rn, final IProgressMonitor monitor, final TYPE type, Result<Rechnung> res) {
 		try {
 			monitor.subTask(rn.getNr() + " wird ausgegeben");
@@ -276,8 +215,8 @@ public class QR_Outputter implements IRnOutputter {
 			File qrFile = outputQRPage(bill);
 			String mailAddress = shouldMail(bill);
 			if (mailAddress != null) {
-				String subject = cfg.get(PreferenceConstants.BY_MAIL_SUBJECT, "Rechnung");
-				String body = cfg.get(PreferenceConstants.BY_MAIL_BODY, "Ihre Rechnung");
+				String subject = resolver.resolve(cfg.get(PreferenceConstants.BY_MAIL_SUBJECT, "Rechnung"));
+				String body = resolver.resolve(cfg.get(PreferenceConstants.BY_MAIL_BODY, "Ihre Rechnung"));
 				mailer.defaultMail(mailAddress, subject, body,
 						new String[] { rfFile.getAbsolutePath(), qrFile.getAbsolutePath() });
 				rn.addTrace(Rechnung.OUTPUT, "by Mail an "+mailAddress);
@@ -352,7 +291,7 @@ public class QR_Outputter implements IRnOutputter {
 			replacer.put("Mandant", bill.biller);
 			replacer.put("Patient", bill.patient);
 			replacer.put("Rechnung", bill.rn);
-			Resolver resolver = new Resolver(replacer, true);
+			resolver = new Resolver(replacer, true);
 
 			String cookedHTML = resolver.resolve(rawHTML);
 			byte[] png = qr.generate(bill);
