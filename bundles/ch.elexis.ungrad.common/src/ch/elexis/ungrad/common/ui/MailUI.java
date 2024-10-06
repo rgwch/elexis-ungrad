@@ -48,7 +48,7 @@ public class MailUI {
 		String smtpport = CoreHub.localCfg.get(PreferenceConstants.SMTP_PORT, "53");
 		String[] attachments = new String[] { pdfFilePath };
 		Resolver resolver = new Resolver();
-		Mailer mailer = new Mailer(sender, smtpserver, smtppwd, smtpport);
+		Mailer mailer = new Mailer(sender, smtpserver, smtppwd, smtpport,true);
 		MailDialog mailDialog = new MailDialog(shell);
 		mailDialog.sender = sender;
 		mailDialog.mailTo = recipient;

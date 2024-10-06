@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.rgw.io.FileTool;
 
@@ -48,16 +49,36 @@ import ch.rgw.io.FileTool;
  *
  */
 public class Mailer {
-	String sender;
-	String smtpHost;
-	String smtpPassword;
-	String smtpPort;
+	String user = CoreHub.localCfg.get(PreferenceConstants.SMTP_USER, "");
+	String sender = CoreHub.localCfg.get(PreferenceConstants.MAIL_SENDER, user);
+	String smtpHost = CoreHub.localCfg.get(PreferenceConstants.SMTP_HOST, "localhost");
+	String smtpPassword = CoreHub.localCfg.get(PreferenceConstants.SMTP_PWD, "doesntMatter");
+	String smtpPort = CoreHub.localCfg.get(PreferenceConstants.SMTP_PORT, "53");
+	// String sender;
+	// String smtpHost;
+	// String smtpPassword;
+	// String smtpPort;
+	boolean bShowSuccess = true;
 
-	public Mailer(String from, String smtpHost, String smtpPassword, String smtpPort) {
+	// Create a Mailer with default settings from local config
+	public Mailer() {
+	}
+
+	// Create a Mailer with custom settings
+	public Mailer(String from, String smtpHost, String smtpPassword, String smtpPort, boolean bShowSuccess) {
 		this.sender = from;
 		this.smtpHost = smtpHost;
 		this.smtpPassword = smtpPassword;
 		this.smtpPort = smtpPort;
+		this.bShowSuccess = bShowSuccess;
+	}
+
+	/**
+	 * Show a success Dialog after successful send
+	 * @param bDoShow if false: Only display errors
+	 */
+	public void showSuccess(boolean bDoShow) {
+		this.bShowSuccess = bDoShow;
 	}
 
 	class SendJob extends Job {
@@ -76,7 +97,9 @@ public class Mailer {
 				monitor.beginTask("Sending mail " + msg.getMessageID(), 1);
 				Transport.send(msg);
 				monitor.done();
-				SWTHelper.showInfo("Mail gesendet", "Die Mail wurde an " + address + " gesendet.");
+				if (bShowSuccess) {
+					SWTHelper.showInfo("Mail gesendet", "Die Mail wurde an " + address + " gesendet.");
+				}
 				return Status.OK_STATUS;
 			} catch (Exception ex) {
 				SWTHelper.showError("SMTP Mailer", ex.getMessage());
@@ -168,11 +191,8 @@ public class Mailer {
 		props.put("mail.smtp.port", smtpPort /* "587" */ );
 		props.put("mail.smtp.auth", "true"); // enable authentication
 		props.put("mail.smtp.starttls.enable", "true"); // enable STARTTLS
-	    props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+		props.put("mail.smtp.ssl.protocols", "TLSv1.2");
 		props.put("mail.smtp.ssl.trust", smtpHost);
-
-
-
 
 		// create Authenticator object to pass in Session.getInstance argument
 		Authenticator auth = new Authenticator() {
@@ -213,6 +233,25 @@ public class Mailer {
 		System.out.println("Session created");
 		sendEmail(session, to, subject, body, attachments);
 
+	}
+	/**
+	 * Send mail using the method defined in local cfg
+	 * @param user
+	 * @param recipient
+	 * @param subject
+	 * @param body
+	 * @param attachments
+	 * @throws Exception
+	 */
+	public void defaultMail(String recipient, String subject, String body, String[] attachments) throws Exception {
+		String sec = CoreHub.localCfg.get(PreferenceConstants.SMTP_SECURITY, "plain");
+		if (sec.equals("plain")) {
+			simpleMail(recipient, subject, body, attachments);
+		} else if (sec.equals("tls")) {
+			tlsMail(user, recipient, subject, body, attachments);
+		} else if (sec.equals("ssl")) {
+			sslMail(user, recipient, subject, body, attachments);
+		}
 	}
 
 }

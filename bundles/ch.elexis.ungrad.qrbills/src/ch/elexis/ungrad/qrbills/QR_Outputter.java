@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -52,6 +53,7 @@ import ch.elexis.data.Zahlung;
 import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.QrRnOutputter;
 import ch.elexis.ungrad.MailQueue;
+import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.elexis.ungrad.qrbills.preferences.PreferenceConstants;
@@ -78,10 +80,10 @@ public class QR_Outputter implements IRnOutputter {
 	private boolean modifyInvoiceState;
 	private IConfigService cfg = ConfigServiceHolder.get();
 	String mailSticker;
-	MailQueue mq;
+	Mailer mailer;
 
 	private String shouldMail(TarmedBillDetails45 bill) {
-		if (mq != null) {
+		if (mailer != null) {
 			Kontakt k = bill.adressat;
 			String mail = k.getMailAddress();
 			if (StringTool.isMailAddress(mail)) {
@@ -100,7 +102,8 @@ public class QR_Outputter implements IRnOutputter {
 		cfg = ConfigServiceHolder.get();
 		mailSticker = cfg.get(PreferenceConstants.BY_MAIL_IF_STICKER, "");
 		if (!StringTool.isNothing(mailSticker)) {
-			mq = new MailQueue();
+			mailer = new Mailer();
+			mailer.showSuccess(false);
 		}
 	}
 
@@ -132,8 +135,8 @@ public class QR_Outputter implements IRnOutputter {
 
 	/**
 	 * To keep things easier, we ask the legacy outputter to produce the
-	 * tarmedbill-page for us. After that, we do the QR-Page and the printing from
-	 * here.
+	 * tarmedbill-page for us. After that, we do the QR-Page and the printing and
+	 * mailing from here.
 	 */
 	@Override
 	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, Properties props) {
@@ -176,9 +179,9 @@ public class QR_Outputter implements IRnOutputter {
 						monitor.beginTask("Drucke Rechnungen", rnn.size() * 3);
 						for (Rechnung rn : rnn) {
 							doPrint(rn, monitor, type, result);
-						}
-						if (mq != null) {
-							mq.sendMails();
+							if (monitor.isCanceled()) {
+								break;
+							}
 						}
 						monitor.done();
 
@@ -275,10 +278,16 @@ public class QR_Outputter implements IRnOutputter {
 			if (mailAddress != null) {
 				String subject = cfg.get(PreferenceConstants.BY_MAIL_SUBJECT, "Rechnung");
 				String body = cfg.get(PreferenceConstants.BY_MAIL_BODY, "Ihre Rechnung");
-				mq.addMail(subject, body, mailAddress,
+				mailer.defaultMail(mailAddress, subject, body,
 						new String[] { rfFile.getAbsolutePath(), qrFile.getAbsolutePath() });
+				rn.addTrace(Rechnung.OUTPUT, "by Mail an "+mailAddress);
+				try {
+					TimeUnit.MILLISECONDS.sleep(100);
+				} catch (InterruptedException e) {
+					
+				}
+				monitor.worked(1);
 			} else {
-
 				if (LocalConfigService.get(PreferenceConstants.FACE_DOWN, false)) {
 					monitor.worked(1);
 					sendToPrinter(qrFile);
