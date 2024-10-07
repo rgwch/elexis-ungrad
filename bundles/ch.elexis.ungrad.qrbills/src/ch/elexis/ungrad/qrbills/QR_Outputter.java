@@ -80,32 +80,34 @@ public class QR_Outputter implements IRnOutputter {
 	private Manager pdfManager;
 	private boolean modifyInvoiceState;
 	private IConfigService cfg = ConfigServiceHolder.get();
-	String mailSticker;
+	String mailPref;
+	String mailBody;
 	Mailer mailer;
 
-	private String shouldMail(TarmedBillDetails45 bill) {
-		if (mailer != null) {
-			Kontakt k = bill.adressat;
-			String mail = k.getMailAddress();
-			if (StringTool.isMailAddress(mail)) {
-				List<ISticker> stickers = k.getStickers();
-				for (ISticker sticker : stickers) {
-					if (sticker.getId().equals(mailSticker)) {
-						return mail;
-					}
+	private String[] shouldMail(TarmedBillDetails45 bill) {
+		Kontakt k = bill.adressat;
+		String mailaddr = "";
+		String mailbody = cfg.get(PreferenceConstants.BY_MAIL_BODY, "");
+		if (!StringTool.isNothing(mailPref)) {
+			String[] opts = bill.fall.getOptionals().split(";");
+			for (String opt : opts) {
+				if (opt.startsWith(mailPref)) {
+					mailaddr = bill.fall.getInfoString(opt.split(":")[0]);
+				}
+				if (opt.startsWith("Mailtext")) {
+					mailbody = bill.fall.getInfoString(opt.split(":")[0]);
 				}
 			}
+			return new String[] { mailaddr, mailbody };
 		}
 		return null;
 	}
 
 	public QR_Outputter() {
 		cfg = ConfigServiceHolder.get();
-		mailSticker = cfg.get(PreferenceConstants.BY_MAIL_IF_STICKER, "");
-		if (!StringTool.isNothing(mailSticker)) {
-			mailer = new Mailer();
-			mailer.showSuccess(false);
-		}
+		mailPref = cfg.get(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
+		mailer = new Mailer();
+		mailer.showSuccess(false);
 	}
 
 	@Override
@@ -213,17 +215,17 @@ public class QR_Outputter implements IRnOutputter {
 			// We just reference it by name here
 			File rfFile = new File(bill.outputDirPDF, bill.rn.getNr() + "_rf.pdf");
 			File qrFile = outputQRPage(bill);
-			String mailAddress = shouldMail(bill);
-			if (mailAddress != null) {
+			String[] mailing = shouldMail(bill);
+			if (mailing != null) {
 				String subject = resolver.resolve(cfg.get(PreferenceConstants.BY_MAIL_SUBJECT, "Rechnung"));
-				String body = resolver.resolve(cfg.get(PreferenceConstants.BY_MAIL_BODY, "Ihre Rechnung"));
-				mailer.defaultMail(mailAddress, subject, body,
+				String body = resolver.resolve(mailing[1]);
+				mailer.defaultMail(mailing[0], subject, body,
 						new String[] { rfFile.getAbsolutePath(), qrFile.getAbsolutePath() });
-				rn.addTrace(Rechnung.OUTPUT, "by Mail an "+mailAddress);
+				rn.addTrace(Rechnung.OUTPUT, "by Mail an " + mailing[0]);
 				try {
 					TimeUnit.MILLISECONDS.sleep(100);
 				} catch (InterruptedException e) {
-					
+
 				}
 				monitor.worked(1);
 			} else {

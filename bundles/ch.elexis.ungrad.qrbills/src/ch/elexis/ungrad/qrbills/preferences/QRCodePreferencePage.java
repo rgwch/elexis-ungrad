@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2018-2024 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
 package ch.elexis.ungrad.qrbills.preferences;
 
 import java.util.HashMap;
@@ -36,10 +49,12 @@ import ch.elexis.data.Mandant;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Query;
 import ch.elexis.data.Sticker;
+import ch.rgw.tools.StringTool;
 
 public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 	private Combo cbMandanten;
-	private Combo cbMailSticker;
+	private Text txCaseVar;
+	private Button bSticker;
 	private Hyperlink hlBank;
 	private Text txBank;
 	private Label lbIban;
@@ -51,7 +66,7 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 
 	public QRCodePreferencePage() {
 		setPreferenceStore(new SettingsPreferenceStore(CoreHub.globalCfg));
-		setDescription("Bankverbindung für Rechnungen");
+		setDescription("QR-Rechnungen");
 	}
 
 	public void init(IWorkbench workbench) {
@@ -146,41 +161,14 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 		ffe2.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1, ""));
 		ffe3.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2, ""));
 		ffe4.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3, ""));
-		Button bSticker = new Button(ret, SWT.CHECK);
+		bSticker = new Button(ret, SWT.CHECK);
 		bSticker.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
-		bSticker.setText("Rechnungen an Patienten mit folgendem Sticker per Mail senden");
-		cbMailSticker = new Combo(ret, SWT.READ_ONLY);
-		cbMailSticker.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
-		List<Sticker> stickers = Sticker.getStickersForClass(Patient.class);
-		for (Sticker sticker : stickers) {
-			cbMailSticker.add(sticker.getLabel());
-		}
-		String mailStickerId = CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_IF_STICKER, "");
-		Sticker mailSticker = Sticker.load(mailStickerId);
-		if (mailSticker.isValid()) {
-			bSticker.setSelection(true);
-			cbMailSticker.setText(mailSticker.getLabel());
-		} else {
-			bSticker.setSelection(false);
-			cbMailSticker.setText("");
-		}
-
-		bSticker.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				int idx = cbMailSticker.getSelectionIndex();
-				if (bSticker.getSelection() && idx != -1) {
-					System.out.print(stickers.get(idx).getId());
-					CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_IF_STICKER, stickers.get(idx).getId());
-				} else {
-					System.out.println("deselected");
-					CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_IF_STICKER, "");
-				}
-
-			}
-
-		});
+		bSticker.setText("Rechnungen bei Fällen mit folgender Eigenschaft per Mail senden");
+		txCaseVar = new Text(ret, SWT.SINGLE);
+		txCaseVar.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
+		String caseVar = CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
+		txCaseVar.setText(caseVar);
+		bSticker.setSelection(!StringTool.isNothing(caseVar));
 		Label lbSubject = new Label(ret, SWT.NONE);
 		lbSubject.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		lbSubject.setText("Nachrichtentitel");
@@ -189,7 +177,7 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 		txSubject.setText(CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_SUBJECT, ""));
 		Label lbBody = new Label(ret, SWT.NONE);
 		lbBody.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		lbBody.setText("Nachrichtentext");
+		lbBody.setText("Standard-Nachrichtentext");
 		txBody = new Text(ret, SWT.MULTI);
 		txBody.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
 		txBody.setText(CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_BODY, ""));
@@ -197,6 +185,12 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 	}
 
 	private boolean applyFields() {
+		if (bSticker.getSelection()) {
+			CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_IF_CASEVAR, txCaseVar.getText());
+
+		} else {
+			CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
+		}
 		String iban = txIban.getText().toUpperCase();
 		if (iban.length() != 21 || (!iban.startsWith("CH") && !iban.startsWith("LI"))) {
 			SWTHelper.showError("IBAN", ERRMSG_BAD_IBAN);

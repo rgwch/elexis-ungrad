@@ -2,7 +2,7 @@
 <feature
       id="ch.elexis.ungrad.qrbills.feature"
       label="Tarmed Bills with QR"
-      version="2.4.1.qualifier"
+      version="2.4.2.qualifier"
       provider-name="weirich@elexis.ch">
 
    <description url="http://www.example.com/description">
