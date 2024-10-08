@@ -38,23 +38,21 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
+import ch.elexis.core.services.IConfigService;
+import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
-import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Mandant;
-import ch.elexis.data.Patient;
 import ch.elexis.data.Query;
-import ch.elexis.data.Sticker;
 import ch.rgw.tools.StringTool;
 
 public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 	private Combo cbMandanten;
 	private Text txCaseVar;
-	private Button bSticker;
+	private Button bMailIfCaseVar;
 	private Hyperlink hlBank;
 	private Text txBank;
 	private Label lbIban;
@@ -63,9 +61,10 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 	private Mandant currentMandator;
 	private static final String ERRMSG_BAD_IBAN = "Eine zulässige QR-IBAN muss genau 21 Zeichen lang sein und mit CH oder LI beginnen.";
 	private static final String ERRMSG_BAD_BANK = "Die gewählte Bank ist nicht gültig.";
+	IConfigService cfg = ConfigServiceHolder.get();
+
 
 	public QRCodePreferencePage() {
-		setPreferenceStore(new SettingsPreferenceStore(CoreHub.globalCfg));
 		setDescription("QR-Rechnungen");
 	}
 
@@ -157,40 +156,49 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 		ffe2 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER1, "Vorlage für Mahnung 1", ret);
 		ffe3 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER2, "Vorlage für Mahnung 2", ret);
 		ffe4 = new FileFieldEditor(PreferenceConstants.TEMPLATE_REMINDER3, "Vorlage für Mahnung 3", ret);
-		ffe1.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_BILL, ""));
-		ffe2.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER1, ""));
-		ffe3.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER2, ""));
-		ffe4.setStringValue(CoreHub.globalCfg.get(PreferenceConstants.TEMPLATE_REMINDER3, ""));
-		bSticker = new Button(ret, SWT.CHECK);
-		bSticker.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
-		bSticker.setText("Rechnungen bei Fällen mit folgender Eigenschaft per Mail senden");
+		ffe1.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_BILL, ""));
+		ffe2.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_REMINDER1, ""));
+		ffe3.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_REMINDER2, ""));
+		ffe4.setStringValue(cfg.get(PreferenceConstants.TEMPLATE_REMINDER3, ""));
+		
+		// Send Mail if Case Variable is set to Mailaddress
+		bMailIfCaseVar = new Button(ret, SWT.CHECK);
+		bMailIfCaseVar.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
+		bMailIfCaseVar.setText("Rechnungen bei Fällen mit folgender Eigenschaft per Mail senden");
 		txCaseVar = new Text(ret, SWT.SINGLE);
 		txCaseVar.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
-		String caseVar = CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
+		String caseVar = cfg.get(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
 		txCaseVar.setText(caseVar);
-		bSticker.setSelection(!StringTool.isNothing(caseVar));
+		bMailIfCaseVar.setSelection(!StringTool.isNothing(caseVar));
 		Label lbSubject = new Label(ret, SWT.NONE);
 		lbSubject.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		lbSubject.setText("Nachrichtentitel");
 		txSubject = new Text(ret, SWT.NONE);
 		txSubject.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		txSubject.setText(CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_SUBJECT, ""));
+		txSubject.setText(cfg.get(PreferenceConstants.BY_MAIL_SUBJECT, ""));
 		Label lbBody = new Label(ret, SWT.NONE);
 		lbBody.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		lbBody.setText("Standard-Nachrichtentext");
 		txBody = new Text(ret, SWT.MULTI);
 		txBody.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
-		txBody.setText(CoreHub.globalCfg.get(PreferenceConstants.BY_MAIL_BODY, ""));
+		txBody.setText(cfg.get(PreferenceConstants.BY_MAIL_BODY, ""));
 		return ret;
 	}
 
 	private boolean applyFields() {
-		if (bSticker.getSelection()) {
-			CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_IF_CASEVAR, txCaseVar.getText());
+		if (bMailIfCaseVar.getSelection()) {
+			cfg.set(PreferenceConstants.BY_MAIL_IF_CASEVAR, txCaseVar.getText());
 
 		} else {
-			CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
+			cfg.set(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
 		}
+		cfg.set(PreferenceConstants.TEMPLATE_BILL, ffe1.getStringValue());
+		cfg.set(PreferenceConstants.TEMPLATE_REMINDER1, ffe2.getStringValue());
+		cfg.set(PreferenceConstants.TEMPLATE_REMINDER2, ffe3.getStringValue());
+		cfg.set(PreferenceConstants.TEMPLATE_REMINDER3, ffe4.getStringValue());
+		cfg.set(PreferenceConstants.BY_MAIL_SUBJECT, txSubject.getText());
+		cfg.set(PreferenceConstants.BY_MAIL_BODY, txBody.getText());
+
 		String iban = txIban.getText().toUpperCase();
 		if (iban.length() != 21 || (!iban.startsWith("CH") && !iban.startsWith("LI"))) {
 			SWTHelper.showError("IBAN", ERRMSG_BAD_IBAN);
@@ -203,12 +211,6 @@ public class QRCodePreferencePage extends PreferencePage implements IWorkbenchPr
 
 	@Override
 	public boolean performOk() {
-		CoreHub.globalCfg.set(PreferenceConstants.TEMPLATE_BILL, ffe1.getStringValue());
-		CoreHub.globalCfg.set(PreferenceConstants.TEMPLATE_REMINDER1, ffe2.getStringValue());
-		CoreHub.globalCfg.set(PreferenceConstants.TEMPLATE_REMINDER2, ffe3.getStringValue());
-		CoreHub.globalCfg.set(PreferenceConstants.TEMPLATE_REMINDER3, ffe4.getStringValue());
-		CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_SUBJECT, txSubject.getText());
-		CoreHub.globalCfg.set(PreferenceConstants.BY_MAIL_BODY, txBody.getText());
 		return applyFields() && super.performOk();
 	}
 
