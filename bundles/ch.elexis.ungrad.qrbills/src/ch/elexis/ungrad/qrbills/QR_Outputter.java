@@ -81,7 +81,6 @@ public class QR_Outputter implements IRnOutputter {
 	private boolean modifyInvoiceState;
 	private IConfigService cfg = ConfigServiceHolder.get();
 	String mailPref;
-	String mailBody;
 	Mailer mailer;
 
 	private String[] shouldMail(TarmedBillDetails45 bill) {
@@ -89,14 +88,13 @@ public class QR_Outputter implements IRnOutputter {
 		String mailaddr = "";
 		String mailbody = cfg.get(PreferenceConstants.BY_MAIL_BODY, "");
 		if (!StringTool.isNothing(mailPref)) {
-			String[] opts = bill.fall.getOptionals().split(";");
-			for (String opt : opts) {
-				if (opt.startsWith(mailPref)) {
-					mailaddr = bill.fall.getInfoString(opt.split(":")[0]);
-				}
-				if (opt.startsWith("Mailtext")) {
-					mailbody = bill.fall.getInfoString(opt.split(":")[0]);
-				}
+			mailaddr = bill.fall.getInfoString(mailPref);
+			if (!StringTool.isMailAddress(mailaddr)) {
+				return null;
+			}
+			String altBody = bill.fall.getInfoString("Mailtext");
+			if (!StringTool.isNothing(altBody)) {
+				mailbody = altBody;
 			}
 			return new String[] { mailaddr, mailbody };
 		}
