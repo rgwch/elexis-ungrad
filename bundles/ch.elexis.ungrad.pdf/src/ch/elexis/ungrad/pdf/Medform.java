@@ -29,6 +29,7 @@ import ch.elexis.core.model.ch.BillingLaw;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.types.Gender;
 import ch.elexis.data.Kontakt;
+import ch.elexis.data.PersistentObject;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
@@ -134,7 +135,7 @@ public class Medform {
 			m.put(get("patPhone1"), pat.getPhone1());
 			m.put(get("patPhone2"), pat.getPhone2());
 			m.put(get("patMail"), pat.getEmail());
-			m.put(get("patAHV"), pat.getExtInfo("AHV").toString());
+			m.put(get("patAHV"), PersistentObject.checkNull(pat.getExtInfo("AHV").toString()));
 			m.put(get("docDate"), new TimeTool().toString(TimeTool.DATE_GER));
 		}
 		// Mandant mand = ElexisEventDispatcher.getSelectedMandator();
