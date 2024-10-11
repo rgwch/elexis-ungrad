@@ -30,6 +30,7 @@ import ch.elexis.core.services.IContextService;
 import ch.elexis.core.types.Gender;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.PersistentObject;
+import ch.elexis.ungrad.Util;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 import ch.rgw.tools.TimeTool;
@@ -132,10 +133,11 @@ public class Medform {
 			m.put(get("patStreet"), pat.getStreet());
 			m.put(get("patZip"), pat.getZip());
 			m.put(get("patCity"), pat.getCity());
-			m.put(get("patPhone1"), pat.getPhone1());
-			m.put(get("patPhone2"), pat.getPhone2());
+			String[] phones=getPhones(pat);
+			m.put(get("patPhone1"), phones[0]);
+			m.put(get("patPhone2"), phones[1]);
 			m.put(get("patMail"), pat.getEmail());
-			m.put(get("patAHV"), PersistentObject.checkNull(pat.getExtInfo("AHV").toString()));
+			m.put(get("patAHV"), PersistentObject.checkNull(Util.getSSN(pat)));
 			m.put(get("docDate"), new TimeTool().toString(TimeTool.DATE_GER));
 		}
 		// Mandant mand = ElexisEventDispatcher.getSelectedMandator();
@@ -186,10 +188,15 @@ public class Medform {
 		return mgr.fillForm(form, outPath, m);
 	}
 
-	private String[] getPhones(Kontakt k) {
-		String p1 = k.get(Kontakt.FLD_PHONE1);
-		String p2 = k.get(Kontakt.FLD_PHONE2);
-		String p3 = k.get(Kontakt.FLD_MOBILEPHONE);
+	/**
+	 * get the "best" phone numbers
+	 * @param k
+	 * @return phones[0]: Best number, phones[1] second best number
+	 */
+	private String[] getPhones(IContact k) {
+		String p1 = k.getPhone1();
+		String p2 = k.getPhone2();
+		String p3 = k.getMobile();
 		String[] ret = new String[2];
 		if (!StringTool.isNothing(p3)) {
 			ret[0] = p3;
