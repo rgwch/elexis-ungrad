@@ -43,8 +43,8 @@ public class Medform {
 
 	String form;
 	Manager mgr = new Manager();
-	IContextService contextService=ContextServiceHolder.get();
-	
+	IContextService contextService = ContextServiceHolder.get();
+
 	Map<String, String> mapping = Stream
 			.of(new String[][] { { "patAddress", "topmostSubform[0].page1[0].patientS1Address[0].blockAddress[0]" },
 					{ "patNameLine", "topmostSubform[0].page1[0].patientS1Address[0].condensedName[0]" },
@@ -55,6 +55,7 @@ public class Medform {
 					{ "patStreet", "topmostSubform[0].page1[0].patientS1Address[0].street[0]" },
 					{ "patZip", "topmostSubform[0].page1[0].patientS1Address[0].zip[0]" },
 					{ "patCity", "topmostSubform[0].page1[0].patientS1Address[0].city[0]" },
+					{ "patAHV", "topmostSubform[0].page1[0].patientS1Address[0].ssn[0]" },
 					{ "patPhone1", "topmostSubform[0].page1[0].patientS1Address[0].phone[0]" },
 					{ "patPhone2", "topmostSubform[0].page1[0].patientS1Address[0].phone[1]" },
 					{ "patMail", "topmostSubform[0].page1[0].patientS1Address[0].email[0]" },
@@ -97,11 +98,11 @@ public class Medform {
 	public boolean isMedform() {
 		try {
 			String oid = mgr.getFieldContents(form, "topmostSubform[0].page1[0].formS1Struct[0].oid[0]");
-			if (oid != null && oid.startsWith("medforms")){
+			if (oid != null && oid.startsWith("medforms")) {
 				return true;
 			}
 			oid = mgr.getFieldContents(form, "topmostSubform[0].page2[0].formS1Struct[0].oid[0]");
-			if (oid != null && oid.startsWith("medforms")){
+			if (oid != null && oid.startsWith("medforms")) {
 				return true;
 			}
 			return false;
@@ -112,78 +113,77 @@ public class Medform {
 	}
 
 	/**
-   * Create a PDF file from formPath with prefilled fields
-   * 
-   * @param outPath
-   *                Path for the newly created PDF
-   * @param pat
-   *                Patient for which the form should be prefilled
-   * @return The Path to the filled form
-   * @throws Exception
-   */
-  public String create(String outPath, IPatient pat) throws Exception {
-    Map<String, String> m = new HashMap<String, String>();
-    if (pat != null) {
-      m.put(get("patAddress"), pat.getPostalAddress());  // .getPostAnschrift(true));
-      m.put(get("patFirstname"), pat.getFirstName());
-      m.put(get("patLastname"), pat.getLastName());
-      m.put(get("patBirthdate"), new TimeTool(pat.getDateOfBirth()).toString(TimeTool.DATE_GER));
-      m.put(get("patSex"), (pat.getGender()==Gender.FEMALE) ? "F" : "M");
-      m.put(get("patStreet"), pat.getStreet());
-      m.put(get("patZip"), pat.getZip());
-      m.put(get("patCity"), pat.getCity());
-      m.put(get("patPhone1"), pat.getPhone1());
-      m.put(get("patPhone2"), pat.getPhone2());
-      m.put(get("patMail"), pat.getEmail());
-      m.put(get("docDate"), new TimeTool().toString(TimeTool.DATE_GER));
-    }
-    // Mandant mand = ElexisEventDispatcher.getSelectedMandator();
-	IMandator mand = contextService.getActiveMandator().orElseThrow();
-    if (mand != null) {
-      m.put(get("mandatorAddress"), mand.getPostalAddress());
-      m.put(get("mandatorNameLine"), mand.getDescription1()+" "+mand.getDescription2());
-      m.put(get("mandatorEAN"), (String) mand.getExtInfo("EAN"));
-      String ksk = (String) mand.getExtInfo("KSK");
-      if (ksk==null) {
-        ksk = (String) mand.getExtInfo("ZSR");
-        if (ksk==null) {
-          ksk = "";
-        }
-      }
-      m.put(get("mandatorZSR"), ksk);
-      m.put(get("mandatorStreet"), mand.getStreet());
-      m.put(get("mandatorZip"), mand.getZip());
-      m.put(get("mandatorCity"), mand.getCity());
-      m.put(get("mandatorPhone1"), mand.getPhone1());
-      m.put(get("mandatorMail"), mand.getEmail());
-    }
-    // Konsultation kons = (Konsultation) ElexisEventDispatcher.getSelected(Konsultation.class);
-    ICoverage cov=contextService.getActiveCoverage().orElseThrow();
-          if (cov != null) {
-        IContact cb = cov.getCostBearer();
-        if (cb != null) {
-          m.put(get("insuranceName"), cb.getDescription1() + " " + cb.getDescription2());
-          m.put(get("insuranceStreet"), StringTool.unNull(cb.getStreet()));
-          m.put(get("insuranceZip"), StringTool.unNull(cb.getZip()));
-          m.put(get("insuranceCity"), StringTool.unNull(cb.getCity()));
-          m.put(get("insuranceMail"), StringTool.unNull(cb.getEmail()));
+	 * Create a PDF file from formPath with prefilled fields
+	 * 
+	 * @param outPath Path for the newly created PDF
+	 * @param pat     Patient for which the form should be prefilled
+	 * @return The Path to the filled form
+	 * @throws Exception
+	 */
+	public String create(String outPath, IPatient pat) throws Exception {
+		Map<String, String> m = new HashMap<String, String>();
+		if (pat != null) {
+			m.put(get("patAddress"), pat.getPostalAddress()); // .getPostAnschrift(true));
+			m.put(get("patFirstname"), pat.getFirstName());
+			m.put(get("patLastname"), pat.getLastName());
+			m.put(get("patBirthdate"), new TimeTool(pat.getDateOfBirth()).toString(TimeTool.DATE_GER));
+			m.put(get("patSex"), (pat.getGender() == Gender.FEMALE) ? "F" : "M");
+			m.put(get("patStreet"), pat.getStreet());
+			m.put(get("patZip"), pat.getZip());
+			m.put(get("patCity"), pat.getCity());
+			m.put(get("patPhone1"), pat.getPhone1());
+			m.put(get("patPhone2"), pat.getPhone2());
+			m.put(get("patMail"), pat.getEmail());
+			m.put(get("patAHV"), pat.getExtInfo("AHV").toString());
+			m.put(get("docDate"), new TimeTool().toString(TimeTool.DATE_GER));
+		}
+		// Mandant mand = ElexisEventDispatcher.getSelectedMandator();
+		IMandator mand = contextService.getActiveMandator().orElseThrow();
+		if (mand != null) {
+			m.put(get("mandatorAddress"), mand.getPostalAddress());
+			m.put(get("mandatorNameLine"), mand.getDescription1() + " " + mand.getDescription2());
+			m.put(get("mandatorEAN"), (String) mand.getExtInfo("EAN"));
+			String ksk = (String) mand.getExtInfo("KSK");
+			if (ksk == null) {
+				ksk = (String) mand.getExtInfo("ZSR");
+				if (ksk == null) {
+					ksk = "";
+				}
+			}
+			m.put(get("mandatorZSR"), ksk);
+			m.put(get("mandatorStreet"), mand.getStreet());
+			m.put(get("mandatorZip"), mand.getZip());
+			m.put(get("mandatorCity"), mand.getCity());
+			m.put(get("mandatorPhone1"), mand.getPhone1());
+			m.put(get("mandatorMail"), mand.getEmail());
+		}
+		// Konsultation kons = (Konsultation)
+		// ElexisEventDispatcher.getSelected(Konsultation.class);
+		ICoverage cov = contextService.getActiveCoverage().orElseThrow();
+		if (cov != null) {
+			IContact cb = cov.getCostBearer();
+			if (cb != null) {
+				m.put(get("insuranceName"), cb.getDescription1() + " " + cb.getDescription2());
+				m.put(get("insuranceStreet"), StringTool.unNull(cb.getStreet()));
+				m.put(get("insuranceZip"), StringTool.unNull(cb.getZip()));
+				m.put(get("insuranceCity"), StringTool.unNull(cb.getCity()));
+				m.put(get("insuranceMail"), StringTool.unNull(cb.getEmail()));
 
-        }
-        BillingLaw bl = cov.getBillingSystem().getLaw();
-        String nr = cov.getInsuranceNumber();
-        if (StringTool.isNothing(nr)) {
-          nr = (String) cov.getExtInfo("Versicherungsnummer");
-        }
-        if (StringTool.isNothing(nr)) {
-          nr = (String) cov.getExtInfo("Unfallnummer");
-        }
-        m.put(get("insuranceCaseNr"), StringTool.unNull(nr));
-        m.put(get("insuranceLaw"), bl.toString());
-      }
-    
+			}
+			BillingLaw bl = cov.getBillingSystem().getLaw();
+			String nr = cov.getInsuranceNumber();
+			if (StringTool.isNothing(nr)) {
+				nr = (String) cov.getExtInfo("Versicherungsnummer");
+			}
+			if (StringTool.isNothing(nr)) {
+				nr = (String) cov.getExtInfo("Unfallnummer");
+			}
+			m.put(get("insuranceCaseNr"), StringTool.unNull(nr));
+			m.put(get("insuranceLaw"), bl.toString());
+		}
 
-    return mgr.fillForm(form, outPath, m);
-  }
+		return mgr.fillForm(form, outPath, m);
+	}
 
 	private String[] getPhones(Kontakt k) {
 		String p1 = k.get(Kontakt.FLD_PHONE1);
