@@ -64,11 +64,12 @@ public class Manager {
 			pdfDoc.getDocumentInformation().setCustomMetadataValue("concern", "Forms");
 			PDAcroForm acroForm = docCatalog.getAcroForm();
 			for (Entry<String, String> e : fields.entrySet()) {
-				PDField pdField = acroForm.getField(e.getKey());
+				String key=e.getKey();
+				String value=e.getValue();
+				PDField pdField = acroForm.getField(key);
 				if (pdField != null) {
 					try {
-						String val = e.getValue();
-						pdField.setValue(val);
+						pdField.setValue(value);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}

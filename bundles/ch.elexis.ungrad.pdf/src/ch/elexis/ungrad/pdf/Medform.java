@@ -17,18 +17,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
-
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.model.IContact;
 import ch.elexis.core.model.ICoverage;
 import ch.elexis.core.model.IMandator;
 import ch.elexis.core.model.IPatient;
-
 import ch.elexis.core.model.ch.BillingLaw;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.types.Gender;
-import ch.elexis.data.Kontakt;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.ungrad.Util;
 import ch.rgw.tools.ExHandler;
@@ -72,6 +68,7 @@ public class Medform {
 					{ "mandatorZip", "topmostSubform[0].page2[0].providerS1Address[0].zip[0]" },
 					{ "mandatorCity", "topmostSubform[0].page2[0].providerS1Address[0].city[0]" },
 					{ "mandatorAddress", "topmostSubform[0].page1[0].providerS1Address[0].blockAddress[0]" },
+					{ "insuranceCondensed", "topmostSubform[0].page1[0].insuranceS1Address[0].condensedName[0]" },
 					{ "insuranceName", "topmostSubform[0].page1[0].insuranceS1Address[0].companyName[0]" },
 					{ "insuranceStreet", "topmostSubform[0].page1[0].insuranceS1Address[0].street[0]" },
 					{ "insuranceZip", "topmostSubform[0].page1[0].insuranceS1Address[0].zip[0]" },
@@ -133,7 +130,7 @@ public class Medform {
 			m.put(get("patStreet"), pat.getStreet());
 			m.put(get("patZip"), pat.getZip());
 			m.put(get("patCity"), pat.getCity());
-			String[] phones=getPhones(pat);
+			String[] phones = getPhones(pat);
 			m.put(get("patPhone1"), phones[0]);
 			m.put(get("patPhone2"), phones[1]);
 			m.put(get("patMail"), pat.getEmail());
@@ -145,7 +142,8 @@ public class Medform {
 		if (mand != null) {
 			m.put(get("mandatorAddress"), mand.getPostalAddress());
 			m.put(get("mandatorNameLine"), mand.getDescription1() + " " + mand.getDescription2());
-			m.put(get("mandatorEAN"), (String) mand.getExtInfo("EAN"));
+			String ean = (String) mand.getExtInfo("EAN");
+			m.put(get("mandatorEAN"), ean);
 			String ksk = (String) mand.getExtInfo("KSK");
 			if (ksk == null) {
 				ksk = (String) mand.getExtInfo("ZSR");
@@ -166,7 +164,14 @@ public class Medform {
 		if (cov != null) {
 			IContact cb = cov.getCostBearer();
 			if (cb != null) {
-				m.put(get("insuranceName"), cb.getDescription1() + " " + cb.getDescription2());
+				String insurance = cb.getDescription1();
+				if (!StringTool.isNothing(cb.getDescription2())) {
+					insurance += " " + cb.getDescription2();
+				} else if (!StringTool.isNothing(cb.getDescription3())) {
+					insurance += " " + cb.getDescription3();
+				}
+				m.put(get("insuranceName"), insurance);
+				m.put(get("insuranceCondensed"), insurance);
 				m.put(get("insuranceStreet"), StringTool.unNull(cb.getStreet()));
 				m.put(get("insuranceZip"), StringTool.unNull(cb.getZip()));
 				m.put(get("insuranceCity"), StringTool.unNull(cb.getCity()));
@@ -190,6 +195,7 @@ public class Medform {
 
 	/**
 	 * get the "best" phone numbers
+	 * 
 	 * @param k
 	 * @return phones[0]: Best number, phones[1] second best number
 	 */
@@ -229,10 +235,10 @@ public class Medform {
 		return ret;
 	}
 
-	public String get(String field) {
+	public String get(String field) throws Exception {
 		String ret = mapping.get(field);
 		if (ret == null) {
-			return "";
+			throw new Exception(field + " is not mapped");
 		} else {
 			return ret;
 		}
@@ -245,13 +251,11 @@ public class Medform {
 	 * @return
 	 */
 	public String getFieldValue(String name) {
-		String medformsField = get(name);
-		if (medformsField != null) {
-			try {
-				return mgr.getFieldContents(this.form, medformsField);
-			} catch (Exception e) {
-				ExHandler.handle(e);
-			}
+		try {
+			String medformsField = get(name);
+			return mgr.getFieldContents(this.form, medformsField);
+		} catch (Exception e) {
+			ExHandler.handle(e);
 		}
 		return "";
 	}
