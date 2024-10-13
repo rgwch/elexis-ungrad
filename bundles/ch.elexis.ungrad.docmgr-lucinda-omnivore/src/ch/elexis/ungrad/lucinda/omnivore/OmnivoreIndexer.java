@@ -15,7 +15,6 @@
 package ch.elexis.ungrad.lucinda.omnivore;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,20 +27,16 @@ import org.slf4j.LoggerFactory;
 import ch.elexis.data.Patient;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.data.Query;
-import ch.elexis.omnivore.model.IDocumentHandle;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.IProgressController;
 import ch.elexis.ungrad.lucinda.model.Customer;
 import ch.elexis.ungrad.lucinda.model.Sender;
-import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.JdbcLink;
 import ch.rgw.tools.TimeTool;
 
 /**
- * A Lucinda Indexer Customer for Omnivore Documents Since the DocHandle doesn't
- * seem to exist anymore, we have to access the database directly
- * 
+ * A Lucinda Indexer Customer for Omnivore Documents
  * @author gerry
  *
  */
@@ -63,11 +58,10 @@ public class OmnivoreIndexer implements Customer {
 
 	/**
 	 * Start indexing. All consultations since last run are fetched from the
-	 * database. A progress indicator and a Sender are initialized We use the
-	 * lastupdate field to check where we ware, which is probably not accurate with
-	 * older databases where that field didn't exist yet.
-	 * 
-	 * @throws IOException
+	 * database. A progress indicator and a Sender are initialized
+	 * We use the lastupdate field to check where we ware, which is probably not accurate with older
+	 * databases where that field didn't exist yet.
+	 * @throws IOException 
 	 * @See Sender
 	 */
 
@@ -79,7 +73,7 @@ public class OmnivoreIndexer implements Customer {
 			lastCheck = 0L;
 		}
 		bMove = Preferences.is(Preferences.OMNIVORE_MOVE);
-		StringBuilder querySQL = new StringBuilder("SELECT ID FROM CH_ELEXIS_OMNIVORE_DATA")
+		StringBuilder querySQL = new StringBuilder("SELECT ID FROM ").append(DocHandle.TABLENAME)
 				.append(" WHERE lastupdate >=").append(lastCheck);
 		String excludes = Preferences.get(Preferences.OMNIVORE_EXCLUDE, "");
 		if (excludes.length() > 0) {
@@ -90,9 +84,8 @@ public class OmnivoreIndexer implements Customer {
 		}
 		querySQL.append(" AND deleted='0' ORDER BY ").append("lastupdate");
 
-		Query<PersistentObject> qbe = new Query<PersistentObject>(PersistentObject.class);
-		Collection<PersistentObject> docs = qbe.queryExpression(querySQL.toString(),
-				new LinkedList<PersistentObject>());
+		Query<DocHandle> qbe = new Query<DocHandle>(DocHandle.class);
+		Collection<DocHandle> docs = qbe.queryExpression(querySQL.toString(), new LinkedList<DocHandle>());
 
 		progressHandle = pc.initProgress(docs.size());
 		setActive(true);
@@ -100,13 +93,13 @@ public class OmnivoreIndexer implements Customer {
 	}
 
 	/**
-	 * for each hit in the List, the Sender asks its Customer to fill in values to
-	 * store in the index. Mandatory fields are as follows:
+	 * for each hit in the List, the Sender asks its Customer to fill in values
+	 * to store in the index. Mandatory fields are as follows:
 	 * <ul>
 	 * <li>title: A short text describing the entry. Will show up in search
 	 * results</li>
-	 * <li>type: A description (one word) of the type of this entry. Well also show
-	 * up in the results</li>
+	 * <li>type: A description (one word) of the type of this entry. Well also
+	 * show up in the results</li>
 	 * <li>payload</li> The the text to index, as byte array.</li>
 	 * </ul>
 	 * 
@@ -122,30 +115,23 @@ public class OmnivoreIndexer implements Customer {
 	 * 
 	 * Other fields are optional.
 	 * 
-	 * @Returns JsonObject with the metadata, or null to indicate,that the sender
-	 *          should finish and discard remaining objects.
+	 * @Returns JsonObject with the metadata, or null to indicate,that the
+	 *          sender should finish and discard remaining objects.
 	 */
 
 	@Override
 	public Map specify(PersistentObject po) {
+		DocHandle dh = (DocHandle) po;
 		if (cont) {
-			Map<String, Object> meta = new HashMap<String, Object>();
-			try {
-				meta.put("payload", getContents(po)); //$NON-NLS-1$ $
-			} catch (Exception ex) {
-				// This version can only process database-stored Omnivore-Documents
-				ExHandler.handle(ex);
-				return null;
-			}
-
-			Patient patient = Patient.load(po.get("PatID"));
+			Map<String,Object> meta = new HashMap<String, Object>();
+			Patient patient = dh.getPatient();
 			String bdRaw = get(patient, Patient.FLD_DOB);
 			String lastname = get(patient, Patient.FLD_NAME);
 			String firstname = get(patient, Patient.FLD_FIRSTNAME);
 			String birthdate = new TimeTool(bdRaw).toString(TimeTool.DATE_GER);
-			String docdate = new TimeTool(po.get("CreationDate")).toString(TimeTool.DATE_COMPACT);
-			if (po.getLastUpdate() > lastCheck) {
-				lastCheck = po.getLastUpdate();
+			String docdate = new TimeTool(dh.getCreationDate()).toString(TimeTool.DATE_COMPACT);
+			if (dh.getLastUpdate() > lastCheck) {
+				lastCheck = dh.getLastUpdate();
 				Preferences.set(Preferences.LASTSCAN_OMNI, Long.toString(lastCheck));
 			}
 			StringBuilder concern = new StringBuilder().append(lastname).append("_").append(firstname).append("_") //$NON-NLS-1$ //$NON-NLS-2$
@@ -155,12 +141,14 @@ public class OmnivoreIndexer implements Customer {
 			meta.put("firstname", firstname); //$NON-NLS-1$
 			meta.put("birthdate", birthdate); //$NON-NLS-1$
 			meta.put("date", docdate); //$NON-NLS-1$
-			meta.put("category", po.get("Category")); //$NON-NLS-1$
-			meta.put("keywords", po.get("Keywords")); //$NON-NLS-1$
+			meta.put("category", dh.getCategory()); //$NON-NLS-1$
+			meta.put("keywords", dh.getKeywords()); //$NON-NLS-1$
 			meta.put("concern", concern.toString()); //$NON-NLS-1$
-			meta.put("title", po.get("title")); //$NON-NLS-1$
+			meta.put("payload", dh.getContents()); //$NON-NLS-1$
+			meta.put("concern", concern.toString()); //$NON-NLS-1$
+			meta.put("title", dh.getTitle()); //$NON-NLS-1$
 			meta.put("type", Preferences.OMNIVORE_NAME); //$NON-NLS-1$
-			meta.put("filetype", po.get("Mimetype"));
+			meta.put("filetype", dh.getMimetype());
 			pc.addProgress(progressHandle, 1);
 			return meta;
 		} else {
@@ -179,15 +167,16 @@ public class OmnivoreIndexer implements Customer {
 	}
 
 	/**
-	 * When all elements are processed, or after the customer answered "null" to the
-	 * call to specify, the Sender calls finished for cleanup. Here we note the date
-	 * of the last document indexed to continue later.
+	 * When all elements are processed, or after the customer answered "null" to
+	 * the call to specify, the Sender calls finished for cleanup. Here we note
+	 * the date of the last document indexed to continue later.
 	 *
-	 * @param messages Lucinda messages sent while transferring.
+	 * @param messages
+	 *            Lucinda messages sent while transferring.
 	 */
 
 	@Override
-	public void finished(List<Map<String, Object>> messages) {
+	public void finished(List<Map<String,Object>> messages) {
 		Activator.getDefault().addMessages(messages);
 		Preferences.cfg.flush();
 	}
@@ -200,18 +189,11 @@ public class OmnivoreIndexer implements Customer {
 	@Override
 	public void success(String id) {
 		if (bMove) {
-			PreparedStatement ps = PersistentObject.getConnection()
-					.getPreparedStatement("UPDATE CH_ELEXIS_OMNIVORE_DATA SET deleted=? WHERE id=?");
-			Query<PersistentObject> qbe = new Query<PersistentObject>(PersistentObject.class);
-			qbe.execute(ps, new String[] { "1", id });
+			DocHandle dh = DocHandle.load(id);
+			if (dh != null && dh.isValid()) {
+				dh.delete();
+			}
 		}
 	}
 
-	public byte[] getContents(PersistentObject po) throws Exception {
-		byte[] ret = po.getBinary("Doc");
-		if (ret == null) {
-			throw new Exception("cant retrieve file system based Omnivore files");
-		}
-		return ret;
-	}
 }

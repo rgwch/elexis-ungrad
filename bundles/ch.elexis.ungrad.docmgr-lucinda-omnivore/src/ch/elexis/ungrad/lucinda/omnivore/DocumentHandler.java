@@ -53,15 +53,18 @@ public class DocumentHandler implements IDocumentHandler {
 
 	@Override
 	public IAction getSyncAction(final Controller controller) {
-		IAction indexOmnivoreAction = new RestrictedAction(EvACE.of(Document.class, Right.CREATE),
-				Messages.GlobalView_omnivoreImport_Name, Action.AS_CHECK_BOX) {
+		/*
+		 * IAction indexOmnivoreAction = new RestrictedAction(EvACE.of(Document.class,
+		 * Right.READ),
+		 */
+		IAction indexOmnivoreAction = new Action(Messages.GlobalView_omnivoreImport_Name, Action.AS_CHECK_BOX) {
 			{
 				setToolTipText(Messages.GlobalView_omnivoreImport_tooltip);
 				setImageDescriptor(Images.IMG_SYNC.getImageDescriptor());
 			}
 
 			@Override
-			public void doRun() {
+			public void run() {
 				if (this.isChecked()) {
 					ImportSettings dlg = new ImportSettings(Hub.getActiveShell());
 					dlg.create();
