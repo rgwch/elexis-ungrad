@@ -53,4 +53,8 @@
          id="ch.elexis.ungrad.docmgr-lucinda.kons"
          version="0.0.0"/>
 
+   <plugin
+         id="ch.elexis.ungrad.docmgr.lucinda.omnivore"
+         version="0.0.0"/>
+
 </feature>
