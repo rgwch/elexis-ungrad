@@ -1,46 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="ch.elexis.ungrad.docmgr-lucinda.feature" label="Document Manager based on Lucinda"
-      version="2.0.1.qualifier" provider-name="G. Weirich" os="linux,macosx,win32"
+<feature
+      id="ch.elexis.ungrad.docmgr-lucinda.feature"
+      label="Document Manager based on Lucinda"
+      version="2.0.1.qualifier"
+      provider-name="G. Weirich"
+      os="linux,macosx,win32"
       ws="cocoa,gtk,win32">
 
-      <description url="https://elexis.ch/ungrad/features/lucinda/">
-            A Lucene based document manager for Elexis
-      </description>
+   <description url="https://elexis.ch/ungrad/features/lucinda/">
+      A Lucene based document manager for Elexis
+   </description>
 
-      <copyright>
-            Copyright (c) 2016-2024 by G. Weirich
-      </copyright>
+   <copyright>
+      Copyright (c) 2016-2024 by G. Weirich
+   </copyright>
 
-      <license url="https://www.eclipse.org/legal/epl-v10.html">
-            Eclipse Public License v1.0
-      </license>
+   <license url="https://www.eclipse.org/legal/epl-v10.html">
+      Eclipse Public License v1.0
+   </license>
 
-      <requires>
-            <import plugin="org.eclipse.core.runtime" version="3.8.0" match="greaterOrEqual" />
-            <import plugin="org.eclipse.ui" version="3.8.2" match="greaterOrEqual" />
-            <import plugin="ch.elexis.omnivore" version="3.0.0" match="greaterOrEqual" />
-            <import plugin="org.slf4j.api" version="0.0.0" match="greaterOrEqual"/>
-            <import plugin="ch.elexis.ungrad.docmgr-lucinda" version="1.0.4" match="greaterOrEqual" />
-            <import plugin="ch.elexis.core" version="3.1.0" match="greaterOrEqual" />
-            <import plugin="ch.rgw.utility" version="3.1.0" match="greaterOrEqual" />
-            <import plugin="ch.elexis.core.data" version="3.1.0" match="greaterOrEqual" />
-            <import plugin="ch.elexis.core.ui" version="3.1.0" match="greaterOrEqual" />
-            <import plugin="ch.elexis.core.ui.icons" version="3.1.0" match="greaterOrEqual" />
-            <import plugin="com.fasterxml.jackson.core.jackson-core" version="2.7.4"
-                  match="greaterOrEqual" />
-      </requires>
+   <requires>
+      <import plugin="org.eclipse.core.runtime" version="3.8.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.8.2" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.omnivore" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.slf4j.api" version="0.0.0" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.ungrad.docmgr-lucinda" version="1.0.4" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.core" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="ch.rgw.utility" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.core.data" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.core.ui" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="ch.elexis.core.ui.icons" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="com.fasterxml.jackson.core.jackson-core" version="2.7.4" match="greaterOrEqual"/>
+   </requires>
 
-      <plugin id="ch.elexis.ungrad.docmgr-lucinda" download-size="0" install-size="0"
-            version="0.0.0" unpack="false" />
+   <plugin
+         id="ch.elexis.ungrad.docmgr-lucinda"
+         version="0.0.0"/>
 
+   <plugin
+         id="com.fasterxml.jackson.core.jackson-core"
+         version="0.0.0"/>
 
-      <plugin id="com.fasterxml.jackson.core.jackson-core" download-size="0" install-size="0"
-            version="0.0.0" unpack="false" />
+   <plugin
+         id="com.fasterxml.jackson.core.jackson-databind"
+         version="0.0.0"/>
 
-      <plugin id="com.fasterxml.jackson.core.jackson-databind" download-size="0" install-size="0"
-            version="0.0.0" unpack="false" />
+   <plugin
+         id="com.fasterxml.jackson.core.jackson-annotations"
+         version="0.0.0"/>
 
-      <plugin id="com.fasterxml.jackson.core.jackson-annotations" download-size="0" install-size="0"
-            version="0.0.0" unpack="false" />
+   <plugin
+         id="ch.elexis.ungrad.docmgr-lucinda.kons"
+         version="0.0.0"/>
 
 </feature>

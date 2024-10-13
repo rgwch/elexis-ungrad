@@ -118,7 +118,7 @@ public class ConsultationIndexer implements Customer {
 	@Override
 	public Map<String, Object> specify(PersistentObject po){
 		Konsultation kons = (Konsultation) po;
-		long lastDisplayUüdate = System.currentTimeMillis();
+		long lastDisplayUpdate = System.currentTimeMillis();
 		int numOfUpdates = 0;
 		if (cont) {
 			Map<String, Object> meta = new HashMap<String, Object>();
@@ -163,10 +163,10 @@ public class ConsultationIndexer implements Customer {
 				lastCheck = kons.getLastUpdate();
 				Preferences.set(Preferences.LASTSCAN_KONS, Long.toString(lastCheck));
 			}
-			if (System.currentTimeMillis() - 1000 > lastDisplayUüdate) {
+			if (System.currentTimeMillis() - 1000 > lastDisplayUpdate) {
 				pc.addProgress(progressHandle, numOfUpdates);
 				numOfUpdates = 0;
-				lastDisplayUüdate = System.currentTimeMillis();
+				lastDisplayUpdate = System.currentTimeMillis();
 			} else {
 				numOfUpdates += 1;
 			}
