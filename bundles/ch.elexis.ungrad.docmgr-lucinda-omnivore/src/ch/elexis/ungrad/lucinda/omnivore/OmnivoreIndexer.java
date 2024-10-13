@@ -37,6 +37,7 @@ import ch.rgw.tools.TimeTool;
 
 /**
  * A Lucinda Indexer Customer for Omnivore Documents
+ * 
  * @author gerry
  *
  */
@@ -58,10 +59,11 @@ public class OmnivoreIndexer implements Customer {
 
 	/**
 	 * Start indexing. All consultations since last run are fetched from the
-	 * database. A progress indicator and a Sender are initialized
-	 * We use the lastupdate field to check where we ware, which is probably not accurate with older
-	 * databases where that field didn't exist yet.
-	 * @throws IOException 
+	 * database. A progress indicator and a Sender are initialized We use the
+	 * lastupdate field to check where we ware, which is probably not accurate with
+	 * older databases where that field didn't exist yet.
+	 * 
+	 * @throws IOException
 	 * @See Sender
 	 */
 
@@ -89,17 +91,18 @@ public class OmnivoreIndexer implements Customer {
 
 		progressHandle = pc.initProgress(docs.size());
 		setActive(true);
-		new Sender(this, (List<? extends PersistentObject>) docs, bMove);
+		Sender sender = new Sender(this, (List<? extends PersistentObject>) docs, bMove);
+		sender.schedule();
 	}
 
 	/**
-	 * for each hit in the List, the Sender asks its Customer to fill in values
-	 * to store in the index. Mandatory fields are as follows:
+	 * for each hit in the List, the Sender asks its Customer to fill in values to
+	 * store in the index. Mandatory fields are as follows:
 	 * <ul>
 	 * <li>title: A short text describing the entry. Will show up in search
 	 * results</li>
-	 * <li>type: A description (one word) of the type of this entry. Well also
-	 * show up in the results</li>
+	 * <li>type: A description (one word) of the type of this entry. Well also show
+	 * up in the results</li>
 	 * <li>payload</li> The the text to index, as byte array.</li>
 	 * </ul>
 	 * 
@@ -115,19 +118,19 @@ public class OmnivoreIndexer implements Customer {
 	 * 
 	 * Other fields are optional.
 	 * 
-	 * @Returns JsonObject with the metadata, or null to indicate,that the
-	 *          sender should finish and discard remaining objects.
+	 * @Returns JsonObject with the metadata, or null to indicate,that the sender
+	 *          should finish and discard remaining objects.
 	 */
 
 	@Override
 	public Map specify(PersistentObject po) {
 		DocHandle dh = (DocHandle) po;
 		if (cont) {
-			Map<String,Object> meta = new HashMap<String, Object>();
+			Map<String, Object> meta = new HashMap<String, Object>();
 			Patient patient = dh.getPatient();
-			String bdRaw = get(patient, Patient.FLD_DOB);
-			String lastname = get(patient, Patient.FLD_NAME);
-			String firstname = get(patient, Patient.FLD_FIRSTNAME);
+			String bdRaw = getSafe(patient, Patient.FLD_DOB);
+			String lastname = getSafe(patient, Patient.FLD_NAME);
+			String firstname = getSafe(patient, Patient.FLD_FIRSTNAME);
 			String birthdate = new TimeTool(bdRaw).toString(TimeTool.DATE_GER);
 			String docdate = new TimeTool(dh.getCreationDate()).toString(TimeTool.DATE_COMPACT);
 			if (dh.getLastUpdate() > lastCheck) {
@@ -158,7 +161,7 @@ public class OmnivoreIndexer implements Customer {
 
 	}
 
-	private String get(PersistentObject po, String field) {
+	private String getSafe(PersistentObject po, String field) {
 		String ret = po.get(field);
 		if (ret == null) {
 			return ""; //$NON-NLS-1$
@@ -167,16 +170,15 @@ public class OmnivoreIndexer implements Customer {
 	}
 
 	/**
-	 * When all elements are processed, or after the customer answered "null" to
-	 * the call to specify, the Sender calls finished for cleanup. Here we note
-	 * the date of the last document indexed to continue later.
+	 * When all elements are processed, or after the customer answered "null" to the
+	 * call to specify, the Sender calls finished for cleanup. Here we note the date
+	 * of the last document indexed to continue later.
 	 *
-	 * @param messages
-	 *            Lucinda messages sent while transferring.
+	 * @param messages Lucinda messages sent while transferring.
 	 */
 
 	@Override
-	public void finished(List<Map<String,Object>> messages) {
+	public void finished(List<Map<String, Object>> messages) {
 		Activator.getDefault().addMessages(messages);
 		Preferences.cfg.flush();
 	}

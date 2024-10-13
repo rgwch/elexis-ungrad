@@ -76,13 +76,15 @@ public class GlobalView extends ViewPart implements IActivationListener {
 	@Inject
 	private IConfigService cfg;
 	@Inject
-	private IContextService ctx=ContextServiceHolder.get();
+	private IContextService ctx = ContextServiceHolder.get();
 
 	@Inject
 	void selectedPatient(@Optional IPatient pat) {
-		CoreUiUtil.runAsyncIfActive(() -> {
-			controller.changePatient(java.util.Optional.of(pat));
-		}, controller.getTopControl());
+		if (pat != null) {
+			CoreUiUtil.runAsyncIfActive(() -> {
+				controller.changePatient(java.util.Optional.of(pat));
+			}, controller.getTopControl());
+		}
 	}
 
 	public GlobalView() {

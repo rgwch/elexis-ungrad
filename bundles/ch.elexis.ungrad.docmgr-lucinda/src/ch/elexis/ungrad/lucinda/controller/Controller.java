@@ -51,7 +51,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.data.activator.CoreHub;
+import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.text.model.Samdas;
@@ -131,8 +133,8 @@ public class Controller implements IProgressController {
 					if (Preferences.KONSULTATION_NAME.equals(doctype)) {
 						Konsultation kons = Konsultation.load((String) doc.get(Preferences.FLD_ID));
 						if (kons.exists()) {
-							contextService.setTyped(kons);
-							// ElexisEventDispatcher.fireSelectionEvent(kons);
+							// contextService.setTyped(kons); // doesn't work
+							ElexisEventDispatcher.fireSelectionEvent(kons);
 						}
 					}
 				}

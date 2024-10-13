@@ -43,12 +43,19 @@ public class DocHandle extends PersistentObject {
 	private static final String FLD_TITLE = "Titel"; //$NON-NLS-1$
 	private static final String FLD_MIMETYPE = "Mimetype"; //$NON-NLS-1$
 	private static final String FLD_DOC = "Doc"; //$NON-NLS-1$
+	public static final String FLD_PATH = "Path"; //$NON-NLS-1$
 	private static final String FLD_KEYWORDS = "Keywords"; //$NON-NLS-1$
 	private static final String FLD_PATID = "PatID"; //$NON-NLS-1$
 	private static final String FLD_CREATION_DATE = "CreationDate"; //$NON-NLS-1$
 
 	static final String TABLENAME = "CH_ELEXIS_OMNIVORE_DATA"; //$NON-NLS-1$
 
+	static {
+		addMapping(TABLENAME, FLD_PATID, FLD_CAT + "=Category", DATE_COMPOUND, //$NON-NLS-1$
+			FLD_CREATION_DATE + "=S:D:" + FLD_CREATION_DATE, FLD_TITLE + "=Title", FLD_KEYWORDS,
+			FLD_PATH, FLD_DOC, FLD_MIMETYPE);
+		DocHandle start = load(StringConstants.ONE);
+	}
 	@Override
 	public String getTableName() {
 		return TABLENAME;
@@ -142,12 +149,14 @@ public class DocHandle extends PersistentObject {
 	}
 
 	public String getDate() {
-		toStringTool.set(get(FLD_DATE));
+		String date=get(FLD_DATE);
+		toStringTool.set(date);
 		return toStringTool.toString(TimeTool.DATE_GER);
 	}
 
 	public String getCreationDate() {
-		toStringTool.set(get(FLD_CREATION_DATE));
+		String date=get(FLD_CREATION_DATE);
+		toStringTool.set(date);
 		return toStringTool.toString(TimeTool.DATE_GER);
 
 	}

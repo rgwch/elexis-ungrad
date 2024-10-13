@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.ungrad.lucinda.Lucinda;
 import ch.rgw.tools.ExHandler;
@@ -89,6 +90,7 @@ public class Sender extends Job {
 									type == null ? "" : type, order, contents, bCopy); //$NON-NLS-1$
 						} catch (Exception ex) {
 							ExHandler.handle(ex);
+							SWTHelper.showError("Fehler", ex.getMessage());
 							return new Status(SEVERITY.ERROR.ordinal(), "ch.ungrad.lucinda", ex.getMessage(), ex);
 						}
 					} else { // Skipped empty file -> Advance to next
