@@ -18,6 +18,7 @@
         <module>ch.elexis.ungrad.labview</module>
         <module>ch.elexis.ungrad.qrbills</module>
         <module>ch.elexis.ungrad.docmgr-lucinda</module>
+        <module>ch.elexis.ungrad.docmgr-lucinda-kons</module>
         <module>ch.elexis.ungrad.inbox</module>
         <module>ch.elexis.ungrad.labenter</module>
         <module>ch.elexis.ungrad.text.templator</module>
