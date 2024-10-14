@@ -5,5 +5,5 @@ Bundle-SymbolicName: ch.elexis.ungrad.docmgr-lucinda.test
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: ch.elexis.ungrad.docmgr-lucinda;bundle-version="2.0.0"
 Automatic-Module-Name: ch.elexis.ungrad.docmgr-lucinda.test
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: junit;bundle-version="4.8.2"
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Require-Bundle: org.junit;bundle-version="4.13.2"
