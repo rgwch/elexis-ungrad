@@ -196,9 +196,6 @@ public class Client3 {
 			throw (new Exception("Empty response"));
 		} else {
 			Map<String, Object> answer = readJson(ans);
-			if(answer.get("status").equals("error")) {
-				throw new Exception("Error sending to Lucinda: "+answer.get("err"));
-			}
 			Map<String, Object> result = (Map<String, Object>) answer.get("responseHeader");
 			if (result.get("status") == (Integer) 0) {
 				result.put("status", "ok");
