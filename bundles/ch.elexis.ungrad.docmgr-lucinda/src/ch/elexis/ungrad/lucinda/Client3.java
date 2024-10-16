@@ -188,6 +188,7 @@ public class Client3 {
 	 */
 	public Map addToIndex(final String id, final String title, final String doctype, Map metadata,
 			final byte[] contents) throws Exception {
+		@SuppressWarnings("unchecked")
 		Map<String, Object> params = prepare(id, title, doctype, metadata);
 		params.put("contents", contents);
 

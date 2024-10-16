@@ -90,8 +90,10 @@ public class Sender extends Job {
 									type == null ? "" : type, order, contents, bCopy); //$NON-NLS-1$
 						} catch (Exception ex) {
 							ExHandler.handle(ex);
-							SWTHelper.showError("Fehler", ex.getMessage());
-							return new Status(SEVERITY.ERROR.ordinal(), "ch.ungrad.lucinda", ex.getMessage(), ex);
+							SWTHelper.showError("Fehler", ex.getMessage() + " " + po.getId() + " " + title);
+							if (!ex.getMessage().equals("Empty response")) {
+								return new Status(SEVERITY.ERROR.ordinal(), "ch.ungrad.lucinda", ex.getMessage(), ex);
+							}
 						}
 					} else { // Skipped empty file -> Advance to next
 						log.warn("Skipping empty Document " + order.get("title"));
