@@ -27,11 +27,13 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.swt.internal.SWTGeometry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 
+import ch.elexis.core.ui.util.SWTHelper;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 
@@ -97,8 +99,10 @@ public class Client3 {
 	}
 
 	/**
-	 * Send a document to the parse-method of Lucinda. Pass the returned text content (if any) line by line to a provided INotifier
-	 * @param contents 
+	 * Send a document to the parse-method of Lucinda. Pass the returned text
+	 * content (if any) line by line to a provided INotifier
+	 * 
+	 * @param contents
 	 * @param got
 	 * @throws IOException
 	 */
@@ -197,12 +201,22 @@ public class Client3 {
 			throw (new Exception("Empty response"));
 		} else {
 			Map<String, Object> answer = readJson(ans);
-			Map<String, Object> result = (Map<String, Object>) answer.get("responseHeader");
-			if (result.get("status") == (Integer) 0) {
-				result.put("status", "ok");
-				result.put("_id", id);
+			if (answer.containsKey("status")) {
+				String status = (String) answer.get("status");
+				if (status.equals("error")) {
+					throw new Error("Error in transmission: " + (String) answer.get("err"));
+				}
+			} else if (answer.containsKey("resonseHeader")) {
+				Map<String, Object> result = (Map<String, Object>) answer.get("responseHeader");
+				if (result.get("status") == (Integer) 0) {
+					result.put("status", "ok");
+					result.put("_id", id);
+				}
+				return result;
+			} else {
+				throw new Error("Bad response " + answer.toString());
 			}
-			return result;
+			return answer;
 		}
 
 	}
