@@ -42,6 +42,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
@@ -530,13 +531,25 @@ public class KonsZumVerrechnen extends ViewPart {
 
 			@Override
 			public void run() {
-				if (((StructuredSelection) tvSel.getSelection()).size() > 0) {
+				IStructuredSelection selected = (IStructuredSelection) tvSel.getSelection();
+				if (selected.size() > 0) {
+					Tree<PersistentObject> t = new Tree<PersistentObject>(null, null);
+					for (Object o : selected.toList()) {
+						if (o instanceof LazyTree) {
+							LazyTree<PersistentObject> lt=(LazyTree<PersistentObject>)o;
+							//Tree<PersistentObject> c=new Tree<PersistentObject>(t, lt.contents);
+							t.merge(lt.preload());
+						}
+					}
+					ErstelleRnnCommand.ExecuteWithParams(getViewSite(), t);
+				} else {
 					if (!SWTHelper.askYesNo(Messages.KonsZumVerrechnenView_RealleCreateBillsCaption, // $NON-NLS-1$
 							Messages.KonsZumVerrechnenView_ReallyCreateBillsBody)) { // $NON-NLS-1$
 						return;
 					}
+
+					ErstelleRnnCommand.ExecuteWithParams(getViewSite(), tSelection);
 				}
-				ErstelleRnnCommand.ExecuteWithParams(getViewSite(), tSelection);
 				tvSel.refresh();
 			}
 		};
