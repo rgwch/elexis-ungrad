@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -o errexit
+
 cd ../elexis-3-core
  mvn -V clean verify  -Dtycho.localArtifacts=ignore -DskipTests -Dmaterialize-products
 
