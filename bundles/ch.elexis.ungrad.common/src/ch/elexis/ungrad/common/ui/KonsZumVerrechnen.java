@@ -544,8 +544,8 @@ public class KonsZumVerrechnen extends ViewPart {
 							t.merge(lt);
 						}
 					}
-					if (!SWTHelper.askYesNo(Messages.KonsZumVerrechnenView_RealleCreateBillsCaption, // $NON-NLS-1$
-							"Von den ausgewählten Fällen Rechnungen erstellen?")) { // $NON-NLS-1$
+					if (!SWTHelper.askYesNo("Rechnungserstellung bestätigen", // $NON-NLS-1$
+							"Von den "+t.getChildren().size()+" markierten Fällen Rechnungen erstellen?")) { // $NON-NLS-1$
 						return;
 					}
 					ErstelleRnnCommand.ExecuteWithParams(getViewSite(), t);
