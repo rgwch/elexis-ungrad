@@ -535,11 +535,18 @@ public class KonsZumVerrechnen extends ViewPart {
 				if (selected.size() > 0) {
 					Tree<PersistentObject> t = new Tree<PersistentObject>(null, null);
 					for (Object o : selected.toList()) {
-						if (o instanceof LazyTree) {
-							LazyTree<PersistentObject> lt=(LazyTree<PersistentObject>)o;
-							//Tree<PersistentObject> c=new Tree<PersistentObject>(t, lt.contents);
-							t.merge(lt.preload());
+						if (o instanceof Tree) {
+							Tree<PersistentObject> lt = (Tree<PersistentObject>) o;
+							// Tree<PersistentObject> c=new Tree<PersistentObject>(t, lt.contents);
+							if (lt instanceof LazyTree) {
+								((LazyTree) lt).preload();
+							}
+							t.merge(lt);
 						}
+					}
+					if (!SWTHelper.askYesNo(Messages.KonsZumVerrechnenView_RealleCreateBillsCaption, // $NON-NLS-1$
+							"Von den ausgewählten Fällen Rechnungen erstellen?")) { // $NON-NLS-1$
+						return;
 					}
 					ErstelleRnnCommand.ExecuteWithParams(getViewSite(), t);
 				} else {
