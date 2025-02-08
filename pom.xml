@@ -16,7 +16,8 @@
         <!-- BASE>file:../elexis-3-base/ch.elexis.base.p2site/target/repository</BASE -->
         <CORE>https://elexis.ch/ungrad2024/3.12/core/</CORE>
         <BASE>https://elexis.ch/ungrad2024/3.12/base/</BASE>
-        <TARGET>https://download.elexis.info/elexis/target/2023-09-java17/</TARGET>
+        <!-- TARGET>https://download.elexis.info/elexis/target/2023-09-java17/</TARGET -->
+        <TARGET>https://elexis.ch/targets/2023-09-java17/</TARGET>
     </properties>
     <repositories>
         <repository>
