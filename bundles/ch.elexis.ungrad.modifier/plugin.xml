@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="ch.elexis.textKategorie"
+            class="ch.elexis.ungrad.modifier.View"
+            id="ch.elexis.ungrad.modifier.view"
+            name="Ungrad-Modifier"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="ch.elexis.ungrad.common.prefs"
+            class="ch.elexis.ungrad.modifier.PreferencePage"
+            id="ch.elexis.ungrad.modifier.prefs"
+            name="Ungrad-Modifier">
+      </page>
+   </extension>
+
+</plugin>
