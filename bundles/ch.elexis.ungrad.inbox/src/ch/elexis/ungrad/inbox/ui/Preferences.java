@@ -83,8 +83,8 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		lResult = new Label(cCheck, SWT.NONE);
 		lResult.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
 		tText.addModifyListener(matchChecker);
-
-	}
+		addField(new FileFieldEditor(PreferenceConstants.AI_SUMMARY, "KI-Zusammenfassung", getFieldEditorParent()));
+	}	
 
 	ModifyListener matchChecker = new ModifyListener() {
 

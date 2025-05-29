@@ -20,4 +20,5 @@ public class PreferenceConstants {
 	public static final String MBOX = BASE + "mboxfile";
 	public static final String MAPPINGS = BASE + "mappingfile";
 	public static final String ANALYZE_CONTENTS = BASE + "analyzeContents";
+	public static final String AI_SUMMARY = BASE + "ai_summary";
 }

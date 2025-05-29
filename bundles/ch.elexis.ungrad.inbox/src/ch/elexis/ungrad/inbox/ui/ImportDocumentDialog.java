@@ -31,7 +31,7 @@ import ch.elexis.data.Person;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
 
 /**
- * Dialog opened to allow the userr to accept or modify a proposal for an association of a file to a patiebnt
+ * Dialog opened to allow the user to accept or modify a proposal for an association of a file to a patient
  * @author gerry
  *
  */
