@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2024 by G. Weirich
+ * Copyright (c) 2016-2025 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -27,13 +27,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.swt.internal.SWTGeometry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.*;
 
-import ch.elexis.core.ui.util.SWTHelper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 

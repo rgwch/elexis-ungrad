@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, G. Weirich and Elexis
+ * Copyright (c) 2023-2025, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,5 +20,7 @@ public class PreferenceConstants {
 	public static final String MBOX = BASE + "mboxfile";
 	public static final String MAPPINGS = BASE + "mappingfile";
 	public static final String ANALYZE_CONTENTS = BASE + "analyzeContents";
-	public static final String AI_SUMMARY = BASE + "ai_summary";
+	public static final String USE_AI = BASE + "use_ai";
+	public static final String AI_URL = BASE + "ai_url";
+	public static final String AI_PROMPT = BASE + "ai_prompt";
 }

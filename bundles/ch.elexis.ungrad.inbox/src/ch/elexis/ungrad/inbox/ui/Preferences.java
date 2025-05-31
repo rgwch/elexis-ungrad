@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, G. Weirich and Elexis
+ * Copyright (c) 2023-2025, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,7 +83,10 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		lResult = new Label(cCheck, SWT.NONE);
 		lResult.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
 		tText.addModifyListener(matchChecker);
-		addField(new FileFieldEditor(PreferenceConstants.AI_SUMMARY, "KI-Zusammenfassung", getFieldEditorParent()));
+		
+		addField(new BooleanFieldEditor(PreferenceConstants.USE_AI, "KI Analyse benutzen", getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.AI_URL, "URL für KI", getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.AI_PROMPT, "Prompt für KI", getFieldEditorParent()));	
 	}	
 
 	ModifyListener matchChecker = new ModifyListener() {

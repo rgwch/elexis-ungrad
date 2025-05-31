@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, G. Weirich and Elexis
+ * Copyright (c) 2023-2025, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,8 @@
 
 package ch.elexis.ungrad.inbox.ui;
 
+import java.net.URL;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -23,12 +25,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Person;
+import ch.elexis.ungrad.Http;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
+import ch.elexis.ungrad.inbox.model.PreferenceConstants;
 
 /**
  * Dialog opened to allow the user to accept or modify a proposal for an association of a file to a patient
@@ -86,6 +91,26 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 			
 		});
 		text.setText(dd.filename);
+		if(CoreHub.localCfg.get(PreferenceConstants.USE_AI, false)) {
+			Button bUseKI=new Button(ret, SWT.PUSH);
+			bUseKI.setText("KI Zusammenfassung");
+			bUseKI.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					try {
+						Http http=new Http();
+						URL url=new URL(CoreHub.localCfg.get(PreferenceConstants.AI_URL, ""));
+						String result=http.doPost(url, CoreHub.localCfg.get(PreferenceConstants.AI_PROMPT,""), 200);
+						SWTHelper.showInfo("KI sagt:", result);
+					}catch(Exception ex) {
+						SWTHelper.showError("Fehler bei KI Aufruf", ex.getMessage());
+					}
+				}
+
+			});
+
+		}
 		return ret;
 	}
 
