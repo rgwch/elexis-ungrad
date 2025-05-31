@@ -86,7 +86,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		
 		addField(new BooleanFieldEditor(PreferenceConstants.USE_AI, "KI Analyse benutzen", getFieldEditorParent()));
 		addField(new StringFieldEditor(PreferenceConstants.AI_URL, "URL für KI", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.AI_PROMPT, "Prompt für KI", getFieldEditorParent()));	
+		// addField(new StringFieldEditor(PreferenceConstants.AI_PROMPT, "Prompt für KI", getFieldEditorParent()));	
 	}	
 
 	ModifyListener matchChecker = new ModifyListener() {

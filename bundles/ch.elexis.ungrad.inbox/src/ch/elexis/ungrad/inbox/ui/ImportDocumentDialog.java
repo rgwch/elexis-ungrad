@@ -19,10 +19,12 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.data.activator.CoreHub;
@@ -48,9 +50,11 @@ import ch.rgw.tools.VersionedResource;
 public class ImportDocumentDialog extends TitleAreaDialog {
 	DocumentDescriptor dd;
 	Text text;
+	Button cbUseKI;
 	// Label lPat;
 	String result = "";
-	private View view;
+	boolean bUseKI=CoreHub.localCfg.get(PreferenceConstants.USE_AI, false);
+	private View view;	
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
@@ -96,8 +100,15 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 
 		});
 		text.setText(dd.filename);
-		if (CoreHub.localCfg.get(PreferenceConstants.USE_AI, false)) {
-			Button cbUseKI = new Button(ret, SWT.CHECK);
+		// boolean bUseKI=CoreHub.localCfg.get(PreferenceConstants.USE_AI, false);
+		if (bUseKI) {
+			Composite cUseKI=new Composite(ret,SWT.NONE);
+			cUseKI.setLayoutData(SWTHelper.getFillGridData(1,false,1,true));
+			cUseKI.setLayout(new FillLayout());
+			cbUseKI = new Button(cUseKI, SWT.CHECK);
+			cbUseKI.setSelection(bUseKI);
+			Label lUseKI=new Label(cUseKI,SWT.NONE);
+				lUseKI.setText("KI Zusammenfassung erstellen");
 		}
 		return ret;
 	}
@@ -117,6 +128,7 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 
 	@Override
 	protected void okPressed() {
+		bUseKI= cbUseKI.getSelection();
 		result = text.getText();
 		super.okPressed();
 	}
