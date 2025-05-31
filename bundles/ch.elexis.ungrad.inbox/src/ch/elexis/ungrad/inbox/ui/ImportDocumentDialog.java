@@ -29,14 +29,19 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.data.Fall;
+import ch.elexis.data.Konsultation;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Person;
 import ch.elexis.ungrad.Http;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
 import ch.elexis.ungrad.inbox.model.PreferenceConstants;
+import ch.rgw.tools.VersionedResource;
 
 /**
- * Dialog opened to allow the user to accept or modify a proposal for an association of a file to a patient
+ * Dialog opened to allow the user to accept or modify a proposal for an
+ * association of a file to a patient
+ * 
  * @author gerry
  *
  */
@@ -75,12 +80,12 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 		} else {
 			setMessage(Patient.load(dd.concerns_id).getLabel());
 		}
-		Composite cText=new Composite(ret,SWT.NONE);
-		cText.setLayoutData(SWTHelper.getFillGridData(2,true,1,false));
+		Composite cText = new Composite(ret, SWT.NONE);
+		cText.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cText.setLayout(new GridLayout(2, false));
 		text = new Text(cText, SWT.BORDER);
 		text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		Button bView=new Button(cText,SWT.PUSH);
+		Button bView = new Button(cText, SWT.PUSH);
 		bView.setImage(Images.IMG_EYE_WO_SHADOW.getImage());
 		bView.addSelectionListener(new SelectionAdapter() {
 
@@ -88,28 +93,11 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 			public void widgetSelected(SelectionEvent e) {
 				view.launchViewer(dd.file);
 			}
-			
+
 		});
 		text.setText(dd.filename);
-		if(CoreHub.localCfg.get(PreferenceConstants.USE_AI, false)) {
-			Button bUseKI=new Button(ret, SWT.PUSH);
-			bUseKI.setText("KI Zusammenfassung");
-			bUseKI.addSelectionListener(new SelectionAdapter() {
-
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					try {
-						Http http=new Http();
-						URL url=new URL(CoreHub.localCfg.get(PreferenceConstants.AI_URL, ""));
-						String result=http.doPost(url, CoreHub.localCfg.get(PreferenceConstants.AI_PROMPT,""), 200);
-						SWTHelper.showInfo("KI sagt:", result);
-					}catch(Exception ex) {
-						SWTHelper.showError("Fehler bei KI Aufruf", ex.getMessage());
-					}
-				}
-
-			});
-
+		if (CoreHub.localCfg.get(PreferenceConstants.USE_AI, false)) {
+			Button cbUseKI = new Button(ret, SWT.CHECK);
 		}
 		return ret;
 	}
@@ -123,7 +111,7 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 
 	public ImportDocumentDialog(View view, DocumentDescriptor dd) {
 		super(view.getSite().getShell());
-		this.view=view;
+		this.view = view;
 		this.dd = dd;
 	}
 

@@ -224,7 +224,8 @@ public class View extends ViewPart {
 						if (idlg.open() == Dialog.OK) {
 							System.out.print(idlg.getValue());
 							if (dd.concerns()) {
-								controller.moveFileToDocbase(dd.concerns_id, sel, idlg.getValue());
+								boolean bUseKI = CoreHub.localCfg.get(PreferenceConstants.USE_AI, false);
+								controller.moveFileToDocbase(dd.concerns_id, sel, idlg.getValue(), bUseKI);
 								reload();
 							} else {
 								SWTHelper.alert("Kein Patient zugewiesen",

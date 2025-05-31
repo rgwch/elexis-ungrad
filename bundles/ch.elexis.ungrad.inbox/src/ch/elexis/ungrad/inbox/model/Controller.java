@@ -14,14 +14,23 @@ package ch.elexis.ungrad.inbox.model;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.URL;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
+import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.model.IPatient;
+import ch.elexis.core.text.model.Samdas;
+import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
+import ch.elexis.data.Fall;
+import ch.elexis.data.Konsultation;
+import ch.elexis.data.Patient;
 import ch.elexis.data.Person;
+import ch.elexis.ungrad.Http;
 import ch.elexis.ungrad.StorageController;
 import ch.rgw.io.FileTool;
+import ch.rgw.tools.VersionedResource;
 
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
 	private StorageController sc = new StorageController();
@@ -53,13 +62,31 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		return ((File) element).getName();
 	}
 
-	public void moveFileToDocbase(String concerns_id, File f, String destName) throws Exception {
+	public void moveFileToDocbase(String concerns_id, File f, String destName, boolean bUseKI) throws Exception {
 		File dir = sc.getOutputDirFor(concerns_id, true);
-		FileTool.copyFile(f, new File(dir, destName), FileTool.FAIL_IF_EXISTS);
+		File dest = new File(dir, destName);
+		FileTool.copyFile(f, dest, FileTool.FAIL_IF_EXISTS);
 		File meta = new File(f.getAbsolutePath() + ".meta");
 		if (meta.exists()) {
 			meta.delete();
 		}
 		f.delete();
+		if (bUseKI) {
+			try {
+				Patient pat = Patient.load(concerns_id);
+				Http http = new Http();
+				URL url = new URL(CoreHub.localCfg.get(PreferenceConstants.AI_URL, "") + "/" + dest.getAbsolutePath());
+				byte[] result = http.doGet(url);
+				Fall currentCase = pat.getLastKonsultation().getFall();
+				Konsultation k = currentCase.neueKonsultation();
+				VersionedResource eintrag = k.getEintrag();
+				Samdas samdas=new Samdas(new String(result,"utf-8"));
+				eintrag.update(samdas.toString(), "summary added by AI");
+				k.setEintrag(eintrag, false);
+
+			} catch (Exception ex) {
+				SWTHelper.showError("Fehler bei KI Aufruf", ex.getMessage());
+			}
+		}
 	}
 }
