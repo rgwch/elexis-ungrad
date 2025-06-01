@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023-2024, G. Weirich and Elexis
+ * Copyright (c) 2023-2025, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
 
+import javax.inject.Inject;
+
+import org.eclipse.core.runtime.ICoreRunnable;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.swt.widgets.Display;
 
@@ -35,6 +40,8 @@ import ch.rgw.tools.VersionedResource;
 
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
 	private StorageController sc = new StorageController();
+	@Inject
+	UISynchronize sync;
 
 	@Override
 	public Object[] getElements(Object dirname) {
@@ -73,28 +80,28 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		}
 		f.delete();
 		if (bUseKI) {
-			Display.getDefault().asyncExec(new Runnable() {
-				
-				@Override
-				public void run() {
-					try {
-						Patient pat = Patient.load(concerns_id);
-						Http http = new Http();
-						URL url = new URL(CoreHub.localCfg.get(PreferenceConstants.AI_URL, "") + "/" + dest.getAbsolutePath());
-						byte[] result = http.doGet(url);
-						Fall currentCase = pat.getLastKonsultation().getFall();
-						Konsultation k = currentCase.neueKonsultation();
-						VersionedResource eintrag = k.getEintrag();
-						Samdas samdas=new Samdas(new String(result,"utf-8"));
-						eintrag.update(samdas.toString(), "summary added by AI");
-						k.setEintrag(eintrag, false);
+			Job job = Job.create("KI Analyze", (ICoreRunnable) monitor -> {
+				try {
+					Patient pat = Patient.load(concerns_id);
+					Http http = new Http();
+					URL url = new URL(
+							CoreHub.localCfg.get(PreferenceConstants.AI_URL, "") + "/" + dest.getAbsolutePath());
+					byte[] result = http.doGet(url);
+					Fall currentCase = pat.getLastKonsultation().getFall();
+					Konsultation k = currentCase.neueKonsultation();
+					VersionedResource eintrag = k.getEintrag();
+					Samdas samdas = new Samdas(new String(result, "utf-8"));
+					// sync.asyncExec(()->{
+					eintrag.update(samdas.toString(), "summary added by AI");
+					k.setEintrag(eintrag, false);
+					// });
 
-					} catch (Exception ex) {
-						SWTHelper.showError("Fehler bei KI Aufruf", ex.getMessage());
-					}				
+				} catch (Exception ex) {
+					SWTHelper.showError("Fehler bei KI Aufruf", ex.getMessage());
 				}
+
 			});
-		
+			job.schedule();
 		}
 	}
 }

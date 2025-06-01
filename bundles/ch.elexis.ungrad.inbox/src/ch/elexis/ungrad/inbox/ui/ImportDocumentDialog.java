@@ -53,8 +53,8 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 	Button cbUseKI;
 	// Label lPat;
 	String result = "";
-	boolean bUseKI=CoreHub.localCfg.get(PreferenceConstants.USE_AI, false);
-	private View view;	
+	boolean bUseKI = CoreHub.localCfg.get(PreferenceConstants.USE_AI, false);
+	private View view;
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
@@ -102,13 +102,13 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 		text.setText(dd.filename);
 		// boolean bUseKI=CoreHub.localCfg.get(PreferenceConstants.USE_AI, false);
 		if (bUseKI) {
-			Composite cUseKI=new Composite(ret,SWT.NONE);
-			cUseKI.setLayoutData(SWTHelper.getFillGridData(1,false,1,true));
+			Composite cUseKI = new Composite(ret, SWT.NONE);
+			cUseKI.setLayoutData(SWTHelper.getFillGridData(1, false, 1, true));
 			cUseKI.setLayout(new FillLayout());
 			cbUseKI = new Button(cUseKI, SWT.CHECK);
 			cbUseKI.setSelection(bUseKI);
-			Label lUseKI=new Label(cUseKI,SWT.NONE);
-				lUseKI.setText("KI Zusammenfassung erstellen");
+			Label lUseKI = new Label(cUseKI, SWT.NONE);
+			lUseKI.setText("KI Zusammenfassung erstellen");
 		}
 		return ret;
 	}
@@ -128,7 +128,7 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 
 	@Override
 	protected void okPressed() {
-		bUseKI= cbUseKI.getSelection();
+		bUseKI = cbUseKI.getSelection();
 		result = text.getText();
 		super.okPressed();
 	}
