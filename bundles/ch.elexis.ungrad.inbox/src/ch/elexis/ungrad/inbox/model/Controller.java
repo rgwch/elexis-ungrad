@@ -17,6 +17,7 @@ import java.io.FilenameFilter;
 import java.net.URL;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.swt.widgets.Display;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.model.IPatient;
@@ -72,21 +73,28 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 		}
 		f.delete();
 		if (bUseKI) {
-			try {
-				Patient pat = Patient.load(concerns_id);
-				Http http = new Http();
-				URL url = new URL(CoreHub.localCfg.get(PreferenceConstants.AI_URL, "") + "/" + dest.getAbsolutePath());
-				byte[] result = http.doGet(url);
-				Fall currentCase = pat.getLastKonsultation().getFall();
-				Konsultation k = currentCase.neueKonsultation();
-				VersionedResource eintrag = k.getEintrag();
-				Samdas samdas=new Samdas(new String(result,"utf-8"));
-				eintrag.update(samdas.toString(), "summary added by AI");
-				k.setEintrag(eintrag, false);
+			Display.getDefault().asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					try {
+						Patient pat = Patient.load(concerns_id);
+						Http http = new Http();
+						URL url = new URL(CoreHub.localCfg.get(PreferenceConstants.AI_URL, "") + "/" + dest.getAbsolutePath());
+						byte[] result = http.doGet(url);
+						Fall currentCase = pat.getLastKonsultation().getFall();
+						Konsultation k = currentCase.neueKonsultation();
+						VersionedResource eintrag = k.getEintrag();
+						Samdas samdas=new Samdas(new String(result,"utf-8"));
+						eintrag.update(samdas.toString(), "summary added by AI");
+						k.setEintrag(eintrag, false);
 
-			} catch (Exception ex) {
-				SWTHelper.showError("Fehler bei KI Aufruf", ex.getMessage());
-			}
+					} catch (Exception ex) {
+						SWTHelper.showError("Fehler bei KI Aufruf", ex.getMessage());
+					}				
+				}
+			});
+		
 		}
 	}
 }
