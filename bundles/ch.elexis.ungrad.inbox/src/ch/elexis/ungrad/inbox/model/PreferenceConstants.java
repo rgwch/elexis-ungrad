@@ -23,4 +23,5 @@ public class PreferenceConstants {
 	public static final String USE_AI = BASE + "use_ai";
 	public static final String AI_URL = BASE + "ai_url";
 	public static final String AI_PROMPT = BASE + "ai_prompt";
+	public static final String AI_MODEL = BASE + "ai_model";
 }

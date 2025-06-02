@@ -85,6 +85,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		tText.addModifyListener(matchChecker);
 		
 		addField(new BooleanFieldEditor(PreferenceConstants.USE_AI, "KI Analyse benutzen", getFieldEditorParent()));
+		addField(new RadioGroupFieldEditor(PreferenceConstants.AI_MODEL, "Anbindung", 2, new String[][]{{"Ollama","ollama"},{"LLama-analyzer","llama"}}, getFieldEditorParent()));
 		addField(new StringFieldEditor(PreferenceConstants.AI_URL, "URL für KI", getFieldEditorParent()));
 		// addField(new StringFieldEditor(PreferenceConstants.AI_PROMPT, "Prompt für KI", getFieldEditorParent()));	
 	}	
