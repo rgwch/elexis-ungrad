@@ -14,6 +14,9 @@ package ch.elexis.ungrad.inbox.model;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.inject.Inject;
@@ -35,7 +38,11 @@ import ch.elexis.data.Patient;
 import ch.elexis.data.Person;
 import ch.elexis.ungrad.Http;
 import ch.elexis.ungrad.StorageController;
+import ch.elexis.ungrad.lucinda.Client3;
+import ch.elexis.ungrad.lucinda.Client3.INotifier;
 import ch.rgw.io.FileTool;
+import ch.rgw.tools.ExHandler;
+import ch.rgw.tools.StringTool;
 import ch.rgw.tools.VersionedResource;
 
 public class Controller extends TableLabelProvider implements IStructuredContentProvider {
@@ -84,16 +91,43 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 				try {
 					Patient pat = Patient.load(concerns_id);
 					Http http = new Http();
-					URL url = new URL(
-							CoreHub.localCfg.get(PreferenceConstants.AI_URL, "") + "/" + dest.getAbsolutePath());
-					byte[] result = http.doGet(url);
-					Fall currentCase = pat.getLastKonsultation().getFall();
-					Konsultation k = currentCase.neueKonsultation();
-					VersionedResource eintrag = k.getEintrag();
-					Samdas samdas = new Samdas(new String(result, "utf-8"));
-					// sync.asyncExec(()->{
-					eintrag.update(samdas.toString(), "summary added by AI");
-					k.setEintrag(eintrag, false);
+					String API_TYPE = CoreHub.localCfg.get(PreferenceConstants.AI_MODEL, "ollama");
+					if (API_TYPE.equals("ollama")) {
+						Client3 client = new Client3();
+						client.analyzeFile(FileTool.readFile(dest), new INotifier() {
+							StringBuilder sb = new StringBuilder();
+
+							@Override
+							public boolean received(String text) {
+								if (!StringTool.isNothing(text) && text.length() > 3) {
+									sb.append(text);
+								} else {
+									String model = "gemma3:12b"; // TODO: Make configurable
+									String prompt = "Bitte erstelle eine Zusammenfassung aus folgendem Text: "; // TODO:
+																												// Make
+																												// configurable
+									String requestBody = String.format("{ \"model\": \"%s\", \"prompt\": \"%s\" }",
+											model, prompt + sb.toString());
+									try {
+										URL url = new URL(CoreHub.localCfg.get(PreferenceConstants.AI_URL, ""));
+										String result = http.doPost(url, requestBody, 200);
+										if (!StringTool.isNothing(result)) {
+											addToEintrag(pat, result);
+										}
+									} catch (Exception e) {
+										ExHandler.handle(e);
+									}
+								}
+								return false;
+							}
+						});
+					} else {
+						URL url = new URL(
+								CoreHub.localCfg.get(PreferenceConstants.AI_URL, "") + "/" + dest.getAbsolutePath());
+						byte[] result = http.doGet(url);
+						addToEintrag(pat, new String(result, "utf-8"));
+					}
+
 					// });
 
 				} catch (Exception ex) {
@@ -103,5 +137,15 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			});
 			job.schedule();
 		}
+	}
+
+	private void addToEintrag(Patient pat, String text) throws UnsupportedEncodingException {
+		Fall currentCase = pat.getLastKonsultation().getFall();
+		Konsultation k = currentCase.neueKonsultation();
+		VersionedResource eintrag = k.getEintrag();
+		Samdas samdas = new Samdas(text);
+		// sync.asyncExec(()->{
+		eintrag.update(samdas.toString(), "summary added by AI");
+		k.setEintrag(eintrag, false);
 	}
 }

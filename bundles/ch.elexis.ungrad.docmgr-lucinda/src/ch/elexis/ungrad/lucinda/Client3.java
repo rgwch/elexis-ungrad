@@ -99,7 +99,7 @@ public class Client3 {
 
 	/**
 	 * Send a document to the parse-method of Lucinda. Pass the returned text
-	 * content (if any) line by line to a provided INotifier
+	 * content (if any) line by line to a provided INotifier. End if the INotifier returns true
 	 * 
 	 * @param contents
 	 * @param got
@@ -129,6 +129,7 @@ public class Client3 {
 					}
 				}
 			}
+			got.received(null);
 			in.close();
 			conn.disconnect();
 		} else {
