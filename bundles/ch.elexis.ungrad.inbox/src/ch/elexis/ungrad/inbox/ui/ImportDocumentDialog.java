@@ -128,7 +128,9 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 
 	@Override
 	protected void okPressed() {
-		bUseKI = cbUseKI.getSelection();
+		if (cbUseKI != null) {
+			bUseKI = cbUseKI.getSelection();
+		}
 		result = text.getText();
 		super.okPressed();
 	}
