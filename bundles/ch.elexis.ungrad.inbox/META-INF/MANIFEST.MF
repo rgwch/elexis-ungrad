@@ -13,7 +13,9 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.29.0",
  ch.elexis.ungrad.common;bundle-version="2.0.0",
  ch.elexis.core.ui;bundle-version="3.12.0",
  ch.elexis.core.ui.icons;bundle-version="3.12.0",
- ch.elexis.ungrad.docmgr-lucinda;bundle-version="3.3.0"
+ ch.elexis.ungrad.docmgr-lucinda;bundle-version="3.3.0",
+ com.fasterxml.jackson.core.jackson-core;bundle-version="2.16.0",
+ com.fasterxml.jackson.core.jackson-databind;bundle-version="2.16.0"
 Bundle-Vendor: weirich@elexis.ch
 Automatic-Module-Name: ch.elexis.ungrad.inbox
 Bundle-RequiredExecutionEnvironment: JavaSE-17

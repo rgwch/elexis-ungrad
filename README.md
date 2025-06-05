@@ -29,8 +29,8 @@ You'll find the Elexis programs für Linux, Mac and Windows in `./elexis-3-core/
 
 ## Develop
 
-Elexis 3.12 builds well with Eclipse 2024-06. First, set the compiler and JRE to Java 17. Then, import elexis-3-core into the workspace. Wait until build is finished, then load ch.elexis.target/ide.target. Again, eait until the target is resolved. Then click "Set as current target". Now, the build should complete without errors.
-Next, import elexis-3-core and elexis-ungrad into the workspace. I would recommend to create separate workings sets for each import. 
+Elexis 3.12 builds well with Eclipse 2024-06. First, set the compiler and JRE to Java 17. Then, import elexis-3-core into the workspace. Wait until build is finished, then load ch.elexis.target/ide.target. Again, wait until the target is resolved. Then click "Set as current target". Now, the build should complete without errors.
+Next, import elexis-3-base and elexis-ungrad into the workspace. I would recommend to create separate workings sets for each import. 
 
 ## Contributing
 
