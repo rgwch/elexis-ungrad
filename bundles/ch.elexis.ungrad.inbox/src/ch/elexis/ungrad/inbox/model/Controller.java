@@ -104,23 +104,36 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 								if (!StringTool.isNothing(text) && text.length() > 3) {
 									sb.append(text);
 								} else {
-									String model = "gemma3:12b"; // TODO: Make configurable
+									String ptrs = CoreHub.localCfg.get(PreferenceConstants.AI_URL, "");
+									if (StringTool.isNothing(ptrs)) {
+										SWTHelper.showError("Fehler bei der Konfiguration",
+												"Bitte in den Einstellungen URL und Model eigeben, z.B. http://localhost:11434/api/;gemma3:4b");
+										return true;
+									}
+									String[] ptr = ptrs.split(";");
+									String model = "gemma3:12b";
+									if (ptr.length > 1) {
+										model = ptr[1];
+									}
 									String prompt = "Bitte erstelle eine Zusammenfassung aus folgendem Text: "; // TODO:
 																												// Make
 																												// configurable
-									String requestBody = String.format("{ \"stream\":false, \"model\": \"%s\", \"prompt\": \"%s\" }",
-											model, prompt + sb.toString());
+									String requestBody = String.format(
+											"{ \"stream\":false, \"model\": \"%s\", \"prompt\": \"%s\" }", model,
+											prompt + sb.toString());
 									try {
-										URL url = new URL(CoreHub.localCfg.get(PreferenceConstants.AI_URL, ""));
+										URL url = new URL(ptr[0]);
 										String result = http.doPost(url, requestBody, 200);
 										if (!StringTool.isNothing(result)) {
-											ObjectMapper mapper=new ObjectMapper();
+											ObjectMapper mapper = new ObjectMapper();
 											@SuppressWarnings("unchecked")
-											Map<String,String> json=mapper.readValue(result.getBytes(), HashMap.class);
-											String response=json.get("response");
+											Map<String, String> json = mapper.readValue(result.getBytes(),
+													HashMap.class);
+											String response = json.get("response");
 											addToEintrag(pat, response);
 										}
 									} catch (Exception e) {
+										SWTHelper.showError("Fehler bei der Analyse", e.getMessage());
 										ExHandler.handle(e);
 									}
 								}
