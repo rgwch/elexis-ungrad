@@ -15,6 +15,9 @@
 package ch.elexis.ungrad.labview.controller.condensed;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,18 +47,25 @@ public class Exporter {
 
 	public boolean runInBrowser() {
 		try {
+			 // 1. Home-Verzeichnis des Benutzers ermitteln
+            String userHome = System.getProperty("user.home");
+            Path userHomePath = Paths.get(userHome);
+
+            // 2. Temporäres Verzeichnis *innerhalb* des Home-Verzeichnisses erstellen
+            // Erstellt z.B. /home/benutzername/temp_ungrad_12345/
+            Path appTempDir = Files.createTempDirectory(userHomePath, "ungrad-html-");
+
+            // 3. Die HTML-Datei in diesem spezifischen temporären Verzeichnis erstellen
+            // Erstellt z.B. /home/benutzername/temp_ungrad_12345/output.html
+            File tmp = new File(appTempDir.toFile(), "output.html");
+
+            // Sicherstellen, dass das Verzeichnis und die Datei gelöscht werden, wenn die JVM beendet wird
+            tmp.deleteOnExit();
+            appTempDir.toFile().deleteOnExit(); // Auch das temporäre Verzeichnis löschen
+
 			String output = makeHtml();
-			File tmp = File.createTempFile("ungrad", ".html");
-			tmp.deleteOnExit();
 			FileTool.writeTextFile(tmp, output);
-			Program proggie = Program.findProgram("html");
-			if (proggie != null) {
-				proggie.execute(tmp.getAbsolutePath());
-			} else {
-				if (Program.launch(tmp.getAbsolutePath()) == false) {
-					Runtime.getRuntime().exec(tmp.getAbsolutePath());
-				}
-			}
+			Program.launch(tmp.getAbsolutePath());
 			return true;
 
 		} catch (Exception ex) {

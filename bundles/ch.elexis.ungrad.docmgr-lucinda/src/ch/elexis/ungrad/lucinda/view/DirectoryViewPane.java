@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2024 by G. Weirich
+ * Copyright (c) 2022-2025 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -94,8 +94,11 @@ public class DirectoryViewPane extends Composite {
 		Menu menu = new Menu(table);
 		MenuItem mEdit = new MenuItem(menu, SWT.NONE);
 		MenuItem mSend = new MenuItem(menu, SWT.NONE);
+		new MenuItem(menu,SWT.SEPARATOR);
+		MenuItem mDelete=new MenuItem(menu, SWT.NONE);
 		mEdit.setText("Umbenennen..");
 		mSend.setText("Per Mail senden");
+		mDelete.setText("Löschen");
 		table.setMenu(menu);
 		mEdit.addSelectionListener(new SelectionAdapter() {
 
