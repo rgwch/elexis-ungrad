@@ -35,6 +35,7 @@ import ch.elexis.data.Fall;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Patient;
 import ch.elexis.data.Person;
+import ch.elexis.ungrad.AIUtil;
 import ch.elexis.ungrad.Http;
 import ch.elexis.ungrad.inbox.model.DocumentDescriptor;
 import ch.elexis.ungrad.inbox.model.PreferenceConstants;
@@ -53,7 +54,7 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 	Button cbUseKI;
 	// Label lPat;
 	String result = "";
-	boolean bUseKI = CoreHub.localCfg.get(PreferenceConstants.USE_AI, false);
+	boolean bUseKI = AIUtil.useAI();
 	private View view;
 
 	@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018-2024, G. Weirich and Elexis
+ * Copyright (c) 2018-2025, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,5 +30,9 @@ public class PreferenceConstants {
 	public static final String IMAP_UIDVALIDITY = BASE + "imapUIDValidity";
 	public static final String IMAP_LAST_SEEN = BASE + "imapLastSeen";
 	public static final String IMAP_WHITELIST = BASE + "imapWhiteList";
+
+	public static final String USE_AI = BASE + "use_ai";
+	public static final String AI_URL = BASE + "ai_url";
+
 
 }
