@@ -84,6 +84,10 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 			meta.delete();
 		}
 		f.delete();
+		/*
+		 * Id the user chose to use KI interpretation, we send the file to Ollama or
+		 * llama-analyze
+		 */
 		if (bUseKI) {
 			Job job = Job.create("KI Analyze", (ICoreRunnable) monitor -> {
 				try {
