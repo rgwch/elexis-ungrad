@@ -14,10 +14,6 @@ package ch.elexis.ungrad.inbox.model;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -26,7 +22,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.text.model.Samdas;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
@@ -34,7 +29,6 @@ import ch.elexis.data.Fall;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.AIUtil;
-import ch.elexis.ungrad.Http;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.lucinda.Client3;
 import ch.elexis.ungrad.lucinda.Client3.INotifier;
