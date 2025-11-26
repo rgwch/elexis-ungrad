@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018-2024 by G. Weirich
+ * Copyright (c) 2018-2025 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -14,6 +14,9 @@
 
 package ch.elexis.ungrad.labenter.views;
 
+import javax.inject.Inject;
+
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
@@ -44,6 +47,7 @@ import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.dialogs.DateSelectorDialog;
+import ch.elexis.core.ui.e4.util.CoreUiUtil;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -52,18 +56,6 @@ import ch.elexis.data.Patient;
 import ch.elexis.ungrad.labenter.views.LabEntryTable.Element;
 import ch.rgw.tools.TimeTool;
 
-/**
- * This sample class demonstrates how to plug-in a new workbench view. The view shows data obtained
- * from the model. The sample creates a dummy model on the fly, but a real implementation would
- * connect to the model available either in this or another plug-in (e.g. the workspace). The view
- * is connected to the model using a content provider.
- * <p>
- * The view uses a label provider to define how model objects should be presented in the view. Each
- * view can present the same model objects using different labels and icons, if needed.
- * Alternatively, a single label provider can be shared between views in order to ensure that
- * objects of the same type are presented in the same way everywhere.
- * <p>
- */
 
 public class ManualLabEntry extends ViewPart implements IActivationListener {
 	
@@ -83,15 +75,15 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 	private LabEntryTable let;
 	private IContextService ctx=ContextServiceHolder.get();
 	
-	private final ElexisUiEventListenerImpl eeli_pat =
-		new ElexisUiEventListenerImpl(Patient.class, ElexisEvent.EVENT_SELECTED) {
-			
-			@Override
-			public void runInUi(ElexisEvent ev){
-				setLabel();
+	@Inject
+	void activePatient(@Optional IPatient patient) {
+		CoreUiUtil.runAsyncIfActive(() -> {
+			if (patient != null) {
+				setPatient(patient);
 			}
-			
-		};
+		}, container);
+	}
+
 	
 	/**
 	 * The constructor.
