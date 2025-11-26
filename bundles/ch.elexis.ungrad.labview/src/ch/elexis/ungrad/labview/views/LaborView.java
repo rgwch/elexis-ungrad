@@ -129,25 +129,6 @@ public class LaborView extends ViewPart implements IRefreshable {
 
 	}
 
-	public void visible(final boolean mode) {
-
-	}
-
-	/*
-	@Override
-	public void activation(boolean mode) {
-		if (mode == true) {
-			try {
-				controller.setPatient(ctx.getActivePatient().orElse(null));
-			} catch (ElexisException e) {
-				log.log(e, "error loading patient data", Log.ERRORS);
-			}
-		} else {
-			controller.saveState();
-		}
-
-	}
-	*/
 
 	@Override
 	public void refresh() {

@@ -41,6 +41,7 @@ import org.eclipse.ui.part.ViewPart;
 import ch.elexis.core.data.events.ElexisEvent;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.UiDesk;
@@ -49,14 +50,16 @@ import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.dialogs.DateSelectorDialog;
 import ch.elexis.core.ui.e4.util.CoreUiUtil;
 import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
+import ch.elexis.core.ui.events.RefreshingPartListener;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.core.ui.views.IRefreshable;
 import ch.elexis.data.LabResult;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.labenter.views.LabEntryTable.Element;
 import ch.rgw.tools.TimeTool;
 
-public class ManualLabEntry extends ViewPart implements IActivationListener {
+public class ManualLabEntry extends ViewPart implements IRefreshable {
 
 	/**
 	 * The ID of the view as specified by the extension.
@@ -73,6 +76,7 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 	private IPatient pat;
 	private LabEntryTable let;
 	private IContextService ctx = ContextServiceHolder.get();
+	private RefreshingPartListener udpateOnVisible = new RefreshingPartListener(this);
 
 	@Inject
 	void activePatient(@Optional IPatient patient) {
@@ -104,8 +108,13 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
-		GlobalEventDispatcher.addActivationListener(this, this);
+		getSite().getPage().addPartListener(udpateOnVisible);
 
+	}
+
+	@Override
+	public void refresh() {
+		pat = (ctx.getActivePatient().orElse(null));
 	}
 
 	private void setLabel() {
@@ -240,22 +249,6 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 	 */
 	public void setFocus() {
 		viewer.getControl().setFocus();
-	}
-
-	@Override
-	public void activation(boolean mode) {
-		if (mode == true) {
-			IPatient sel = ctx.getActivePatient().orElse(null);
-			if (sel == null || pat == null || sel.getId() != pat.getId()) {
-				pat = sel;
-			}
-		}
-	}
-
-	@Override
-	public void visible(boolean mode) {
-		// TODO Auto-generated method stub
-
 	}
 
 }
