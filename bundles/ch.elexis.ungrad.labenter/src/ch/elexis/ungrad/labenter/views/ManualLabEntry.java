@@ -56,14 +56,13 @@ import ch.elexis.data.Patient;
 import ch.elexis.ungrad.labenter.views.LabEntryTable.Element;
 import ch.rgw.tools.TimeTool;
 
-
 public class ManualLabEntry extends ViewPart implements IActivationListener {
-	
+
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID = "ch.elexis.ungrad.labenter.views.manualentries";
-	
+
 	private TableViewer viewer;
 	private IAction changeDateAction;
 	private IAction sendValuesAction;
@@ -73,27 +72,25 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 	private Form form;
 	private IPatient pat;
 	private LabEntryTable let;
-	private IContextService ctx=ContextServiceHolder.get();
-	
+	private IContextService ctx = ContextServiceHolder.get();
+
 	@Inject
 	void activePatient(@Optional IPatient patient) {
 		CoreUiUtil.runAsyncIfActive(() -> {
-			if (patient != null) {
-				setPatient(patient);
-			}
-		}, container);
+			setLabel();
+		}, form);
 	}
 
-	
 	/**
 	 * The constructor.
 	 */
-	public ManualLabEntry(){}
-	
+	public ManualLabEntry() {
+	}
+
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize it.
 	 */
-	public void createPartControl(Composite parent){
+	public void createPartControl(Composite parent) {
 		setTitleImage(Images.IMG_EDIT.getImage());
 		tk = UiDesk.getToolkit();
 		form = tk.createForm(parent);
@@ -108,21 +105,21 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 		hookDoubleClickAction();
 		contributeToActionBars();
 		GlobalEventDispatcher.addActivationListener(this, this);
-		
+
 	}
-	
-	private void setLabel(){
-		pat=(IPatient) ctx.getActivePatient().orElseGet(()->null);
+
+	private void setLabel() {
+		pat = (IPatient) ctx.getActivePatient().orElseGet(() -> null);
 		// pat = ElexisEventDispatcher.getSelectedPatient();
 		String lab = pat == null ? "Kein Patient gewählt" : pat.getLabel();
 		form.setText("Labor von " + lab + ", vom " + actDate.toString(TimeTool.DATE_GER));
 	}
-	
-	private void hookContextMenu(){
+
+	private void hookContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager){
+			public void menuAboutToShow(IMenuManager manager) {
 				ManualLabEntry.this.fillContextMenu(manager);
 			}
 		});
@@ -130,59 +127,51 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 		viewer.getControl().setMenu(menu);
 		getSite().registerContextMenu(menuMgr, viewer);
 	}
-	
-	private void contributeToActionBars(){
+
+	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
 		fillLocalToolBar(bars.getToolBarManager());
 	}
-	
-	private void fillLocalPullDown(IMenuManager manager){
+
+	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(changeDateAction);
 		manager.add(sendValuesAction);
 		manager.add(clearAction);
 	}
-	
-	private void fillContextMenu(IMenuManager manager){
+
+	private void fillContextMenu(IMenuManager manager) {
 		/*
 		 * manager.add(action1); manager.add(action2); // Other plug-ins can contribute
 		 * there actions here manager.add(new
 		 * Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		 */
 	}
-	
-	private void fillLocalToolBar(IToolBarManager manager){
-		
+
+	private void fillLocalToolBar(IToolBarManager manager) {
+
 		manager.add(changeDateAction);
 		manager.add(sendValuesAction);
 		manager.add(clearAction);
-		
+
 	}
-	
-	public void visible(final boolean mode){
-		if (mode) {
-			ElexisEventDispatcher.getInstance().addListeners(eeli_pat);
-		} else {
-			ElexisEventDispatcher.getInstance().removeListeners(eeli_pat);
-		}
-	}
-	
-	private void clearFields(){
+
+	private void clearFields() {
 		for (Element el : let.elements) {
 			el.value = "";
 		}
 		viewer.setInput(let.elements);
 	}
-	
-	private void makeActions(){
+
+	private void makeActions() {
 		changeDateAction = new Action() {
 			{
 				setText("Anderes Datum");
 				setToolTipText("Datum für diese Laborwerte eingeben");
 				setImageDescriptor(Images.IMG_CALENDAR.getImageDescriptor());
 			}
-			
-			public void run(){
+
+			public void run() {
 				DateSelectorDialog dsl = new DateSelectorDialog(getViewSite().getShell());
 				if (dsl.open() == Dialog.OK) {
 					actDate = dsl.getSelectedDate();
@@ -190,23 +179,23 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 				}
 			}
 		};
-		
+
 		sendValuesAction = new Action() {
 			{
 				setText("Absenden");
 				setToolTipText("Diese Werte speichern");
 				setImageDescriptor(Images.IMG_EDIT_DONE.getImageDescriptor());
 			}
-			
-			public void run(){
+
+			public void run() {
 				if (pat == null) {
 					showMessage("Es ist kein Patient ausgewählt");
-					
+
 				} else {
-					if (SWTHelper.askYesNo("Daten eintragen", "Wirklich die Daten für\n\n"
-						+ pat.getLabel() + ", Datum "+actDate.toString(TimeTool.DATE_GER)+"\n\neintragen?")) {
+					if (SWTHelper.askYesNo("Daten eintragen", "Wirklich die Daten für\n\n" + pat.getLabel() + ", Datum "
+							+ actDate.toString(TimeTool.DATE_GER) + "\n\neintragen?")) {
 						BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-							public void run(){
+							public void run() {
 								for (Element el : let.elements) {
 									if (!el.value.isEmpty()) {
 										new LabResult(Patient.load(pat.getId()), actDate, el.item, el.value, "");
@@ -226,37 +215,47 @@ public class ManualLabEntry extends ViewPart implements IActivationListener {
 				setToolTipText("Formulareingaben leeren");
 				setImageDescriptor(Images.IMG_CLEAR.getImageDescriptor());
 			}
-			
-			public void run(){
+
+			public void run() {
 				clearFields();
 			}
 		};
-		
+
 	}
-	
-	private void hookDoubleClickAction(){
+
+	private void hookDoubleClickAction() {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event){
+			public void doubleClick(DoubleClickEvent event) {
 				// doubleClickAction.run();
 			}
 		});
 	}
-	
-	private void showMessage(String message){
+
+	private void showMessage(String message) {
 		MessageDialog.openInformation(viewer.getControl().getShell(), "Laboreingabe", message);
 	}
-	
+
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
-	public void setFocus(){
+	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-	
+
 	@Override
-	public void activation(boolean mode){
-		// TODO Auto-generated method stub
-		
+	public void activation(boolean mode) {
+		if (mode == true) {
+			IPatient sel = ctx.getActivePatient().orElse(null);
+			if (sel == null || pat == null || sel.getId() != pat.getId()) {
+				pat = sel;
+			}
+		}
 	}
-	
+
+	@Override
+	public void visible(boolean mode) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
