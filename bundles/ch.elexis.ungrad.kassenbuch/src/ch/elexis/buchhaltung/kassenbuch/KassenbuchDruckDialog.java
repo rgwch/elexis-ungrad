@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.model.IContact;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.text.ITextPlugin;
 import ch.elexis.core.ui.text.ITextPlugin.ICallback;
@@ -56,7 +57,8 @@ public class KassenbuchDruckDialog extends Dialog implements ICallback {
 		text.getPlugin().createContainer(ret, this);
 		text.getPlugin().showMenu(false);
 		text.getPlugin().showToolbar(false);
-		text.createFromTemplateName(null, "Liste", Brief.UNKNOWN, (Kontakt)ContextServiceHolder.get().getActiveUserContact().get(), "Kassenbuch");
+		Kontakt activeUser = Kontakt.load(ContextServiceHolder.get().getActiveUserContact().get().getId());
+		text.createFromTemplateName(null, "Liste", Brief.UNKNOWN, activeUser, "Kassenbuch");
 		SortedSet<KassenbuchEintrag> set = KassenbuchEintrag.getBookings(ttVon, ttBis);
 		if (set == null) {
 			return ret;

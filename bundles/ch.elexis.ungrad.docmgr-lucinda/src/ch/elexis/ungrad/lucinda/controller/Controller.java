@@ -25,6 +25,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -61,9 +62,12 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Patient;
+import ch.elexis.ungrad.AIUtil;
 import ch.elexis.ungrad.lucinda.Activator;
+import ch.elexis.ungrad.lucinda.Client3;
 import ch.elexis.ungrad.lucinda.Lucinda;
 import ch.elexis.ungrad.lucinda.Preferences;
+import ch.elexis.ungrad.lucinda.Client3.INotifier;
 import ch.elexis.ungrad.lucinda.view.DirectoryViewPane;
 import ch.elexis.ungrad.lucinda.view.GlobalViewPane;
 import ch.elexis.ungrad.lucinda.view.Master;
@@ -95,11 +99,12 @@ public class Controller implements IProgressController {
 	StackLayout stack = new StackLayout();
 
 	@Reference
-	private IContextService contextService=ContextServiceHolder.get();
+	private IContextService contextService = ContextServiceHolder.get();
 
 	public Control getTopControl() {
 		return envelope;
 	}
+
 	public Controller() {
 		lucinda = new Lucinda();
 		bRestrictCurrentPatient = Boolean
@@ -141,7 +146,7 @@ public class Controller implements IProgressController {
 
 			}
 		});
-		dirView = new DirectoryViewPane(envelope);
+		dirView = new DirectoryViewPane(envelope, this);
 		if (CoreHub.localCfg.get(Preferences.COMMON_DIRECTORY, false) == true) {
 			stack.topControl = dirView;
 		} else {
@@ -246,7 +251,7 @@ public class Controller implements IProgressController {
 				IPatient pat = oPat.get();
 				q.append("+concern:").append(pat.getLastName().replaceAll(" ", "_")).append("_")
 						.append(pat.getFirstName().replaceAll(" ", "_")).append("_")
-						//.append(pat.getDateOfBirth().toLocalDate().toString());
+						// .append(pat.getDateOfBirth().toLocalDate().toString());
 						.append(new TimeTool(pat.getDateOfBirth()).toString(TimeTool.DATE_GER));
 				/*
 				 * q.append("+lastname:").append(pat.getName()).append(" +firstname:")
@@ -553,4 +558,42 @@ public class Controller implements IProgressController {
 		return sb.substring(0, sb.length() - 1);
 	}
 
+	public void addSummary(File file) {
+
+	}
+
+	public void askKI(File file, String prompt, INotifier notifier) {
+		Job job = Job.create("KI Analyze", (ICoreRunnable) monitor -> {
+			try {
+				Client3 client = new Client3();
+				client.analyzeFile(FileTool.readFile(file), new INotifier() {
+					StringBuilder sb = new StringBuilder();
+
+					@Override
+					public boolean received(String text) {
+						if (!StringTool.isNothing(text) && text.length() > 3) {
+							sb.append(text);
+						} else {
+							try {
+								String model = "gemma3:12b"; // TODO: Make configurable
+								String response = AIUtil.sendPrompt(model, prompt + sb.toString());
+								notifier.received(response);
+							} catch (Exception e) {
+								ExHandler.handle(e);
+							}
+
+						}
+						return false;
+					}
+				});
+
+				// });
+
+			} catch (Exception ex) {
+				SWTHelper.showError("Fehler bei KI Aufruf", ex.getMessage());
+			}
+
+		});
+		job.schedule();
+	}
 }

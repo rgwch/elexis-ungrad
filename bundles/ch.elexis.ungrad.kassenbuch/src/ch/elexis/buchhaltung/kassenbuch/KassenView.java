@@ -221,7 +221,8 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				setToolTipText("Einnahme verbuchen");
 			}
 
-			public void doRun() {
+			@Override
+			public void run() {
 				new BuchungsDialog(getSite().getShell(), true).open();
 				tv.refresh();
 			}
@@ -232,18 +233,20 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				setToolTipText("Ausgabe verbuchen");
 			}
 
-			public void doRun() {
+			@Override
+			public void run() {
 				new BuchungsDialog(getSite().getShell(), false).open();
 				tv.refresh();
 			}
 		};
-		stornoAction = new Action( "Storno") {
+		stornoAction = new Action("Storno") {
 			{
 				setImageDescriptor(Images.IMG_DELETE.getImageDescriptor());
 				setToolTipText("Buchung stornieren");
 			}
 
-			public void doRun() {
+			@Override
+			public void run() {
 				IStructuredSelection sel = (IStructuredSelection) tv.getSelection();
 				if (!sel.isEmpty()) {
 					KassenbuchEintrag kb = (KassenbuchEintrag) sel.getFirstElement();
@@ -260,7 +263,8 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				setToolTipText("Zwischenbilanz erstellen");
 			}
 
-			public void doRun() {
+			@Override
+			public void run() {
 				InputDialog inp = new InputDialog(getSite().getShell(), "Kassenbestand abgleichen",
 						"Geben Sie bitte den abgezählten Betrag in der Kasse ein", "0.00", null);
 				if (inp.open() == Dialog.OK) {
@@ -289,7 +293,8 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				setToolTipText("Anzeigezeitraum einstellen");
 			}
 
-			public void doRun() {
+			@Override
+			public void run() {
 				DatumEingabeDialog ded = new DatumEingabeDialog(getViewSite().getShell(), ttVon, ttBis);
 				if (ded.open() == Dialog.OK) {
 					ttVon = ded.ttVon;
@@ -309,7 +314,7 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				setTitleToolTip("Angezeigte Buchungen ausdrucken");
 			}
 
-			public void doRun() {
+			public void run() {
 				KassenbuchDruckDialog kbd = new KassenbuchDruckDialog(getSite().getShell(), ttVon, ttBis);
 				kbd.open();
 			}
@@ -320,7 +325,8 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				setTitleToolTip("Kategorien editieren");
 			}
 
-			public void doRun() {
+			@Override
+			public void run() {
 				new EditCatsDialog(getSite().getShell()).open();
 			}
 		};

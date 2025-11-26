@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2024 by G. Weirich
+ * Copyright (c) 2022-2025 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -42,9 +42,12 @@ import org.eclipse.swt.widgets.TableColumn;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.PreferenceConstants;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.common.ui.MailUI;
+import ch.elexis.ungrad.lucinda.Client3.INotifier;
 import ch.elexis.ungrad.lucinda.Preferences;
+import ch.elexis.ungrad.lucinda.controller.Controller;
 import ch.elexis.ungrad.lucinda.controller.DirectoryLabelProvider;
 import ch.elexis.ungrad.lucinda.controller.DocumentComparator;
 import ch.rgw.io.FileTool;
@@ -66,7 +69,7 @@ public class DirectoryViewPane extends Composite {
 	private DirectoryContentProvider dcp = new DirectoryContentProvider();
 	private StorageController sc = new StorageController();
 
-	public DirectoryViewPane(Composite parent) {
+	public DirectoryViewPane(Composite parent, Controller controlle) {
 		super(parent, SWT.NONE);
 		setLayout(new FillLayout());
 		tv = new TableViewer(this, SWT.BORDER | SWT.FULL_SELECTION);
@@ -94,8 +97,77 @@ public class DirectoryViewPane extends Composite {
 		Menu menu = new Menu(table);
 		MenuItem mEdit = new MenuItem(menu, SWT.NONE);
 		MenuItem mSend = new MenuItem(menu, SWT.NONE);
+		if (CoreHub.localCfg.get(PreferenceConstants.USE_AI, false) == true) {
+			new MenuItem(menu, SWT.SEPARATOR);
+
+			MenuItem mSummary = new MenuItem(menu, SWT.NONE);
+			MenuItem mDiagnoses = new MenuItem(menu, SWT.NONE);
+			MenuItem mMedication = new MenuItem(menu, SWT.NONE);
+			mSummary.setText("KI-Zusammenfassung");
+			mDiagnoses.setText("KI-Diagnosen");
+			mMedication.setText("KI-Medikation");
+			mSummary.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					IStructuredSelection sel = tv.getStructuredSelection();
+					if (!sel.isEmpty()) {
+						File selected = (File) sel.getFirstElement();
+						controlle.askKI(selected, "Erstelle eine Zusammenfassung des folgenden Texts: ",
+								new INotifier() {
+									@Override
+									public boolean received(String text) {
+										SWTHelper.showInfo("Antwort", text);
+										return true;
+									}
+								});
+					}
+				}
+
+			});
+			mDiagnoses.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					IStructuredSelection sel = tv.getStructuredSelection();
+					if (!sel.isEmpty()) {
+						File selected = (File) sel.getFirstElement();
+						controlle.askKI(selected, "Finde die Diagnosen in folgendem Text: ", new INotifier() {
+							@Override
+							public boolean received(String text) {
+								SWTHelper.showInfo("Antwort", text);
+								return true;
+							}
+						});
+					}
+				}
+
+			});
+			mMedication.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					IStructuredSelection sel = tv.getStructuredSelection();
+					if (!sel.isEmpty()) {
+						File selected = (File) sel.getFirstElement();
+						controlle.askKI(selected, "Finde die Austrittsmedikation in folgendem Text: ", new INotifier() {
+							@Override
+							public boolean received(String text) {
+								SWTHelper.showInfo("Antwort", text);
+								return true;
+							}
+						});
+					}
+				}
+
+			});
+
+		}
+		new MenuItem(menu, SWT.SEPARATOR);
+		MenuItem mDelete = new MenuItem(menu, SWT.NONE);
 		mEdit.setText("Umbenennen..");
 		mSend.setText("Per Mail senden");
+		mDelete.setText("Löschen");
 		table.setMenu(menu);
 		mEdit.addSelectionListener(new SelectionAdapter() {
 

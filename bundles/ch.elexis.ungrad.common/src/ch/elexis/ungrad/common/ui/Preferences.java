@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2024 by G. Weirich
+ * Copyright (c) 2022-2025 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -14,6 +14,7 @@
 
 package ch.elexis.ungrad.common.ui;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
@@ -59,6 +60,9 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		addField(new StringFieldEditor(PreferenceConstants.IMAP_PORT, "IMAP Port",getFieldEditorParent()));
 		addField(new StringFieldEditor(PreferenceConstants.IMAP_USER, "IMAP User", getFieldEditorParent()));
 		addField(new PasswordFieldEditor(PreferenceConstants.IMAP_PWD, "IMAP Passwort", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.USE_AI, "KI Analyse benutzen", getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.AI_URL, "URL für KI", getFieldEditorParent()));
+		
 	}
 
 	protected void performApply() {
