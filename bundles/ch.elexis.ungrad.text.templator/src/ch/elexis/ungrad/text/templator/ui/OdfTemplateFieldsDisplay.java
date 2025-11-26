@@ -32,7 +32,7 @@ import ch.elexis.ungrad.text.templator.model.ODFDoc;
 import ch.rgw.tools.ExHandler;
 
 public class OdfTemplateFieldsDisplay extends Composite {
-	private IAction printAction, directPrintAction;
+	private IAction printAction /*, directPrintAction*/;
 	private ch.elexis.core.ui.text.ITextPlugin.ICallback saveHandler;
 	private Composite cFields;
 	private ODFDoc doc;
@@ -49,7 +49,7 @@ public class OdfTemplateFieldsDisplay extends Composite {
 		makeActions();
 		ToolBarManager tbm = new ToolBarManager(SWT.HORIZONTAL);
 		tbm.add(printAction);
-		tbm.add(directPrintAction);
+		// tbm.add(directPrintAction);
 		tbm.createControl(body);
 		cFields = new Composite(body, SWT.NONE);
 		// cFields.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -104,6 +104,7 @@ public class OdfTemplateFieldsDisplay extends Composite {
 				}
 			}
 		};
+		/*
 		directPrintAction = new Action("Direkt ausgeben", Action.AS_CHECK_BOX) {
 			{
 				setImageDescriptor(Images.IMG_EXPORT.getImageDescriptor());
@@ -114,6 +115,7 @@ public class OdfTemplateFieldsDisplay extends Composite {
 				CoreHub.localCfg.set(Preferences.PREF_DIRECT, isChecked());
 			}
 		};
+		*/
 
 	}
 }
