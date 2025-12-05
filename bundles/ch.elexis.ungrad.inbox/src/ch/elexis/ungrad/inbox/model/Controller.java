@@ -15,7 +15,7 @@ package ch.elexis.ungrad.inbox.model;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.jobs.Job;

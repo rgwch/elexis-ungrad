@@ -24,7 +24,7 @@ import static ch.elexis.ungrad.lucinda.Preferences.USE_COMMON_DIRECTORY;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.jface.action.Action;

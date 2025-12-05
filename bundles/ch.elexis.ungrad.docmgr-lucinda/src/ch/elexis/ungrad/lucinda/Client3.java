@@ -30,9 +30,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
 

@@ -14,8 +14,6 @@
 
 package ch.elexis.ungrad.labenter.views;
 
-import javax.inject.Inject;
-
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -38,18 +36,12 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
 
-import ch.elexis.core.data.events.ElexisEvent;
-import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.service.ContextServiceHolder;
-import ch.elexis.core.exceptions.ElexisException;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.UiDesk;
-import ch.elexis.core.ui.actions.GlobalEventDispatcher;
-import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.dialogs.DateSelectorDialog;
 import ch.elexis.core.ui.e4.util.CoreUiUtil;
-import ch.elexis.core.ui.events.ElexisUiEventListenerImpl;
 import ch.elexis.core.ui.events.RefreshingPartListener;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -58,6 +50,7 @@ import ch.elexis.data.LabResult;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.labenter.views.LabEntryTable.Element;
 import ch.rgw.tools.TimeTool;
+import jakarta.inject.Inject;
 
 public class ManualLabEntry extends ViewPart implements IRefreshable {
 

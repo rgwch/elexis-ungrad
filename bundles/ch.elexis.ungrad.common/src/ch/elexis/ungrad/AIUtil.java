@@ -4,8 +4,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ch.elexis.core.data.activator.CoreHub;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;

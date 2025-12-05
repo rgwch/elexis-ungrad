@@ -30,11 +30,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.text.ReplaceCallback;
 import ch.elexis.ungrad.pdf.Manager;

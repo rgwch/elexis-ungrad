@@ -18,4 +18,3 @@ Require-Bundle: ch.elexis.core.ui;bundle-version="3.2.0",
  com.fasterxml.jackson.core.jackson-databind;bundle-version="2.7.4"
 Bundle-ClassPath: lib/jsoup-1.15.3.jar,
  .
-Import-Package: com.fasterxml.jackson.annotation
