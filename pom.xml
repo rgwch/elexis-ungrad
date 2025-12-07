@@ -7,7 +7,7 @@
 
     <properties>
         <tycho.version>3.0.5</tycho.version>
-        <elexis.target>2023-09-java17</elexis.target>
+        <elexis.target>2025-03-java21</elexis.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tycho-groupid>org.eclipse.tycho</tycho-groupid>
@@ -76,7 +76,7 @@
                 <version>${tycho.version}</version>
                 <configuration>
                     <!-- Optional set the Java version you are using-->
-                    <executionEnvironment>JavaSE-17</executionEnvironment>
+                    <executionEnvironment>JavaSE-21</executionEnvironment>
                     <environments>
                         <environment>
                             <os>linux</os>
