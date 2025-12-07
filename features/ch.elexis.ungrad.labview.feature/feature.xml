@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="ch.elexis.ungrad.labview.feature" label="Ungrad LabView feature" version="1.0.1.qualifier" provider-name="rgw.ch">
+<feature
+      id="ch.elexis.ungrad.labview.feature"
+      label="Ungrad LabView feature"
+      version="2.0.0.qualifier"
+      provider-name="rgw.ch">
 
    <description url="https://elexis.ch/ungrad/features/labview/">
       An alternative lab result viewer
@@ -24,6 +28,8 @@
       <import plugin="org.slf4j.api"/>
    </requires>
 
-   <plugin id="ch.elexis.ungrad.labview" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+   <plugin
+         id="ch.elexis.ungrad.labview"
+         version="0.0.0"/>
 
 </feature>

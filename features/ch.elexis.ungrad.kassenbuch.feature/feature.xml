@@ -2,7 +2,7 @@
 <feature
       id="ch.elexis.ungrad.kassenbuch.feature"
       label="Elexis Kassenbuch Feature"
-      version="3.1.0.qualifier"
+      version="4.0.0.qualifier"
       provider-name="weirich.ch">
 
    <description url="https://elexis.ch/ungrad/features/kassenbuch/">
@@ -19,9 +19,6 @@
 
    <plugin
          id="ch.elexis.ungrad.kassenbuch"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
 </feature>

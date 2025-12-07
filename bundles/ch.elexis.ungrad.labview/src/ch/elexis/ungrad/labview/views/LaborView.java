@@ -15,7 +15,7 @@ package ch.elexis.ungrad.labview.views;
 
 import java.net.URL;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;

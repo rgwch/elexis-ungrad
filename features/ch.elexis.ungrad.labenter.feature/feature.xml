@@ -2,7 +2,7 @@
 <feature
       id="ch.elexis.ungrad.labenter.feature"
       label="Manuelle Laboreingabe"
-      version="1.0.0.qualifier"
+      version="3.0.0.qualifier"
       provider-name="weirich@elexis.ch"
       plugin="ch.elexis.ungrad.labenter">
 
@@ -28,9 +28,6 @@
 
    <plugin
          id="ch.elexis.ungrad.labenter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
 </feature>
