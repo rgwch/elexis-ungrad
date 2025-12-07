@@ -1,6 +1,6 @@
 # Elexis-Ungrad 2026
 
-**Important**: For users in Switzerland, update is required to be able to use the new Tardoc Tariff. or update instructions, see [here](https://www.elexis.ch/ungrad/reference/upgrade2026/)
+**Important**: For users in Switzerland, update is required to be able to use the new Tardoc Tariff. For update instructions, see [here](https://www.elexis.ch/ungrad/reference/upgrade2026/)
 
 **Note**: Beginning with this branch The Elexis Ungrad plugins are built against Branch 3.13 of elexis-3-core and elexis-3-base and require Java 21.
 
