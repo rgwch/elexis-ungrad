@@ -12,12 +12,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tycho-groupid>org.eclipse.tycho</tycho-groupid>
         <buildplan.plugin.version>1.5</buildplan.plugin.version>
-        <!-- CORE>file:../elexis-3-core/ch.elexis.core.p2site/target/repository</CORE -->
-        <!-- BASE>file:../elexis-3-base/ch.elexis.base.p2site/target/repository</BASE -->
-        <CORE>https://elexis.ch/ungrad2024/3.12/core/</CORE>
-        <BASE>https://elexis.ch/ungrad2024/3.12/base/</BASE>
+        <CORE>https://elexis.ch/ungrad2026/ungrad_2026/core/</CORE>
+        <BASE>https://elexis.ch/ungrad2026/ungrad_2026/base/</BASE>
         <!-- TARGET>https://download.elexis.info/elexis/target/2023-09-java17/</TARGET -->
-        <TARGET>https://elexis.ch/targets/2023-09-java17/</TARGET>
+        <!-- TARGET>https://elexis.ch/targets/2023-09-java17/</!TARGET -->
+        <TARGET>http://download.elexis.info/elexis/target/2025-03-java21/</TARGET>
     </properties>
     <repositories>
         <repository>
