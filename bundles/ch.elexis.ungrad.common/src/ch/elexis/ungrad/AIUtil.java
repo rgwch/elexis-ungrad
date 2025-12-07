@@ -1,12 +1,16 @@
 package ch.elexis.ungrad;
 
+import java.lang.reflect.Type;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.StringTool;
+
 
 public class AIUtil {
 	public static boolean useAI() {
@@ -22,13 +26,13 @@ public class AIUtil {
 			URL url = new URL(CoreHub.localCfg.get(PreferenceConstants.AI_URL, ""));
 			String result = http.doPost(url, requestBody, 200);
 			if (!StringTool.isNothing(result)) {
-				ObjectMapper mapper = new ObjectMapper();
-				@SuppressWarnings("unchecked")
-				Map<String, String> json = mapper.readValue(result.getBytes(),
-						HashMap.class);
-				String response = json.get("response");
-				return response;
-			}
+				Gson gson = new Gson();
+
+			    Type type = new TypeToken<Map<String, String>>() {}.getType();
+			    Map<String, String> json = gson.fromJson(result, type);
+
+			    String response = json.get("response");
+			    return response;	}
 		} catch (Exception e) {
 			ExHandler.handle(e);
 		}

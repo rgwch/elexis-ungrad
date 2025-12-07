@@ -26,6 +26,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +100,8 @@ public class Client3 {
 
 	/**
 	 * Send a document to the parse-method of Lucinda. Pass the returned text
-	 * content (if any) line by line to a provided INotifier. End if the INotifier returns true
+	 * content (if any) line by line to a provided INotifier. End if the INotifier
+	 * returns true
 	 * 
 	 * @param contents
 	 * @param got
@@ -289,10 +294,11 @@ public class Client3 {
 	}
 
 	public Map<String, Object> readJson(String source) {
-		ObjectMapper mapper = new ObjectMapper();
+		Gson gson = new Gson();
 		try {
-			Map<String, Object> res = mapper.readValue(source, new TypeReference<Map<String, Object>>() {
-			});
+			Type type = new TypeToken<Map<String, Object>>() {
+			}.getType();
+			Map<String, Object> res = gson.fromJson(source, type);
 			return res;
 		} catch (Exception e) {
 			return null;
@@ -300,14 +306,13 @@ public class Client3 {
 	}
 
 	public String writeJson(Map<String, Object> source) {
-		ObjectMapper mapper = new ObjectMapper();
+		Gson gson = new Gson();
 		try {
-			return mapper.writeValueAsString(source);
+			return gson.toJson(source);
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
 			return null;
 		}
-
 	}
 
 	public interface INotifier {
