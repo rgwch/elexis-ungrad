@@ -15,6 +15,7 @@
 package ch.elexis.ungrad.lucinda.view;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -120,7 +121,7 @@ public class GlobalViewPane extends Composite {
 	}
 
 	public void loadDocument(Object element) {
-		controller.loadDocument((HashMap) element);
+		controller.loadDocument((Map) element);
 	}
 
 }
