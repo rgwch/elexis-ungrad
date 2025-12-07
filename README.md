@@ -1,6 +1,6 @@
 # Elexis-Ungrad 2026
 
-**Important**: For users in Switzerland, update is required to be able to use the new Tardoc Tariff.
+**Important**: For users in Switzerland, update is required to be able to use the new Tardoc Tariff. or update instructions, see [here](https://www.elexis.ch/ungrad/reference/upgrade2026/)
 
 **Note**: Beginning with this branch The Elexis Ungrad plugins are built against Branch 3.13 of elexis-3-core and elexis-3-base and require Java 21.
 
@@ -10,11 +10,11 @@ The repositories https://github.com/rgwch/elexis-3-core and https://github.com/r
 Some more experimental and strictly OpenSource'd extensions from the original creator of Elexis. 
 
 ## Download
-Link the Repository with the elexis [ungrad plugins](https://elexis.ch/ungrad2024/3.12/ungrad/) with your Elexis installation ("Help/Install new Software"/"Hilfe/Neue Software installieren")
+Link the Repository with the elexis [ungrad plugins](https://www.elexis.ch/ungrad2026/ungrad_2026/ungrad/) with your Elexis installation ("Help/Install new Software"/"Hilfe/Neue Software installieren")
 
 ## Build:
 
-Prerequisites: Git, jdk17, Maven 3.6.x; Linux or Windows recommended. MacOS will be a bit tricky,
+Prerequisites: Git, jdk21, Maven 3.9.x; Linux or Windows recommended. MacOS will be a bit tricky,
 
 Full build:
 
