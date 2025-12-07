@@ -27,9 +27,6 @@
    <feature url="features/ch.elexis.ungrad.laborimport_risch.feature_0.0.0.jar" id="ch.elexis.ungrad.laborimport_risch.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.importers"/>
    </feature>
-   <feature url="features/com.jsigle.noatext_jsl.feature_0.0.0.jar" id="com.jsigle.noatext_jsl.feature" version="0.0.0">
-      <category name="ch.elexis.ungrad.docmgr"/>
-   </feature>
    <feature url="features/ch.elexis.ungrad.labenter.feature_0.0.0.jar" id="ch.elexis.ungrad.labenter.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.findings"/>
    </feature>
