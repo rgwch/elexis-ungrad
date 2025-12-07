@@ -16,7 +16,7 @@
         <module>ch.elexis.ungrad.pdf</module>
         <module>ch.elexis.ungrad.forms</module>
         <module>ch.elexis.ungrad.labview</module>
-        <module>ch.elexis.ungrad.qrbills</module>
+        <!-- module>ch.elexis.ungrad.qrbills </module -->
         <module>ch.elexis.ungrad.docmgr-lucinda</module>
         <module>ch.elexis.ungrad.docmgr-lucinda-kons</module>
         <module>ch.elexis.ungrad.docmgr-lucinda-omnivore</module>
@@ -26,7 +26,7 @@
         <module>ch.elexis.ungrad.laborimport_risch</module>
         <module>ch.elexis.ungrad.laborimport_sftp</module>
         <module>ch.elexis.ungrad.kassenbuch</module>
-        <module>ch.elexis.ungrad.privatrechnung_qr</module>
-        <module>com.jsigle.noatext_jsl</module>
+        <!-- module>ch.elexis.ungrad.privatrechnung_qr</!--module>
+        <module>com.jsigle.noatext_jsl</module -->
     </modules>
 </project>
