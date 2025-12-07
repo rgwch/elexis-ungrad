@@ -1,4 +1,4 @@
-# Elexis-Ungrad 2024
+# Elexis-Ungrad 2026
 
 **Note**: Beginning with this branch The Elexis Ungrad plugins are built against Branch 3.13 of elexis-3-core and elexis-3-base. 
 
