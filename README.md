@@ -1,6 +1,8 @@
 # Elexis-Ungrad 2026
 
-**Note**: Beginning with this branch The Elexis Ungrad plugins are built against Branch 3.13 of elexis-3-core and elexis-3-base. 
+**Important**: For users un Switzerland, update is required to be able to use the new Tardoc Tariff.
+
+**Note**: Beginning with this branch The Elexis Ungrad plugins are built against Branch 3.13 of elexis-3-core and elexis-3-base and require Java 21.
 
 The repositories https://github.com/rgwch/elexis-3-core and https://github.com/rgwch/elexis-3-base can still have some differences to their respective https://github.com/elexis/elexis-3-xx equivalents, but these are rather some small quick fixes and adaptations.  
 
