@@ -1,10 +1,13 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tardoc Kons
-Bundle-SymbolicName: ch.elexis.ungrad.tardoc
+Bundle-SymbolicName: ch.elexis.ungrad.tardoc;singleton:=true
 Bundle-Version: 0.1.0.qualifier
+Import-Package: jakarta.inject;version="[2.0.0,3.0.0)"
 Bundle-Vendor: elexis.ch
 Require-Bundle: org.eclipse.swt,
- org.eclipse.jface
+ org.eclipse.jface,
+ org.eclipse.ui;bundle-version="3.207.100",
+ org.eclipse.core.runtime
 Automatic-Module-Name: ch.elexis.ungrad.tardoc
 Bundle-RequiredExecutionEnvironment: JavaSE-21
