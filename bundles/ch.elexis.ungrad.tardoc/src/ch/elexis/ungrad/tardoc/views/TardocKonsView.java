@@ -1,36 +1,35 @@
 package ch.elexis.ungrad.tardoc.views;
 
+import java.util.ArrayList;
+import java.util.List;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.part.*;
-import org.eclipse.jface.viewers.*;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.*;
-import org.eclipse.swt.widgets.Menu;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.part.ViewPart;
+
 import jakarta.inject.Inject;
 
-
 /**
- * This sample class demonstrates how to plug-in a new
- * workbench view. The view shows data obtained from the
- * model. The sample creates a dummy model on the fly,
- * but a real implementation would connect to the model
- * available either in this or another plug-in (e.g. the workspace).
- * The view is connected to the model using a content provider.
- * <p>
- * The view uses a label provider to define how model
- * objects should be presented in the view. Each
- * view can present the same model objects using
- * different labels and icons, if needed. Alternatively,
- * a single label provider can be shared between views
- * in order to ensure that objects of the same type are
- * presented in the same way everywhere.
- * <p>
+ * Tardoc consultation view with timer, text area, and billing positions list.
+ * Features:
+ * - Timer with start/pause functionality
+ * - Free text entry area
+ * - Billing positions list viewer
  */
-
 public class TardocKonsView extends ViewPart {
 
 	/**
@@ -38,125 +37,234 @@ public class TardocKonsView extends ViewPart {
 	 */
 	public static final String ID = "ch.elexis.ungrad.tardoc.views.TardocKonsView";
 
-	@Inject IWorkbench workbench;
-	
-	private TableViewer viewer;
-	private Action action1;
-	private Action action2;
-	private Action doubleClickAction;
-	 
+	// Timer components
+	private Label timerLabel;
+	private Button startPauseButton;
+	private Button resetButton;
+	private long startTime;
+	private long pausedTime;
+	private boolean isRunning = false;
+	private boolean isPaused = false;
+	private Runnable timerRunnable;
 
-	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+	// Text area
+	private Text textArea;
+
+	// Billing positions list
+	private TableViewer billingPositionsViewer;
+
+	/**
+	 * Label provider for billing positions
+	 */
+	class BillingPositionLabelProvider extends LabelProvider implements ITableLabelProvider {
 		@Override
 		public String getColumnText(Object obj, int index) {
 			return getText(obj);
 		}
+		
 		@Override
 		public Image getColumnImage(Object obj, int index) {
-			return getImage(obj);
-		}
-		@Override
-		public Image getImage(Object obj) {
-			return workbench.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
+			return null;
 		}
 	}
 
 	@Override
 	public void createPartControl(Composite parent) {
-		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		
-		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		viewer.setInput(new String[] { "One", "Two", "Three" });
-	viewer.setLabelProvider(new ViewLabelProvider());
-		getSite().setSelectionProvider(viewer);
-		makeActions();
-		hookContextMenu();
-		hookDoubleClickAction();
-		contributeToActionBars();
+		// Main layout
+		parent.setLayout(new GridLayout(1, false));
+
+		// Create timer section
+		createTimerSection(parent);
+
+		// Create text area section
+		createTextAreaSection(parent);
+
+		// Create billing positions section
+		createBillingPositionsSection(parent);
+
+		// Initialize timer display
+		updateTimerDisplay();
 	}
 
-	private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				TardocKonsView.this.fillContextMenu(manager);
+	/**
+	 * Creates the timer section with start/pause and reset buttons
+	 */
+	private void createTimerSection(Composite parent) {
+		Group timerGroup = new Group(parent, SWT.NONE);
+		timerGroup.setText("Timer");
+		timerGroup.setLayout(new GridLayout(3, false));
+		timerGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+
+		// Timer display
+		timerLabel = new Label(timerGroup, SWT.NONE);
+		timerLabel.setText("00:00");
+		timerLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+		// Start/Pause button
+		startPauseButton = new Button(timerGroup, SWT.PUSH);
+		startPauseButton.setText("Start");
+		startPauseButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				toggleTimer();
 			}
 		});
-		Menu menu = menuMgr.createContextMenu(viewer.getControl());
-		viewer.getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, viewer);
-	}
 
-	private void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
-		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
-	}
-
-	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(action1);
-		manager.add(new Separator());
-		manager.add(action2);
-	}
-
-	private void fillContextMenu(IMenuManager manager) {
-		manager.add(action1);
-		manager.add(action2);
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}
-	
-	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(action1);
-		manager.add(action2);
-	}
-
-	private void makeActions() {
-		action1 = new Action() {
-			public void run() {
-				showMessage("Action 1 executed");
-			}
-		};
-		action1.setText("Action 1");
-		action1.setToolTipText("Action 1 tooltip");
-		action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-			getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		
-		action2 = new Action() {
-			public void run() {
-				showMessage("Action 2 executed");
-			}
-		};
-		action2.setText("Action 2");
-		action2.setToolTipText("Action 2 tooltip");
-		action2.setImageDescriptor(workbench.getSharedImages().
-				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		doubleClickAction = new Action() {
-			public void run() {
-				IStructuredSelection selection = viewer.getStructuredSelection();
-				Object obj = selection.getFirstElement();
-				showMessage("Double-click detected on "+obj.toString());
-			}
-		};
-	}
-
-	private void hookDoubleClickAction() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				doubleClickAction.run();
+		// Reset button
+		resetButton = new Button(timerGroup, SWT.PUSH);
+		resetButton.setText("Reset");
+		resetButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				resetTimer();
 			}
 		});
 	}
-	private void showMessage(String message) {
-		MessageDialog.openInformation(
-			viewer.getControl().getShell(),
-			"Tardoc",
-			message);
+
+	/**
+	 * Creates the text area section for free text entry
+	 */
+	private void createTextAreaSection(Composite parent) {
+		Group textGroup = new Group(parent, SWT.NONE);
+		textGroup.setText("Notes");
+		textGroup.setLayout(new GridLayout(1, false));
+		textGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		textArea = new Text(textGroup, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		textArea.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		textArea.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+	}
+
+	/**
+	 * Creates the billing positions section with a list viewer
+	 */
+	private void createBillingPositionsSection(Composite parent) {
+		Group billingGroup = new Group(parent, SWT.NONE);
+		billingGroup.setText("Billing Positions");
+		billingGroup.setLayout(new GridLayout(1, false));
+		billingGroup.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
+
+		billingPositionsViewer = new TableViewer(billingGroup, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
+		billingPositionsViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		billingPositionsViewer.getTable().setHeaderVisible(true);
+		billingPositionsViewer.getTable().setLinesVisible(true);
+
+		// Set content and label provider
+		billingPositionsViewer.setContentProvider(ArrayContentProvider.getInstance());
+		billingPositionsViewer.setLabelProvider(new BillingPositionLabelProvider());
+
+		// Initialize with sample data (to be replaced with database query later)
+		List<String> samplePositions = new ArrayList<>();
+		samplePositions.add("00.0010 - Consultation, first 5 min");
+		samplePositions.add("00.0020 - Consultation, each additional 5 min");
+		samplePositions.add("00.0030 - Consultation by phone");
+		samplePositions.add("00.0040 - Emergency consultation");
+		samplePositions.add("00.0050 - Visit at patient's home");
+		
+		billingPositionsViewer.setInput(samplePositions);
+
+		// Set selection provider for the site
+		getSite().setSelectionProvider(billingPositionsViewer);
+	}
+
+	/**
+	 * Toggles the timer between start/pause states
+	 */
+	private void toggleTimer() {
+		if (!isRunning) {
+			startTimer();
+		} else {
+			pauseTimer();
+		}
+	}
+
+	/**
+	 * Starts the timer
+	 */
+	private void startTimer() {
+		if (isPaused) {
+			// Resume from paused state
+			startTime = System.currentTimeMillis() - pausedTime;
+			isPaused = false;
+		} else {
+			// Fresh start
+			startTime = System.currentTimeMillis();
+			pausedTime = 0;
+		}
+		
+		isRunning = true;
+		startPauseButton.setText("Pause");
+
+		// Create and schedule timer runnable
+		timerRunnable = new Runnable() {
+			@Override
+			public void run() {
+				if (isRunning && !timerLabel.isDisposed()) {
+					updateTimerDisplay();
+					Display.getCurrent().timerExec(1000, this);
+				}
+			}
+		};
+		Display.getCurrent().timerExec(1000, timerRunnable);
+	}
+
+	/**
+	 * Pauses the timer
+	 */
+	private void pauseTimer() {
+		isRunning = false;
+		isPaused = true;
+		pausedTime = System.currentTimeMillis() - startTime;
+		startPauseButton.setText("Start");
+	}
+
+	/**
+	 * Resets the timer to 00:00
+	 */
+	private void resetTimer() {
+		isRunning = false;
+		isPaused = false;
+		startTime = 0;
+		pausedTime = 0;
+		startPauseButton.setText("Start");
+		updateTimerDisplay();
+	}
+
+	/**
+	 * Updates the timer display label
+	 */
+	private void updateTimerDisplay() {
+		if (timerLabel == null || timerLabel.isDisposed()) {
+			return;
+		}
+
+		long elapsedTime = 0;
+		if (isRunning) {
+			elapsedTime = System.currentTimeMillis() - startTime;
+		} else if (isPaused) {
+			elapsedTime = pausedTime;
+		}
+
+		long minutes = elapsedTime / (60 * 1000);
+		long seconds = (elapsedTime % (60 * 1000)) / 1000;
+
+		String timeString = String.format("%02d:%02d", minutes, seconds);
+		timerLabel.setText(timeString);
 	}
 
 	@Override
 	public void setFocus() {
-		viewer.getControl().setFocus();
+		if (textArea != null && !textArea.isDisposed()) {
+			textArea.setFocus();
+		}
+	}
+
+	@Override
+	public void dispose() {
+		// Stop timer when view is disposed
+		if (isRunning) {
+			isRunning = false;
+		}
+		super.dispose();
 	}
 }
