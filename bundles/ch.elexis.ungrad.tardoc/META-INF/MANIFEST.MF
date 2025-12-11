@@ -21,7 +21,8 @@ Require-Bundle: org.eclipse.swt,
  ch.elexis.base.ch.arzttarife.model;bundle-version="3.13.0",
  ch.elexis.core.data;bundle-version="3.13.0",
  ch.elexis.core.jpa.entities;bundle-version="3.13.0",
- ch.elexis.core.ui
+ ch.elexis.core.ui,
+ org.eclipse.nebula.widgets.tablecombo
 Automatic-Module-Name: ch.elexis.ungrad.tardoc
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-21
