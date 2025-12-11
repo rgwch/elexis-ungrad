@@ -23,6 +23,9 @@ import org.eclipse.ui.part.ViewPart;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
+import ch.elexis.ungrad.tardoc.services.TardocManager;
+import ch.elexis.ungrad.tardoc.services.TardocManagerHolder;
+
 /**
  * Tardoc consultation view with timer, text area, and billing positions list.
  * Features:

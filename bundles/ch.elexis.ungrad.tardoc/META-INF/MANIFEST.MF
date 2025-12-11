@@ -4,7 +4,11 @@ Bundle-Name: Tardoc Kons
 Bundle-SymbolicName: ch.elexis.ungrad.tardoc;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Import-Package: ch.elexis.base.ch.arzttarife.tardoc,
+ ch.elexis.base.ch.arzttarife.util,
+ ch.elexis.core.findings,
+ ch.elexis.core.model,
  ch.elexis.core.services,
+ ch.elexis.core.services.holder,
  jakarta.inject;version="[2.0.0,3.0.0)",
  org.osgi.framework;version="[1.9.0,2.0.0)",
  org.osgi.service.component.annotations;version="[1.3.0,2.0.0)"

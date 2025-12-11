@@ -1,8 +1,13 @@
-package ch.elexis.ungrad.tardoc.views;
-
+package ch.elexis.ungrad.tardoc.services;
+/* We have to do quite a lot boilerplate coding, because ch.elexis.base.arzttarife.service.ArzttarifeModelServiceHolder
+ * is not API accessible.
+ * This is copilot's solution.
+ */
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -12,14 +17,19 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import ch.elexis.base.ch.arzttarife.tardoc.ITardocLeistung;
+import ch.elexis.base.ch.arzttarife.util.ArzttarifeUtil;
+import ch.elexis.core.findings.ICoding;
+import ch.elexis.core.model.IMandator;
 import ch.elexis.core.services.IModelService;
 import ch.elexis.core.services.IQuery;
 import ch.elexis.core.services.IQuery.COMPARATOR;
+import ch.elexis.core.services.holder.ContextServiceHolder;
 
 @Component(service = TardocManager.class)
 public class TardocManager{
 	
 	private static IModelService modelService;
+	private boolean bOnlyValidForDignity=true;
 		
 	public TardocManager() {
 		
@@ -71,7 +81,7 @@ public class TardocManager{
 		
 		return null;
 	}
-		
+	
 	public List<ITardocLeistung> getLeistungen(String filter) {
 		return getLeistungen(filter, null);
 	}
@@ -97,12 +107,84 @@ public class TardocManager{
 			// Order by code
 			query.orderBy("code_", IQuery.ORDER.ASC);
 			
-			return query.execute();
+			List<ITardocLeistung> results = query.execute();
+			
+			// Filter by dignity if required
+			if (bOnlyValidForDignity) {
+				results = filterByDignity(results);
+			}
+			
+			return results;
 		} catch (Exception e) {
 			// Handle case where service is not available
 			e.printStackTrace();
 			return Collections.emptyList();
 		}
+	}
+	
+	/**
+	 * Filter the list of Tardoc services based on the current mandator's dignities.
+	 * Only services where DigniQuali includes at least one of the mandator's dignities are returned.
+	 * 
+	 * @param leistungen List of services to filter
+	 * @return Filtered list of services
+	 */
+	private List<ITardocLeistung> filterByDignity(List<ITardocLeistung> leistungen) {
+		// Get current mandator
+		IMandator mandator = ContextServiceHolder.get().getActiveMandator().orElse(null);
+		if (mandator == null) {
+			return leistungen;
+		}
+		
+		// Get mandator's dignities
+		List<ICoding> mandatorDignities = ArzttarifeUtil.getMandantTardocSepcialist(mandator);
+		if (mandatorDignities == null || mandatorDignities.isEmpty()) {
+			return leistungen;
+		}
+		
+		// Extract dignity codes
+		Set<String> mandatorDignityCodes = mandatorDignities.stream()
+			.map(ICoding::getCode)
+			.collect(Collectors.toSet());
+		
+		// Filter services
+		return leistungen.stream()
+			.filter(leistung -> {
+				String digniQuali = leistung.getDigniQuali();
+				if (digniQuali == null || digniQuali.trim().isEmpty()) {
+					// If no dignity specified, include it (or exclude based on your business logic)
+					return true;
+				}
+				
+				// Split by pipe and check if any dignity matches
+				String[] dignities = digniQuali.split("\\|");
+				for (String dignity : dignities) {
+					if (mandatorDignityCodes.contains(dignity.trim())) {
+						return true;
+					}
+				}
+				return false;
+			})
+			.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Get the current state of the dignity filtering flag.
+	 * 
+	 * @return true if filtering by dignity is enabled, false otherwise
+	 */
+	public boolean isOnlyValidForDignity() {
+		return bOnlyValidForDignity;
+	}
+	
+	/**
+	 * Set whether to filter services by dignity.
+	 * When true, only services where DigniQuali includes at least one of the current mandator's dignities are returned.
+	 * 
+	 * @param onlyValidForDignity true to enable dignity filtering, false to disable
+	 */
+	public void setOnlyValidForDignity(boolean onlyValidForDignity) {
+		this.bOnlyValidForDignity = onlyValidForDignity;
 	}	
 	
 	/**
