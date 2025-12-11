@@ -1,5 +1,6 @@
 package ch.elexis.ungrad.tardoc.views;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -16,12 +17,21 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.Form;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.part.ViewPart;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
+import ch.elexis.core.model.IEncounter;
+import ch.elexis.core.model.IPatient;
+import ch.elexis.core.ui.text.EnhancedTextField;
+import ch.elexis.core.ui.util.IKonsExtension;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
 import ch.elexis.ungrad.tardoc.services.TardocManagerHolder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * Tardoc consultation view with timer, text area, and billing positions list.
@@ -36,6 +46,14 @@ public class TardocKonsView extends ViewPart {
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID = "ch.elexis.ungrad.tardoc.views.TardocKonsView";
+	Hashtable<String, IKonsExtension> hXrefs;
+	EnhancedTextField text;
+	private Hyperlink hlMandant, hlDate;
+	// TableComboViewer tableComboViewerFall;
+	private IEncounter actEncounter;
+	FormToolkit tk;
+	Form form;
+	IPatient actPat;
 
 	// Timer components
 	private Label timerLabel;
