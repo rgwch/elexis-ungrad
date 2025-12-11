@@ -1,16 +1,13 @@
 package ch.elexis.ungrad.tardoc.views;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -53,23 +50,11 @@ public class TardocKonsView extends ViewPart {
 	// Text area
 	private Text textArea;
 
-	// Billing positions list
-	private TableViewer billingPositionsViewer;
-
-	/**
-	 * Label provider for billing positions
-	 */
-	class BillingPositionLabelProvider extends LabelProvider implements ITableLabelProvider {
-		@Override
-		public String getColumnText(Object obj, int index) {
-			return getText(obj);
-		}
-		
-		@Override
-		public Image getColumnImage(Object obj, int index) {
-			return null;
-		}
-	}
+	// Billing positions
+	private BillingPositionsComposite billingPositionsComposite;
+	private SashForm sashForm;
+	private boolean billingPositionsVisible = true;
+	private Action toggleBillingPositionsAction;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -79,14 +64,25 @@ public class TardocKonsView extends ViewPart {
 		// Create timer section
 		createTimerSection(parent);
 
-		// Create text area section
-		createTextAreaSection(parent);
+		// Create SashForm for resizable sections
+		sashForm = new SashForm(parent, SWT.VERTICAL);
+		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		// Create billing positions section
-		createBillingPositionsSection(parent);
+		// Create text area section in the sash form
+		createTextAreaSection(sashForm);
+
+		// Create billing positions section in the sash form
+		createBillingPositionsSection(sashForm);
+
+		// Set initial weights (70% text area, 30% billing positions)
+		sashForm.setWeights(new int[] { 70, 30 });
 
 		// Initialize timer display
 		updateTimerDisplay();
+		
+		// Create toolbar actions
+		createActions();
+		contributeToActionBars();
 		
 		// Test the TardocManager
 		System.out.println("TardocKonsView: Initializing TardocManager...");
@@ -166,35 +162,65 @@ public class TardocKonsView extends ViewPart {
 	}
 
 	/**
-	 * Creates the billing positions section with a list viewer
+	 * Creates the billing positions section with a composite viewer
 	 */
 	private void createBillingPositionsSection(Composite parent) {
-		Group billingGroup = new Group(parent, SWT.NONE);
-		billingGroup.setText("Billing Positions");
-		billingGroup.setLayout(new GridLayout(1, false));
-		billingGroup.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
-
-		billingPositionsViewer = new TableViewer(billingGroup, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
-		billingPositionsViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-		billingPositionsViewer.getTable().setHeaderVisible(true);
-		billingPositionsViewer.getTable().setLinesVisible(true);
-
-		// Set content and label provider
-		billingPositionsViewer.setContentProvider(ArrayContentProvider.getInstance());
-		billingPositionsViewer.setLabelProvider(new BillingPositionLabelProvider());
-
-		// Initialize with sample data (to be replaced with database query later)
-		List<String> samplePositions = new ArrayList<>();
-		samplePositions.add("00.0010 - Consultation, first 5 min");
-		samplePositions.add("00.0020 - Consultation, each additional 5 min");
-		samplePositions.add("00.0030 - Consultation by phone");
-		samplePositions.add("00.0040 - Emergency consultation");
-		samplePositions.add("00.0050 - Visit at patient's home");
+		billingPositionsComposite = new BillingPositionsComposite(parent, SWT.NONE);
 		
-		billingPositionsViewer.setInput(samplePositions);
-
 		// Set selection provider for the site
-		getSite().setSelectionProvider(billingPositionsViewer);
+		getSite().setSelectionProvider(billingPositionsComposite.getBillingPositionsViewer());
+	}
+
+	/**
+	 * Creates the toolbar actions
+	 */
+	private void createActions() {
+		toggleBillingPositionsAction = new Action("Toggle Billing Positions", Action.AS_CHECK_BOX) {
+			@Override
+			public void run() {
+				toggleBillingPositionsVisibility();
+			}
+		};
+		toggleBillingPositionsAction.setToolTipText("Show/Hide Billing Positions");
+		toggleBillingPositionsAction.setChecked(billingPositionsVisible);
+		// You can add an icon here if available:
+		// toggleBillingPositionsAction.setImageDescriptor(...)
+	}
+
+	/**
+	 * Contributes actions to the view's toolbar
+	 */
+	private void contributeToActionBars() {
+		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+		toolBarManager.add(toggleBillingPositionsAction);
+	}
+
+	/**
+	 * Toggles the visibility of the billing positions section
+	 */
+	private void toggleBillingPositionsVisibility() {
+		billingPositionsVisible = !billingPositionsVisible;
+		
+		if (billingPositionsVisible) {
+			// Show the billing positions
+			if (billingPositionsComposite != null && !billingPositionsComposite.isDisposed()) {
+				billingPositionsComposite.setVisible(true);
+				sashForm.setWeights(new int[] { 70, 30 });
+				sashForm.setMaximizedControl(null); // Restore normal layout
+			}
+		} else {
+			// Hide the billing positions - maximize the text area section
+			if (billingPositionsComposite != null && !billingPositionsComposite.isDisposed()) {
+				// Get the first child (text area section) and maximize it
+				if (sashForm.getChildren().length > 0) {
+					sashForm.setMaximizedControl(sashForm.getChildren()[0]);
+				}
+			}
+		}
+		
+		// Force layout update
+		sashForm.layout(true, true);
+		toggleBillingPositionsAction.setChecked(billingPositionsVisible);
 	}
 
 	/**
