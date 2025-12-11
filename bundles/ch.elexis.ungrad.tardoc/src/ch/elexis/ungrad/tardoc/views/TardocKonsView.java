@@ -20,8 +20,8 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
-
-import jakarta.inject.Inject;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * Tardoc consultation view with timer, text area, and billing positions list.
@@ -84,6 +84,33 @@ public class TardocKonsView extends ViewPart {
 
 		// Initialize timer display
 		updateTimerDisplay();
+		
+		// Test the TardocManager
+		System.out.println("TardocKonsView: Initializing TardocManager...");
+		
+		// Get BundleContext from this View's bundle
+		BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
+		System.out.println("TardocKonsView: BundleContext obtained: " + (bundleContext != null));
+		
+		TardocManager manager = TardocManagerHolder.get();
+		if (manager == null) {
+			System.out.println("TardocKonsView: Holder returned null, creating instance directly");
+			// Fallback: create instance directly (will use OSGi service lookup internally)
+			manager = new TardocManager();
+		} else {
+			System.out.println("TardocKonsView: Got manager from holder");
+		}
+		
+		if (manager.isServiceAvailable(bundleContext)) {
+			System.out.println("TardocKonsView: Service is available, querying...");
+			List<ch.elexis.base.ch.arzttarife.tardoc.ITardocLeistung> results = manager.getLeistungen("Konsultation", bundleContext);
+			System.out.println("TardocManager returned " + results.size() + " results for 'Konsultation'");
+			if (results.size() > 0) {
+				System.out.println("First result: " + results.get(0).getCode() + " - " + results.get(0).getText());
+			}
+		} else {
+			System.err.println("TardocKonsView: Service is NOT available");
+		}
 	}
 
 	/**
