@@ -95,6 +95,7 @@ public class TardocManager{
 		
 		try {
 			IQuery<ITardocLeistung> query = service.getQuery(ITardocLeistung.class);
+			query.and("isChapter", COMPARATOR.EQUALS,false);
 			
 			// Filter by tx255 field - use LIKE for partial matching
 			if (filter != null && !filter.trim().isEmpty()) {
