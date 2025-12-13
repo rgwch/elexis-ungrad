@@ -96,6 +96,8 @@ public class TardocKonsView extends ViewPart {
 	IPatient actPat;
 	private boolean created = false;
 
+	private Composite cDesc;
+	
 	// Timer components
 	private Label timerLabel;
 	private Button startPauseButton;
@@ -312,7 +314,7 @@ public class TardocKonsView extends ViewPart {
 			// diagnosesDisplay.setEnabled(false);
 		}
 		actEncounter = encounter;
-		// cDesc.layout();
+		cDesc.layout();
 
 	}
 
@@ -341,7 +343,10 @@ public class TardocKonsView extends ViewPart {
 		// Main layout
 		parent.setLayout(new GridLayout(1, false));
 		
+		createDetailsSection(parent);
+		
 		createFallSection(parent);
+		
 			// Create timer section
 		createTimerSection(parent);
 
@@ -406,7 +411,7 @@ public class TardocKonsView extends ViewPart {
 	}
 	
 	private void createDetailsSection(final Composite parent) {
-		Composite cDesc = new Composite(parent, SWT.NONE);
+		cDesc = new Composite(parent, SWT.NONE);
 		cDesc.setLayout(new RowLayout(SWT.HORIZONTAL));
 		cDesc.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		//emFont = UiDesk.getFont("Helvetica", 11, SWT.BOLD); //$NON-NLS-1$
