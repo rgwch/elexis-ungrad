@@ -192,7 +192,7 @@ public class TardocKonsView extends ViewPart {
 		return remark;
 	}
 	
-	/** Aktuellen patient setzen */
+	/** Aktuellen Patienten setzen */
 	private synchronized void setPatient(IPatient pat) {
 		LoggerFactory.getLogger(getClass()).info("[KONS PAT] " + (pat != null ? pat.getId() : "null"));
 		if (pat != null && actPat != null) {
