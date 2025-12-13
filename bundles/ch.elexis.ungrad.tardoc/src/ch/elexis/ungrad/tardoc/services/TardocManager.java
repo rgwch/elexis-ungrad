@@ -206,7 +206,7 @@ public class TardocManager{
 	/**
 	 * Get a specific ITardocLeistung by its code.
 	 * 
-	 * @param code The Tardoc code (e.g., "CA00.0010")
+	 * @param code The Tardoc code (e.g., "CA.00.0010")
 	 * @param context Optional BundleContext
 	 * @return The ITardocLeistung if found, null otherwise
 	 */

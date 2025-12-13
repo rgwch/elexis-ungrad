@@ -303,6 +303,7 @@ public class TardocKonsView extends ViewPart {
 			} else {
 				text.setTextBackground(UiDesk.getColorFromRGB("FAFAFA")); //$NON-NLS-1$
 			}
+			billingsManager.setEncounter(encounter);
 			billingPositionsComposite.setKons(encounter);
 		} else {
 			hlDate.setText("-"); //$NON-NLS-1$
@@ -604,7 +605,7 @@ public class TardocKonsView extends ViewPart {
 	}
 
 	/**
-	 * Starts the timer
+	 * Starts the timer. Auto-Adds billing positions based on mandator's Dignity,
 	 */
 	private void startTimer() {
 		if (isPaused) {
@@ -617,7 +618,8 @@ public class TardocKonsView extends ViewPart {
 			pausedTime = 0;
 			
 			// Auto-bill CA00.0010 if conditions are met
-			checkAndBillConsultation();
+			this.billingsManager.autostart();
+			
 		}
 
 		isRunning = true;
@@ -636,49 +638,7 @@ public class TardocKonsView extends ViewPart {
 		Display.getCurrent().timerExec(1000, timerRunnable);
 	}
 	
-	/**
-	 * Check conditions and automatically bill CA00.0010 if:
-	 * - Current mandator has dignity 3010
-	 * - Current encounter has no billings
-	 * - Timer is being started (not resumed)
-	 */
-	private void checkAndBillConsultation() {
-		if (actEncounter == null) {
-			return;
-		}
-		
-		// Check if there are already billings
-		List<ch.elexis.core.model.IBilled> billed = actEncounter.getBilled();
-		if (billed != null && !billed.isEmpty()) {
-			// Already has billings, don't auto-add
-			return;
-		}
-		
-		// Get TardocManager
-		BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
-		TardocManager manager = TardocManagerHolder.get();
-		if (manager == null) {
-			manager = new TardocManager();
-		}
-		
-		// Check if mandator has dignity 3010
-		if (!manager.mandatorHasDignity("3010")) {
-			return;
-		}
-		
-		// Get CA00.0010
-		ch.elexis.base.ch.arzttarife.tardoc.ITardocLeistung consultation = 
-			manager.getLeistungByCode("CA.00.0010", bundleContext);
-		
-		if (consultation != null) {
-			// Add to billing
-			ch.elexis.core.services.holder.BillingServiceHolder.get()
-				.bill(consultation, actEncounter, 1);
-			
-			// Trigger update event to refresh the display
-			ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, actEncounter);
-		}
-	}
+
 
 	/**
 	 * Pauses the timer
