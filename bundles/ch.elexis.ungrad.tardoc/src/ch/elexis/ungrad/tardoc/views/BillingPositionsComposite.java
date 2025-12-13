@@ -21,13 +21,15 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
 import ch.elexis.base.ch.arzttarife.tardoc.ITardocLeistung;
+import ch.elexis.core.model.IEncounter;
+import ch.elexis.core.ui.views.VerrechnungsDisplay;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
 import ch.elexis.ungrad.tardoc.services.TardocManagerHolder;
 
 /**
- * Composite for displaying billing positions with a table viewer.
- * This component is extracted from TardocKonsView to allow better separation of concerns
- * and to enable show/hide functionality.
+ * Composite for displaying billing positions with a table viewer. This
+ * component is extracted from TardocKonsView to allow better separation of
+ * concerns and to enable show/hide functionality.
  */
 public class BillingPositionsComposite extends Composite {
 
@@ -37,6 +39,8 @@ public class BillingPositionsComposite extends Composite {
 	private TardocManager tardocManager;
 	private BundleContext bundleContext;
 	private Label statusLabel;
+	private TardocKonsView tkv;
+	private VerrechnungsDisplay billed;
 
 	/**
 	 * Label provider for billing positions (ITardocLeistung)
@@ -50,7 +54,7 @@ public class BillingPositionsComposite extends Composite {
 			}
 			return getText(obj);
 		}
-		
+
 		@Override
 		public Image getColumnImage(Object obj, int index) {
 			return null;
@@ -61,19 +65,24 @@ public class BillingPositionsComposite extends Composite {
 	 * Creates a new billing positions composite.
 	 * 
 	 * @param parent the parent composite
-	 * @param style the SWT style bits
+	 * @param style  the SWT style bits
 	 */
-	public BillingPositionsComposite(Composite parent, int style) {
+	public BillingPositionsComposite(Composite parent, int style, TardocKonsView view) {
 		super(parent, style);
-		
+		this.tkv = view;
+
 		// Initialize TardocManager
 		bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
 		tardocManager = TardocManagerHolder.get();
 		if (tardocManager == null) {
 			tardocManager = new TardocManager();
 		}
-		
+
 		createContent();
+	}
+
+	void setKons(IEncounter k) {
+		billed.setEncounter(k);
 	}
 
 	/**
@@ -82,9 +91,11 @@ public class BillingPositionsComposite extends Composite {
 	private void createContent() {
 		setLayout(new GridLayout(1, false));
 		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		billed = new VerrechnungsDisplay(tkv.getSite().getPage(), this, SWT.NONE);
+		billed.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		billingGroup = new Group(this, SWT.NONE);
-		billingGroup.setText("Billing Positions");
+		billingGroup.setText("Tardoc");
 		billingGroup.setLayout(new GridLayout(1, false));
 		billingGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -105,7 +116,7 @@ public class BillingPositionsComposite extends Composite {
 		statusLabel = new Label(billingGroup, SWT.NONE);
 		statusLabel.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
 		statusLabel.setText("Enter search term to find billing positions");
-		
+
 		// Initialize with empty list
 		billingPositionsViewer.setInput(Collections.emptyList());
 	}
@@ -140,7 +151,7 @@ public class BillingPositionsComposite extends Composite {
 	 */
 	private void performSearch() {
 		String searchText = searchField.getText().trim();
-		
+
 		if (searchText.isEmpty()) {
 			// Clear the list if search is empty
 			billingPositionsViewer.setInput(Collections.emptyList());
@@ -158,10 +169,10 @@ public class BillingPositionsComposite extends Composite {
 		try {
 			// Perform the search
 			List<ITardocLeistung> results = tardocManager.getLeistungen(searchText, bundleContext);
-			
+
 			// Update the viewer
 			billingPositionsViewer.setInput(results);
-			
+
 			// Update status
 			if (results.isEmpty()) {
 				statusLabel.setText("No results found for: " + searchText);
@@ -176,8 +187,8 @@ public class BillingPositionsComposite extends Composite {
 	}
 
 	/**
-	 * Gets the table viewer for the billing positions.
-	 * This can be used to set it as a selection provider.
+	 * Gets the table viewer for the billing positions. This can be used to set it
+	 * as a selection provider.
 	 * 
 	 * @return the table viewer
 	 */
