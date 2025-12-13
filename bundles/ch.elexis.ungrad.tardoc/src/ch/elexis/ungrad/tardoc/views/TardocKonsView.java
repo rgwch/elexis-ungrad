@@ -64,6 +64,7 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.views.Messages;
 import ch.elexis.core.ui.views.provider.CoverageColorLabelProvider;
 import ch.elexis.data.Mandant;
+import ch.elexis.ungrad.tardoc.services.BillingsManager;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
 import ch.elexis.ungrad.tardoc.services.TardocManagerHolder;
 import ch.rgw.tools.Result;
@@ -90,6 +91,7 @@ public class TardocKonsView extends ViewPart {
 	private Hyperlink hlMandant, hlDate;
 	TableComboViewer tableComboViewerFall;
 	private ComboFallSelectionListener comboFallSelectionListener;
+	BillingsManager billingsManager=new BillingsManager(this);
 	private FormToolkit tk = UiDesk.getToolkit();
 
 	protected IEncounter actEncounter;
