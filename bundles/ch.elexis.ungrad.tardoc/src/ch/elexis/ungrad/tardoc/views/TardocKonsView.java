@@ -90,14 +90,14 @@ public class TardocKonsView extends ViewPart {
 	private Hyperlink hlMandant, hlDate;
 	TableComboViewer tableComboViewerFall;
 	private ComboFallSelectionListener comboFallSelectionListener;
-	private FormToolkit tk=UiDesk.getToolkit();
+	private FormToolkit tk = UiDesk.getToolkit();
 
 	protected IEncounter actEncounter;
 	IPatient actPat;
 	private boolean created = false;
 
 	private Composite cDesc;
-	
+
 	// Timer components
 	private Label timerLabel;
 	private Button startPauseButton;
@@ -301,6 +301,7 @@ public class TardocKonsView extends ViewPart {
 			} else {
 				text.setTextBackground(UiDesk.getColorFromRGB("FAFAFA")); //$NON-NLS-1$
 			}
+			billingPositionsComposite.setKons(encounter);
 		} else {
 			hlDate.setText("-"); //$NON-NLS-1$
 			hlMandant.setText("--"); //$NON-NLS-1$
@@ -342,19 +343,18 @@ public class TardocKonsView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 		// Main layout
 		parent.setLayout(new GridLayout(1, false));
-		
+
 		createDetailsSection(parent);
-		
+
 		createFallSection(parent);
-		
-			// Create timer section
+
+		// Create timer section
 		createTimerSection(parent);
 
 		// Create SashForm for resizable sections
 		sashForm = new SashForm(parent, SWT.VERTICAL);
 		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		
 		// Create text area section in the sash form
 		createTextAreaSection(sashForm);
 
@@ -409,12 +409,12 @@ public class TardocKonsView extends ViewPart {
 		getSite().getPage().addPartListener(udpateOnVisible);
 
 	}
-	
+
 	private void createDetailsSection(final Composite parent) {
 		cDesc = new Composite(parent, SWT.NONE);
 		cDesc.setLayout(new RowLayout(SWT.HORIZONTAL));
 		cDesc.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		//emFont = UiDesk.getFont("Helvetica", 11, SWT.BOLD); //$NON-NLS-1$
+		// emFont = UiDesk.getFont("Helvetica", 11, SWT.BOLD); //$NON-NLS-1$
 		// defaultBackground = p.getBackground();
 		hlDate = tk.createHyperlink(cDesc, NO_CONS_SELECTED, SWT.NONE);
 		// hlDate.setFont(emFont);
@@ -461,7 +461,8 @@ public class TardocKonsView extends ViewPart {
 		hlMandant.setBackground(parent.getBackground());
 
 	}
-	private void createFallSection(final Composite parent){
+
+	private void createFallSection(final Composite parent) {
 		tableComboViewerFall = new TableComboViewer(parent, SWT.SINGLE | SWT.BORDER);
 		tableComboViewerFall.setContentProvider(ArrayContentProvider.getInstance());
 		tableComboViewerFall.setLabelProvider(new CoverageColorLabelProvider());
@@ -528,7 +529,7 @@ public class TardocKonsView extends ViewPart {
 	 * Creates the billing positions section with a composite viewer
 	 */
 	private void createBillingPositionsSection(Composite parent) {
-		billingPositionsComposite = new BillingPositionsComposite(parent, SWT.NONE);
+		billingPositionsComposite = new BillingPositionsComposite(parent, SWT.NONE, this);
 
 		// Set selection provider for the site
 		getSite().setSelectionProvider(billingPositionsComposite.getBillingPositionsViewer());
@@ -686,6 +687,5 @@ public class TardocKonsView extends ViewPart {
 		}
 		super.dispose();
 	}
-
 
 }
