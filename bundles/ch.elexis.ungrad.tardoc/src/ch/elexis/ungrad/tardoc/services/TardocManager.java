@@ -202,4 +202,55 @@ public class TardocManager{
 	public boolean isServiceAvailable(BundleContext context) {
 		return getModelService(context) != null;
 	}
+	
+	/**
+	 * Get a specific ITardocLeistung by its code.
+	 * 
+	 * @param code The Tardoc code (e.g., "CA00.0010")
+	 * @param context Optional BundleContext
+	 * @return The ITardocLeistung if found, null otherwise
+	 */
+	public ITardocLeistung getLeistungByCode(String code, BundleContext context) {
+		IModelService service = getModelService(context);
+		if (service == null) {
+			System.err.println("TardocManager: IModelService is not available");
+			return null;
+		}
+		
+		try {
+			IQuery<ITardocLeistung> query = service.getQuery(ITardocLeistung.class);
+			query.and("code_", COMPARATOR.EQUALS, code);
+			query.and("deleted", COMPARATOR.EQUALS, false);
+			
+			List<ITardocLeistung> results = query.execute();
+			if (results != null && !results.isEmpty()) {
+				return results.get(0);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Check if the current mandator has a specific dignity code.
+	 * 
+	 * @param dignityCode The dignity code to check (e.g., "3010")
+	 * @return true if the mandator has this dignity, false otherwise
+	 */
+	public boolean mandatorHasDignity(String dignityCode) {
+		IMandator mandator = ContextServiceHolder.get().getActiveMandator().orElse(null);
+		if (mandator == null) {
+			return false;
+		}
+		
+		List<ICoding> mandatorDignities = ArzttarifeUtil.getMandantTardocSepcialist(mandator);
+		if (mandatorDignities == null || mandatorDignities.isEmpty()) {
+			return false;
+		}
+		
+		return mandatorDignities.stream()
+			.anyMatch(coding -> dignityCode.equals(coding.getCode()));
+	}
 }
