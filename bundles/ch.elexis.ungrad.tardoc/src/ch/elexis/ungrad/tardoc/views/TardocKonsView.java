@@ -668,7 +668,7 @@ public class TardocKonsView extends ViewPart {
 		
 		// Get CA00.0010
 		ch.elexis.base.ch.arzttarife.tardoc.ITardocLeistung consultation = 
-			manager.getLeistungByCode("CA00.0010", bundleContext);
+			manager.getLeistungByCode("CA.00.0010", bundleContext);
 		
 		if (consultation != null) {
 			// Add to billing
