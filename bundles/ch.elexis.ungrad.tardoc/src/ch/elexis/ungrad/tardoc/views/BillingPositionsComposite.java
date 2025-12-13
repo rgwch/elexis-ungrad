@@ -3,11 +3,18 @@ package ch.elexis.ungrad.tardoc.views;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceAdapter;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Image;
@@ -21,6 +28,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
 import ch.elexis.base.ch.arzttarife.tardoc.ITardocLeistung;
+import ch.elexis.core.common.ElexisEventTopics;
+import ch.elexis.core.data.service.StoreToStringServiceHolder;
 import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.ui.views.VerrechnungsDisplay;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
@@ -41,6 +50,20 @@ public class BillingPositionsComposite extends Composite {
 	private Label statusLabel;
 	private TardocKonsView tkv;
 	private VerrechnungsDisplay billed;
+	private IEncounter currentEncounter;
+
+	/**
+	 * Event handler to refresh the billed display when encounter is updated
+	 * (e.g., after dropping items)
+	 */
+	@Optional
+	@jakarta.inject.Inject
+	public void updateEncounter(@UIEventTopic(ElexisEventTopics.EVENT_UPDATE) IEncounter encounter) {
+		if (encounter != null && encounter.equals(currentEncounter) && billed != null) {
+			// Refresh the billed display to show newly added items
+			billed.setEncounter(encounter);
+		}
+	}
 
 	/**
 	 * Label provider for billing positions (ITardocLeistung)
@@ -82,6 +105,7 @@ public class BillingPositionsComposite extends Composite {
 	}
 
 	void setKons(IEncounter k) {
+		currentEncounter = k;
 		billed.setEncounter(k);
 	}
 
@@ -111,6 +135,9 @@ public class BillingPositionsComposite extends Composite {
 		// Set content and label provider
 		billingPositionsViewer.setContentProvider(ArrayContentProvider.getInstance());
 		billingPositionsViewer.setLabelProvider(new BillingPositionLabelProvider());
+
+		// Add drag support to enable dragging items to VerrechnungsDisplay
+		addDragSupport();
 
 		// Create status label
 		statusLabel = new Label(billingGroup, SWT.NONE);
@@ -184,6 +211,50 @@ public class BillingPositionsComposite extends Composite {
 			billingPositionsViewer.setInput(Collections.emptyList());
 			ex.printStackTrace();
 		}
+	}
+
+	/**
+	 * Adds drag support to the billing positions viewer to enable dragging items
+	 * to VerrechnungsDisplay
+	 */
+	private void addDragSupport() {
+		int operations = DND.DROP_COPY;
+		Transfer[] transferTypes = new Transfer[] { org.eclipse.swt.dnd.TextTransfer.getInstance() };
+
+		DragSource dragSource = new DragSource(billingPositionsViewer.getTable(), operations);
+		dragSource.setTransfer(transferTypes);
+		dragSource.addDragListener(new DragSourceAdapter() {
+			@Override
+			public void dragSetData(DragSourceEvent event) {
+				// Get the selected item
+				org.eclipse.jface.viewers.IStructuredSelection selection = 
+					(org.eclipse.jface.viewers.IStructuredSelection) billingPositionsViewer.getSelection();
+				
+				if (selection.isEmpty()) {
+					event.data = null;
+					return;
+				}
+
+				// Get the ITardocLeistung object
+				Object firstElement = selection.getFirstElement();
+				if (firstElement instanceof ITardocLeistung) {
+					ITardocLeistung leistung = (ITardocLeistung) firstElement;
+					// Convert to string using StoreToStringService
+					String storeToString = StoreToStringServiceHolder.getStoreToString(leistung);
+					event.data = storeToString;
+				} else {
+					event.data = null;
+				}
+			}
+
+			@Override
+			public void dragStart(DragSourceEvent event) {
+				// Check if there is a selection
+				org.eclipse.jface.viewers.IStructuredSelection selection = 
+					(org.eclipse.jface.viewers.IStructuredSelection) billingPositionsViewer.getSelection();
+				event.doit = !selection.isEmpty();
+			}
+		});
 	}
 
 	/**

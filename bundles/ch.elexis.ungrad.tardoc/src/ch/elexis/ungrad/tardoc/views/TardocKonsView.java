@@ -533,6 +533,9 @@ public class TardocKonsView extends ViewPart {
 	private void createBillingPositionsSection(Composite parent) {
 		billingPositionsComposite = new BillingPositionsComposite(parent, SWT.NONE, this);
 
+		// Inject E4 context to enable event handling
+		ch.elexis.core.ui.e4.util.CoreUiUtil.injectServices(billingPositionsComposite);
+
 		// Set selection provider for the site
 		getSite().setSelectionProvider(billingPositionsComposite.getBillingPositionsViewer());
 	}
