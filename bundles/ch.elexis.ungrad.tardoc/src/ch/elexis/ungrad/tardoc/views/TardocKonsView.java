@@ -258,8 +258,14 @@ public class TardocKonsView extends ViewPart {
 		topSection.setLayout(topLayout);
 		topSection.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
+		// DetailsComposite on the left (fixed width)
 		cDesc = new DetailsComposite(topSection, this);
+		
+		// CasesComposite in the center (expands to fill available space)
 		casesComposite = new CasesComposite(topSection, this);
+		casesComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		
+		// TimerComposite on the right (fixed width)
 		timerComposite = new TimerComposite(topSection, this);
 
 		// Create SashForm for resizable sections
