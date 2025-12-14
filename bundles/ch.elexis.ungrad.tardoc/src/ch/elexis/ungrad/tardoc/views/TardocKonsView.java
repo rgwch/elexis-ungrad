@@ -16,6 +16,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.part.ViewPart;
@@ -24,6 +25,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.common.ElexisEventTopics;
+import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.model.ICoverage;
 import ch.elexis.core.model.IEncounter;
@@ -74,6 +76,8 @@ public class TardocKonsView extends ViewPart {
 	private SashForm sashForm;
 	private boolean billingPositionsVisible = true;
 	private Action toggleBillingPositionsAction;
+	private IMemento memento;
+	private static final int[] DEFAULT_WEIGHTS = new int[] { 70, 30 };
 
 	private IPartListener2 udpateOnVisible = new IPartListener2() {
 		@Override
@@ -245,6 +249,12 @@ public class TardocKonsView extends ViewPart {
 	}
 
 	@Override
+	public void init(IViewSite site, IMemento memento) throws org.eclipse.ui.PartInitException {
+		super.init(site, memento);
+		this.memento = memento;
+	}
+
+	@Override
 	public void createPartControl(final Composite parent) {
 		// Main layout
 		parent.setLayout(new GridLayout(1, false));
@@ -273,13 +283,42 @@ public class TardocKonsView extends ViewPart {
 		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		// Create text area section in the sash form
-		createTextAreaSection(sashForm);
+		text = new EnhancedTextField(sashForm, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		text.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+	
 
 		// Create billing positions section in the sash form
-		createBillingPositionsSection(sashForm);
+		billingPositionsComposite = new BillingPositionsComposite(sashForm, SWT.NONE, this);
+
+		// Inject E4 context to enable event handling
+		ch.elexis.core.ui.e4.util.CoreUiUtil.injectServices(billingPositionsComposite);
+
+		// Set selection provider for the site
+		getSite().setSelectionProvider(billingPositionsComposite.getBillingPositionsViewer());
+
 
 		// Set initial weights (70% text area, 30% billing positions)
-		sashForm.setWeights(new int[] { 70, 30 });
+		// Restore saved weights from memento if available
+		int[] weights = DEFAULT_WEIGHTS;
+		if (memento != null) {
+			String savedWeights = memento.getString("billings_height");
+			if (savedWeights != null) {
+				String[] parts = savedWeights.split(StringConstants.COMMA);
+				if (parts.length == 2) {
+					try {
+						weights = new int[] { 
+							Integer.parseInt(parts[0].trim()), 
+							Integer.parseInt(parts[1].trim()) 
+						};
+					} catch (NumberFormatException e) {
+						// Use default weights if parsing fails
+						weights = DEFAULT_WEIGHTS;
+					}
+				}
+			}
+		}
+		sashForm.setWeights(weights);
 
 		// Initialize timer display
 		timerComposite.updateTimerDisplay();
@@ -328,33 +367,6 @@ public class TardocKonsView extends ViewPart {
 	}
 
 	
-	/**
-	 * Creates the text area section for free text entry
-	 */
-	private void createTextAreaSection(Composite parent) {
-		/*Group textGroup = new Group(parent, SWT.NONE);
-		textGroup.setText("Notes");
-		textGroup.setLayout(new GridLayout(1, false));
-		textGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));*/
-
-		text = new EnhancedTextField(parent, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		text.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-	}
-
-	/**
-	 * Creates the billing positions section with a composite viewer
-	 */
-	private void createBillingPositionsSection(Composite parent) {
-		billingPositionsComposite = new BillingPositionsComposite(parent, SWT.NONE, this);
-
-		// Inject E4 context to enable event handling
-		ch.elexis.core.ui.e4.util.CoreUiUtil.injectServices(billingPositionsComposite);
-
-		// Set selection provider for the site
-		getSite().setSelectionProvider(billingPositionsComposite.getBillingPositionsViewer());
-	}
-
 	/**
 	 * Creates the toolbar actions
 	 */
@@ -413,6 +425,13 @@ public class TardocKonsView extends ViewPart {
 	@Override
 	public void dispose() {
 		super.dispose();
+	}
+	
+	@Override
+	public void saveState(IMemento memento) {
+		int[] w = sashForm.getWeights();
+		memento.putString("billings_height", Integer.toString(w[0]) + StringConstants.COMMA + Integer.toString(w[1]));
+		super.saveState(memento);
 	}
 
 }
