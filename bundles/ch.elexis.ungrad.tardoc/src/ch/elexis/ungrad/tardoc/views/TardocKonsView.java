@@ -90,6 +90,7 @@ public class TardocKonsView extends ViewPart {
 	EnhancedTextField text;
 	private Hyperlink hlMandant, hlDate;
 	TableComboViewer tableComboViewerFall;
+	private TimerComposite timerComposite;
 	private ComboFallSelectionListener comboFallSelectionListener;
 	BillingsManager billingsManager = new BillingsManager(this);
 	private FormToolkit tk = UiDesk.getToolkit();
@@ -100,15 +101,6 @@ public class TardocKonsView extends ViewPart {
 
 	private Composite cDesc;
 
-	// Timer components
-	private Label timerLabel;
-	private Button startPauseButton;
-	private Button resetButton;
-	private long startTime;
-	private long pausedTime;
-	private boolean isRunning = false;
-	private boolean isPaused = false;
-	private Runnable timerRunnable;
 
 	// Text area
 
@@ -292,7 +284,7 @@ public class TardocKonsView extends ViewPart {
 				text.setEnabled(true);
 				text.setToolTipText(StringUtils.EMPTY);
 				hlDate.setForeground(UiDesk.getColor(UiDesk.COL_BLACK));
-				// hlDate.setBackground(defaultBackground);
+				hlDate.setBackground(UiDesk.getColor(UiDesk.COL_GREY20));
 			} else {
 				text.setToolTipText("Konsultation geschlossen oder nicht von Ihnen");
 				hlDate.setForeground(UiDesk.getColor(UiDesk.COL_WHITE));
@@ -301,7 +293,7 @@ public class TardocKonsView extends ViewPart {
 			if (encounter.getDate().isEqual(LocalDate.now())) {
 				text.setTextBackground(UiDesk.getColor(UiDesk.COL_WHITE));
 			} else {
-				text.setTextBackground(UiDesk.getColorFromRGB("FAFAFA")); //$NON-NLS-1$
+				text.setTextBackground(UiDesk.getColor(UiDesk.COL_LIGHTBLUE)); // $NON-NLS-1$
 			}
 			billingsManager.setEncounter(encounter);
 			billingPositionsComposite.setKons(encounter);
@@ -347,12 +339,19 @@ public class TardocKonsView extends ViewPart {
 		// Main layout
 		parent.setLayout(new GridLayout(1, false));
 
-		createDetailsSection(parent);
+		// Create compact top section with all three sections in one row
+		Composite topSection = new Composite(parent, SWT.NONE);
+		GridLayout topLayout = new GridLayout(3, false);
+		topLayout.marginWidth = 0;
+		topLayout.marginHeight = 0;
+		topLayout.horizontalSpacing = 5;
+		topSection.setLayout(topLayout);
+		topSection.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-		createFallSection(parent);
-
-		// Create timer section
-		createTimerSection(parent);
+		createDetailsSection(topSection);
+		createFallSection(topSection);
+		timerComposite = new TimerComposite(topSection,this);
+	
 
 		// Create SashForm for resizable sections
 		sashForm = new SashForm(parent, SWT.VERTICAL);
@@ -368,7 +367,7 @@ public class TardocKonsView extends ViewPart {
 		sashForm.setWeights(new int[] { 70, 30 });
 
 		// Initialize timer display
-		updateTimerDisplay();
+		timerComposite.updateTimerDisplay();
 
 		// Create toolbar actions
 		createActions();
@@ -416,7 +415,9 @@ public class TardocKonsView extends ViewPart {
 	private void createDetailsSection(final Composite parent) {
 		cDesc = new Composite(parent, SWT.NONE);
 		cDesc.setLayout(new RowLayout(SWT.HORIZONTAL));
-		cDesc.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
+		GridData gdDesc = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		gdDesc.widthHint = 200;
+		cDesc.setLayoutData(gdDesc);
 		// emFont = UiDesk.getFont("Helvetica", 11, SWT.BOLD); //$NON-NLS-1$
 		// defaultBackground = p.getBackground();
 		hlDate = tk.createHyperlink(cDesc, NO_CONS_SELECTED, SWT.NONE);
@@ -472,48 +473,14 @@ public class TardocKonsView extends ViewPart {
 
 		comboFallSelectionListener = new ComboFallSelectionListener(this);
 		tableComboViewerFall.addSelectionChangedListener(comboFallSelectionListener);
-		GridData gdFall = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+		GridData gdFall = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		tableComboViewerFall.getTableCombo().setLayoutData(gdFall);
 		tableComboViewerFall.getTableCombo().setTableVisible(true);
 		tableComboViewerFall.getTableCombo().setTableVisible(false);
 
 	}
 
-	/**
-	 * Creates the timer section with start/pause and reset buttons
-	 */
-	private void createTimerSection(Composite parent) {
-		Group timerGroup = new Group(parent, SWT.NONE);
-		timerGroup.setText("Timer");
-		timerGroup.setLayout(new GridLayout(3, false));
-		timerGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-
-		// Timer display
-		timerLabel = new Label(timerGroup, SWT.NONE);
-		timerLabel.setText("00:00");
-		timerLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-		// Start/Pause button
-		startPauseButton = new Button(timerGroup, SWT.PUSH);
-		startPauseButton.setText("Start");
-		startPauseButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				toggleTimer();
-			}
-		});
-
-		// Reset button
-		resetButton = new Button(timerGroup, SWT.PUSH);
-		resetButton.setText("Reset");
-		resetButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				resetTimer();
-			}
-		});
-	}
-
+	
 	/**
 	 * Creates the text area section for free text entry
 	 */
@@ -593,98 +560,7 @@ public class TardocKonsView extends ViewPart {
 		toggleBillingPositionsAction.setChecked(billingPositionsVisible);
 	}
 
-	/**
-	 * Toggles the timer between start/pause states
-	 */
-	private void toggleTimer() {
-		if (!isRunning) {
-			startTimer();
-		} else {
-			pauseTimer();
-		}
-	}
-
-	/**
-	 * Starts the timer. Auto-Adds billing positions based on mandator's Dignity,
-	 */
-	private void startTimer() {
-		if (isPaused) {
-			// Resume from paused state
-			startTime = System.currentTimeMillis() - pausedTime;
-			isPaused = false;
-		} else {
-			// Fresh start - check conditions for auto-billing CA00.0010
-			startTime = System.currentTimeMillis();
-			pausedTime = 0;
-			
-			// Auto-bill CA00.0010 if conditions are met
-			this.billingsManager.autostart();
-			
-		}
-
-		isRunning = true;
-		startPauseButton.setText("Pause");
-
-		// Create and schedule timer runnable
-		timerRunnable = new Runnable() {
-			@Override
-			public void run() {
-				if (isRunning && !timerLabel.isDisposed()) {
-					updateTimerDisplay();
-					Display.getCurrent().timerExec(1000, this);
-				}
-			}
-		};
-		Display.getCurrent().timerExec(1000, timerRunnable);
-	}
-	
-
-
-	/**
-	 * Pauses the timer
-	 */
-	private void pauseTimer() {
-		isRunning = false;
-		isPaused = true;
-		pausedTime = System.currentTimeMillis() - startTime;
-		startPauseButton.setText("Start");
-	}
-
-	/**
-	 * Resets the timer to 00:00
-	 */
-	private void resetTimer() {
-		isRunning = false;
-		isPaused = false;
-		startTime = 0;
-		pausedTime = 0;
-		startPauseButton.setText("Start");
-		updateTimerDisplay();
-	}
-
-	/**
-	 * Updates the timer display label
-	 */
-	private void updateTimerDisplay() {
-		if (timerLabel == null || timerLabel.isDisposed()) {
-			return;
-		}
-
-		long elapsedTime = 0;
-		if (isRunning) {
-			elapsedTime = System.currentTimeMillis() - startTime;
-		} else if (isPaused) {
-			elapsedTime = pausedTime;
-		}
-
-		long minutes = elapsedTime / (60 * 1000);
-		long seconds = (elapsedTime % (60 * 1000)) / 1000;
-
-		String timeString = String.format("%02d:%02d", minutes, seconds);
-		timerLabel.setText(timeString);
-	}
-
-	@Override
+		@Override
 	public void setFocus() {
 		if (text != null && !text.isDisposed()) {
 			text.setFocus();
@@ -693,10 +569,6 @@ public class TardocKonsView extends ViewPart {
 
 	@Override
 	public void dispose() {
-		// Stop timer when view is disposed
-		if (isRunning) {
-			isRunning = false;
-		}
 		super.dispose();
 	}
 
