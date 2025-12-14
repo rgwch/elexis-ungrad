@@ -332,12 +332,12 @@ public class TardocKonsView extends ViewPart {
 	 * Creates the text area section for free text entry
 	 */
 	private void createTextAreaSection(Composite parent) {
-		Group textGroup = new Group(parent, SWT.NONE);
+		/*Group textGroup = new Group(parent, SWT.NONE);
 		textGroup.setText("Notes");
 		textGroup.setLayout(new GridLayout(1, false));
-		textGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		textGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));*/
 
-		text = new EnhancedTextField(textGroup, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		text = new EnhancedTextField(parent, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		text.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 	}
@@ -359,16 +359,13 @@ public class TardocKonsView extends ViewPart {
 	 * Creates the toolbar actions
 	 */
 	private void createActions() {
-		toggleBillingPositionsAction = new Action("Toggle Billing Positions", Action.AS_CHECK_BOX) {
+		toggleBillingPositionsAction = new Action("§", Action.AS_PUSH_BUTTON) {
 			@Override
 			public void run() {
 				toggleBillingPositionsVisibility();
 			}
 		};
-		toggleBillingPositionsAction.setToolTipText("Show/Hide Billing Positions");
-		toggleBillingPositionsAction.setChecked(billingPositionsVisible);
-		// You can add an icon here if available:
-		// toggleBillingPositionsAction.setImageDescriptor(...)
+		toggleBillingPositionsAction.setToolTipText("Toggle billing positions");
 	}
 
 	/**
@@ -404,7 +401,6 @@ public class TardocKonsView extends ViewPart {
 
 		// Force layout update
 		sashForm.layout(true, true);
-		toggleBillingPositionsAction.setChecked(billingPositionsVisible);
 	}
 
 	@Override

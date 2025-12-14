@@ -16,5 +16,15 @@
             name="Tardoc">
       </view>
    </extension>
+   <extension point="org.eclipse.ui.menus">
+  		<menuContribution
+        	locationURI="toolbar:ch.elexis.ungrad.tardoc.views.TardocKonsView">
+        	<command
+            	commandId="ch.elexis.core.ui.command.encounter.create"
+            	icon="icon://IMG_NEW"
+            	style="push">
+        	</command>
+    	</menuContribution>
+	</extension>
 
 </plugin>
