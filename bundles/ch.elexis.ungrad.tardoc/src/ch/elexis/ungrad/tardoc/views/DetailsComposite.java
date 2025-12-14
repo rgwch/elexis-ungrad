@@ -41,7 +41,7 @@ public class DetailsComposite extends Composite {
 		this.tkv = view;
 		setLayout(new RowLayout(SWT.HORIZONTAL));
 		GridData gdDesc = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		gdDesc.widthHint = 200;
+		gdDesc.widthHint = 250;
 		setLayoutData(gdDesc);
 		// emFont = UiDesk.getFont("Helvetica", 11, SWT.BOLD); //$NON-NLS-1$
 		// defaultBackground = p.getBackground();
@@ -53,6 +53,7 @@ public class DetailsComposite extends Composite {
 				GlobalActions.redateAction.reflectRight();
 				if (GlobalActions.redateAction.isEnabled()) {
 					GlobalActions.redateAction.doRun();
+					DetailsComposite.this.setEncounter(DetailsComposite.this.tkv.actEncounter);
 				}
 			}
 		});
