@@ -20,11 +20,11 @@ import ch.rgw.tools.Result;
 
 public class ComboFallSelectionListener implements ISelectionChangedListener {
 	private boolean ignoreEventSelectionChanged;
-	private TardocKonsView view;
+	private TardocKonsView tkv;
 
 	public ComboFallSelectionListener(TardocKonsView view) {
 		this.ignoreEventSelectionChanged = false;
-		this.view = view;
+		this.tkv = view;
 	}
 	public void ignoreSelectionEventOnce() {
 		this.ignoreEventSelectionChanged = true;
@@ -40,8 +40,8 @@ public class ComboFallSelectionListener implements ISelectionChangedListener {
 
 					ICoverage actCoverage = null;
 					String fallLabel = "Current Case NOT found!!";//$NON-NLS-1$
-					if (view.actEncounter != null) {
-						actCoverage = view.actEncounter.getCoverage();
+					if (tkv.actEncounter != null) {
+						actCoverage = tkv.actEncounter.getCoverage();
 						fallLabel = actCoverage.getLabel();
 					}
 
@@ -50,7 +50,7 @@ public class ComboFallSelectionListener implements ISelectionChangedListener {
 							SWTHelper.alert(Messages.Core_Case_is_closed, // $NON-NLS-1$
 									Messages.KonsDetailView_CaseClosedBody); // $NON-NLS-1$
 						} else {
-							MessageDialog msd = new MessageDialog(view.getViewSite().getShell(),
+							MessageDialog msd = new MessageDialog(tkv.getViewSite().getShell(),
 									Messages.KonsDetailView_ChangeCaseCaption, // $NON-NLS-1$
 									Images.IMG_LOGO.getImage(ImageSize._75x66_TitleDialogIconSize),
 									MessageFormat.format(Messages.KonsDetailView_ConfirmChangeConsToCase,
@@ -60,14 +60,14 @@ public class ComboFallSelectionListener implements ISelectionChangedListener {
 									0); // $NON-NLS-1$
 							if (msd.open() == Window.OK) {
 								Result<IEncounter> transferResult = EncounterServiceHolder.get()
-										.transferToCoverage(view.actEncounter, changeToCoverage, false);
+										.transferToCoverage(tkv.actEncounter, changeToCoverage, false);
 								if (!transferResult.isOK()) {
 									SWTHelper.alert("Error", transferResult.toString());
 								}
 
 							} else {
 								ignoreSelectionEventOnce();
-								view.tableComboViewerFall.setSelection(new StructuredSelection(actCoverage));
+								tkv.casesComposite.tableComboViewerFall.setSelection(new StructuredSelection(actCoverage));
 							}
 						}
 					}

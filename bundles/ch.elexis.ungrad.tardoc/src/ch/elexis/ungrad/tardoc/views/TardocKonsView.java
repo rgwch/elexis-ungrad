@@ -1,7 +1,6 @@
 package ch.elexis.ungrad.tardoc.views;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -10,64 +9,34 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.nebula.jface.tablecomboviewer.TableComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.part.ViewPart;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.slf4j.LoggerFactory;
 
 import ch.elexis.core.common.ElexisEventTopics;
-import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.service.ContextServiceHolder;
-import ch.elexis.core.model.IContact;
 import ch.elexis.core.model.ICoverage;
 import ch.elexis.core.model.IEncounter;
-import ch.elexis.core.model.IMandator;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.model.IUser;
-import ch.elexis.core.model.ac.EvACEs;
-import ch.elexis.core.services.holder.AccessControlServiceHolder;
-import ch.elexis.core.services.holder.BillingServiceHolder;
-import ch.elexis.core.services.holder.CoreModelServiceHolder;
-import ch.elexis.core.time.TimeUtil;
 import ch.elexis.core.ui.UiDesk;
-import ch.elexis.core.ui.actions.GlobalActions;
-import ch.elexis.core.ui.data.UiMandant;
-import ch.elexis.core.ui.dialogs.KontaktSelektor;
 import ch.elexis.core.ui.services.EncounterServiceHolder;
 import ch.elexis.core.ui.text.EnhancedTextField;
-import ch.elexis.core.ui.util.CoverageComparator;
 import ch.elexis.core.ui.util.IKonsExtension;
-import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.views.Messages;
-import ch.elexis.core.ui.views.provider.CoverageColorLabelProvider;
-import ch.elexis.data.Mandant;
 import ch.elexis.ungrad.tardoc.services.BillingsManager;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
 import ch.elexis.ungrad.tardoc.services.TardocManagerHolder;
-import ch.rgw.tools.Result;
 import ch.rgw.tools.TimeTool;
 import ch.rgw.tools.VersionedResource;
 import ch.rgw.tools.VersionedResource.ResourceItem;
@@ -84,28 +53,24 @@ public class TardocKonsView extends ViewPart {
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID = "ch.elexis.ungrad.tardoc.views.TardocKonsView";
-	private static final String NO_CONS_SELECTED = Messages.KonsDetailView_NoConsSelected; // $NON-NLS-1$
 
 	Hashtable<String, IKonsExtension> hXrefs;
 	EnhancedTextField text;
-	private Hyperlink hlMandant, hlDate;
-	TableComboViewer tableComboViewerFall;
 	private TimerComposite timerComposite;
-	private ComboFallSelectionListener comboFallSelectionListener;
+	CasesComposite casesComposite;
 	BillingsManager billingsManager = new BillingsManager(this);
-	private FormToolkit tk = UiDesk.getToolkit();
 
 	protected IEncounter actEncounter;
 	IPatient actPat;
 	private boolean created = false;
 
-	private Composite cDesc;
-
+	private DetailsComposite cDesc;
 
 	// Text area
 
 	// Billing positions
 	private BillingPositionsComposite billingPositionsComposite;
+
 	private SashForm sashForm;
 	private boolean billingPositionsVisible = true;
 	private Action toggleBillingPositionsAction;
@@ -204,20 +169,7 @@ public class TardocKonsView extends ViewPart {
 	}
 
 	private void updateFallCombo() {
-		IPatient pat = ContextServiceHolder.get().getRootContext().getTyped(IPatient.class).orElse(null);
-		if (pat != null && tableComboViewerFall != null) {
-			List<ICoverage> coverages = pat.getCoverages();
-			Collections.sort(coverages, new CoverageComparator());
-			tableComboViewerFall.setInput(coverages);
-			if (actEncounter != null) {
-				comboFallSelectionListener.ignoreSelectionEventOnce();
-				tableComboViewerFall.setSelection(new StructuredSelection(actEncounter.getCoverage()));
-			}
-			// needed for initial background colours
-			tableComboViewerFall.getTableCombo().setTableVisible(true);
-			tableComboViewerFall.getTableCombo().setTableVisible(false);
-			tableComboViewerFall.refresh();
-		}
+		casesComposite.refreshCases(actEncounter);
 	}
 
 	@Inject
@@ -243,53 +195,15 @@ public class TardocKonsView extends ViewPart {
 					getVersionRemark());
 			text.setDirty(false);
 		}
-
+		cDesc.setEncounter(encounter);
 		if (encounter != null) {
 			ICoverage coverage = encounter.getCoverage();
 			// TODO remove, pat should be already set via context
 			setPatient(coverage.getPatient());
 			setKonsText(encounter, encounter.getVersionedEntry().getHeadVersion());
 
-			comboFallSelectionListener.ignoreSelectionEventOnce();
-			tableComboViewerFall.setSelection(new StructuredSelection(coverage));
-			tableComboViewerFall.getTableCombo().setEnabled(coverage.isOpen());
-			IMandator mandator = encounter.getMandator();
-			String encounterDate = TimeUtil.formatSafe(encounter.getDate());
-			hlDate.setText(encounterDate + " (" //$NON-NLS-1$
-					+ new TimeTool(encounter.getDate()).getDurationToNowString() + ")"); //$NON-NLS-1$
-			StringBuilder sb = new StringBuilder();
-			if (mandator == null) {
-				sb.append(Messages.KonsDetailView_NotYours); // $NON-NLS-1$
-				hlMandant.setBackground(hlMandant.getParent().getBackground());
-			} else {
-				IContact biller = mandator.getBiller();
-				if (biller.getId().equals(mandator.getId())) {
-					sb.append("(").append(mandator.getLabel()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-				} else {
-					sb.append("(").append(mandator.getLabel()).append("/").append( //$NON-NLS-1$ //$NON-NLS-2$
-							biller.getLabel()).append(")"); //$NON-NLS-1$
-				}
-				hlMandant.setBackground(UiMandant.getColorForMandator(Mandant.load(mandator.getId())));
-			}
-			hlMandant.setText(sb.toString());
+			casesComposite.setEncounter(coverage);
 
-			boolean hlMandantEnabled = BillingServiceHolder.get().isEditable(encounter).isOK()
-					&& AccessControlServiceHolder.get().evaluate(EvACEs.KONS_REASSIGN);
-			hlMandant.setEnabled(hlMandantEnabled);
-			// diagnosesDisplay.setEncounter(encounter);
-			// billedDisplay.setEncounter(encounter);
-			// billedDisplay.setEnabled(true);
-			// diagnosesDisplay.setEnabled(true);
-			if (BillingServiceHolder.get().isEditable(encounter).isOK()) {
-				text.setEnabled(true);
-				text.setToolTipText(StringUtils.EMPTY);
-				hlDate.setForeground(UiDesk.getColor(UiDesk.COL_BLACK));
-				hlDate.setBackground(UiDesk.getColor(UiDesk.COL_GREY20));
-			} else {
-				text.setToolTipText("Konsultation geschlossen oder nicht von Ihnen");
-				hlDate.setForeground(UiDesk.getColor(UiDesk.COL_WHITE));
-				hlDate.setBackground(UiDesk.getColor(UiDesk.COL_GREY20));
-			}
 			if (encounter.getDate().isEqual(LocalDate.now())) {
 				text.setTextBackground(UiDesk.getColor(UiDesk.COL_WHITE));
 			} else {
@@ -298,10 +212,6 @@ public class TardocKonsView extends ViewPart {
 			billingsManager.setEncounter(encounter);
 			billingPositionsComposite.setKons(encounter);
 		} else {
-			hlDate.setText("-"); //$NON-NLS-1$
-			hlMandant.setText("--"); //$NON-NLS-1$
-			hlMandant.setEnabled(false);
-			hlMandant.setBackground(hlMandant.getParent().getBackground());
 			// diagnosesDisplay.clear();
 			// billedDisplay.clear();
 			text.setText(StringUtils.EMPTY);
@@ -348,10 +258,9 @@ public class TardocKonsView extends ViewPart {
 		topSection.setLayout(topLayout);
 		topSection.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-		createDetailsSection(topSection);
-		createFallSection(topSection);
-		timerComposite = new TimerComposite(topSection,this);
-	
+		cDesc = new DetailsComposite(topSection, this);
+		casesComposite = new CasesComposite(topSection, this);
+		timerComposite = new TimerComposite(topSection, this);
 
 		// Create SashForm for resizable sections
 		sashForm = new SashForm(parent, SWT.VERTICAL);
@@ -409,74 +318,6 @@ public class TardocKonsView extends ViewPart {
 		ContextServiceHolder.get().getTyped(IEncounter.class).ifPresent(e -> selectedEncounter(e));
 
 		getSite().getPage().addPartListener(udpateOnVisible);
-
-	}
-
-	private void createDetailsSection(final Composite parent) {
-		cDesc = new Composite(parent, SWT.NONE);
-		cDesc.setLayout(new RowLayout(SWT.HORIZONTAL));
-		GridData gdDesc = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		gdDesc.widthHint = 200;
-		cDesc.setLayoutData(gdDesc);
-		// emFont = UiDesk.getFont("Helvetica", 11, SWT.BOLD); //$NON-NLS-1$
-		// defaultBackground = p.getBackground();
-		hlDate = tk.createHyperlink(cDesc, NO_CONS_SELECTED, SWT.NONE);
-		// hlDate.setFont(emFont);
-		hlDate.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
-			public void linkActivated(HyperlinkEvent e) {
-				GlobalActions.redateAction.reflectRight();
-				if (GlobalActions.redateAction.isEnabled()) {
-					GlobalActions.redateAction.doRun();
-				}
-			}
-		});
-
-		hlMandant = tk.createHyperlink(cDesc, "--", SWT.NONE); //$NON-NLS-1$
-		hlMandant.addHyperlinkListener(new HyperlinkAdapter() {
-
-			@Override
-			public void linkActivated(HyperlinkEvent e) {
-				// CommonViewer of KontaktSelektor will set Mandant selection of
-				// ElexisEventDispatcher
-				// we want do reset to current mandant afterwards
-				Mandant currentMandant = ElexisEventDispatcher.getSelectedMandator();
-				KontaktSelektor ksl = new KontaktSelektor(getSite().getShell(), Mandant.class,
-						Messages.Core_Select_Mandator, // $NON-NLS-1$
-						Messages.KonsDetailView_SelectMandatorBody,
-						new String[] { Mandant.FLD_SHORT_LABEL, Mandant.FLD_NAME1, Mandant.FLD_NAME2 }); // $NON-NLS-1$
-				ksl.disableContextSelection();
-				if (ksl.open() == Dialog.OK) {
-					IMandator mandator = CoreModelServiceHolder.get()
-							.load(((Mandant) ksl.getSelection()).getId(), IMandator.class).orElse(null);
-					if (mandator != null) {
-						Result<IEncounter> result = EncounterServiceHolder.get().transferToMandator(actEncounter,
-								mandator, false);
-						if (!result.isOK()) {
-							MessageDialog.openError(getSite().getShell(), Messages.Core_Error,
-									result.getCombinedMessages());
-						}
-					}
-				}
-				ElexisEventDispatcher.fireSelectionEvent(currentMandant);
-			}
-
-		});
-		hlMandant.setBackground(parent.getBackground());
-
-	}
-
-	private void createFallSection(final Composite parent) {
-		tableComboViewerFall = new TableComboViewer(parent, SWT.SINGLE | SWT.BORDER);
-		tableComboViewerFall.setContentProvider(ArrayContentProvider.getInstance());
-		tableComboViewerFall.setLabelProvider(new CoverageColorLabelProvider());
-
-		comboFallSelectionListener = new ComboFallSelectionListener(this);
-		tableComboViewerFall.addSelectionChangedListener(comboFallSelectionListener);
-		GridData gdFall = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		tableComboViewerFall.getTableCombo().setLayoutData(gdFall);
-		tableComboViewerFall.getTableCombo().setTableVisible(true);
-		tableComboViewerFall.getTableCombo().setTableVisible(false);
 
 	}
 
@@ -560,7 +401,7 @@ public class TardocKonsView extends ViewPart {
 		toggleBillingPositionsAction.setChecked(billingPositionsVisible);
 	}
 
-		@Override
+	@Override
 	public void setFocus() {
 		if (text != null && !text.isDisposed()) {
 			text.setFocus();
