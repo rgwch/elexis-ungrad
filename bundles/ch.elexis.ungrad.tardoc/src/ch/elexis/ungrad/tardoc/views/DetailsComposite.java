@@ -93,6 +93,10 @@ public class DetailsComposite extends Composite {
 	}
 
 	void setEncounter(IEncounter enc) {
+		if (isDisposed() || hlDate == null || hlDate.isDisposed() || hlMandant == null || hlMandant.isDisposed()) {
+			return;
+		}
+		
 		if (enc == null) {
 			hlDate.setText("---"); //$NON-NLS-1$
 			hlMandant.setText("---"); //$NON-NLS-1$

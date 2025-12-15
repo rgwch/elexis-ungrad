@@ -1,14 +1,18 @@
 package ch.elexis.ungrad.tardoc.views;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 public class TimerComposite extends Composite {
 	TardocKonsView tkv;
@@ -21,10 +25,19 @@ public class TimerComposite extends Composite {
 	private boolean isRunning = false;
 	private boolean isPaused = false;
 	private Runnable timerRunnable;
+	
+	// Icons
+	private Image playIcon;
+	private Image pauseIcon;
+	private Image stopIcon;
 
 	public TimerComposite(Composite parent, TardocKonsView view) {
 		super(parent, SWT.NONE);
 		this.tkv = view;
+		
+		// Load icons
+		loadIcons();
+		
 		GridLayout timerLayout = new GridLayout(3, false);
 		timerLayout.marginWidth = 0;
 		timerLayout.marginHeight = 0;
@@ -41,7 +54,12 @@ public class TimerComposite extends Composite {
 
 		// Start/Pause button
 		startPauseButton = new Button(this, SWT.PUSH);
-		startPauseButton.setText("Start");
+		startPauseButton.setImage(playIcon);
+		startPauseButton.setToolTipText("Start timer");
+		GridData gdStartPause = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+		gdStartPause.widthHint = 24;
+		gdStartPause.heightHint = 24;
+		startPauseButton.setLayoutData(gdStartPause);
 		startPauseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -51,7 +69,12 @@ public class TimerComposite extends Composite {
 
 		// Reset button
 		resetButton = new Button(this, SWT.PUSH);
-		resetButton.setText("Reset");
+		resetButton.setImage(stopIcon);
+		resetButton.setToolTipText("Reset timer");
+		GridData gdReset = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+		gdReset.widthHint = 24;
+		gdReset.heightHint = 24;
+		resetButton.setLayoutData(gdReset);
 		resetButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -59,6 +82,25 @@ public class TimerComposite extends Composite {
 			}
 		});
 
+	}
+	
+	/**
+	 * Loads the icon images from the icons folder
+	 */
+	private void loadIcons() {
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+		
+		ImageDescriptor playDesc = ImageDescriptor.createFromURL(
+			bundle.getEntry("icons/media-play-4x.png"));
+		playIcon = playDesc.createImage();
+		
+		ImageDescriptor pauseDesc = ImageDescriptor.createFromURL(
+			bundle.getEntry("icons/media-pause-4x.png"));
+		pauseIcon = pauseDesc.createImage();
+		
+		ImageDescriptor stopDesc = ImageDescriptor.createFromURL(
+			bundle.getEntry("icons/media-stop-4x.png"));
+		stopIcon = stopDesc.createImage();
 	}
 
 	/**
@@ -91,7 +133,8 @@ public class TimerComposite extends Composite {
 		}
 
 		isRunning = true;
-		startPauseButton.setText("Pause");
+		startPauseButton.setImage(pauseIcon);
+		startPauseButton.setToolTipText("Pause timer");
 
 		// Create and schedule timer runnable
 		timerRunnable = new Runnable() {
@@ -113,7 +156,8 @@ public class TimerComposite extends Composite {
 		isRunning = false;
 		isPaused = true;
 		pausedTime = System.currentTimeMillis() - startTime;
-		startPauseButton.setText("Start");
+		startPauseButton.setImage(playIcon);
+		startPauseButton.setToolTipText("Start timer");
 	}
 
 	/**
@@ -124,7 +168,8 @@ public class TimerComposite extends Composite {
 		isPaused = false;
 		startTime = 0;
 		pausedTime = 0;
-		startPauseButton.setText("Start");
+		startPauseButton.setImage(playIcon);
+		startPauseButton.setToolTipText("Start timer");
 		updateTimerDisplay();
 	}
 
@@ -156,6 +201,18 @@ public class TimerComposite extends Composite {
 		if (isRunning) {
 			isRunning = false;
 		}
+		
+		// Dispose of icon images
+		if (playIcon != null && !playIcon.isDisposed()) {
+			playIcon.dispose();
+		}
+		if (pauseIcon != null && !pauseIcon.isDisposed()) {
+			pauseIcon.dispose();
+		}
+		if (stopIcon != null && !stopIcon.isDisposed()) {
+			stopIcon.dispose();
+		}
+		
 		super.dispose();
 	}
 

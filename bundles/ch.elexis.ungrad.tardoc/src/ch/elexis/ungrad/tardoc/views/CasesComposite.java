@@ -105,6 +105,10 @@ public class CasesComposite extends Composite {
 	}
 
 	void refreshCases(IEncounter actEncounter) {
+		if (isDisposed() || coverageLink == null || coverageLink.isDisposed()) {
+			return;
+		}
+		
 		IPatient pat = ContextServiceHolder.get().getRootContext().getTyped(IPatient.class).orElse(null);
 		currentPatient = pat;
 		
@@ -120,6 +124,10 @@ public class CasesComposite extends Composite {
 	}
 	
 	void setEncounter(ICoverage coverage) {
+		if (isDisposed() || coverageLink == null || coverageLink.isDisposed()) {
+			return;
+		}
+		
 		currentCoverage = coverage;
 		updateLinkText(coverage);
 		updateLinkColor(coverage);
@@ -127,6 +135,10 @@ public class CasesComposite extends Composite {
 	}
 	
 	private void updateLinkText(ICoverage coverage) {
+		if (isDisposed() || coverageLink == null || coverageLink.isDisposed()) {
+			return;
+		}
+		
 		if (coverage != null) {
 			String label = coverage.getLabel();
 			if (!coverage.isOpen()) {
@@ -140,6 +152,10 @@ public class CasesComposite extends Composite {
 	}
 	
 	private void updateLinkColor(ICoverage coverage) {
+		if (isDisposed() || coverageLink == null || coverageLink.isDisposed()) {
+			return;
+		}
+		
 		if (coverage != null) {
 			// Use similar color logic as CoverageColorLabelProvider
 			Color color;

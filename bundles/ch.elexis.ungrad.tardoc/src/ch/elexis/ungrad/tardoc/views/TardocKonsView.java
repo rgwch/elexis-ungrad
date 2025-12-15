@@ -82,7 +82,7 @@ public class TardocKonsView extends ViewPart {
 	private IPartListener2 udpateOnVisible = new IPartListener2() {
 		@Override
 		public void partActivated(org.eclipse.ui.IWorkbenchPartReference partRef) {
-			if (actEncounter != null && !text.isDirty()) {
+			if (actEncounter != null && text != null && !text.isDisposed() && !text.isDirty()) {
 				setKonsText(actEncounter, actEncounter.getVersionedEntry().getHeadVersion());
 			}
 		}
@@ -147,7 +147,7 @@ public class TardocKonsView extends ViewPart {
 
 	@Inject
 	void updateCoverage(@Optional @UIEventTopic(ElexisEventTopics.EVENT_UPDATE) ICoverage coverage) {
-		if (created) {
+		if (created && casesComposite != null && !casesComposite.isDisposed()) {
 			updateFallCombo();
 		}
 	}
@@ -398,7 +398,27 @@ public class TardocKonsView extends ViewPart {
 			// Show the billing positions
 			if (billingPositionsComposite != null && !billingPositionsComposite.isDisposed()) {
 				billingPositionsComposite.setVisible(true);
-				sashForm.setWeights(new int[] { 70, 30 });
+				
+				// Restore saved weights from memento if available
+				int[] weights = DEFAULT_WEIGHTS;
+				if (memento != null) {
+					String savedWeights = memento.getString("billings_height");
+					if (savedWeights != null) {
+						String[] parts = savedWeights.split(StringConstants.COMMA);
+						if (parts.length == 2) {
+							try {
+								weights = new int[] { 
+									Integer.parseInt(parts[0].trim()), 
+									Integer.parseInt(parts[1].trim()) 
+								};
+							} catch (NumberFormatException e) {
+								// Use default weights if parsing fails
+								weights = DEFAULT_WEIGHTS;
+							}
+						}
+					}
+				}
+				sashForm.setWeights(weights);
 				sashForm.setMaximizedControl(null); // Restore normal layout
 			}
 		} else {
@@ -424,6 +444,8 @@ public class TardocKonsView extends ViewPart {
 
 	@Override
 	public void dispose() {
+		created = false;
+		getSite().getPage().removePartListener(udpateOnVisible);
 		super.dispose();
 	}
 	
