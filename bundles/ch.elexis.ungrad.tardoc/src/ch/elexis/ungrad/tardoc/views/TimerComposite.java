@@ -91,15 +91,15 @@ public class TimerComposite extends Composite {
 		Bundle bundle = FrameworkUtil.getBundle(getClass());
 		
 		ImageDescriptor playDesc = ImageDescriptor.createFromURL(
-			bundle.getEntry("icons/media-play-4x.png"));
+			bundle.getEntry("icons/media-play-2x.png"));
 		playIcon = playDesc.createImage();
 		
 		ImageDescriptor pauseDesc = ImageDescriptor.createFromURL(
-			bundle.getEntry("icons/media-pause-4x.png"));
+			bundle.getEntry("icons/media-pause-2x.png"));
 		pauseIcon = pauseDesc.createImage();
 		
 		ImageDescriptor stopDesc = ImageDescriptor.createFromURL(
-			bundle.getEntry("icons/media-stop-4x.png"));
+			bundle.getEntry("icons/media-stop-2x.png"));
 		stopIcon = stopDesc.createImage();
 	}
 
