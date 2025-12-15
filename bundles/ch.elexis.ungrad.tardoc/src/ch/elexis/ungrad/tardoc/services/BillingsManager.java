@@ -30,9 +30,20 @@ public class BillingsManager {
 	private IEncounter kons;
 	private Konsultation b;
 	private TardocKonsView tkv;
+	private TardocConfig config;
 
 	public BillingsManager(TardocKonsView view) {
-		this.tkv=view;
+		this.tkv = view;
+		// read rsc/config.json and parse it with gson
+		this.config = TardocConfig.load();
+	}
+	
+	/**
+	 * Get the loaded configuration
+	 * @return the TardocConfig instance or null if loading failed
+	 */
+	public TardocConfig getConfig() {
+		return config;
 	}
 
 	public void setEncounter(IEncounter kons) {

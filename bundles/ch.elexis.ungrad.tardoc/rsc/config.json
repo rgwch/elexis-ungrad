@@ -1,0 +1,32 @@
+{
+	"3010":{
+		"autobilling_enabled": true,
+		"initial_billing": "CA.00.0010",
+		"followup_billing": {
+			"code": "CA.00.0030",	
+			"after": "1",
+			"every": "1"
+		},
+		"stop_timer": {
+            "AA.05.0010":"Blutdruck/Puls: \nGewicht: \nperiphere Pulse: oB\nZirkulation: oB\nVenenverhältnisse: oB",
+            "AA.05.0020":"Lider: unauff\nKonjunktiven: unauff\nCornea: unauff\nBrechende Medien: unaauff\n,Kammerwinkel: normal\nPupillenmotilitöt: normal\nAugenmbeweglichkeit: normal\n",
+			"AA.05.0030":"Ohrmuscheln: unauff\nGehörgang: unauff\nTrommelfell: unauff\nMastoid: unauff\nRegionale LK: unauff\n",
+			"AA.05.0040":"Atmung: unauff\nMund: unauff\nTonsillen: bland\nRachen: unauff\nSinus: indolent\nAuskultation: unauff\nPerkussion: unauff\n",
+			"AA.05.0050":"",
+			"AA.05.0070":"",
+			"AA.05.0080":"",
+			"AA.05.0090":"",
+			"AA.05.0100":"",
+			"AA.05.0110":"",
+			"AA.05.0120":"",
+			"AA.05.0130":"",
+			"AA.05.0140":""
+        },
+	"continue_timer":{
+		"AA.00.0060":"Besprechung: \n",
+		"AA.00.0070":"Instruktion: \n",
+		"AA.00.0080":"Konsilium: \n",
+        "AA.00.0090":"Impfberatung: \n",
+		}
+	}
+}

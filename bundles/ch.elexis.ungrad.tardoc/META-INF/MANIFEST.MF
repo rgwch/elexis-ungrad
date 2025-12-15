@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.swt,
  ch.elexis.core.data;bundle-version="3.13.0",
  ch.elexis.core.jpa.entities;bundle-version="3.13.0",
  ch.elexis.core.ui,
- org.eclipse.nebula.widgets.tablecombo
+ org.eclipse.nebula.widgets.tablecombo,
+ com.google.gson;bundle-version="2.12.1"
 Automatic-Module-Name: ch.elexis.ungrad.tardoc
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-21
