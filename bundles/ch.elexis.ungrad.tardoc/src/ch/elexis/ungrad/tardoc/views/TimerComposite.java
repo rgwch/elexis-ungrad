@@ -23,7 +23,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
@@ -37,11 +36,6 @@ public class TimerComposite extends Composite {
 	private Label timerLabel;
 	private Button startPauseButton;
 	private Button resetButton;
-	private long startTime;
-	private long pausedTime;
-	private boolean isRunning = false;
-	private boolean isPaused = false;
-	private Runnable timerRunnable;
 
 	// Icons
 	private Image playIcon;
@@ -98,7 +92,9 @@ public class TimerComposite extends Composite {
 				resetTimer();
 			}
 		});
-
+		this.tkv.encounterTimer.addTimerListener(newTime -> {
+			getDisplay().asyncExec(() -> updateDisplay(newTime));
+		});
 	}
 
 	/**
@@ -121,103 +117,47 @@ public class TimerComposite extends Composite {
 	 * Toggles the timer between start/pause states
 	 */
 	private void toggleTimer() {
-		if (!isRunning) {
-			startTimer();
+		if (!this.tkv.encounterTimer.isRunning()) {
+			this.tkv.encounterTimer.resume();
+			startPauseButton.setImage(pauseIcon);
+			startPauseButton.setToolTipText("Pause timer");
 		} else {
-			pauseTimer();
+			this.tkv.encounterTimer.pause();
+			startPauseButton.setImage(playIcon);
+			startPauseButton.setToolTipText("Start timer");
 		}
-	}
-
-	/**
-	 * Starts the timer. Auto-Adds billing positions based on mandator's Dignity,
-	 */
-	private void startTimer() {
-		if (isPaused) {
-			// Resume from paused state
-			startTime = System.currentTimeMillis() - pausedTime;
-			isPaused = false;
-		} else {
-			// Fresh start - check conditions for auto-billing CA00.0010
-			startTime = System.currentTimeMillis();
-			pausedTime = 0;
-
-			// Auto-bill CA00.0010 if conditions are met
-			this.tkv.billingsManager.autostart();
-
-		}
-
-		isRunning = true;
-		startPauseButton.setImage(pauseIcon);
-		startPauseButton.setToolTipText("Pause timer");
-
-		// Create and schedule timer runnable
-		timerRunnable = new Runnable() {
-			@Override
-			public void run() {
-				if (isRunning && !timerLabel.isDisposed()) {
-					updateTimerDisplay();
-					Display.getCurrent().timerExec(1000, this);
-				}
-			}
-		};
-		Display.getCurrent().timerExec(1000, timerRunnable);
-	}
-
-	/**
-	 * Pauses the timer
-	 */
-	void pauseTimer() {
-		isRunning = false;
-		isPaused = true;
-		pausedTime = System.currentTimeMillis() - startTime;
-		startPauseButton.setImage(playIcon);
-		startPauseButton.setToolTipText("Start timer");
-		this.tkv.billingsManager.stopTimer();
-
 	}
 
 	/**
 	 * Resets the timer to 00:00
 	 */
 	private void resetTimer() {
-		isRunning = false;
-		isPaused = false;
-		startTime = 0;
-		pausedTime = 0;
 		startPauseButton.setImage(playIcon);
 		startPauseButton.setToolTipText("Start timer");
-		updateTimerDisplay();
+		this.tkv.encounterTimer.stop();
+		updateDisplay(0L);
 	}
 
-	/**
-	 * Updates the timer display label
-	 */
-	void updateTimerDisplay() {
-		if (timerLabel == null || timerLabel.isDisposed()) {
-			return;
-		}
-
-		long elapsedTime = 0;
-		if (isRunning) {
-			elapsedTime = System.currentTimeMillis() - startTime;
-		} else if (isPaused) {
-			elapsedTime = pausedTime;
-		}
-
-		long minutes = elapsedTime / (60 * 1000);
-		long seconds = (elapsedTime % (60 * 1000)) / 1000;
-
+	public void updateDisplay(long elapsedSeconds) {
+		long minutes = elapsedSeconds / 60;
+		long seconds = elapsedSeconds % 60;
 		String timeString = String.format("%02d:%02d", minutes, seconds);
-		timerLabel.setText(timeString);
+		if (timerLabel != null && !timerLabel.isDisposed()) {
+			timerLabel.setText(timeString);
+		}
+		if(this.tkv.encounterTimer.isRunning()) {
+			startPauseButton.setImage(pauseIcon);
+			startPauseButton.setToolTipText("Pause timer");
+		} else {
+			startPauseButton.setImage(playIcon);
+			startPauseButton.setToolTipText("Start timer");
+		}	
 	}
 
 	@Override
 	public void dispose() {
 		// Stop timer when view is disposed
-		if (isRunning) {
-			isRunning = false;
-		}
-
+		this.tkv.encounterTimer.stop();
 		// Dispose of icon images
 		if (playIcon != null && !playIcon.isDisposed()) {
 			playIcon.dispose();

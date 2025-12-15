@@ -50,6 +50,7 @@ import ch.elexis.core.ui.text.EnhancedTextField;
 import ch.elexis.core.ui.util.IKonsExtension;
 import ch.elexis.core.ui.views.Messages;
 import ch.elexis.ungrad.tardoc.services.BillingsManager;
+import ch.elexis.ungrad.tardoc.services.EncounterTimer;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
 import ch.elexis.ungrad.tardoc.services.TardocManagerHolder;
 import ch.rgw.tools.TimeTool;
@@ -69,7 +70,8 @@ public class TardocKonsView extends ViewPart {
 
 	Hashtable<String, IKonsExtension> hXrefs;
 	EnhancedTextField text;
-	private TimerComposite timerComposite;
+	public TimerComposite timerComposite;
+	public EncounterTimer encounterTimer=new EncounterTimer(this);
 	CasesComposite casesComposite;
 	BillingsManager billingsManager = new BillingsManager(this);
 
@@ -325,10 +327,6 @@ public class TardocKonsView extends ViewPart {
 			}
 		}
 		sashForm.setWeights(weights);
-
-		// Initialize timer display
-		timerComposite.updateTimerDisplay();
-
 		// Create toolbar actions
 		createActions();
 		contributeToActionBars();
@@ -448,6 +446,7 @@ public class TardocKonsView extends ViewPart {
 	@Override
 	public void dispose() {
 		created = false;
+		this.encounterTimer.dispose();
 		getSite().getPage().removePartListener(udpateOnVisible);
 		super.dispose();
 	}
