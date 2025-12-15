@@ -59,8 +59,6 @@ import jakarta.inject.Inject;
 
 /**
  * Tardoc consultation view with timer, text area, and billing positions list.
- * Features: - Timer with start/pause functionality - Free text entry area -
- * Billing positions list viewer
  */
 public class TardocKonsView extends ViewPart {
 
@@ -283,11 +281,11 @@ public class TardocKonsView extends ViewPart {
 
 		// DetailsComposite on the left (fixed width)
 		cDesc = new DetailsComposite(topSection, this);
-		
+
 		// CasesComposite in the center (expands to fill available space)
 		casesComposite = new CasesComposite(topSection, this);
 		casesComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		
+
 		// TimerComposite on the right (fixed width)
 		timerComposite = new TimerComposite(topSection, this);
 
@@ -299,7 +297,6 @@ public class TardocKonsView extends ViewPart {
 		text = new EnhancedTextField(sashForm, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		text.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-	
 
 		// Create billing positions section in the sash form
 		billingPositionsComposite = new BillingPositionsComposite(sashForm, SWT.NONE, this);
@@ -310,7 +307,6 @@ public class TardocKonsView extends ViewPart {
 		// Set selection provider for the site
 		getSite().setSelectionProvider(billingPositionsComposite.getBillingPositionsViewer());
 
-
 		// Set initial weights (70% text area, 30% billing positions)
 		// Restore saved weights from memento if available
 		int[] weights = DEFAULT_WEIGHTS;
@@ -320,10 +316,7 @@ public class TardocKonsView extends ViewPart {
 				String[] parts = savedWeights.split(StringConstants.COMMA);
 				if (parts.length == 2) {
 					try {
-						weights = new int[] { 
-							Integer.parseInt(parts[0].trim()), 
-							Integer.parseInt(parts[1].trim()) 
-						};
+						weights = new int[] { Integer.parseInt(parts[0].trim()), Integer.parseInt(parts[1].trim()) };
 					} catch (NumberFormatException e) {
 						// Use default weights if parsing fails
 						weights = DEFAULT_WEIGHTS;
@@ -379,7 +372,6 @@ public class TardocKonsView extends ViewPart {
 
 	}
 
-	
 	/**
 	 * Creates the toolbar actions
 	 */
@@ -411,7 +403,7 @@ public class TardocKonsView extends ViewPart {
 			// Show the billing positions
 			if (billingPositionsComposite != null && !billingPositionsComposite.isDisposed()) {
 				billingPositionsComposite.setVisible(true);
-				
+
 				// Restore saved weights from memento if available
 				int[] weights = DEFAULT_WEIGHTS;
 				if (memento != null) {
@@ -420,10 +412,8 @@ public class TardocKonsView extends ViewPart {
 						String[] parts = savedWeights.split(StringConstants.COMMA);
 						if (parts.length == 2) {
 							try {
-								weights = new int[] { 
-									Integer.parseInt(parts[0].trim()), 
-									Integer.parseInt(parts[1].trim()) 
-								};
+								weights = new int[] { Integer.parseInt(parts[0].trim()),
+										Integer.parseInt(parts[1].trim()) };
 							} catch (NumberFormatException e) {
 								// Use default weights if parsing fails
 								weights = DEFAULT_WEIGHTS;
@@ -461,7 +451,7 @@ public class TardocKonsView extends ViewPart {
 		getSite().getPage().removePartListener(udpateOnVisible);
 		super.dispose();
 	}
-	
+
 	@Override
 	public void saveState(IMemento memento) {
 		int[] w = sashForm.getWeights();

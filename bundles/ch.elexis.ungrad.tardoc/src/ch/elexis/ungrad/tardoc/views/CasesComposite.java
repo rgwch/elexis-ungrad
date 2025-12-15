@@ -25,7 +25,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 
 import ch.elexis.core.data.service.ContextServiceHolder;
@@ -39,6 +38,9 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.views.Messages;
 import ch.rgw.tools.Result;
 
+/**
+ * Composite for displaying and selecting cases (coverages) in the Tardoc consultation view.
+ */
 public class CasesComposite extends Composite {
 	private TardocKonsView tkv;
 	private Hyperlink coverageLink;
@@ -48,19 +50,19 @@ public class CasesComposite extends Composite {
 	public CasesComposite(Composite parent, TardocKonsView view) {
 		super(parent, SWT.NONE);
 		this.tkv = view;
-		
+
 		// Set layout for this composite
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginWidth = 5;
 		layout.marginHeight = 0;
 		setLayout(layout);
-		
+
 		// Create hyperlink
 		coverageLink = new Hyperlink(this, SWT.NONE);
 		coverageLink.setText("No case selected");
 		coverageLink.setUnderlined(true);
 		coverageLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		
+
 		// Add click listener to show dialog
 		coverageLink.addMouseListener(new MouseAdapter() {
 			@Override
@@ -74,13 +76,9 @@ public class CasesComposite extends Composite {
 		if (currentPatient == null) {
 			return;
 		}
-		
-		CoverageSelectionDialog dialog = new CoverageSelectionDialog(
-			getShell(), 
-			currentPatient, 
-			currentCoverage
-		);
-		
+
+		CoverageSelectionDialog dialog = new CoverageSelectionDialog(getShell(), currentPatient, currentCoverage);
+
 		if (dialog.open() == Window.OK) {
 			ICoverage selectedCoverage = dialog.getSelectedCoverage();
 			if (selectedCoverage != null && !selectedCoverage.equals(currentCoverage)) {
@@ -88,24 +86,20 @@ public class CasesComposite extends Composite {
 			}
 		}
 	}
-	
+
 	private void handleCoverageChange(ICoverage changeToCoverage) {
 		ICoverage actCoverage = currentCoverage;
 		String fallLabel = actCoverage != null ? actCoverage.getLabel() : "Current Case NOT found!!";
 
 		if (!changeToCoverage.isOpen()) {
-			SWTHelper.alert(Messages.Core_Case_is_closed,
-					Messages.KonsDetailView_CaseClosedBody);
+			SWTHelper.alert(Messages.Core_Case_is_closed, Messages.KonsDetailView_CaseClosedBody);
 		} else {
-			MessageDialog msd = new MessageDialog(getShell(),
-					Messages.KonsDetailView_ChangeCaseCaption,
+			MessageDialog msd = new MessageDialog(getShell(), Messages.KonsDetailView_ChangeCaseCaption,
 					Images.IMG_LOGO.getImage(ImageSize._75x66_TitleDialogIconSize),
 					MessageFormat.format(Messages.KonsDetailView_ConfirmChangeConsToCase,
 							new Object[] { fallLabel, changeToCoverage.getLabel() }),
-					MessageDialog.QUESTION, 
-					new String[] { Messages.Core_Yes, Messages.Corr_No },
-					0);
-			
+					MessageDialog.QUESTION, new String[] { Messages.Core_Yes, Messages.Corr_No }, 0);
+
 			if (msd.open() == Window.OK) {
 				if (tkv.actEncounter != null) {
 					Result<IEncounter> transferResult = EncounterServiceHolder.get()
@@ -122,10 +116,10 @@ public class CasesComposite extends Composite {
 		if (isDisposed() || coverageLink == null || coverageLink.isDisposed()) {
 			return;
 		}
-		
+
 		IPatient pat = ContextServiceHolder.get().getRootContext().getTyped(IPatient.class).orElse(null);
 		currentPatient = pat;
-		
+
 		if (actEncounter != null) {
 			currentCoverage = actEncounter.getCoverage();
 			updateLinkText(currentCoverage);
@@ -136,23 +130,23 @@ public class CasesComposite extends Composite {
 			coverageLink.setForeground(getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 		}
 	}
-	
+
 	void setEncounter(ICoverage coverage) {
 		if (isDisposed() || coverageLink == null || coverageLink.isDisposed()) {
 			return;
 		}
-		
+
 		currentCoverage = coverage;
 		updateLinkText(coverage);
 		updateLinkColor(coverage);
 		coverageLink.setEnabled(coverage != null && coverage.isOpen());
 	}
-	
+
 	private void updateLinkText(ICoverage coverage) {
 		if (isDisposed() || coverageLink == null || coverageLink.isDisposed()) {
 			return;
 		}
-		
+
 		if (coverage != null) {
 			String label = coverage.getLabel();
 			if (!coverage.isOpen()) {
@@ -164,12 +158,12 @@ public class CasesComposite extends Composite {
 		}
 		layout(true);
 	}
-	
+
 	private void updateLinkColor(ICoverage coverage) {
 		if (isDisposed() || coverageLink == null || coverageLink.isDisposed()) {
 			return;
 		}
-		
+
 		if (coverage != null) {
 			// Use similar color logic as CoverageColorLabelProvider
 			Color color;
