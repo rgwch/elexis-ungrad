@@ -166,12 +166,14 @@ public class TimerComposite extends Composite {
 	/**
 	 * Pauses the timer
 	 */
-	private void pauseTimer() {
+	void pauseTimer() {
 		isRunning = false;
 		isPaused = true;
 		pausedTime = System.currentTimeMillis() - startTime;
 		startPauseButton.setImage(playIcon);
 		startPauseButton.setToolTipText("Start timer");
+		this.tkv.billingsManager.stopTimer();
+
 	}
 
 	/**

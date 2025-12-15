@@ -76,11 +76,19 @@ public class TardocConfig {
 		public String code;
 		public String after;
 		public String every;
+		public String max;
 		
 		public String getCode() {
 			return code;
 		}
 		
+		public int getMax() {
+			try {
+				return Integer.parseInt(max);
+			} catch (NumberFormatException e) {
+				return 1;
+			}
+		}
 		public int getAfter() {
 			try {
 				return Integer.parseInt(after);
