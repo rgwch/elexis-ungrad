@@ -1,6 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2025 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad.tardoc.views;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;

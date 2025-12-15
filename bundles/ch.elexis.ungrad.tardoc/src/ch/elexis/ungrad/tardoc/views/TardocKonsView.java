@@ -1,3 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2025 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad.tardoc.views;
 
 import java.time.LocalDate;
@@ -15,7 +29,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IViewSite;

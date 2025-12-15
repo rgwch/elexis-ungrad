@@ -1,3 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2025 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad.tardoc.views;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -25,7 +39,7 @@ public class TimerComposite extends Composite {
 	private boolean isRunning = false;
 	private boolean isPaused = false;
 	private Runnable timerRunnable;
-	
+
 	// Icons
 	private Image playIcon;
 	private Image pauseIcon;
@@ -34,10 +48,10 @@ public class TimerComposite extends Composite {
 	public TimerComposite(Composite parent, TardocKonsView view) {
 		super(parent, SWT.NONE);
 		this.tkv = view;
-		
+
 		// Load icons
 		loadIcons();
-		
+
 		GridLayout timerLayout = new GridLayout(3, false);
 		timerLayout.marginWidth = 0;
 		timerLayout.marginHeight = 0;
@@ -83,23 +97,20 @@ public class TimerComposite extends Composite {
 		});
 
 	}
-	
+
 	/**
 	 * Loads the icon images from the icons folder
 	 */
 	private void loadIcons() {
 		Bundle bundle = FrameworkUtil.getBundle(getClass());
-		
-		ImageDescriptor playDesc = ImageDescriptor.createFromURL(
-			bundle.getEntry("icons/media-play-2x.png"));
+
+		ImageDescriptor playDesc = ImageDescriptor.createFromURL(bundle.getEntry("icons/media-play-2x.png"));
 		playIcon = playDesc.createImage();
-		
-		ImageDescriptor pauseDesc = ImageDescriptor.createFromURL(
-			bundle.getEntry("icons/media-pause-2x.png"));
+
+		ImageDescriptor pauseDesc = ImageDescriptor.createFromURL(bundle.getEntry("icons/media-pause-2x.png"));
 		pauseIcon = pauseDesc.createImage();
-		
-		ImageDescriptor stopDesc = ImageDescriptor.createFromURL(
-			bundle.getEntry("icons/media-stop-2x.png"));
+
+		ImageDescriptor stopDesc = ImageDescriptor.createFromURL(bundle.getEntry("icons/media-stop-2x.png"));
 		stopIcon = stopDesc.createImage();
 	}
 
@@ -201,7 +212,7 @@ public class TimerComposite extends Composite {
 		if (isRunning) {
 			isRunning = false;
 		}
-		
+
 		// Dispose of icon images
 		if (playIcon != null && !playIcon.isDisposed()) {
 			playIcon.dispose();
@@ -212,7 +223,7 @@ public class TimerComposite extends Composite {
 		if (stopIcon != null && !stopIcon.isDisposed()) {
 			stopIcon.dispose();
 		}
-		
+
 		super.dispose();
 	}
 
