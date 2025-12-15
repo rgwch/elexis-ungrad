@@ -28,6 +28,9 @@ import org.eclipse.swt.widgets.Label;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
+/**
+ * Composite for a start/pause/reset timer with auto-billing capabilities.
+ */
 public class TimerComposite extends Composite {
 	TardocKonsView tkv;
 	// Timer components

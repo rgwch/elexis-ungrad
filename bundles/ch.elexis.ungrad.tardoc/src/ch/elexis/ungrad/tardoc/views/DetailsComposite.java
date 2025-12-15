@@ -44,6 +44,9 @@ import ch.elexis.data.Mandant;
 import ch.rgw.tools.Result;
 import ch.rgw.tools.TimeTool;
 
+/**
+ * Composite for displaying and editing date and mandator of the current encounter.
+ */
 public class DetailsComposite extends Composite {
 	private TardocKonsView tkv;
 	private Hyperlink hlMandant, hlDate;

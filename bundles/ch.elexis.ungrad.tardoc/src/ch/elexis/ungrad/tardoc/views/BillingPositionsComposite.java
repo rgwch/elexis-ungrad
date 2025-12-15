@@ -50,9 +50,7 @@ import ch.elexis.ungrad.tardoc.services.TardocManager;
 import ch.elexis.ungrad.tardoc.services.TardocManagerHolder;
 
 /**
- * Composite for displaying billing positions with a table viewer. This
- * component is extracted from TardocKonsView to allow better separation of
- * concerns and to enable show/hide functionality.
+ * Composite for displaying billed positions and billing positions.
  */
 public class BillingPositionsComposite extends Composite {
 

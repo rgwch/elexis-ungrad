@@ -37,6 +37,9 @@ import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.util.CoverageComparator;
 import ch.elexis.core.ui.views.provider.CoverageColorLabelProvider;
 
+/**
+ * Dialog for selecting a coverage (case) for a patient.
+ */
 public class CoverageSelectionDialog extends Dialog {
 	private IPatient patient;
 	private ICoverage selectedCoverage;
