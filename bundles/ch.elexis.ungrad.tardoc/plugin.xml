@@ -10,7 +10,7 @@
       <view
             category="ch.elexis.ungrad.tardoc"
             class="ch.elexis.ungrad.tardoc.views.TardocKonsView"
-            icon="icons/sample.png"
+            icon="icons/tardoc.png"
             id="ch.elexis.ungrad.tardoc.views.TardocKonsView"
             inject="true"
             name="Tardoc">
