@@ -33,10 +33,14 @@
    <feature id="ch.elexis.ungrad.kassenbuch.feature">
       <category name="ch.elexis.ungrad.financial"/>
    </feature>
+   <feature url="features/ch.elexis.ungrad.tardoc.feature_0.0.0.jar" id="ch.elexis.ungrad.tardoc.feature" version="0.0.0">
+      <category name="ch.elexis.ungrad.emr"/>
+   </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
    <category-def name="ch.elexis.ungrad.common" label="Ungrad Gemeinsames"/>
    <category-def name="ch.elexis.ungrad.financial" label="Finanzen"/>
    <category-def name="ch.elexis.ungrad.articles" label="Artikel"/>
    <category-def name="ch.elexis.ungrad.importers" label="Importer"/>
+   <category-def name="ch.elexis.ungrad.emr" label="KG-Führung"/>
 </site>
