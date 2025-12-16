@@ -40,10 +40,12 @@ import org.slf4j.LoggerFactory;
 import ch.elexis.core.common.ElexisEventTopics;
 import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.data.service.LocalLockServiceHolder;
 import ch.elexis.core.model.ICoverage;
 import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.model.IUser;
+import ch.elexis.core.text.model.Samdas;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.services.EncounterServiceHolder;
 import ch.elexis.core.ui.text.EnhancedTextField;
@@ -68,7 +70,7 @@ public class TardocKonsView extends ViewPart {
 	public static final String ID = "ch.elexis.ungrad.tardoc.views.TardocKonsView";
 
 	Hashtable<String, IKonsExtension> hXrefs;
-	EnhancedTextField text;
+	EnhancedTextField etf;
 	public TimerComposite timerComposite;
 	public EncounterTimer encounterTimer = new EncounterTimer();
 	CasesComposite casesComposite;
@@ -94,7 +96,7 @@ public class TardocKonsView extends ViewPart {
 	private IPartListener2 udpateOnVisible = new IPartListener2() {
 		@Override
 		public void partActivated(org.eclipse.ui.IWorkbenchPartReference partRef) {
-			if (actEncounter != null && text != null && !text.isDisposed() && !text.isDirty()) {
+			if (actEncounter != null && etf != null && !etf.isDisposed() && !etf.isDirty()) {
 				setKonsText(actEncounter, actEncounter.getVersionedEntry().getHeadVersion());
 			}
 		}
@@ -102,10 +104,10 @@ public class TardocKonsView extends ViewPart {
 		@Override
 		public void partDeactivated(org.eclipse.ui.IWorkbenchPartReference partRef) {
 			// save entry on deactivation if text was edited
-			if (actEncounter != null && (text.isDirty())) {
-				EncounterServiceHolder.get().updateVersionedEntry(actEncounter, text.getContentsAsXML(),
+			if (actEncounter != null && (etf.isDirty())) {
+				EncounterServiceHolder.get().updateVersionedEntry(actEncounter, etf.getContentsAsXML(),
 						getVersionRemark());
-				text.setDirty(false);
+				etf.setDirty(false);
 				ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, actEncounter);
 			}
 		};
@@ -206,10 +208,10 @@ public class TardocKonsView extends ViewPart {
 	private synchronized void setKons(final IEncounter encounter) {
 		LoggerFactory.getLogger(getClass()).info("[KONS] " + (encounter != null ? encounter.getId() : "null"));
 
-		if (actEncounter != null && text.isDirty()) {
-			EncounterServiceHolder.get().updateVersionedEntry(actEncounter, text.getContentsAsXML(),
+		if (actEncounter != null && etf.isDirty()) {
+			EncounterServiceHolder.get().updateVersionedEntry(actEncounter, etf.getContentsAsXML(),
 					getVersionRemark());
-			text.setDirty(false);
+			etf.setDirty(false);
 		}
 		cDesc.setEncounter(encounter);
 		if (encounter != null) {
@@ -221,9 +223,9 @@ public class TardocKonsView extends ViewPart {
 			casesComposite.setEncounter(coverage);
 
 			if (encounter.getDate().isEqual(LocalDate.now())) {
-				text.setTextBackground(UiDesk.getColor(UiDesk.COL_WHITE));
+				etf.setTextBackground(UiDesk.getColor(UiDesk.COL_WHITE));
 			} else {
-				text.setTextBackground(UiDesk.getColor(UiDesk.COL_LIGHTBLUE)); // $NON-NLS-1$
+				etf.setTextBackground(UiDesk.getColor(UiDesk.COL_LIGHTBLUE)); // $NON-NLS-1$
 			}
 			billingsManager.setEncounter(encounter);
 			billingPositionsComposite.setKons(encounter);
@@ -231,8 +233,8 @@ public class TardocKonsView extends ViewPart {
 		} else {
 			// diagnosesDisplay.clear();
 			// billedDisplay.clear();
-			text.setText(StringUtils.EMPTY);
-			text.setEnabled(false);
+			etf.setText(StringUtils.EMPTY);
+			etf.setEnabled(false);
 			// billedDisplay.setEnabled(false);
 			// diagnosesDisplay.setEnabled(false);
 		}
@@ -253,14 +255,28 @@ public class TardocKonsView extends ViewPart {
 							new TimeTool(entry.timestamp).toString(TimeTool.FULL_GER))
 					.append(" (").append(entry.remark).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		text.setText(ntext);
-		text.setKons(encounter);
+		etf.setText(ntext);
+		etf.setKons(encounter);
 		// displayedVersion = version;
 		// versionBackAction.setEnabled(version != 0);
 		// versionFwdAction.setEnabled(version !=
 		// encounter.getVersionedEntry().getHeadVersion());
 	}
 
+	public void insertTextAtEndOfKons(String text) {
+		if (text == null || text.trim().isEmpty()) {
+			return;
+		}
+		ContextServiceHolder.get().getTyped(IEncounter.class).ifPresent(encounter -> {
+			if (LocalLockServiceHolder.get().acquireLock(encounter).isOk()) {
+				etf.replace(0,0,text);
+				EncounterServiceHolder.get().updateVersionedEntry(encounter, new Samdas(etf.getContentsAsXML()));
+
+				ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, encounter);
+				LocalLockServiceHolder.get().releaseLock(encounter);
+			}
+		});
+	}
 	@Override
 	public void init(IViewSite site, IMemento memento) throws org.eclipse.ui.PartInitException {
 		super.init(site, memento);
@@ -296,9 +312,9 @@ public class TardocKonsView extends ViewPart {
 		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		// Create text area section in the sash form
-		text = new EnhancedTextField(sashForm, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		text.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+		etf = new EnhancedTextField(sashForm, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		etf.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		etf.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 
 		// Create billing positions section in the sash form
 		billingPositionsComposite = new BillingPositionsComposite(sashForm, SWT.NONE, this);
@@ -353,7 +369,7 @@ public class TardocKonsView extends ViewPart {
 		}
 		IViewSite viewSite = getViewSite();
 
-		text.connectGlobalActions(viewSite);
+		etf.connectGlobalActions(viewSite);
 		// adaptMenus();
 		// initialize with currently selected encounter
 		created = true;
@@ -431,8 +447,8 @@ public class TardocKonsView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		if (text != null && !text.isDisposed()) {
-			text.setFocus();
+		if (etf != null && !etf.isDisposed()) {
+			etf.setFocus();
 		}
 	}
 

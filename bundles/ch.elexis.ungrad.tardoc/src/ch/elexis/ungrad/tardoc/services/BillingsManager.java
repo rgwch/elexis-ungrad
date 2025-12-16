@@ -23,8 +23,11 @@ import org.osgi.framework.FrameworkUtil;
 
 import ch.elexis.core.common.ElexisEventTopics;
 import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.data.service.LocalLockServiceHolder;
 import ch.elexis.core.model.IBilled;
 import ch.elexis.core.model.IEncounter;
+import ch.elexis.core.text.model.Samdas;
+import ch.elexis.core.ui.services.EncounterServiceHolder;
 import ch.elexis.ungrad.tardoc.views.TardocKonsView;
 import ch.rgw.tools.VersionedResource;
 
@@ -37,7 +40,6 @@ public class BillingsManager {
 
 	private int autoBillingCount = 0;
 	private long lastBilledMinute = -1;
-
 
 	BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
 	private TardocManager manager = TardocManager.getInstance();
@@ -110,9 +112,9 @@ public class BillingsManager {
 	}
 
 	/**
-	 * Check conditions and automatically bill if: -
-	 * Current mandator has one of the dignities configured in TardocConfig -
-	 * Autobilling is enabled for that dignity
+	 * Check conditions and automatically bill if: - Current mandator has one of the
+	 * dignities configured in TardocConfig - Autobilling is enabled for that
+	 * dignity
 	 */
 	public void autobill(long minutesElapsed) {
 		if (this.kons == null) {
@@ -167,17 +169,16 @@ public class BillingsManager {
 			return;
 		} else {
 			// There are existing billings. Check if any were added manually
-			int numBilled=0;
-			for(IBilled ib : billed) {
+			int numBilled = 0;
+			for (IBilled ib : billed) {
 				if (!ib.isDeleted()) {
-					numBilled+=ib.getAmount();
-					String text=getStopTimerText(ib);
-					if(text!=null) {
-						VersionedResource vr=kons.getVersionedEntry();
-						String contents=vr.getHead();
-						contents+=text;
-						vr.update(contents, "Auto-Tardoc");
-						kons.setVersionedEntry(vr);
+					numBilled += ib.getAmount();
+					String text = getStopTimerText(ib);
+					if (text != null) {
+						VersionedResource vr = kons.getVersionedEntry();
+						String contents = vr.getHead();
+						contents += text;
+						this.tkv.insertTextAtEndOfKons(contents);
 						this.stopAutoBilling();
 						return;
 					}
@@ -238,6 +239,8 @@ public class BillingsManager {
 		this.tkv.encounterTimer.pause();
 	}
 
+	
+
 	/**
 	 * Get the stop_timer text for a given billed item.
 	 * 
@@ -248,18 +251,18 @@ public class BillingsManager {
 		if (billed == null || activeDignityConfig == null) {
 			return null;
 		}
-		
+
 		Map<String, String> stopTimer = activeDignityConfig.getStopTimer();
 		if (stopTimer == null || stopTimer.isEmpty()) {
 			return null;
 		}
-		
+
 		// Get the code from the billed item
 		String billedCode = billed.getCode();
 		if (billedCode == null) {
 			return null;
 		}
-		
+
 		// Look up in stop_timer map
 		return stopTimer.get(billedCode);
 	}
