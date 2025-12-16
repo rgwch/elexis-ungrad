@@ -23,13 +23,13 @@ import org.osgi.service.event.EventHandler;
 
 import ch.elexis.core.common.ElexisEventTopics;
 import ch.elexis.core.data.service.ContextServiceHolder;
+import ch.elexis.core.model.IBilled;
 import ch.elexis.core.model.IEncounter;
 import ch.elexis.data.Konsultation;
 import ch.elexis.ungrad.tardoc.views.TardocKonsView;
 
 public class BillingsManager {
 	private IEncounter kons;
-	private Konsultation b;
 	private TardocKonsView tkv;
 	private TardocConfig config;
 	private TardocConfig.DignityConfig activeDignityConfig;
@@ -38,8 +38,6 @@ public class BillingsManager {
 	private int autoBillingCount = 0;
 	private long lastBilledMinute = -1;
 
-	// Event handler for billing changes
-	private EventHandler billingEventHandler;
 
 	BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
 	private TardocManager manager = TardocManager.getInstance();
@@ -103,7 +101,6 @@ public class BillingsManager {
 
 	public void setEncounter(IEncounter kons) {
 		this.kons = kons;
-		this.b = Konsultation.load(kons.getId());
 
 	}
 
@@ -113,10 +110,9 @@ public class BillingsManager {
 	}
 
 	/**
-	 * Check conditions and automatically bill the initial billing code if: -
+	 * Check conditions and automatically bill if: -
 	 * Current mandator has one of the dignities configured in TardocConfig -
-	 * Autobilling is enabled for that dignity - Current encounter has no billings -
-	 * Timer is being started (not resumed)
+	 * Autobilling is enabled for that dignity
 	 */
 	public void autobill(long minutesElapsed) {
 		if (this.kons == null) {
@@ -139,7 +135,7 @@ public class BillingsManager {
 		List<ch.elexis.core.model.IBilled> billed = this.kons.getBilled();
 		if (billed == null || billed.isEmpty()) {
 
-			// Get the initial billing code
+			// Billings are empty. Get the initial billing code
 			String initialBillingCode = activeDignityConfig.getInitialBilling();
 			if (initialBillingCode == null || initialBillingCode.trim().isEmpty()) {
 				System.err.println(
@@ -170,11 +166,19 @@ public class BillingsManager {
 			}
 			return;
 		} else {
-			if (this.autoBillingCount < billed.size()) {
+			// There are existing billings. Check if any were added manually
+			int numBilled=0;
+			for(IBilled ib : billed) {
+				if (!ib.isDeleted()) {
+					numBilled+=ib.getAmount();
+				}
+			}
+			if (this.autoBillingCount < numBilled) {
 				System.out.println("BillingsManager: Manual billing detected, skipping autobill");
 				this.stopAutoBilling();
 				return;
 			}
+			// No manual billings detected, proceed with automatic followup billing
 			TardocConfig.FollowupBilling followup = activeDignityConfig.getFollowupBilling();
 			if (followup.getCode() == null || followup.getCode().trim().isEmpty()) {
 				return;

@@ -70,7 +70,7 @@ public class TardocKonsView extends ViewPart {
 	Hashtable<String, IKonsExtension> hXrefs;
 	EnhancedTextField text;
 	public TimerComposite timerComposite;
-	public EncounterTimer encounterTimer = new EncounterTimer(this);
+	public EncounterTimer encounterTimer = new EncounterTimer();
 	CasesComposite casesComposite;
 	BillingsManager billingsManager = new BillingsManager(this);
 
