@@ -175,10 +175,7 @@ public class BillingsManager {
 					numBilled += ib.getAmount();
 					String text = getStopTimerText(ib);
 					if (text != null) {
-						VersionedResource vr = kons.getVersionedEntry();
-						String contents = vr.getHead();
-						contents += text;
-						this.tkv.insertTextAtEndOfKons(contents);
+						this.tkv.insertTextAtEndOfKons(text);
 						this.stopAutoBilling();
 						return;
 					}

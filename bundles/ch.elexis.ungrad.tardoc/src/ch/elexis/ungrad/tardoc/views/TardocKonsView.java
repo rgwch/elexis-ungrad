@@ -209,8 +209,7 @@ public class TardocKonsView extends ViewPart {
 		LoggerFactory.getLogger(getClass()).info("[KONS] " + (encounter != null ? encounter.getId() : "null"));
 
 		if (actEncounter != null && etf.isDirty()) {
-			EncounterServiceHolder.get().updateVersionedEntry(actEncounter, etf.getContentsAsXML(),
-					getVersionRemark());
+			EncounterServiceHolder.get().updateVersionedEntry(actEncounter, etf.getContentsAsXML(), getVersionRemark());
 			etf.setDirty(false);
 		}
 		cDesc.setEncounter(encounter);
@@ -225,7 +224,7 @@ public class TardocKonsView extends ViewPart {
 			if (encounter.getDate().isEqual(LocalDate.now())) {
 				etf.setTextBackground(UiDesk.getColor(UiDesk.COL_WHITE));
 			} else {
-				etf.setTextBackground(UiDesk.getColor(UiDesk.COL_LIGHTBLUE)); // $NON-NLS-1$
+				etf.setTextBackground(UiDesk.getColor(UiDesk.COL_WHITE)); // $NON-NLS-1$
 			}
 			billingsManager.setEncounter(encounter);
 			billingPositionsComposite.setKons(encounter);
@@ -263,20 +262,24 @@ public class TardocKonsView extends ViewPart {
 		// encounter.getVersionedEntry().getHeadVersion());
 	}
 
+	public String getText() {
+		return etf.getContentsPlaintext();
+	}
+
 	public void insertTextAtEndOfKons(String text) {
 		if (text == null || text.trim().isEmpty()) {
 			return;
 		}
-		ContextServiceHolder.get().getTyped(IEncounter.class).ifPresent(encounter -> {
-			if (LocalLockServiceHolder.get().acquireLock(encounter).isOk()) {
-				etf.replace(0,0,text);
-				EncounterServiceHolder.get().updateVersionedEntry(encounter, new Samdas(etf.getContentsAsXML()));
+		String existing = etf.getContentsPlaintext();
+		if (LocalLockServiceHolder.get().acquireLock(actEncounter).isOk()) {
+			etf.replace(0, existing.length(), existing+text);
+			EncounterServiceHolder.get().updateVersionedEntry(actEncounter, new Samdas(etf.getContentsAsXML()));
 
-				ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, encounter);
-				LocalLockServiceHolder.get().releaseLock(encounter);
-			}
-		});
+			ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, actEncounter);
+			LocalLockServiceHolder.get().releaseLock(actEncounter);
+		}
 	}
+
 	@Override
 	public void init(IViewSite site, IMemento memento) throws org.eclipse.ui.PartInitException {
 		super.init(site, memento);
