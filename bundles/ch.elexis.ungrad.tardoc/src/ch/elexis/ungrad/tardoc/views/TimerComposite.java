@@ -145,13 +145,14 @@ public class TimerComposite extends Composite {
 		if (timerLabel != null && !timerLabel.isDisposed()) {
 			timerLabel.setText(timeString);
 		}
-		if(this.tkv.encounterTimer.isRunning()) {
+		if (this.tkv.encounterTimer.isRunning()) {
+			this.tkv.billingsManager.autobill(minutes);
 			startPauseButton.setImage(pauseIcon);
 			startPauseButton.setToolTipText("Pause timer");
 		} else {
 			startPauseButton.setImage(playIcon);
 			startPauseButton.setToolTipText("Start timer");
-		}	
+		}
 	}
 
 	@Override

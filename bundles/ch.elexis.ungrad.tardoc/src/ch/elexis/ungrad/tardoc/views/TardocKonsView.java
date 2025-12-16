@@ -52,7 +52,6 @@ import ch.elexis.core.ui.views.Messages;
 import ch.elexis.ungrad.tardoc.services.BillingsManager;
 import ch.elexis.ungrad.tardoc.services.EncounterTimer;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
-import ch.elexis.ungrad.tardoc.services.TardocManagerHolder;
 import ch.rgw.tools.TimeTool;
 import ch.rgw.tools.VersionedResource;
 import ch.rgw.tools.VersionedResource.ResourceItem;
@@ -71,7 +70,7 @@ public class TardocKonsView extends ViewPart {
 	Hashtable<String, IKonsExtension> hXrefs;
 	EnhancedTextField text;
 	public TimerComposite timerComposite;
-	public EncounterTimer encounterTimer=new EncounterTimer(this);
+	public EncounterTimer encounterTimer = new EncounterTimer(this);
 	CasesComposite casesComposite;
 	BillingsManager billingsManager = new BillingsManager(this);
 
@@ -228,6 +227,7 @@ public class TardocKonsView extends ViewPart {
 			}
 			billingsManager.setEncounter(encounter);
 			billingPositionsComposite.setKons(encounter);
+			encounterTimer.stop();
 		} else {
 			// diagnosesDisplay.clear();
 			// billedDisplay.clear();
@@ -338,14 +338,7 @@ public class TardocKonsView extends ViewPart {
 		BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
 		System.out.println("TardocKonsView: BundleContext obtained: " + (bundleContext != null));
 
-		TardocManager manager = TardocManagerHolder.get();
-		if (manager == null) {
-			System.out.println("TardocKonsView: Holder returned null, creating instance directly");
-			// Fallback: create instance directly (will use OSGi service lookup internally)
-			manager = new TardocManager();
-		} else {
-			System.out.println("TardocKonsView: Got manager from holder");
-		}
+		TardocManager manager = TardocManager.getInstance();
 
 		if (manager.isServiceAvailable(bundleContext)) {
 			System.out.println("TardocKonsView: Service is available, querying...");

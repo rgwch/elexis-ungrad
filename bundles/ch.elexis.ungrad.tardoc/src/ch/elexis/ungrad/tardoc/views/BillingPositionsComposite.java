@@ -47,7 +47,6 @@ import ch.elexis.core.data.service.StoreToStringServiceHolder;
 import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.ui.views.VerrechnungsDisplay;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
-import ch.elexis.ungrad.tardoc.services.TardocManagerHolder;
 
 /**
  * Composite for displaying billed positions and billing positions.
@@ -65,8 +64,8 @@ public class BillingPositionsComposite extends Composite {
 	private IEncounter currentEncounter;
 
 	/**
-	 * Event handler to refresh the billed display when encounter is updated
-	 * (e.g., after dropping items)
+	 * Event handler to refresh the billed display when encounter is updated (e.g.,
+	 * after dropping items)
 	 */
 	@Optional
 	@jakarta.inject.Inject
@@ -108,10 +107,7 @@ public class BillingPositionsComposite extends Composite {
 
 		// Initialize TardocManager
 		bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
-		tardocManager = TardocManagerHolder.get();
-		if (tardocManager == null) {
-			tardocManager = new TardocManager();
-		}
+		tardocManager = TardocManager.getInstance();
 
 		createContent();
 	}
@@ -226,8 +222,8 @@ public class BillingPositionsComposite extends Composite {
 	}
 
 	/**
-	 * Adds drag support to the billing positions viewer to enable dragging items
-	 * to VerrechnungsDisplay
+	 * Adds drag support to the billing positions viewer to enable dragging items to
+	 * VerrechnungsDisplay
 	 */
 	private void addDragSupport() {
 		int operations = DND.DROP_COPY;
@@ -239,9 +235,9 @@ public class BillingPositionsComposite extends Composite {
 			@Override
 			public void dragSetData(DragSourceEvent event) {
 				// Get the selected item
-				org.eclipse.jface.viewers.IStructuredSelection selection = 
-					(org.eclipse.jface.viewers.IStructuredSelection) billingPositionsViewer.getSelection();
-				
+				org.eclipse.jface.viewers.IStructuredSelection selection = (org.eclipse.jface.viewers.IStructuredSelection) billingPositionsViewer
+						.getSelection();
+
 				if (selection.isEmpty()) {
 					event.data = null;
 					return;
@@ -262,8 +258,8 @@ public class BillingPositionsComposite extends Composite {
 			@Override
 			public void dragStart(DragSourceEvent event) {
 				// Check if there is a selection
-				org.eclipse.jface.viewers.IStructuredSelection selection = 
-					(org.eclipse.jface.viewers.IStructuredSelection) billingPositionsViewer.getSelection();
+				org.eclipse.jface.viewers.IStructuredSelection selection = (org.eclipse.jface.viewers.IStructuredSelection) billingPositionsViewer
+						.getSelection();
 				event.doit = !selection.isEmpty();
 			}
 		});

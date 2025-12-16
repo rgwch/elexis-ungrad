@@ -26,9 +26,9 @@ public class EncounterTimer extends Timer {
 				if (!isRunning) {
 					return;
 				}
-				long elapsed = (System.currentTimeMillis() - startTime) / 1000;
+				long elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000;
 				for (TimerListener listener : listeners) {
-					listener.onTick(elapsed);
+					listener.onTick(elapsedSeconds);
 				}
 			}
 		}, 0L, 1000L);

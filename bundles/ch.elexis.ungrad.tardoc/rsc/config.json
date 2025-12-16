@@ -4,7 +4,7 @@
 		"initial_billing": "CA.00.0010",
 		"followup_billing": {
 			"code": "CA.00.0030",	
-			"after": "2",
+			"after": "1",
 			"every": "1",
 			"max": "15"
 		},

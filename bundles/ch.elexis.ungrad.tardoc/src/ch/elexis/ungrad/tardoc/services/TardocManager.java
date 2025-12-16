@@ -36,7 +36,8 @@ import ch.elexis.core.services.IQuery.COMPARATOR;
 import ch.elexis.core.services.holder.ContextServiceHolder;
 
 /**
- * Service to manage Tardoc services and provide filtering based on mandator dignities.
+ * Service to manage Tardoc services and provide filtering based on mandator
+ * dignities.
  */
 @Component(service = TardocManager.class)
 public class TardocManager {
@@ -44,8 +45,17 @@ public class TardocManager {
 	private static IModelService modelService;
 	private boolean bOnlyValidForDignity = true;
 
-	public TardocManager() {
+	private static TardocManager theInstance = null;
 
+	private TardocManager() {
+
+	}
+
+	public static TardocManager getInstance() {
+		if (theInstance == null) {
+			theInstance = new TardocManager();
+		}
+		return theInstance;
 	}
 
 	@Reference(target = "(" + IModelService.SERVICEMODELNAME + "=ch.elexis.base.ch.arzttarife.model)")
@@ -100,11 +110,13 @@ public class TardocManager {
 	}
 
 	/**
-	 * Get a list of Tardoc services, optionally filtered by a search string on the text field.
-	 * if bOnlyValidForDignity is true, only services where DigniQuali includes at least one of the
-	 * current mandator's dignities are returned.
+	 * Get a list of Tardoc services, optionally filtered by a search string on the
+	 * text field. if bOnlyValidForDignity is true, only services where DigniQuali
+	 * includes at least one of the current mandator's dignities are returned.
+	 * 
 	 * @param filter Optional search string to filter services by text (tx255 field)
-	 * @return The list of matching ITardocLeistung services (possibly empty but never null)
+	 * @return The list of matching ITardocLeistung services (possibly empty but
+	 *         never null)
 	 */
 	public List<ITardocLeistung> getLeistungen(String filter) {
 		return getLeistungen(filter, null);
