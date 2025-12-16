@@ -16,17 +16,17 @@ package ch.elexis.ungrad.tardoc.services;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.service.event.EventHandler;
 
 import ch.elexis.core.common.ElexisEventTopics;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.model.IBilled;
 import ch.elexis.core.model.IEncounter;
-import ch.elexis.data.Konsultation;
 import ch.elexis.ungrad.tardoc.views.TardocKonsView;
+import ch.rgw.tools.VersionedResource;
 
 public class BillingsManager {
 	private IEncounter kons;
@@ -171,6 +171,16 @@ public class BillingsManager {
 			for(IBilled ib : billed) {
 				if (!ib.isDeleted()) {
 					numBilled+=ib.getAmount();
+					String text=getStopTimerText(ib);
+					if(text!=null) {
+						VersionedResource vr=kons.getVersionedEntry();
+						String contents=vr.getHead();
+						contents+=text;
+						vr.update(contents, "Auto-Tardoc");
+						kons.setVersionedEntry(vr);
+						this.stopAutoBilling();
+						return;
+					}
 				}
 			}
 			if (this.autoBillingCount < numBilled) {
@@ -226,6 +236,32 @@ public class BillingsManager {
 
 	private void stopAutoBilling() {
 		this.tkv.encounterTimer.pause();
+	}
+
+	/**
+	 * Get the stop_timer text for a given billed item.
+	 * 
+	 * @param billed the billed item
+	 * @return the default text from stop_timer map, or null if not found
+	 */
+	public String getStopTimerText(IBilled billed) {
+		if (billed == null || activeDignityConfig == null) {
+			return null;
+		}
+		
+		Map<String, String> stopTimer = activeDignityConfig.getStopTimer();
+		if (stopTimer == null || stopTimer.isEmpty()) {
+			return null;
+		}
+		
+		// Get the code from the billed item
+		String billedCode = billed.getCode();
+		if (billedCode == null) {
+			return null;
+		}
+		
+		// Look up in stop_timer map
+		return stopTimer.get(billedCode);
 	}
 
 }

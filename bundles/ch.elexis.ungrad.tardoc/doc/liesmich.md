@@ -16,6 +16,8 @@ Wenn Sie eine neue Konsultation beginnen, klicken Sie auf den "Start"-Button. Da
 
 Wenn Sie eine Handlungsposition verrechnen, wird der Timer gestoppt. Im Konsultationstext werden die für diese Handlungsleistung vorgeschriebenen Untersuchungen vorgegeben und müssen dann noch von Hand ergänzt werden.
 
-Falls Sie nach einer Handlungsleistung wieder Zeitleistungen verrechnen, wird der Timer wieder gestartet.
+## Einschränkungen
 
+Zwar kann das Plugin mittels der Datei rsc/config.json konfiguriert werden, aber getestet ist es bisher nur für die hausärztlichen Basis-Positionen. 
+Auch ist config.json sehr Syntax-Sensibel. Prüfen Sie nach einer Änderung unbedingt mit einem JSON-Validator, ob sie korrekt ist.
 
