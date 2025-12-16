@@ -13,7 +13,8 @@
             icon="icons/tardoc.png"
             id="ch.elexis.ungrad.tardoc.views.TardocKonsView"
             inject="true"
-            name="Tardoc">
+            name="Tardoc"
+            restorable="true">
       </view>
    </extension>
    <extension point="org.eclipse.ui.menus">
