@@ -31,6 +31,8 @@ import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -43,6 +45,7 @@ import org.osgi.framework.FrameworkUtil;
 
 import ch.elexis.base.ch.arzttarife.tardoc.ITardocLeistung;
 import ch.elexis.core.common.ElexisEventTopics;
+import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.data.service.StoreToStringServiceHolder;
 import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.ui.views.VerrechnungsDisplay;
@@ -126,18 +129,13 @@ public class BillingPositionsComposite extends Composite {
 		billed = new VerrechnungsDisplay(tkv.getSite().getPage(), this, SWT.NONE);
 		billed.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		billingGroup = new Group(this, SWT.NONE);
-		billingGroup.setText("Tardoc");
-		billingGroup.setLayout(new GridLayout(1, false));
-		billingGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		// Create search field
-		createSearchField(billingGroup);
+				// Create search field
+		createSearchField(this);
 
 		// Create table viewer
-		billingPositionsViewer = new TableViewer(billingGroup, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
+		billingPositionsViewer = new TableViewer(this, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
 		billingPositionsViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		billingPositionsViewer.getTable().setHeaderVisible(true);
+		billingPositionsViewer.getTable().setHeaderVisible(false);
 		billingPositionsViewer.getTable().setLinesVisible(true);
 
 		// Set content and label provider
@@ -147,10 +145,8 @@ public class BillingPositionsComposite extends Composite {
 		// Add drag support to enable dragging items to VerrechnungsDisplay
 		addDragSupport();
 
-		// Create status label
-		statusLabel = new Label(billingGroup, SWT.NONE);
-		statusLabel.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
-		statusLabel.setText("Enter search term to find billing positions");
+		// Add double-click support to add items directly to the encounter
+		addDoubleClickSupport();
 
 		// Initialize with empty list
 		billingPositionsViewer.setInput(Collections.emptyList());
@@ -165,12 +161,12 @@ public class BillingPositionsComposite extends Composite {
 		searchComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
 		Label searchLabel = new Label(searchComposite, SWT.NONE);
-		searchLabel.setText("Search:");
+		searchLabel.setText("Suche:");
 		searchLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
 		searchField = new Text(searchComposite, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
 		searchField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		searchField.setMessage("Type to search..."); // Placeholder text
+		searchField.setMessage("Suchbegriff..."); // Placeholder text
 
 		// Add modify listener to perform search as user types
 		searchField.addModifyListener(new ModifyListener() {
@@ -293,5 +289,41 @@ public class BillingPositionsComposite extends Composite {
 		if (billingPositionsViewer != null && !billingPositionsViewer.getTable().isDisposed()) {
 			billingPositionsViewer.refresh();
 		}
+	}
+
+	/**
+	 * Adds double-click support to the billing positions viewer to add items
+	 * directly to the encounter
+	 */
+	private void addDoubleClickSupport() {
+		billingPositionsViewer.getTable().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				// Get the selected item
+				org.eclipse.jface.viewers.IStructuredSelection selection = 
+					(org.eclipse.jface.viewers.IStructuredSelection) billingPositionsViewer.getSelection();
+
+				if (selection.isEmpty() || currentEncounter == null) {
+					return;
+				}
+
+				// Get the ITardocLeistung object
+				Object firstElement = selection.getFirstElement();
+				if (firstElement instanceof ITardocLeistung) {
+					ITardocLeistung leistung = (ITardocLeistung) firstElement;
+					
+					// Add the leistung to the encounter using BillingService
+					try {
+						ch.elexis.core.services.holder.BillingServiceHolder.get()
+							.bill(leistung, currentEncounter, 1.0);
+						// Trigger update event to refresh the display
+						ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, currentEncounter);
+
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
 	}
 }
