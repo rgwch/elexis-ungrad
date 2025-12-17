@@ -84,12 +84,13 @@ public class TardocKonsView extends ViewPart {
 
 	// Text area
 
-	// Billing positions
-	private BillingPositionsComposite billingPositionsComposite;
+	// Additions composite (will contain billing positions, diagnoses, etc.)
+	private AdditionsComposite additionsComposite;
 
 	private SashForm sashForm;
-	private boolean billingPositionsVisible = true;
-	private Action toggleBillingPositionsAction;
+	private boolean additionsVisible = true;
+	private Action toggleAdditionsAction;
+	private Action toggleViewAction;
 	private IMemento memento;
 	private static final int[] DEFAULT_WEIGHTS = new int[] { 70, 30 };
 
@@ -227,15 +228,14 @@ public class TardocKonsView extends ViewPart {
 				etf.setTextBackground(UiDesk.getColor(UiDesk.COL_WHITE)); // $NON-NLS-1$
 			}
 			billingsManager.setEncounter(encounter);
-			billingPositionsComposite.setKons(encounter);
+			// Update billing positions composite with encounter data
+			if (additionsComposite != null && !additionsComposite.isDisposed()) {
+				additionsComposite.getBillingPositionsComposite().setKons(encounter);
+			}
 			encounterTimer.stop();
 		} else {
-			// diagnosesDisplay.clear();
-			// billedDisplay.clear();
 			etf.setText(StringUtils.EMPTY);
 			etf.setEnabled(false);
-			// billedDisplay.setEnabled(false);
-			// diagnosesDisplay.setEnabled(false);
 		}
 		actEncounter = encounter;
 		cDesc.layout();
@@ -316,23 +316,20 @@ public class TardocKonsView extends ViewPart {
 
 		// Create text area section in the sash form
 		etf = new EnhancedTextField(sashForm, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-		etf.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		etf.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 
-		// Create billing positions section in the sash form
-		billingPositionsComposite = new BillingPositionsComposite(sashForm, SWT.NONE, this);
+		// Create additions composite in the sash form
+		additionsComposite = new AdditionsComposite(sashForm, SWT.NONE, this);
 
-		// Inject E4 context to enable event handling
-		ch.elexis.core.ui.e4.util.CoreUiUtil.injectServices(billingPositionsComposite);
+		// Set initial selection provider (billing positions is shown by default)
+		getSite().setSelectionProvider(
+			additionsComposite.getBillingPositionsComposite().getBillingPositionsViewer());
 
-		// Set selection provider for the site
-		getSite().setSelectionProvider(billingPositionsComposite.getBillingPositionsViewer());
-
-		// Set initial weights (70% text area, 30% billing positions)
+		// Set initial weights (70% text area, 30% additions)
 		// Restore saved weights from memento if available
 		int[] weights = DEFAULT_WEIGHTS;
 		if (memento != null) {
-			String savedWeights = memento.getString("billings_height");
+			String savedWeights = memento.getString("additions_height");
 			if (savedWeights != null) {
 				String[] parts = savedWeights.split(StringConstants.COMMA);
 				if (parts.length == 2) {
@@ -386,13 +383,21 @@ public class TardocKonsView extends ViewPart {
 	 * Creates the toolbar actions
 	 */
 	private void createActions() {
-		toggleBillingPositionsAction = new Action("§", Action.AS_PUSH_BUTTON) {
+		toggleAdditionsAction = new Action("§", Action.AS_PUSH_BUTTON) {
 			@Override
 			public void run() {
-				toggleBillingPositionsVisibility();
+				toggleAdditionsVisibility();
 			}
 		};
-		toggleBillingPositionsAction.setToolTipText("Toggle billing positions");
+		toggleAdditionsAction.setToolTipText("Toggle additions section");
+		
+		toggleViewAction = new Action("Dx", Action.AS_PUSH_BUTTON) {
+			@Override
+			public void run() {
+				toggleView();
+			}
+		};
+		toggleViewAction.setToolTipText("Switch to Diagnoses");
 	}
 
 	/**
@@ -400,52 +405,67 @@ public class TardocKonsView extends ViewPart {
 	 */
 	private void contributeToActionBars() {
 		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
-		toolBarManager.add(toggleBillingPositionsAction);
+		toolBarManager.add(toggleAdditionsAction);
+		toolBarManager.add(toggleViewAction);
 	}
 
 	/**
-	 * Toggles the visibility of the billing positions section
+	 * Toggles the visibility of the additions section
 	 */
-	private void toggleBillingPositionsVisibility() {
-		billingPositionsVisible = !billingPositionsVisible;
+	private void toggleAdditionsVisibility() {
+		additionsVisible = !additionsVisible;
 
-		if (billingPositionsVisible) {
-			// Show the billing positions
-			if (billingPositionsComposite != null && !billingPositionsComposite.isDisposed()) {
-				billingPositionsComposite.setVisible(true);
-
-				// Restore saved weights from memento if available
-				int[] weights = DEFAULT_WEIGHTS;
-				if (memento != null) {
-					String savedWeights = memento.getString("billings_height");
-					if (savedWeights != null) {
-						String[] parts = savedWeights.split(StringConstants.COMMA);
-						if (parts.length == 2) {
-							try {
-								weights = new int[] { Integer.parseInt(parts[0].trim()),
-										Integer.parseInt(parts[1].trim()) };
-							} catch (NumberFormatException e) {
-								// Use default weights if parsing fails
-								weights = DEFAULT_WEIGHTS;
-							}
+		if (additionsVisible) {
+			// Show the additions section
+			// Restore saved weights from memento if available
+			int[] weights = DEFAULT_WEIGHTS;
+			if (memento != null) {
+				String savedWeights = memento.getString("additions_height");
+				if (savedWeights != null) {
+					String[] parts = savedWeights.split(StringConstants.COMMA);
+					if (parts.length == 2) {
+						try {
+							weights = new int[] { Integer.parseInt(parts[0].trim()),
+									Integer.parseInt(parts[1].trim()) };
+						} catch (NumberFormatException e) {
+							// Use default weights if parsing fails
+							weights = DEFAULT_WEIGHTS;
 						}
 					}
 				}
-				sashForm.setWeights(weights);
-				sashForm.setMaximizedControl(null); // Restore normal layout
 			}
+			sashForm.setWeights(weights);
+			sashForm.setMaximizedControl(null); // Restore normal layout
 		} else {
-			// Hide the billing positions - maximize the text area section
-			if (billingPositionsComposite != null && !billingPositionsComposite.isDisposed()) {
-				// Get the first child (text area section) and maximize it
-				if (sashForm.getChildren().length > 0) {
-					sashForm.setMaximizedControl(sashForm.getChildren()[0]);
-				}
+			// Hide the additions section - maximize the text area section
+			// Get the first child (text area section) and maximize it
+			if (sashForm.getChildren().length > 0) {
+				sashForm.setMaximizedControl(sashForm.getChildren()[0]);
 			}
 		}
 
 		// Force layout update
 		sashForm.layout(true, true);
+	}
+
+	/**
+	 * Toggles between billing positions and diagnoses view in the additions composite
+	 */
+	private void toggleView() {
+		if (additionsComposite != null && !additionsComposite.isDisposed()) {
+			additionsComposite.toggleView();
+			
+			// Update the selection provider based on which view is showing
+			if (additionsComposite.isShowingBillingPositions()) {
+				getSite().setSelectionProvider(
+					additionsComposite.getBillingPositionsComposite().getBillingPositionsViewer());
+				toggleViewAction.setToolTipText("Switch to Diagnoses");
+			} else {
+				getSite().setSelectionProvider(
+					additionsComposite.getDiagnosesComposite().getDiagnosesViewer());
+				toggleViewAction.setToolTipText("Switch to Billing Positions");
+			}
+		}
 	}
 
 	@Override
@@ -466,7 +486,7 @@ public class TardocKonsView extends ViewPart {
 	@Override
 	public void saveState(IMemento memento) {
 		int[] w = sashForm.getWeights();
-		memento.putString("billings_height", Integer.toString(w[0]) + StringConstants.COMMA + Integer.toString(w[1]));
+		memento.putString("additions_height", Integer.toString(w[0]) + StringConstants.COMMA + Integer.toString(w[1]));
 		super.saveState(memento);
 	}
 
