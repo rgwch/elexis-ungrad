@@ -37,7 +37,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.osgi.framework.BundleContext;
@@ -57,7 +56,6 @@ import ch.elexis.ungrad.tardoc.services.TardocManager;
 public class BillingPositionsComposite extends Composite {
 
 	private TableViewer billingPositionsViewer;
-	private Group billingGroup;
 	private Text searchField;
 	private TardocManager tardocManager;
 	private BundleContext bundleContext;

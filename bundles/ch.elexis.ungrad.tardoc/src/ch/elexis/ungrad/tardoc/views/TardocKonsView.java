@@ -231,6 +231,7 @@ public class TardocKonsView extends ViewPart {
 			// Update billing positions composite with encounter data
 			if (additionsComposite != null && !additionsComposite.isDisposed()) {
 				additionsComposite.getBillingPositionsComposite().setKons(encounter);
+				additionsComposite.getDiagnosesComposite().setKons(encounter);
 			}
 			encounterTimer.stop();
 		} else {

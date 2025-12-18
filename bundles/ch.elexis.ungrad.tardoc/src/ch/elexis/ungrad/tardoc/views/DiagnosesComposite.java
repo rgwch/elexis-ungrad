@@ -17,6 +17,8 @@ package ch.elexis.ungrad.tardoc.views;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -40,8 +42,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPage;
 
+import ch.elexis.core.common.ElexisEventTopics;
 import ch.elexis.core.data.service.StoreToStringServiceHolder;
 import ch.elexis.core.model.IDiagnosis;
+import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.ui.views.DiagnosenDisplay;
 import ch.elexis.ungrad.tardoc.services.DiagnosesManager;
 
@@ -56,9 +60,30 @@ public class DiagnosesComposite extends Composite {
 	private DiagnosesManager diagnosesManager;
 	private Label statusLabel;
 	private IWorkbenchPage page;
+	private IEncounter currentEncounter;
+	private DiagnosenDisplay diags;
 	
 	// Code system options
 	private static final String[] CODE_SYSTEMS = { "All", "ICD-10", "TI-Code" };
+
+	/**
+	 * Event handler to refresh the billed display when encounter is updated (e.g.,
+	 * after dropping items)
+	 */
+	@Optional
+	@jakarta.inject.Inject
+	public void updateEncounter(@UIEventTopic(ElexisEventTopics.EVENT_UPDATE) IEncounter encounter) {
+		if (encounter != null && encounter.equals(currentEncounter) && diags != null) {
+			// Refresh the billed display to show newly added items
+			diags.setEncounter(encounter);
+		}
+	}
+	
+	void setKons(IEncounter k) {
+		currentEncounter = k;
+		diags.setEncounter(k);
+	}
+
 
 	/**
 	 * Label provider for diagnoses (IDiagnosis)
@@ -102,10 +127,10 @@ public class DiagnosesComposite extends Composite {
 		setLayout(new GridLayout(1, false));
 		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		DiagnosenDisplay dd=new DiagnosenDisplay(page, this, SWT.NONE);
+		diags=new DiagnosenDisplay(page, this, SWT.NONE);
 		GridData ddLayoutData = new GridData(SWT.FILL, SWT.TOP, true, false);
 		ddLayoutData.heightHint = 150; // Minimum height of 150 pixels
-		dd.setLayoutData(ddLayoutData);
+		diags.setLayoutData(ddLayoutData);
 		// Create search field with code system selector
 		createSearchControls(this);
 
