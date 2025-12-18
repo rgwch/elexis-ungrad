@@ -39,7 +39,7 @@ public class AdditionsComposite extends Composite {
 		billingPositionsComposite = new BillingPositionsComposite(this, SWT.NONE, view);
 		
 		// Create diagnoses composite
-		diagnosesComposite = new DiagnosesComposite(this, SWT.NONE);
+		diagnosesComposite = new DiagnosesComposite(view.getSite().getPage(), this, SWT.NONE);
 		
 		// Inject E4 context to enable event handling
 		ch.elexis.core.ui.e4.util.CoreUiUtil.injectServices(billingPositionsComposite);

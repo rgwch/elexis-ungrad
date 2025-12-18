@@ -38,9 +38,11 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPage;
 
 import ch.elexis.core.data.service.StoreToStringServiceHolder;
 import ch.elexis.core.model.IDiagnosis;
+import ch.elexis.core.ui.views.DiagnosenDisplay;
 import ch.elexis.ungrad.tardoc.services.DiagnosesManager;
 
 /**
@@ -53,6 +55,7 @@ public class DiagnosesComposite extends Composite {
 	private Combo codeSystemCombo;
 	private DiagnosesManager diagnosesManager;
 	private Label statusLabel;
+	private IWorkbenchPage page;
 	
 	// Code system options
 	private static final String[] CODE_SYSTEMS = { "All", "ICD-10", "TI-Code" };
@@ -83,9 +86,9 @@ public class DiagnosesComposite extends Composite {
 	 * @param parent the parent composite
 	 * @param style  the SWT style bits
 	 */
-	public DiagnosesComposite(Composite parent, int style) {
+	public DiagnosesComposite(IWorkbenchPage page, Composite parent, int style) {
 		super(parent, style);
-
+		this.page=page;
 		// Initialize DiagnosesManager
 		diagnosesManager = new DiagnosesManager();
 
@@ -99,6 +102,10 @@ public class DiagnosesComposite extends Composite {
 		setLayout(new GridLayout(1, false));
 		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+		DiagnosenDisplay dd=new DiagnosenDisplay(page, this, SWT.NONE);
+		GridData ddLayoutData = new GridData(SWT.FILL, SWT.TOP, true, false);
+		ddLayoutData.heightHint = 150; // Minimum height of 150 pixels
+		dd.setLayoutData(ddLayoutData);
 		// Create search field with code system selector
 		createSearchControls(this);
 
@@ -130,7 +137,7 @@ public class DiagnosesComposite extends Composite {
 	private void createSearchControls(Composite parent) {
 		Composite searchComposite = new Composite(parent, SWT.NONE);
 		searchComposite.setLayout(new GridLayout(4, false));
-		searchComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		searchComposite.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
 
 		// Code system label
 		Label codeSystemLabel = new Label(searchComposite, SWT.NONE);
