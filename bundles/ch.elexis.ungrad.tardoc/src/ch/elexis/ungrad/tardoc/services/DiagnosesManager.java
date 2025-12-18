@@ -125,35 +125,72 @@ public class DiagnosesManager {
 		String searchPattern = pattern.toLowerCase();
 		
 		try {
-			// Get all root nodes (chapters)
-			// Use reflection or CodeElementService to access TI-Code diagnoses
-			// Since TessinerCode has access restrictions, we'll query through the model service
+			// TessinerCode doesn't use IModelService - it's a static class with hardcoded data
+			// We need to access it through ICodeElementServiceContribution
 			
-			// Try to get TI-Code model service
 			BundleContext context = FrameworkUtil.getBundle(getClass()).getBundleContext();
 			if (context != null) {
 				try {
-					String filter = "(" + IModelService.SERVICEMODELNAME + "=ch.elexis.base.ch.ticode)";
-					ServiceReference<?>[] refs = context.getServiceReferences(IModelService.class.getName(), filter);
+					// Look for all ICodeElementServiceContribution services
+					ServiceReference<?>[] refs = context.getServiceReferences(
+						"ch.elexis.core.services.ICodeElementServiceContribution", null);
+					
 					if (refs != null && refs.length > 0) {
-						IModelService ticodeService = (IModelService) context.getService(refs[0]);
-						
-						// Query all TI-Code diagnoses
-						IQuery<IDiagnosisTree> query = ticodeService.getQuery(IDiagnosisTree.class);
-						List<IDiagnosisTree> allDiagnoses = query.execute();
-						
-						// Filter by pattern
-						for (IDiagnosisTree diagnosis : allDiagnoses) {
-							String code = diagnosis.getCode();
-							String text = diagnosis.getText();
+						// Find the one that provides TI-Code
+						for (ServiceReference<?> ref : refs) {
+							Object service = context.getService(ref);
 							
-							if ((code != null && code.toLowerCase().contains(searchPattern)) ||
-							    (text != null && text.toLowerCase().contains(searchPattern))) {
-								results.add((IDiagnosis) diagnosis);
+							// Check if this is the TI-Code service
+							java.lang.reflect.Method getSystemMethod = service.getClass().getMethod("getSystem");
+							String systemName = (String) getSystemMethod.invoke(service);
+							
+							if ("TI-Code".equals(systemName)) {
+								// Get root elements using getElements with TREE_ROOTS context
+								java.lang.reflect.Method getElementsMethod = service.getClass()
+									.getMethod("getElements", java.util.Map.class);
+								
+								java.util.Map<Object, Object> contextMap = new java.util.HashMap<>();
+								// Use reflection to get the TREE_ROOTS key from ICodeElementService.ContextKeys
+								Class<?> contextKeysClass = Class.forName("ch.elexis.core.services.ICodeElementService$ContextKeys");
+								Object treeRootsKey = contextKeysClass.getField("TREE_ROOTS").get(null);
+								contextMap.put(treeRootsKey, Boolean.TRUE);
+								
+								Object rootElements = getElementsMethod.invoke(service, contextMap);
+								
+								if (rootElements instanceof List) {
+									@SuppressWarnings("unchecked")
+									List<IDiagnosisTree> roots = (List<IDiagnosisTree>) rootElements;
+									
+									// Search through root nodes (chapters) and their children
+									for (IDiagnosisTree root : roots) {
+										if (matches(root, searchPattern)) {
+											results.add((IDiagnosis) root);
+										}
+										
+										// Check children
+										List<IDiagnosisTree> children = root.getChildren();
+										if (children != null) {
+											for (IDiagnosisTree child : children) {
+												if (matches(child, searchPattern)) {
+													results.add((IDiagnosis) child);
+												}
+											}
+										}
+									}
+								}
+								
+								context.ungetService(ref);
+								break; // Found TI-Code service, no need to continue
 							}
+							
+							context.ungetService(ref);
 						}
+					} else {
+						System.err.println("DiagnosesManager: No ICodeElementServiceContribution services found");
 					}
-				} catch (InvalidSyntaxException e) {
+				} catch (Exception e) {
+					// If service approach fails, log and continue
+					System.err.println("DiagnosesManager: Could not access TI-Code via ICodeElementServiceContribution: " + e.getMessage());
 					e.printStackTrace();
 				}
 			}
