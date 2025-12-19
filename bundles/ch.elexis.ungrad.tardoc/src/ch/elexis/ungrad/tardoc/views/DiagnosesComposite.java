@@ -66,7 +66,7 @@ public class DiagnosesComposite extends Composite {
 	private IMemento memento;
 	
 	// Code system options
-	private static final String[] CODE_SYSTEMS = { "All", "ICD-10", "TI-Code" };
+	private static final String[] CODE_SYSTEMS = { "Alle", "ICD-10", "TI-Code" };
 	private static final String MEMENTO_CODE_SYSTEM = "selected_code_system";
 
 	/**
@@ -157,6 +157,9 @@ public class DiagnosesComposite extends Composite {
 
 		// Add drag support to enable dragging items
 		addDragSupport();
+		
+		// Add double-click listener to add diagnosis to encounter
+		addDoubleClickListener();
 
 		// Initialize with empty list
 		diagnosesViewer.setInput(Collections.emptyList());
@@ -273,6 +276,31 @@ public class DiagnosesComposite extends Composite {
 				org.eclipse.jface.viewers.IStructuredSelection selection = (org.eclipse.jface.viewers.IStructuredSelection) diagnosesViewer
 						.getSelection();
 				event.doit = !selection.isEmpty();
+			}
+		});
+	}
+
+	/**
+	 * Adds double-click listener to add diagnosis to current encounter
+	 */
+	private void addDoubleClickListener() {
+		diagnosesViewer.addDoubleClickListener(event -> {
+			org.eclipse.jface.viewers.IStructuredSelection selection = 
+				(org.eclipse.jface.viewers.IStructuredSelection) event.getSelection();
+			
+			if (selection.isEmpty() || currentEncounter == null) {
+				return;
+			}
+			
+			Object firstElement = selection.getFirstElement();
+			if (firstElement instanceof IDiagnosis) {
+				IDiagnosis diagnosis = (IDiagnosis) firstElement;
+				currentEncounter.addDiagnosis(diagnosis);
+				
+				// Refresh the diagnoses display to show the newly added diagnosis
+				if (diags != null) {
+					diags.setEncounter(currentEncounter);
+				}
 			}
 		});
 	}
