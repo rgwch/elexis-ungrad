@@ -61,6 +61,7 @@ import jakarta.inject.Inject;
 
 /**
  * Tardoc consultation view with timer, text area, and billing positions list.
+ * This is the main view of the Tardoc plugin
  */
 public class TardocKonsView extends ViewPart {
 
