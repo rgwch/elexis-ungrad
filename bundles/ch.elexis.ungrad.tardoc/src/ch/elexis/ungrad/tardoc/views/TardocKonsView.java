@@ -319,8 +319,8 @@ public class TardocKonsView extends ViewPart {
 		etf = new EnhancedTextField(sashForm, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		etf.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 
-		// Create additions composite in the sash form
-		additionsComposite = new AdditionsComposite(sashForm, SWT.NONE, this);
+		// Create additions composite in the sash form with memento for state persistence
+		additionsComposite = new AdditionsComposite(sashForm, SWT.NONE, this, memento);
 
 		// Set initial selection provider (billing positions is shown by default)
 		getSite().setSelectionProvider(
@@ -488,6 +488,12 @@ public class TardocKonsView extends ViewPart {
 	public void saveState(IMemento memento) {
 		int[] w = sashForm.getWeights();
 		memento.putString("additions_height", Integer.toString(w[0]) + StringConstants.COMMA + Integer.toString(w[1]));
+		
+		// Save additions composite state (including diagnoses code system selection)
+		if (additionsComposite != null && !additionsComposite.isDisposed()) {
+			additionsComposite.saveState(memento);
+		}
+		
 		super.saveState(memento);
 	}
 

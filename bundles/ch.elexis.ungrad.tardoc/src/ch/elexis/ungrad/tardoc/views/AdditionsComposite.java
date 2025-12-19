@@ -17,6 +17,7 @@ package ch.elexis.ungrad.tardoc.views;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IMemento;
 
 /**
  * Composite to hold additional content (billing positions, diagnoses, etc.)
@@ -29,7 +30,7 @@ public class AdditionsComposite extends Composite {
 	private DiagnosesComposite diagnosesComposite;
 	private boolean showingBillingPositions = true;
 
-	public AdditionsComposite(Composite parent, int style, TardocKonsView view) {
+	public AdditionsComposite(Composite parent, int style, TardocKonsView view, IMemento memento) {
 		super(parent, style);
 		
 		stackLayout = new StackLayout();
@@ -38,8 +39,8 @@ public class AdditionsComposite extends Composite {
 		// Create billing positions composite
 		billingPositionsComposite = new BillingPositionsComposite(this, SWT.NONE, view);
 		
-		// Create diagnoses composite
-		diagnosesComposite = new DiagnosesComposite(view.getSite().getPage(), this, SWT.NONE);
+		// Create diagnoses composite with memento for state persistence
+		diagnosesComposite = new DiagnosesComposite(view.getSite().getPage(), this, SWT.NONE, memento);
 		
 		// Inject E4 context to enable event handling
 		ch.elexis.core.ui.e4.util.CoreUiUtil.injectServices(billingPositionsComposite);
@@ -83,5 +84,16 @@ public class AdditionsComposite extends Composite {
 	 */
 	public DiagnosesComposite getDiagnosesComposite() {
 		return diagnosesComposite;
+	}
+	
+	/**
+	 * Saves the current state to the memento.
+	 * 
+	 * @param memento the memento to save to
+	 */
+	public void saveState(IMemento memento) {
+		if (diagnosesComposite != null && !diagnosesComposite.isDisposed()) {
+			diagnosesComposite.saveState(memento);
+		}
 	}
 }

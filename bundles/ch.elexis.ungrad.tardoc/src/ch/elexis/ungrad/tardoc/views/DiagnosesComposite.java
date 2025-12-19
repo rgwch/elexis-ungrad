@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchPage;
 
 import ch.elexis.core.common.ElexisEventTopics;
@@ -58,13 +59,15 @@ public class DiagnosesComposite extends Composite {
 	private Text searchField;
 	private Combo codeSystemCombo;
 	private DiagnosesManager diagnosesManager;
-	private Label statusLabel;
+	// rivate Label statusLabel;
 	private IWorkbenchPage page;
 	private IEncounter currentEncounter;
 	private DiagnosenDisplay diags;
+	private IMemento memento;
 	
 	// Code system options
 	private static final String[] CODE_SYSTEMS = { "All", "ICD-10", "TI-Code" };
+	private static final String MEMENTO_CODE_SYSTEM = "selected_code_system";
 
 	/**
 	 * Event handler to refresh the billed display when encounter is updated (e.g.,
@@ -108,16 +111,23 @@ public class DiagnosesComposite extends Composite {
 	/**
 	 * Creates a new diagnoses composite.
 	 * 
+	 * @param page the workbench page
 	 * @param parent the parent composite
 	 * @param style  the SWT style bits
+	 * @param memento the memento for restoring state (can be null)
 	 */
-	public DiagnosesComposite(IWorkbenchPage page, Composite parent, int style) {
+	public DiagnosesComposite(IWorkbenchPage page, Composite parent, int style, IMemento memento) {
 		super(parent, style);
-		this.page=page;
+		this.page = page;
+		this.memento = memento;
+		
 		// Initialize DiagnosesManager
 		diagnosesManager = new DiagnosesManager();
 
 		createContent();
+		
+		// Restore saved code system selection
+		restoreState();
 	}
 
 	/**
@@ -134,11 +144,7 @@ public class DiagnosesComposite extends Composite {
 		// Create search field with code system selector
 		createSearchControls(this);
 
-		// Create status label
-		statusLabel = new Label(this, SWT.NONE);
-		statusLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		statusLabel.setText("Enter search term to find diagnoses");
-
+		
 		// Create table viewer
 		diagnosesViewer = new TableViewer(this, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
 		diagnosesViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -183,13 +189,13 @@ public class DiagnosesComposite extends Composite {
 
 		// Search label
 		Label searchLabel = new Label(searchComposite, SWT.NONE);
-		searchLabel.setText("Search:");
+		searchLabel.setText("Suche:");
 		searchLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
 		// Search field
 		searchField = new Text(searchComposite, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
 		searchField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		searchField.setMessage("Enter diagnosis code or text..."); // Placeholder text
+		searchField.setMessage("Diagnosecode oder Text eingeben..."); // Placeholder text
 
 		// Add modify listener to perform search as user types
 		searchField.addModifyListener(new ModifyListener() {
@@ -209,7 +215,6 @@ public class DiagnosesComposite extends Composite {
 		if (searchText.isEmpty()) {
 			// Clear the list if search is empty
 			diagnosesViewer.setInput(Collections.emptyList());
-			statusLabel.setText("Enter search term to find diagnoses");
 			return;
 		}
 
@@ -223,14 +228,7 @@ public class DiagnosesComposite extends Composite {
 			// Update the viewer
 			diagnosesViewer.setInput(results);
 
-			// Update status
-			if (results.isEmpty()) {
-				statusLabel.setText("No results found for: " + searchText + " in " + codeSystem);
-			} else {
-				statusLabel.setText("Found " + results.size() + " result(s) in " + codeSystem);
-			}
 		} catch (Exception ex) {
-			statusLabel.setText("Error searching: " + ex.getMessage());
 			diagnosesViewer.setInput(Collections.emptyList());
 			ex.printStackTrace();
 		}
@@ -308,4 +306,34 @@ public class DiagnosesComposite extends Composite {
 			diagnosesViewer.refresh();
 		}
 	}
+	
+	/**
+	 * Saves the current state to the memento.
+	 * 
+	 * @param memento the memento to save to
+	 */
+	public void saveState(IMemento memento) {
+		if (memento != null && codeSystemCombo != null && !codeSystemCombo.isDisposed()) {
+			memento.putString(MEMENTO_CODE_SYSTEM, codeSystemCombo.getText());
+		}
+	}
+	
+	/**
+	 * Restores the saved state from the memento.
+	 */
+	private void restoreState() {
+		if (memento != null && codeSystemCombo != null && !codeSystemCombo.isDisposed()) {
+			String savedCodeSystem = memento.getString(MEMENTO_CODE_SYSTEM);
+			if (savedCodeSystem != null) {
+				// Find the index of the saved code system
+				for (int i = 0; i < CODE_SYSTEMS.length; i++) {
+					if (CODE_SYSTEMS[i].equals(savedCodeSystem)) {
+						codeSystemCombo.select(i);
+						break;
+					}
+				}
+			}
+		}
+	}
 }
+
