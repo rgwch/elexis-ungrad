@@ -21,3 +21,7 @@ Wenn Sie eine Handlungsposition verrechnen, wird der Timer gestoppt. Im Konsulta
 Zwar kann das Plugin mittels der Datei rsc/config.json konfiguriert werden, aber getestet ist es bisher nur für die hausärztlichen Basis-Positionen. 
 Auch ist config.json sehr Syntax-Sensibel. Prüfen Sie nach einer Änderung unbedingt mit einem JSON-Validator, ob sie korrekt ist.
 
+## Vibe Coding
+
+Dieses Plugin entstand mit wesentlicher Hilfe von KI (Claude Sonnet 4.5)
+

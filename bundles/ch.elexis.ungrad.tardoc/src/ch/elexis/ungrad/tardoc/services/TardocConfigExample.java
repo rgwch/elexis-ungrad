@@ -8,6 +8,7 @@
  *
  * Contributors:
  * G. Weirich - initial implementation
+ * Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
  *********************************************************************************/
 
 package ch.elexis.ungrad.tardoc.services;
