@@ -46,6 +46,7 @@ import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.model.IUser;
 import ch.elexis.core.text.model.Samdas;
+import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.services.EncounterServiceHolder;
 import ch.elexis.core.ui.text.EnhancedTextField;
@@ -327,7 +328,6 @@ public class TardocKonsView extends ViewPart {
 		getSite().setSelectionProvider(
 			additionsComposite.getBillingPositionsComposite().getBillingPositionsViewer());
 
-		// Set initial weights (70% text area, 30% additions)
 		// Restore saved weights from memento if available
 		int[] weights = DEFAULT_WEIGHTS;
 		if (memento != null) {
@@ -392,6 +392,7 @@ public class TardocKonsView extends ViewPart {
 			}
 		};
 		toggleAdditionsAction.setToolTipText("Toggle additions section");
+		toggleAdditionsAction.setImageDescriptor(Images.IMG_VIEW_PATIENT_DETAIL.getImageDescriptor());
 		
 		toggleViewAction = new Action("Dx", Action.AS_PUSH_BUTTON) {
 			@Override
@@ -400,6 +401,7 @@ public class TardocKonsView extends ViewPart {
 			}
 		};
 		toggleViewAction.setToolTipText("Switch to Diagnoses");
+		toggleViewAction.setImageDescriptor(Images.IMG_BILL.getImageDescriptor());
 	}
 
 	/**
