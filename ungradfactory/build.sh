@@ -1,8 +1,13 @@
 #! /bin/bash
 
+# stop on errors
+set -o errexit
+
+branch=ungrad-2026
+
 ######### Elexis Core
 cd /opt/elexisfactory
-rm -rf dist
+rm -rf dist/*
 if [ -d "/opt/elexisfactory/elexis-3-core" ]
 then
   echo "pull elexis-3-core"
@@ -11,12 +16,13 @@ then
   cd ..
 else
   echo clone elexis-3-core
-  git clone https://github.com/rgwch/elexis-3-core
+  git clone https://github.com/rgwch/elexis-3-core -b $branch
 fi
 cd /opt/elexisfactory/elexis-3-core
-mvn clean install -Dmaven.test.skip=true -Pall-archs
-mkdir /opt/elexisfactory/dist
-cp -r /opt/elexisfactory/elexis-3-core/ch.elexis.core.p2site/target/products/* /opt/elexisfactory/dist
+git pull
+ mvn -V clean verify  -Dtycho.localArtifacts=ignore -DskipTests -Dmaterialize-products
+mkdir /opt/elexisfactory/dist/core-p2site
+cp -r /opt/elexisfactory/elexis-3-core/ch.elexis.core.p2site/target/* /opt/elexisfactory/dist/core-p2site/
 
 ######### Elexis Base
 cd /opt/elexisfactory
@@ -28,12 +34,12 @@ then
   cd ..
 else
   echo clone elexis-3-base
-  git clone https://github.com/rgwch/elexis-3-base
+  git clone https://github.com/rgwch/elexis-3-base -b $branch
 fi
 cd /opt/elexisfactory/elexis-3-base
-mvn clean install -Dmaven.test.skip=true
-mkdir /opt/elexisfactory/dist/base-b2site
-cp -r /opt/elexisfactory/elexis-3-base/ch.elexis.base.p2site/target/repository/* /opt/elexisfactory/dist/base-p2site
+mvn -V clean verify  -Dtycho.localArtifacts=ignore -DskipTests
+mkdir -p /opt/elexisfactory/dist/base-p2site
+cp -r /opt/elexisfactory/elexis-3-base/ch.elexis.base.p2site/target/repository/* /opt/elexisfactory/dist/base-p2site/
 
 ######### Elexis Ungrad
 cd /opt/elexisfactory
@@ -45,9 +51,9 @@ then
   cd ..
 else
   echo clone elexis-ungrad
-  git clone https://github.com/rgwch/elexis-ungrad
+  git clone https://github.com/rgwch/elexis-ungrad -b $branch
 fi
 cd /opt/elexisfactory/elexis-ungrad
-mvn clean install -Dmaven.test.skip=true
+mvn -V clean verify  -Dtycho.localArtifacts=ignore -DskipTests
 mkdir /opt/elexisfactory/dist/ungrad-p2site
-cp -r /opt/elexisfactory/elexis-ungrad/ungrad-p2site/target/repository/* /opt/elexisfactory/dist/ungrad-p2site
+cp -r /opt/elexisfactory/elexis-ungrad/ch.elexis.ungrad.p2site/target/repository/* /opt/elexisfactory/dist/ungrad-p2site/
