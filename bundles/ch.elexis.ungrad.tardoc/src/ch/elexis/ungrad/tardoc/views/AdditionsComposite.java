@@ -31,21 +31,21 @@ public class AdditionsComposite extends Composite {
 	private DiagnosesComposite diagnosesComposite;
 	private boolean showingBillingPositions = true;
 
-	public AdditionsComposite(Composite parent, int style, TardocKonsView view, IMemento memento) {
-		super(parent, style);
-		
+	public AdditionsComposite(Composite parent, TardocKonsView view, IMemento memento) {
+		super(parent, SWT.NONE);
+
 		stackLayout = new StackLayout();
 		setLayout(stackLayout);
-		
+
 		// Create billing positions composite
 		billingPositionsComposite = new BillingPositionsComposite(this, SWT.NONE, view);
-		
+
 		// Create diagnoses composite with memento for state persistence
 		diagnosesComposite = new DiagnosesComposite(view.getSite().getPage(), this, SWT.NONE, memento);
-		
+
 		// Inject E4 context to enable event handling
 		ch.elexis.core.ui.e4.util.CoreUiUtil.injectServices(billingPositionsComposite);
-		
+
 		// Initially show billing positions
 		stackLayout.topControl = billingPositionsComposite;
 		layout();
@@ -56,18 +56,19 @@ public class AdditionsComposite extends Composite {
 	 */
 	public void toggleView() {
 		showingBillingPositions = !showingBillingPositions;
-		
+
 		if (showingBillingPositions) {
 			stackLayout.topControl = billingPositionsComposite;
 		} else {
 			stackLayout.topControl = diagnosesComposite;
 		}
-		
+
 		layout();
 	}
 
 	/**
-	 * @return true if currently showing billing positions, false if showing diagnoses
+	 * @return true if currently showing billing positions, false if showing
+	 *         diagnoses
 	 */
 	public boolean isShowingBillingPositions() {
 		return showingBillingPositions;
@@ -86,9 +87,9 @@ public class AdditionsComposite extends Composite {
 	public DiagnosesComposite getDiagnosesComposite() {
 		return diagnosesComposite;
 	}
-	
+
 	/**
-	 * Saves the current state to the memento.
+	 * Saves the current state (i.e. the selected diagnose system) to the memento.
 	 * 
 	 * @param memento the memento to save to
 	 */

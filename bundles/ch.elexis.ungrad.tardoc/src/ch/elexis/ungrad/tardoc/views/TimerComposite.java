@@ -16,8 +16,6 @@
 package ch.elexis.ungrad.tardoc.views;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-
-import ch.elexis.ungrad.tardoc.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -30,8 +28,10 @@ import org.eclipse.swt.widgets.Label;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
+import ch.elexis.ungrad.tardoc.Messages;
+
 /**
- * Composite for a start/pause/reset timer with auto-billing capabilities.
+ * Composite for a simple start/pause/reset timer with auto-billing capabilities.
  */
 public class TimerComposite extends Composite {
 	TardocKonsView tkv;

@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (c) 2025 by G. Weirich
- *
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- *
- * Contributors:
- * G. Weirich - initial implementation
- * Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
- *********************************************************************************/
+* Copyright (c) 2025 by G. Weirich
+*
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+*
+* Contributors:
+* G. Weirich - initial implementation
+* Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
+*********************************************************************************/
 
 package ch.elexis.ungrad.tardoc.services;
 
@@ -24,13 +24,9 @@ import org.osgi.framework.FrameworkUtil;
 
 import ch.elexis.core.common.ElexisEventTopics;
 import ch.elexis.core.data.service.ContextServiceHolder;
-import ch.elexis.core.data.service.LocalLockServiceHolder;
 import ch.elexis.core.model.IBilled;
 import ch.elexis.core.model.IEncounter;
-import ch.elexis.core.text.model.Samdas;
-import ch.elexis.core.ui.services.EncounterServiceHolder;
 import ch.elexis.ungrad.tardoc.views.TardocKonsView;
-import ch.rgw.tools.VersionedResource;
 
 public class BillingsManager {
 	private IEncounter kons;
@@ -236,8 +232,6 @@ public class BillingsManager {
 	private void stopAutoBilling() {
 		this.tkv.encounterTimer.pause();
 	}
-
-	
 
 	/**
 	 * Get the stop_timer text for a given billed item.

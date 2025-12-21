@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (c) 2025 by G. Weirich
- *
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- *
- * Contributors:
- * G. Weirich - initial implementation
- * Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
- *********************************************************************************/
+* Copyright (c) 2025 by G. Weirich
+*
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+*
+* Contributors:
+* G. Weirich - initial implementation
+* Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
+*********************************************************************************/
 
 package ch.elexis.ungrad.tardoc.views;
 
@@ -19,8 +19,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.e4.core.di.annotations.Optional;
-
-import ch.elexis.ungrad.tardoc.Messages;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -51,10 +49,12 @@ import ch.elexis.core.data.service.StoreToStringServiceHolder;
 import ch.elexis.core.model.IDiagnosis;
 import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.ui.views.DiagnosenDisplay;
+import ch.elexis.ungrad.tardoc.Messages;
 import ch.elexis.ungrad.tardoc.services.DiagnosesManager;
 
 /**
- * Composite for searching and displaying diagnoses from ICD-10 and TI-Code systems.
+ * Composite for searching and displaying diagnoses from ICD-10 and TI-Code
+ * systems.
  */
 public class DiagnosesComposite extends Composite {
 
@@ -67,9 +67,10 @@ public class DiagnosesComposite extends Composite {
 	private IEncounter currentEncounter;
 	private DiagnosenDisplay diags;
 	private IMemento memento;
-	
+
 	// Code system options - will be initialized with localized strings
 	private String[] CODE_SYSTEMS;
+	// We'll remember the latest selected code system in the memento
 	private static final String MEMENTO_CODE_SYSTEM = "selected_code_system";
 
 	/**
@@ -84,12 +85,11 @@ public class DiagnosesComposite extends Composite {
 			diags.setEncounter(encounter);
 		}
 	}
-	
+
 	void setKons(IEncounter k) {
 		currentEncounter = k;
 		diags.setEncounter(k);
 	}
-
 
 	/**
 	 * Label provider for diagnoses (IDiagnosis)
@@ -114,28 +114,25 @@ public class DiagnosesComposite extends Composite {
 	/**
 	 * Creates a new diagnoses composite.
 	 * 
-	 * @param page the workbench page
-	 * @param parent the parent composite
-	 * @param style  the SWT style bits
+	 * @param page    the workbench page
+	 * @param parent  the parent composite
+	 * @param style   the SWT style bits
 	 * @param memento the memento for restoring state (can be null)
 	 */
 	public DiagnosesComposite(IWorkbenchPage page, Composite parent, int style, IMemento memento) {
 		super(parent, style);
 		this.page = page;
 		this.memento = memento;
-		
+
 		// Initialize CODE_SYSTEMS with localized strings
-		CODE_SYSTEMS = new String[] {
-			Messages.DiagnosesComposite_CodeSystem_All,
-			Messages.DiagnosesComposite_CodeSystem_ICD10,
-			Messages.DiagnosesComposite_CodeSystem_TICode
-		};
-		
+		CODE_SYSTEMS = new String[] { Messages.DiagnosesComposite_CodeSystem_All,
+				Messages.DiagnosesComposite_CodeSystem_ICD10, Messages.DiagnosesComposite_CodeSystem_TICode };
+
 		// Initialize DiagnosesManager
 		diagnosesManager = new DiagnosesManager();
 
 		createContent();
-		
+
 		// Restore saved code system selection
 		restoreState();
 	}
@@ -147,14 +144,13 @@ public class DiagnosesComposite extends Composite {
 		setLayout(new GridLayout(1, false));
 		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		diags=new DiagnosenDisplay(page, this, SWT.NONE);
+		diags = new DiagnosenDisplay(page, this, SWT.NONE);
 		GridData ddLayoutData = new GridData(SWT.FILL, SWT.TOP, true, false);
 		ddLayoutData.heightHint = 150; // Minimum height of 150 pixels
 		diags.setLayoutData(ddLayoutData);
 		// Create search field with code system selector
 		createSearchControls(this);
 
-		
 		// Create table viewer
 		diagnosesViewer = new TableViewer(this, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
 		diagnosesViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -167,7 +163,7 @@ public class DiagnosesComposite extends Composite {
 
 		// Add drag support to enable dragging items
 		addDragSupport();
-		
+
 		// Add double-click listener to add diagnosis to encounter
 		addDoubleClickListener();
 
@@ -295,18 +291,18 @@ public class DiagnosesComposite extends Composite {
 	 */
 	private void addDoubleClickListener() {
 		diagnosesViewer.addDoubleClickListener(event -> {
-			org.eclipse.jface.viewers.IStructuredSelection selection = 
-				(org.eclipse.jface.viewers.IStructuredSelection) event.getSelection();
-			
+			org.eclipse.jface.viewers.IStructuredSelection selection = (org.eclipse.jface.viewers.IStructuredSelection) event
+					.getSelection();
+
 			if (selection.isEmpty() || currentEncounter == null) {
 				return;
 			}
-			
+
 			Object firstElement = selection.getFirstElement();
 			if (firstElement instanceof IDiagnosis) {
 				IDiagnosis diagnosis = (IDiagnosis) firstElement;
 				currentEncounter.addDiagnosis(diagnosis);
-				
+
 				// Refresh the diagnoses display to show the newly added diagnosis
 				if (diags != null) {
 					diags.setEncounter(currentEncounter);
@@ -316,8 +312,8 @@ public class DiagnosesComposite extends Composite {
 	}
 
 	/**
-	 * Gets the table viewer for the diagnoses. This can be used to set it
-	 * as a selection provider.
+	 * Gets the table viewer for the diagnoses. This can be used to set it as a
+	 * selection provider.
 	 * 
 	 * @return the table viewer
 	 */
@@ -344,7 +340,7 @@ public class DiagnosesComposite extends Composite {
 			diagnosesViewer.refresh();
 		}
 	}
-	
+
 	/**
 	 * Saves the current state to the memento.
 	 * 
@@ -355,7 +351,7 @@ public class DiagnosesComposite extends Composite {
 			memento.putString(MEMENTO_CODE_SYSTEM, codeSystemCombo.getText());
 		}
 	}
-	
+
 	/**
 	 * Restores the saved state from the memento.
 	 */
@@ -374,4 +370,3 @@ public class DiagnosesComposite extends Composite {
 		}
 	}
 }
-

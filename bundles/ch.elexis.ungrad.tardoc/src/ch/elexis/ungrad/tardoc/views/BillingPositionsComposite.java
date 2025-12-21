@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (c) 2025 by G. Weirich
- *
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- *
- * Contributors:
- * G. Weirich - initial implementation
- * Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
- *********************************************************************************/
+* Copyright (c) 2025 by G. Weirich
+*
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+*
+* Contributors:
+* G. Weirich - initial implementation
+* Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
+*********************************************************************************/
 
 package ch.elexis.ungrad.tardoc.views;
 
@@ -131,7 +131,7 @@ public class BillingPositionsComposite extends Composite {
 		billed = new VerrechnungsDisplay(tkv.getSite().getPage(), this, SWT.NONE);
 		billed.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-				// Create search field
+		// Create search field
 		createSearchField(this);
 
 		// Create table viewer
@@ -293,8 +293,8 @@ public class BillingPositionsComposite extends Composite {
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				// Get the selected item
-				org.eclipse.jface.viewers.IStructuredSelection selection = 
-					(org.eclipse.jface.viewers.IStructuredSelection) billingPositionsViewer.getSelection();
+				org.eclipse.jface.viewers.IStructuredSelection selection = (org.eclipse.jface.viewers.IStructuredSelection) billingPositionsViewer
+						.getSelection();
 
 				if (selection.isEmpty() || currentEncounter == null) {
 					return;
@@ -304,17 +304,16 @@ public class BillingPositionsComposite extends Composite {
 				Object firstElement = selection.getFirstElement();
 				if (firstElement instanceof ITardocLeistung) {
 					ITardocLeistung leistung = (ITardocLeistung) firstElement;
-					
+
 					// Add the leistung to the encounter using BillingService
 					try {
-						BillingProcessor bp= new BillingProcessor(currentEncounter);
+						BillingProcessor bp = new BillingProcessor(currentEncounter);
 						bp.processOtherObject(leistung);
 						ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, currentEncounter);
-						
+
 						/*
-						ch.elexis.core.services.holder.BillingServiceHolder.get()
-							.bill(leistung, currentEncounter, 1.0);
-						// Trigger update event to refresh the display
+						 * ch.elexis.core.services.holder.BillingServiceHolder.get() .bill(leistung,
+						 * currentEncounter, 1.0); // Trigger update event to refresh the display
 						 */
 					} catch (Exception ex) {
 						ex.printStackTrace();

@@ -41,7 +41,9 @@ import ch.elexis.core.ui.util.SWTHelper;
 import ch.rgw.tools.Result;
 
 /**
- * Composite for displaying and selecting cases (coverages) in the Tardoc consultation view.
+ * Composite for displaying and selecting cases (coverages) in the Tardoc
+ * consultation view. Instead of displaying a ComboBox, a Hyperlink is used to
+ * show the current case, which opens a dialog for case selection when clicked.
  */
 public class CasesComposite extends Composite {
 	private TardocKonsView tkv;
@@ -74,6 +76,9 @@ public class CasesComposite extends Composite {
 		});
 	}
 
+	/**
+	 * Opens the coverage selection dialog and handles coverage changes.
+	 */
 	private void openCoverageSelectionDialog() {
 		if (currentPatient == null) {
 			return;
@@ -94,13 +99,17 @@ public class CasesComposite extends Composite {
 		String fallLabel = actCoverage != null ? actCoverage.getLabel() : "Current Case NOT found!!";
 
 		if (!changeToCoverage.isOpen()) {
-			SWTHelper.alert(ch.elexis.core.ui.views.Messages.Core_Case_is_closed, ch.elexis.core.ui.views.Messages.KonsDetailView_CaseClosedBody);
+			SWTHelper.alert(ch.elexis.core.ui.views.Messages.Core_Case_is_closed,
+					ch.elexis.core.ui.views.Messages.KonsDetailView_CaseClosedBody);
 		} else {
-			MessageDialog msd = new MessageDialog(getShell(), ch.elexis.core.ui.views.Messages.KonsDetailView_ChangeCaseCaption,
+			MessageDialog msd = new MessageDialog(getShell(),
+					ch.elexis.core.ui.views.Messages.KonsDetailView_ChangeCaseCaption,
 					Images.IMG_LOGO.getImage(ImageSize._75x66_TitleDialogIconSize),
 					MessageFormat.format(ch.elexis.core.ui.views.Messages.KonsDetailView_ConfirmChangeConsToCase,
 							new Object[] { fallLabel, changeToCoverage.getLabel() }),
-					MessageDialog.QUESTION, new String[] { ch.elexis.core.ui.views.Messages.Core_Yes, ch.elexis.core.ui.views.Messages.Corr_No }, 0);
+					MessageDialog.QUESTION, new String[] { ch.elexis.core.ui.views.Messages.Core_Yes,
+							ch.elexis.core.ui.views.Messages.Corr_No },
+					0);
 
 			if (msd.open() == Window.OK) {
 				if (tkv.actEncounter != null) {
@@ -168,7 +177,7 @@ public class CasesComposite extends Composite {
 
 		if (coverage != null) {
 			// Use similar color logic as CoverageColorLabelProvider
-			Color color;
+			Color color;	
 			if (!coverage.isOpen()) {
 				color = getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY);
 			} else {

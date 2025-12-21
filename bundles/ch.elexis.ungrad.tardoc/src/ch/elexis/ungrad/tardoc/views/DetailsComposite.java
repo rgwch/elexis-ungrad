@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (c) 2025 by G. Weirich
- *
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- *
- * Contributors:
- * G. Weirich - initial implementation
- * Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
- *********************************************************************************/
+* Copyright (c) 2025 by G. Weirich
+*
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+*
+* Contributors:
+* G. Weirich - initial implementation
+* Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
+*********************************************************************************/
 
 package ch.elexis.ungrad.tardoc.views;
 
@@ -46,7 +46,8 @@ import ch.rgw.tools.Result;
 import ch.rgw.tools.TimeTool;
 
 /**
- * Composite for displaying and editing date and mandator of the current encounter.
+ * Composite for displaying and editing date and mandator of the current
+ * encounter.
  */
 public class DetailsComposite extends Composite {
 	private TardocKonsView tkv;
@@ -101,8 +102,9 @@ public class DetailsComposite extends Composite {
 						}
 					}
 				}
+				// TODO: Find out how Elexis wants to handle mandator selection changes
 				ElexisEventDispatcher.fireSelectionEvent(currentMandant);
-			}
+			}	
 
 		});
 		hlMandant.setBackground(parent.getBackground());
@@ -113,7 +115,7 @@ public class DetailsComposite extends Composite {
 		if (isDisposed() || hlDate == null || hlDate.isDisposed() || hlMandant == null || hlMandant.isDisposed()) {
 			return;
 		}
-		
+
 		if (enc == null) {
 			hlDate.setText("---"); //$NON-NLS-1$
 			hlMandant.setText("---"); //$NON-NLS-1$

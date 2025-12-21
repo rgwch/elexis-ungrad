@@ -20,8 +20,6 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-
-import ch.elexis.ungrad.tardoc.Messages;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.Action;
@@ -50,13 +48,14 @@ import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.model.IUser;
 import ch.elexis.core.text.model.Samdas;
-import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.constants.ExtensionPointConstantsUi;
+import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.services.EncounterServiceHolder;
 import ch.elexis.core.ui.text.EnhancedTextField;
 import ch.elexis.core.ui.util.IKonsExtension;
 import ch.elexis.core.ui.util.IKonsMakro;
+import ch.elexis.ungrad.tardoc.Messages;
 import ch.elexis.ungrad.tardoc.services.BillingsManager;
 import ch.elexis.ungrad.tardoc.services.EncounterTimer;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
@@ -67,8 +66,9 @@ import jakarta.inject.Inject;
 
 /**
  * Tardoc consultation view with timer, text area, and billing positions list.
- * This is the main view of the Tardoc plugin. 
- * We started from the standard Elexis KonsDetailView, so there's some leftover code and comments referring to "KonsDetailView".
+ * This is the main view of the Tardoc plugin. We started from the standard
+ * Elexis KonsDetailView, so there's some leftover code and comments referring
+ * to "KonsDetailView".
  */
 public class TardocKonsView extends ViewPart {
 
@@ -78,30 +78,38 @@ public class TardocKonsView extends ViewPart {
 	public static final String ID = "ch.elexis.ungrad.tardoc.views.TardocKonsView";
 
 	Hashtable<String, IKonsExtension> hXrefs;
-	EnhancedTextField etf;
+
+	private DetailsComposite cDesc;
 	public TimerComposite timerComposite;
 	public EncounterTimer encounterTimer = new EncounterTimer();
 	CasesComposite casesComposite;
-	BillingsManager billingsManager = new BillingsManager(this);
 
 	protected IEncounter actEncounter;
+	EnhancedTextField etf;
+	BillingsManager billingsManager = new BillingsManager(this);
+
 	IPatient actPat;
 	private boolean created = false;
-
-	private DetailsComposite cDesc;
 
 	// Text area
 
 	// Additions composite (will contain billing positions, diagnoses, etc.)
 	private AdditionsComposite additionsComposite;
 
+	// split the view vertically between text and additions
 	private SashForm sashForm;
+	// If false, additions section is hidden and text is full height
 	private boolean additionsVisible = true;
 	private Action toggleAdditionsAction;
-	private Action toggleViewAction;
-	private IMemento memento;
-	private static final int[] DEFAULT_WEIGHTS = new int[] { 70, 30 };
 
+	// toggle between showing billing positions and diagnoses
+	private Action toggleViewAction;
+
+	// Save sash weights and additions composite state
+	private IMemento memento;
+	private static final int[] DEFAULT_WEIGHTS = new int[] { 60, 40 };
+
+	// Set current encounter text when view becomes visible
 	private IPartListener2 udpateOnVisible = new IPartListener2() {
 		@Override
 		public void partActivated(org.eclipse.ui.IWorkbenchPartReference partRef) {
@@ -214,6 +222,7 @@ public class TardocKonsView extends ViewPart {
 		}
 	}
 
+	// Set the current encounter and propagate to subcomponents
 	private synchronized void setKons(final IEncounter encounter) {
 		LoggerFactory.getLogger(getClass()).info("[KONS] " + (encounter != null ? encounter.getId() : "null"));
 
@@ -225,11 +234,12 @@ public class TardocKonsView extends ViewPart {
 		if (encounter != null) {
 			ICoverage coverage = encounter.getCoverage();
 			// TODO remove, pat should be already set via context
-			setPatient(coverage.getPatient());
+			// setPatient(coverage.getPatient());
 			setKonsText(encounter, encounter.getVersionedEntry().getHeadVersion());
 
 			casesComposite.setEncounter(coverage);
 
+			// TODO Save this for later: different background for today's kons
 			if (encounter.getDate().isEqual(LocalDate.now())) {
 				etf.setTextBackground(UiDesk.getColor(UiDesk.COL_WHITE));
 			} else {
@@ -242,6 +252,7 @@ public class TardocKonsView extends ViewPart {
 				additionsComposite.getDiagnosesComposite().setKons(encounter);
 			}
 			encounterTimer.stop();
+			etf.setEnabled(true);
 		} else {
 			etf.setText(StringUtils.EMPTY);
 			etf.setEnabled(false);
@@ -251,6 +262,10 @@ public class TardocKonsView extends ViewPart {
 
 	}
 
+	/**
+	 * Set the text of the encounter to the specified version of the stored
+	 * VersionedResource
+	 */
 	void setKonsText(final IEncounter encounter, final int version) {
 		String ntext = StringUtils.EMPTY;
 		if ((version >= 0) && (version <= encounter.getVersionedEntry().getHeadVersion())) {
@@ -271,17 +286,23 @@ public class TardocKonsView extends ViewPart {
 		// encounter.getVersionedEntry().getHeadVersion());
 	}
 
+	/** Get the current text of the consultation as plaintext */
 	public String getText() {
 		return etf.getContentsPlaintext();
 	}
 
+	/**
+	 * Insert text at the end of the consultation text
+	 * 
+	 * @param text
+	 */
 	public void insertTextAtEndOfKons(String text) {
 		if (text == null || text.trim().isEmpty()) {
 			return;
 		}
 		String existing = etf.getContentsPlaintext();
 		if (LocalLockServiceHolder.get().acquireLock(actEncounter).isOk()) {
-			etf.replace(0, existing.length(), existing+text);
+			etf.replace(0, existing.length(), existing + text);
 			EncounterServiceHolder.get().updateVersionedEntry(actEncounter, new Samdas(etf.getContentsAsXML()));
 
 			ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, actEncounter);
@@ -289,6 +310,9 @@ public class TardocKonsView extends ViewPart {
 		}
 	}
 
+	/**
+	 * Initializes the view with the given site and memento.
+	 */
 	@Override
 	public void init(IViewSite site, IMemento memento) throws org.eclipse.ui.PartInitException {
 		super.init(site, memento);
@@ -327,7 +351,7 @@ public class TardocKonsView extends ViewPart {
 		etf = new EnhancedTextField(sashForm, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		etf.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 		hXrefs = new Hashtable<String, IKonsExtension>();
-		
+
 		// Enable cross-references
 		@SuppressWarnings("unchecked")
 		List<IKonsExtension> xrefs = Extensions
@@ -337,19 +361,19 @@ public class TardocKonsView extends ViewPart {
 			hXrefs.put(provider, x);
 		}
 		etf.setXrefHandlers(hXrefs);
-		
+
 		// Enable Makros
 		@SuppressWarnings("unchecked")
 		List<IKonsMakro> makros = Extensions
 				.getClasses(Extensions.getExtensions(ExtensionPointConstantsUi.KONSEXTENSION), "KonsMakro", false); //$NON-NLS-1$ //$NON-NLS-2$
 		etf.setExternalMakros(makros);
-		
-		// Create additions composite in the sash form with memento for state persistence
-		additionsComposite = new AdditionsComposite(sashForm, SWT.NONE, this, memento);
+
+		// Create additions composite in the sash form with memento for state
+		// persistence
+		additionsComposite = new AdditionsComposite(sashForm, this, memento);
 
 		// Set initial selection provider (billing positions is shown by default)
-		getSite().setSelectionProvider(
-			additionsComposite.getBillingPositionsComposite().getBillingPositionsViewer());
+		getSite().setSelectionProvider(additionsComposite.getBillingPositionsComposite().getBillingPositionsViewer());
 
 		// Restore saved weights from memento if available
 		int[] weights = DEFAULT_WEIGHTS;
@@ -416,7 +440,7 @@ public class TardocKonsView extends ViewPart {
 		};
 		toggleAdditionsAction.setToolTipText(Messages.TardocKonsView_ToggleAdditions_Tooltip);
 		toggleAdditionsAction.setImageDescriptor(Images.IMG_VIEW_PATIENT_DETAIL.getImageDescriptor());
-		
+
 		toggleViewAction = new Action("Dx", Action.AS_PUSH_BUTTON) {
 			@Override
 			public void run() {
@@ -476,20 +500,20 @@ public class TardocKonsView extends ViewPart {
 	}
 
 	/**
-	 * Toggles between billing positions and diagnoses view in the additions composite
+	 * Toggles between billing positions and diagnoses view in the additions
+	 * composite
 	 */
 	private void toggleView() {
 		if (additionsComposite != null && !additionsComposite.isDisposed()) {
 			additionsComposite.toggleView();
-			
+
 			// Update the selection provider based on which view is showing
 			if (additionsComposite.isShowingBillingPositions()) {
 				getSite().setSelectionProvider(
-					additionsComposite.getBillingPositionsComposite().getBillingPositionsViewer());
+						additionsComposite.getBillingPositionsComposite().getBillingPositionsViewer());
 				toggleViewAction.setToolTipText(Messages.TardocKonsView_SwitchToDiagnoses_Tooltip);
 			} else {
-				getSite().setSelectionProvider(
-					additionsComposite.getDiagnosesComposite().getDiagnosesViewer());
+				getSite().setSelectionProvider(additionsComposite.getDiagnosesComposite().getDiagnosesViewer());
 				toggleViewAction.setToolTipText(Messages.TardocKonsView_SwitchToBillingPositions_Tooltip);
 			}
 		}
@@ -514,12 +538,12 @@ public class TardocKonsView extends ViewPart {
 	public void saveState(IMemento memento) {
 		int[] w = sashForm.getWeights();
 		memento.putString("additions_height", Integer.toString(w[0]) + StringConstants.COMMA + Integer.toString(w[1]));
-		
+
 		// Save additions composite state (including diagnoses code system selection)
 		if (additionsComposite != null && !additionsComposite.isDisposed()) {
 			additionsComposite.saveState(memento);
 		}
-		
+
 		super.saveState(memento);
 	}
 
