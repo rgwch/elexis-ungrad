@@ -60,7 +60,6 @@ public class BillingPositionsComposite extends Composite {
 	private Text searchField;
 	private TardocManager tardocManager;
 	private BundleContext bundleContext;
-	private Label statusLabel;
 	private TardocKonsView tkv;
 	private VerrechnungsDisplay billed;
 	private IEncounter currentEncounter;
@@ -185,13 +184,11 @@ public class BillingPositionsComposite extends Composite {
 		if (searchText.isEmpty()) {
 			// Clear the list if search is empty
 			billingPositionsViewer.setInput(Collections.emptyList());
-			statusLabel.setText("Enter search term to find billing positions");
 			return;
 		}
 
 		// Check if service is available
 		if (tardocManager == null || !tardocManager.isServiceAvailable(bundleContext)) {
-			statusLabel.setText("Service not available");
 			billingPositionsViewer.setInput(Collections.emptyList());
 			return;
 		}
@@ -203,14 +200,7 @@ public class BillingPositionsComposite extends Composite {
 			// Update the viewer
 			billingPositionsViewer.setInput(results);
 
-			// Update status
-			if (results.isEmpty()) {
-				statusLabel.setText("No results found for: " + searchText);
-			} else {
-				statusLabel.setText("Found " + results.size() + " result(s)");
-			}
 		} catch (Exception ex) {
-			statusLabel.setText("Error searching: " + ex.getMessage());
 			billingPositionsViewer.setInput(Collections.emptyList());
 			ex.printStackTrace();
 		}
