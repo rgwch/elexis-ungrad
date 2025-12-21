@@ -47,7 +47,9 @@ import ch.elexis.base.ch.arzttarife.tardoc.ITardocLeistung;
 import ch.elexis.core.common.ElexisEventTopics;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.data.service.StoreToStringServiceHolder;
+import ch.elexis.core.model.ICodeElementBlock;
 import ch.elexis.core.model.IEncounter;
+import ch.elexis.core.ui.processor.BillingProcessor;
 import ch.elexis.core.ui.views.VerrechnungsDisplay;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
 
@@ -303,11 +305,15 @@ public class BillingPositionsComposite extends Composite {
 					
 					// Add the leistung to the encounter using BillingService
 					try {
+						BillingProcessor bp= new BillingProcessor(currentEncounter);
+						bp.processOtherObject(leistung);
+						ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, currentEncounter);
+						
+						/*
 						ch.elexis.core.services.holder.BillingServiceHolder.get()
 							.bill(leistung, currentEncounter, 1.0);
 						// Trigger update event to refresh the display
-						ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, currentEncounter);
-
+						 */
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
