@@ -10,6 +10,7 @@
  *
  * Contributors:
  * G. Weirich - initial implementation
+ * Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
  *********************************************************************************/
 
 package ch.elexis.ungrad.tardoc.views;
@@ -19,6 +20,8 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+
+import ch.elexis.ungrad.tardoc.Messages;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.Action;
@@ -51,7 +54,6 @@ import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.services.EncounterServiceHolder;
 import ch.elexis.core.ui.text.EnhancedTextField;
 import ch.elexis.core.ui.util.IKonsExtension;
-import ch.elexis.core.ui.views.Messages;
 import ch.elexis.ungrad.tardoc.services.BillingsManager;
 import ch.elexis.ungrad.tardoc.services.EncounterTimer;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
@@ -62,7 +64,8 @@ import jakarta.inject.Inject;
 
 /**
  * Tardoc consultation view with timer, text area, and billing positions list.
- * This is the main view of the Tardoc plugin
+ * This is the main view of the Tardoc plugin. 
+ * We started from the standard Elexis KonsDetailView, so there's some leftover code and comments referring to "KonsDetailView".
  */
 public class TardocKonsView extends ViewPart {
 
@@ -252,7 +255,7 @@ public class TardocKonsView extends ViewPart {
 			ResourceItem entry = vr.getVersion(version);
 			ntext = entry.data;
 			StringBuilder sb = new StringBuilder();
-			sb.append("rev. ").append(version).append(Messages.KonsDetailView_of) //$NON-NLS-1$
+			sb.append("rev. ").append(version).append(ch.elexis.core.ui.views.Messages.KonsDetailView_of) //$NON-NLS-1$
 					.append( // $NON-NLS-2$
 							new TimeTool(entry.timestamp).toString(TimeTool.FULL_GER))
 					.append(" (").append(entry.remark).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -391,7 +394,7 @@ public class TardocKonsView extends ViewPart {
 				toggleAdditionsVisibility();
 			}
 		};
-		toggleAdditionsAction.setToolTipText("Toggle additions section");
+		toggleAdditionsAction.setToolTipText(Messages.TardocKonsView_ToggleAdditions_Tooltip);
 		toggleAdditionsAction.setImageDescriptor(Images.IMG_VIEW_PATIENT_DETAIL.getImageDescriptor());
 		
 		toggleViewAction = new Action("Dx", Action.AS_PUSH_BUTTON) {
@@ -400,7 +403,7 @@ public class TardocKonsView extends ViewPart {
 				toggleView();
 			}
 		};
-		toggleViewAction.setToolTipText("Switch to Diagnoses");
+		toggleViewAction.setToolTipText(Messages.TardocKonsView_SwitchToDiagnoses_Tooltip);
 		toggleViewAction.setImageDescriptor(Images.IMG_BILL.getImageDescriptor());
 	}
 
@@ -463,11 +466,11 @@ public class TardocKonsView extends ViewPart {
 			if (additionsComposite.isShowingBillingPositions()) {
 				getSite().setSelectionProvider(
 					additionsComposite.getBillingPositionsComposite().getBillingPositionsViewer());
-				toggleViewAction.setToolTipText("Switch to Diagnoses");
+				toggleViewAction.setToolTipText(Messages.TardocKonsView_SwitchToDiagnoses_Tooltip);
 			} else {
 				getSite().setSelectionProvider(
 					additionsComposite.getDiagnosesComposite().getDiagnosesViewer());
-				toggleViewAction.setToolTipText("Switch to Billing Positions");
+				toggleViewAction.setToolTipText(Messages.TardocKonsView_SwitchToBillingPositions_Tooltip);
 			}
 		}
 	}

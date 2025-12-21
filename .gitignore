@@ -11,6 +11,7 @@
 **/.settings/
 **/*.log
 **/*.iml
+ungradfactory/build
 
 # Locally stored "Eclipse launch configurations"
 **/*.launch

@@ -10,6 +10,7 @@
  *
  * Contributors:
  * G. Weirich - initial implementation
+ * Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
  *********************************************************************************/
 
 package ch.elexis.ungrad.tardoc.views;
@@ -17,6 +18,8 @@ package ch.elexis.ungrad.tardoc.views;
 import java.text.MessageFormat;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+
+import ch.elexis.ungrad.tardoc.Messages;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -35,7 +38,6 @@ import ch.elexis.core.ui.icons.ImageSize;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.services.EncounterServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
-import ch.elexis.core.ui.views.Messages;
 import ch.rgw.tools.Result;
 
 /**
@@ -59,7 +61,7 @@ public class CasesComposite extends Composite {
 
 		// Create hyperlink
 		coverageLink = new Hyperlink(this, SWT.NONE);
-		coverageLink.setText("No case selected");
+		coverageLink.setText(Messages.CasesComposite_NoCase_Selected);
 		coverageLink.setUnderlined(true);
 		coverageLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
@@ -92,13 +94,13 @@ public class CasesComposite extends Composite {
 		String fallLabel = actCoverage != null ? actCoverage.getLabel() : "Current Case NOT found!!";
 
 		if (!changeToCoverage.isOpen()) {
-			SWTHelper.alert(Messages.Core_Case_is_closed, Messages.KonsDetailView_CaseClosedBody);
+			SWTHelper.alert(ch.elexis.core.ui.views.Messages.Core_Case_is_closed, ch.elexis.core.ui.views.Messages.KonsDetailView_CaseClosedBody);
 		} else {
-			MessageDialog msd = new MessageDialog(getShell(), Messages.KonsDetailView_ChangeCaseCaption,
+			MessageDialog msd = new MessageDialog(getShell(), ch.elexis.core.ui.views.Messages.KonsDetailView_ChangeCaseCaption,
 					Images.IMG_LOGO.getImage(ImageSize._75x66_TitleDialogIconSize),
-					MessageFormat.format(Messages.KonsDetailView_ConfirmChangeConsToCase,
+					MessageFormat.format(ch.elexis.core.ui.views.Messages.KonsDetailView_ConfirmChangeConsToCase,
 							new Object[] { fallLabel, changeToCoverage.getLabel() }),
-					MessageDialog.QUESTION, new String[] { Messages.Core_Yes, Messages.Corr_No }, 0);
+					MessageDialog.QUESTION, new String[] { ch.elexis.core.ui.views.Messages.Core_Yes, ch.elexis.core.ui.views.Messages.Corr_No }, 0);
 
 			if (msd.open() == Window.OK) {
 				if (tkv.actEncounter != null) {
@@ -126,7 +128,7 @@ public class CasesComposite extends Composite {
 			updateLinkColor(currentCoverage);
 		} else {
 			currentCoverage = null;
-			coverageLink.setText("No case selected");
+			coverageLink.setText(Messages.CasesComposite_NoCase_Selected);
 			coverageLink.setForeground(getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 		}
 	}
@@ -150,11 +152,11 @@ public class CasesComposite extends Composite {
 		if (coverage != null) {
 			String label = coverage.getLabel();
 			if (!coverage.isOpen()) {
-				label += " (closed)";
+				label += " " + Messages.CasesComposite_Closed_Suffix;
 			}
 			coverageLink.setText(label);
 		} else {
-			coverageLink.setText("No case selected");
+			coverageLink.setText(Messages.CasesComposite_NoCase_Selected);
 		}
 		layout(true);
 	}

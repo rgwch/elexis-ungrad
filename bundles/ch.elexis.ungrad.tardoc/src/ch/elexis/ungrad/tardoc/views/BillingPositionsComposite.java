@@ -10,6 +10,7 @@
  *
  * Contributors:
  * G. Weirich - initial implementation
+ * Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
  *********************************************************************************/
 
 package ch.elexis.ungrad.tardoc.views;
@@ -18,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+
+import ch.elexis.ungrad.tardoc.Messages;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -46,7 +49,9 @@ import ch.elexis.base.ch.arzttarife.tardoc.ITardocLeistung;
 import ch.elexis.core.common.ElexisEventTopics;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.data.service.StoreToStringServiceHolder;
+import ch.elexis.core.model.ICodeElementBlock;
 import ch.elexis.core.model.IEncounter;
+import ch.elexis.core.ui.processor.BillingProcessor;
 import ch.elexis.core.ui.views.VerrechnungsDisplay;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
 
@@ -59,7 +64,6 @@ public class BillingPositionsComposite extends Composite {
 	private Text searchField;
 	private TardocManager tardocManager;
 	private BundleContext bundleContext;
-	private Label statusLabel;
 	private TardocKonsView tkv;
 	private VerrechnungsDisplay billed;
 	private IEncounter currentEncounter;
@@ -159,12 +163,12 @@ public class BillingPositionsComposite extends Composite {
 		searchComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
 		Label searchLabel = new Label(searchComposite, SWT.NONE);
-		searchLabel.setText("Suche:");
+		searchLabel.setText(Messages.BillingPositionsComposite_Search_Label);
 		searchLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
 		searchField = new Text(searchComposite, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
 		searchField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		searchField.setMessage("Suchbegriff..."); // Placeholder text
+		searchField.setMessage(Messages.BillingPositionsComposite_Search_Placeholder); // Placeholder text
 
 		// Add modify listener to perform search as user types
 		searchField.addModifyListener(new ModifyListener() {
@@ -184,13 +188,11 @@ public class BillingPositionsComposite extends Composite {
 		if (searchText.isEmpty()) {
 			// Clear the list if search is empty
 			billingPositionsViewer.setInput(Collections.emptyList());
-			statusLabel.setText("Enter search term to find billing positions");
 			return;
 		}
 
 		// Check if service is available
 		if (tardocManager == null || !tardocManager.isServiceAvailable(bundleContext)) {
-			statusLabel.setText("Service not available");
 			billingPositionsViewer.setInput(Collections.emptyList());
 			return;
 		}
@@ -202,14 +204,7 @@ public class BillingPositionsComposite extends Composite {
 			// Update the viewer
 			billingPositionsViewer.setInput(results);
 
-			// Update status
-			if (results.isEmpty()) {
-				statusLabel.setText("No results found for: " + searchText);
-			} else {
-				statusLabel.setText("Found " + results.size() + " result(s)");
-			}
 		} catch (Exception ex) {
-			statusLabel.setText("Error searching: " + ex.getMessage());
 			billingPositionsViewer.setInput(Collections.emptyList());
 			ex.printStackTrace();
 		}
@@ -312,11 +307,15 @@ public class BillingPositionsComposite extends Composite {
 					
 					// Add the leistung to the encounter using BillingService
 					try {
+						BillingProcessor bp= new BillingProcessor(currentEncounter);
+						bp.processOtherObject(leistung);
+						ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, currentEncounter);
+						
+						/*
 						ch.elexis.core.services.holder.BillingServiceHolder.get()
 							.bill(leistung, currentEncounter, 1.0);
 						// Trigger update event to refresh the display
-						ContextServiceHolder.get().postEvent(ElexisEventTopics.EVENT_UPDATE, currentEncounter);
-
+						 */
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}

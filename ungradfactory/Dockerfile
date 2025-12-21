@@ -1,17 +1,11 @@
-FROM maven:3.6-jdk-8-slim
+FROM debian:13
 
-RUN apt-get update && apt-get install -y git \
+ARG BRANCH=ungrad-2026
+
+RUN apt-get update && apt-get install -y git openjdk-21-jdk-headless maven\
   && mkdir /opt/elexisfactory && mkdir -p /opt/artifacts && cd /opt/elexisfactory \
-  && git clone https://github.com/rgwch/elexis-3-core \
-  && git clone https://github.com/rgwch/elexis-3-base \
-  && git clone https://github.com/rgwch/elexis-ungrad \
-  && cd elexis-3-core \
-  && mvn -V clean verify -Dtycho.localArtifacts=ignore -Dmaven.test.skip=true -P all-archs  \
-  && cd ../elexis-3-base \
-  && mvn -V clean verify -Dtycho.localArtifacts=ignore -Dmaven.test.skip=true \
-  && cd ../elexis-ungrad \
-  && mvn -V clean verify -Dtycho.localArtifacts=ignore -Dmaven.test.skip=true 
-
+  && git clone -b $BRANCH https://github.com/rgwch/elexis-3-core \
+  && git clone -b $BRANCH https://github.com/rgwch/elexis-3-base \
+  && git clone -b $BRANCH https://github.com/rgwch/elexis-ungrad
 
 ADD build.sh /opt/elexisfactory/build.sh
-CMD ["/opt/elexisfactory/build.sh"]

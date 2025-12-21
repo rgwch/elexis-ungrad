@@ -2,7 +2,7 @@
 
 ## What is it for?
 
-The Tardoc tariff brings its own challenges: New billing positions, minute-accurate billing for time-based services, and requirements for procedural services.
+The Tardoc tariff brings its own challenges: New tariff positions, minute-precise billing for time-based services, requirements for action-based services.
 
 This plugin facilitates correct billing.
 
@@ -12,11 +12,15 @@ Currently, the plugin only works for holders of dignity 3010 (Specialists in Gen
 
 ## Usage:
 
-When you start a new consultation, click the "Start" button. This will automatically bill position CA.00.0010 and the stopwatch will start running. After 5 minutes, position CA.00.0030 is additionally billed and incremented every minute, up to a maximum of 15 minutes.
+When you start a new consultation, click the "Start" button. This automatically bills position CA.00.0010 and the stopwatch starts running. After 5 minutes, position CA.00.0030 is additionally billed and counts up one minute at a time, up to a maximum of 15 minutes.
 
-When you bill a procedural position, the timer is stopped. In the consultation text, the examinations required for this procedural service are pre-filled and must then be completed manually.
+When you bill an action position, the timer stops. In the consultation text, the examinations prescribed for this action service are predefined and must then be completed manually.
 
 ## Limitations
 
-Although the plugin can be configured via the rsc/config.json file, it has so far only been tested for general practitioner basic positions.
-Also, config.json is very syntax-sensitive. After making a change, be sure to check with a JSON validator that it is correct.
+While the plugin can be configured using the file rsc/config.json, it has only been tested for basic general practitioner positions so far.
+Also, config.json is very syntax-sensitive. After making changes, be sure to check with a JSON validator that it is correct.
+
+## Vibe Coding
+
+This plugin was created with significant help from AI (Claude Sonnet 4.5)

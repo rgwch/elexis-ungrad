@@ -10,6 +10,7 @@
  *
  * Contributors:
  * G. Weirich - initial implementation
+ * Substantial contributions:  Copilot (c) 2024 GitHub, Inc. using Claude Sonnet 4.5
  *********************************************************************************/
 
 package ch.elexis.ungrad.tardoc.services;
@@ -84,7 +85,7 @@ public class DiagnosesManager {
 			results.addAll(searchTessinerCode(pattern));
 		}
 		// if codeSystem is "All", search both code systems and combine results
-		else if ("All".equals(codeSystem)) {
+		else if ("Alle".equals(codeSystem)) {
 			results.addAll(searchIcd10(pattern));
 			results.addAll(searchTessinerCode(pattern));
 		}
