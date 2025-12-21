@@ -38,7 +38,7 @@ else
 fi
 cd /opt/elexisfactory/elexis-3-base
 mvn -V clean verify  -Dtycho.localArtifacts=ignore -DskipTests
-mkdir /opt/elexisfactory/dist/base-b2site
+mkdir -p /opt/elexisfactory/dist/base-p2site
 cp -r /opt/elexisfactory/elexis-3-base/ch.elexis.base.p2site/target/repository/* /opt/elexisfactory/dist/base-p2site/
 
 ######### Elexis Ungrad
