@@ -14,6 +14,16 @@ Link the Repository with the elexis [ungrad plugins](https://www.elexis.ch/ungra
 
 ## Build:
 
+### Reproducible build using docker:
+
+```bash
+cd ungradfactory
+./docker-build.sh
+```
+Products and Repositories will be in ungradfactory/dist
+
+### Custom build
+
 Prerequisites: Git, jdk21, Maven 3.9.x; Linux or Windows recommended. MacOS will be a bit tricky,
 
 Full build:
