@@ -64,7 +64,8 @@ import jakarta.inject.Inject;
 
 /**
  * Tardoc consultation view with timer, text area, and billing positions list.
- * This is the main view of the Tardoc plugin
+ * This is the main view of the Tardoc plugin. 
+ * We started from the standard Elexis KonsDetailView, so there's some leftover code and comments referring to "KonsDetailView".
  */
 public class TardocKonsView extends ViewPart {
 
