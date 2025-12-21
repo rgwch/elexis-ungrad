@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+
+import ch.elexis.ungrad.tardoc.Messages;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -161,12 +163,12 @@ public class BillingPositionsComposite extends Composite {
 		searchComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
 		Label searchLabel = new Label(searchComposite, SWT.NONE);
-		searchLabel.setText("Suche:");
+		searchLabel.setText(Messages.BillingPositionsComposite_Search_Label);
 		searchLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
 		searchField = new Text(searchComposite, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
 		searchField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		searchField.setMessage("Suchbegriff..."); // Placeholder text
+		searchField.setMessage(Messages.BillingPositionsComposite_Search_Placeholder); // Placeholder text
 
 		// Add modify listener to perform search as user types
 		searchField.addModifyListener(new ModifyListener() {

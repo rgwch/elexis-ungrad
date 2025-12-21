@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+
+import ch.elexis.ungrad.tardoc.Messages;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -66,8 +68,8 @@ public class DiagnosesComposite extends Composite {
 	private DiagnosenDisplay diags;
 	private IMemento memento;
 	
-	// Code system options
-	private static final String[] CODE_SYSTEMS = { "Alle", "ICD-10", "TI-Code" };
+	// Code system options - will be initialized with localized strings
+	private String[] CODE_SYSTEMS;
 	private static final String MEMENTO_CODE_SYSTEM = "selected_code_system";
 
 	/**
@@ -121,6 +123,13 @@ public class DiagnosesComposite extends Composite {
 		super(parent, style);
 		this.page = page;
 		this.memento = memento;
+		
+		// Initialize CODE_SYSTEMS with localized strings
+		CODE_SYSTEMS = new String[] {
+			Messages.DiagnosesComposite_CodeSystem_All,
+			Messages.DiagnosesComposite_CodeSystem_ICD10,
+			Messages.DiagnosesComposite_CodeSystem_TICode
+		};
 		
 		// Initialize DiagnosesManager
 		diagnosesManager = new DiagnosesManager();
@@ -176,7 +185,7 @@ public class DiagnosesComposite extends Composite {
 
 		// Code system label
 		Label codeSystemLabel = new Label(searchComposite, SWT.NONE);
-		codeSystemLabel.setText("Code System:");
+		codeSystemLabel.setText(Messages.DiagnosesComposite_CodeSystem_Label);
 		codeSystemLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
 		// Code system combo
@@ -193,13 +202,13 @@ public class DiagnosesComposite extends Composite {
 
 		// Search label
 		Label searchLabel = new Label(searchComposite, SWT.NONE);
-		searchLabel.setText("Suche:");
+		searchLabel.setText(Messages.DiagnosesComposite_Search_Label);
 		searchLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
 		// Search field
 		searchField = new Text(searchComposite, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
 		searchField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		searchField.setMessage("Diagnosecode oder Text eingeben..."); // Placeholder text
+		searchField.setMessage(Messages.DiagnosesComposite_Search_Placeholder); // Placeholder text
 
 		// Add modify listener to perform search as user types
 		searchField.addModifyListener(new ModifyListener() {

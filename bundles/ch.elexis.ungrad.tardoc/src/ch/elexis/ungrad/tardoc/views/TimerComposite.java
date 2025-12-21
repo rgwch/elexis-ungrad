@@ -16,6 +16,8 @@
 package ch.elexis.ungrad.tardoc.views;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+
+import ch.elexis.ungrad.tardoc.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -67,7 +69,7 @@ public class TimerComposite extends Composite {
 		// Start/Pause button
 		startPauseButton = new Button(this, SWT.PUSH);
 		startPauseButton.setImage(playIcon);
-		startPauseButton.setToolTipText("Start timer");
+		startPauseButton.setToolTipText(Messages.TimerComposite_StartTimer_Tooltip);
 		GridData gdStartPause = new GridData(SWT.CENTER, SWT.CENTER, false, false);
 		gdStartPause.widthHint = 24;
 		gdStartPause.heightHint = 24;
@@ -82,7 +84,7 @@ public class TimerComposite extends Composite {
 		// Reset button
 		resetButton = new Button(this, SWT.PUSH);
 		resetButton.setImage(stopIcon);
-		resetButton.setToolTipText("Reset timer");
+		resetButton.setToolTipText(Messages.TimerComposite_ResetTimer_Tooltip);
 		GridData gdReset = new GridData(SWT.CENTER, SWT.CENTER, false, false);
 		gdReset.widthHint = 24;
 		gdReset.heightHint = 24;
@@ -121,11 +123,11 @@ public class TimerComposite extends Composite {
 		if (!this.tkv.encounterTimer.isRunning()) {
 			this.tkv.encounterTimer.resume();
 			startPauseButton.setImage(pauseIcon);
-			startPauseButton.setToolTipText("Pause timer");
+			startPauseButton.setToolTipText(Messages.TimerComposite_PauseTimer_Tooltip);
 		} else {
 			this.tkv.encounterTimer.pause();
 			startPauseButton.setImage(playIcon);
-			startPauseButton.setToolTipText("Start timer");
+			startPauseButton.setToolTipText(Messages.TimerComposite_StartTimer_Tooltip);
 		}
 	}
 
@@ -134,7 +136,7 @@ public class TimerComposite extends Composite {
 	 */
 	private void resetTimer() {
 		startPauseButton.setImage(playIcon);
-		startPauseButton.setToolTipText("Start timer");
+		startPauseButton.setToolTipText(Messages.TimerComposite_StartTimer_Tooltip);
 		this.tkv.encounterTimer.stop();
 		updateDisplay(0L);
 	}
@@ -149,10 +151,10 @@ public class TimerComposite extends Composite {
 		if (this.tkv.encounterTimer.isRunning()) {
 			this.tkv.billingsManager.autobill(minutes);
 			startPauseButton.setImage(pauseIcon);
-			startPauseButton.setToolTipText("Pause timer");
+			startPauseButton.setToolTipText(Messages.TimerComposite_PauseTimer_Tooltip);
 		} else {
 			startPauseButton.setImage(playIcon);
-			startPauseButton.setToolTipText("Start timer");
+			startPauseButton.setToolTipText(Messages.TimerComposite_StartTimer_Tooltip);
 		}
 	}
 
