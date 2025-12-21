@@ -11,7 +11,6 @@ fi
 
 # If exec fails, rebuild the docker image and run
 echo "Exec failed, rebuilding docker image and starting new container..."
-docker build -t rgwch/ungrad-factory:1.0.0 .
-docker run --rm -v ./build:/opt/elexisfactory/dist --name elexisfactory rgwch/ungrad-factory:1.0.0 /opt/elexisfactory/build.sh
-
+docker build -t rgwch/ungrad-factory:1.1.0 .
+docker run -v ./build:/opt/elexisfactory/dist --name elexisfactory rgwch/ungrad-factory:1.1.0 /opt/elexisfactory/build.sh
 
