@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# stop on errors
+set -o errexit
+
 branch=ungrad-2026
 
 ######### Elexis Core
