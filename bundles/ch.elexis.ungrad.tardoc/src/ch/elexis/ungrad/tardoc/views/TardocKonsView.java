@@ -44,6 +44,7 @@ import ch.elexis.core.common.ElexisEventTopics;
 import ch.elexis.core.constants.StringConstants;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.data.service.LocalLockServiceHolder;
+import ch.elexis.core.data.util.Extensions;
 import ch.elexis.core.model.ICoverage;
 import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.model.IPatient;
@@ -51,9 +52,11 @@ import ch.elexis.core.model.IUser;
 import ch.elexis.core.text.model.Samdas;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.UiDesk;
+import ch.elexis.core.ui.constants.ExtensionPointConstantsUi;
 import ch.elexis.core.ui.services.EncounterServiceHolder;
 import ch.elexis.core.ui.text.EnhancedTextField;
 import ch.elexis.core.ui.util.IKonsExtension;
+import ch.elexis.core.ui.util.IKonsMakro;
 import ch.elexis.ungrad.tardoc.services.BillingsManager;
 import ch.elexis.ungrad.tardoc.services.EncounterTimer;
 import ch.elexis.ungrad.tardoc.services.TardocManager;
@@ -323,7 +326,24 @@ public class TardocKonsView extends ViewPart {
 		// Create text area section in the sash form
 		etf = new EnhancedTextField(sashForm, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		etf.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-
+		hXrefs = new Hashtable<String, IKonsExtension>();
+		
+		// Enable cross-references
+		@SuppressWarnings("unchecked")
+		List<IKonsExtension> xrefs = Extensions
+				.getClasses(Extensions.getExtensions(ExtensionPointConstantsUi.KONSEXTENSION), "KonsExtension", false); //$NON-NLS-1$ //$NON-NLS-2$
+		for (IKonsExtension x : xrefs) {
+			String provider = x.connect(etf);
+			hXrefs.put(provider, x);
+		}
+		etf.setXrefHandlers(hXrefs);
+		
+		// Enable Makros
+		@SuppressWarnings("unchecked")
+		List<IKonsMakro> makros = Extensions
+				.getClasses(Extensions.getExtensions(ExtensionPointConstantsUi.KONSEXTENSION), "KonsMakro", false); //$NON-NLS-1$ //$NON-NLS-2$
+		etf.setExternalMakros(makros);
+		
 		// Create additions composite in the sash form with memento for state persistence
 		additionsComposite = new AdditionsComposite(sashForm, SWT.NONE, this, memento);
 
