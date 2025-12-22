@@ -39,6 +39,12 @@ public class Messages extends NLS {
 	public static String View_SendByMail;
 	public static String View_ShowCurrentForm;
 	public static String View_ShowListOfDocuments;
+	public static String Preferences_Description;
+	public static String Preferences_Templates;
+	public static String Preferences_PugCompiler;
+	public static String Preferences_PDFViewer;
+	public static String Preferences_MailBody;
+	public static String Preferences_Signature;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

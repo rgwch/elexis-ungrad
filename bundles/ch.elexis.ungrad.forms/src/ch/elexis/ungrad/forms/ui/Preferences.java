@@ -32,7 +32,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	public Preferences() {
 		super(GRID);
 		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
-		setDescription("Ungrad Forms");
+		setDescription(Messages.Preferences_Description);
 	}
 
 	@Override
@@ -43,11 +43,11 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	@Override
 	protected void createFieldEditors() {
 		addField(
-				new DirectoryFieldEditor(PreferenceConstants.TEMPLATES, "Vorlagenverzeichnis", getFieldEditorParent()));
-		addField(new FileFieldEditor(PreferenceConstants.PUG, "Pug-Compiler", getFieldEditorParent()));
-		addField(new FileFieldEditor(PreferenceConstants.PDF_VIEWER, "PDF Viewer", getFieldEditorParent()));
-		addField(new MultilineFieldEditor(PreferenceConstants.MAIL_BODY, "Mail-Standardtext", getFieldEditorParent()));
-		addField(new FileFieldEditor(PreferenceConstants.SIGNATURE, "Signatur", getFieldEditorParent()));
+				new DirectoryFieldEditor(PreferenceConstants.TEMPLATES, Messages.Preferences_Templates, getFieldEditorParent()));
+		addField(new FileFieldEditor(PreferenceConstants.PUG, Messages.Preferences_PugCompiler, getFieldEditorParent()));
+		addField(new FileFieldEditor(PreferenceConstants.PDF_VIEWER, Messages.Preferences_PDFViewer, getFieldEditorParent()));
+		addField(new MultilineFieldEditor(PreferenceConstants.MAIL_BODY, Messages.Preferences_MailBody, getFieldEditorParent()));
+		addField(new FileFieldEditor(PreferenceConstants.SIGNATURE, Messages.Preferences_Signature, getFieldEditorParent()));
 
 	}
 
