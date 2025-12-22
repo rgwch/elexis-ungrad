@@ -62,7 +62,7 @@ import ch.rgw.tools.ExHandler;
 public class DirectoryViewPane extends Composite {
 	private static int COLUMN_DATE = 0;
 	private static int COLUMN_NAME = 1;
-	private static String[] columnTitles = { "Datum", "Dateiname" };
+	private String[] columnTitles = { Messages.DirectoryViewPane_col_date, Messages.DirectoryViewPane_col_filename };
 	private int[] columnWidths = { 80, 300 };
 	private Table table;
 	private TableViewer tv;
@@ -103,9 +103,9 @@ public class DirectoryViewPane extends Composite {
 			MenuItem mSummary = new MenuItem(menu, SWT.NONE);
 			MenuItem mDiagnoses = new MenuItem(menu, SWT.NONE);
 			MenuItem mMedication = new MenuItem(menu, SWT.NONE);
-			mSummary.setText("KI-Zusammenfassung");
-			mDiagnoses.setText("KI-Diagnosen");
-			mMedication.setText("KI-Medikation");
+			mSummary.setText(Messages.DirectoryViewPane_menu_ai_summary);
+			mDiagnoses.setText(Messages.DirectoryViewPane_menu_ai_diagnoses);
+			mMedication.setText(Messages.DirectoryViewPane_menu_ai_medication);
 			mSummary.addSelectionListener(new SelectionAdapter() {
 
 				@Override
@@ -113,11 +113,11 @@ public class DirectoryViewPane extends Composite {
 					IStructuredSelection sel = tv.getStructuredSelection();
 					if (!sel.isEmpty()) {
 						File selected = (File) sel.getFirstElement();
-						controlle.askKI(selected, "Erstelle eine Zusammenfassung des folgenden Texts: ",
+						controlle.askKI(selected, Messages.DirectoryViewPane_ai_prompt_summary,
 								new INotifier() {
 									@Override
 									public boolean received(String text) {
-										SWTHelper.showInfo("Antwort", text);
+										SWTHelper.showInfo(Messages.DirectoryViewPane_ai_answer, text);
 										return true;
 									}
 								});
@@ -132,10 +132,10 @@ public class DirectoryViewPane extends Composite {
 					IStructuredSelection sel = tv.getStructuredSelection();
 					if (!sel.isEmpty()) {
 						File selected = (File) sel.getFirstElement();
-						controlle.askKI(selected, "Finde die Diagnosen in folgendem Text: ", new INotifier() {
+						controlle.askKI(selected, Messages.DirectoryViewPane_ai_prompt_diagnoses, new INotifier() {
 							@Override
 							public boolean received(String text) {
-								SWTHelper.showInfo("Antwort", text);
+								SWTHelper.showInfo(Messages.DirectoryViewPane_ai_answer, text);
 								return true;
 							}
 						});
@@ -150,10 +150,10 @@ public class DirectoryViewPane extends Composite {
 					IStructuredSelection sel = tv.getStructuredSelection();
 					if (!sel.isEmpty()) {
 						File selected = (File) sel.getFirstElement();
-						controlle.askKI(selected, "Finde die Austrittsmedikation in folgendem Text: ", new INotifier() {
+						controlle.askKI(selected, Messages.DirectoryViewPane_ai_prompt_medication, new INotifier() {
 							@Override
 							public boolean received(String text) {
-								SWTHelper.showInfo("Antwort", text);
+								SWTHelper.showInfo(Messages.DirectoryViewPane_ai_answer, text);
 								return true;
 							}
 						});
@@ -165,9 +165,9 @@ public class DirectoryViewPane extends Composite {
 		}
 		new MenuItem(menu, SWT.SEPARATOR);
 		MenuItem mDelete = new MenuItem(menu, SWT.NONE);
-		mEdit.setText("Umbenennen..");
-		mSend.setText("Per Mail senden");
-		mDelete.setText("Löschen");
+		mEdit.setText(Messages.DirectoryViewPane_menu_rename);
+		mSend.setText(Messages.DirectoryViewPane_menu_send);
+		mDelete.setText(Messages.DirectoryViewPane_menu_delete);
 		table.setMenu(menu);
 		mEdit.addSelectionListener(new SelectionAdapter() {
 
@@ -176,8 +176,8 @@ public class DirectoryViewPane extends Composite {
 				IStructuredSelection sel = tv.getStructuredSelection();
 				if (!sel.isEmpty()) {
 					File selected = (File) sel.getFirstElement();
-					InputDialog id = new InputDialog(getShell(), "Dateinamen ändern",
-							"Bitte geben Sie den neuen Dateinamen ein", selected.getName(), null);
+					InputDialog id = new InputDialog(getShell(), Messages.DirectoryViewPane_rename_title,
+							Messages.DirectoryViewPane_rename_message, selected.getName(), null);
 					if (id.open() == Dialog.OK) {
 						File dest = new File(selected.getParent(), id.getValue());
 						selected.renameTo(dest);
@@ -213,7 +213,7 @@ public class DirectoryViewPane extends Composite {
 			}
 		} catch (Exception e) {
 			ExHandler.handle(e);
-			SWTHelper.showError("Can't set Patient", e.getMessage());
+			SWTHelper.showError(Messages.DirectoryViewPane_error_setpatient, e.getMessage());
 		}
 
 	}

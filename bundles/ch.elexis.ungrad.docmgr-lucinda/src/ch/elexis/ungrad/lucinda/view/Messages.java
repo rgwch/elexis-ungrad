@@ -50,6 +50,21 @@ public class Messages extends NLS {
 	public static String Master_connected_tooltip2;
 	public static String Master_disconnected_tooltip;
 	public static String Master_searchButton_caption;
+	public static String DirectoryViewPane_col_date;
+	public static String DirectoryViewPane_col_filename;
+	public static String DirectoryViewPane_menu_rename;
+	public static String DirectoryViewPane_menu_send;
+	public static String DirectoryViewPane_menu_delete;
+	public static String DirectoryViewPane_menu_ai_summary;
+	public static String DirectoryViewPane_menu_ai_diagnoses;
+	public static String DirectoryViewPane_menu_ai_medication;
+	public static String DirectoryViewPane_rename_title;
+	public static String DirectoryViewPane_rename_message;
+	public static String DirectoryViewPane_error_setpatient;
+	public static String DirectoryViewPane_ai_prompt_summary;
+	public static String DirectoryViewPane_ai_prompt_diagnoses;
+	public static String DirectoryViewPane_ai_prompt_medication;
+	public static String DirectoryViewPane_ai_answer;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
