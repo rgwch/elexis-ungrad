@@ -73,7 +73,7 @@ public class ExtIdPreferences extends PreferencePage implements IWorkbenchPrefer
 			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				KontaktSelektor ksl = new KontaktSelektor(getShell(), Kontakt.class, "Kontakt auswählen",
-						"Bitte wählen Sie den Kontat, dessen Extinfo bearbeitet werden soll", new String[] {});
+						"Bitte wählen Sie den Kontakt, dessen Extinfo bearbeitet werden soll", new String[] {});
 				int ret = ksl.open();
 				if (ret == Window.OK) {
 					Kontakt k = (Kontakt) ksl.getSelection();
@@ -87,7 +87,7 @@ public class ExtIdPreferences extends PreferencePage implements IWorkbenchPrefer
 		scroller = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		scroller.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 		fields = new Composite(scroller, SWT.NONE);
-		fields.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
+		fields.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 		scroller.setContent(fields);
 		// fields.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 		fields.setLayout(new GridLayout(4, false));
