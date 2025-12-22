@@ -14,11 +14,13 @@ All visible texts in the Tardoc plugin have been localized to support German, En
 - **German (default)**: `src/ch/elexis/ungrad/tardoc/messages.properties`
 - **English**: `src/ch/elexis/ungrad/tardoc/messages_en.properties`
 - **French**: `src/ch/elexis/ungrad/tardoc/messages_fr.properties`
+- **Italian**: `src/ch/elexis/ungrad/tardoc/messages_it.properties`
 
 ### 3. Documentation
 - **German**: `doc/liesmich.md` (already existed)
 - **English**: `doc/readme.md` (already existed)
 - **French**: `doc/lisezmoi.md` (newly created)
+- **Italian**: `doc/leggimi.md` (newly created)
 
 ## Localized Components
 
@@ -69,6 +71,7 @@ The plugin now fully supports:
 - 🇩🇪 **German** (Deutsch) - Default language
 - 🇬🇧 **English** - Full translation
 - 🇫🇷 **French** (Français) - Full translation
+- 🇮🇹 **Italian** (Italiano) - Full translation
 
 ## Usage
 
@@ -84,4 +87,7 @@ eclipse -nl fr
 
 # For German (default)
 eclipse -nl de
+
+# For Italian
+eclipse -nl it
 ```

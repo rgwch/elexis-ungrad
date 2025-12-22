@@ -1,28 +1,28 @@
 # Localization Reference Table
 
-| Key | German (DE) | English (EN) | French (FR) |
-|-----|-------------|--------------|-------------|
+| Key | German (DE) | English (EN) | French (FR) | Italian (IT) |
+|-----|-------------|--------------|-------------|--------------|
 | **TardocKonsView** |
-| `TardocKonsView_ToggleAdditions_Tooltip` | Zusatzansicht umschalten | Toggle additional view | Basculer la vue supplémentaire |
-| `TardocKonsView_SwitchToDiagnoses_Tooltip` | Zu Diagnosen wechseln | Switch to diagnoses | Passer aux diagnostics |
-| `TardocKonsView_SwitchToBillingPositions_Tooltip` | Zu Abrechnungspositionen wechseln | Switch to billing positions | Passer aux positions de facturation |
+| `TardocKonsView_ToggleAdditions_Tooltip` | Zusatzansicht umschalten | Toggle additional view | Basculer la vue supplémentaire | Attiva/disattiva vista aggiuntiva |
+| `TardocKonsView_SwitchToDiagnoses_Tooltip` | Zu Diagnosen wechseln | Switch to diagnoses | Passer aux diagnostics | Passa alle diagnosi |
+| `TardocKonsView_SwitchToBillingPositions_Tooltip` | Zu Abrechnungspositionen wechseln | Switch to billing positions | Passer aux positions de facturation | Passa alle posizioni di fatturazione |
 | **TimerComposite** |
-| `TimerComposite_StartTimer_Tooltip` | Timer starten | Start timer | Démarrer le minuteur |
-| `TimerComposite_PauseTimer_Tooltip` | Timer pausieren | Pause timer | Mettre en pause le minuteur |
-| `TimerComposite_ResetTimer_Tooltip` | Timer zurücksetzen | Reset timer | Réinitialiser le minuteur |
+| `TimerComposite_StartTimer_Tooltip` | Timer starten | Start timer | Démarrer le minuteur | Avvia timer |
+| `TimerComposite_PauseTimer_Tooltip` | Timer pausieren | Pause timer | Mettre en pause le minuteur | Metti in pausa timer |
+| `TimerComposite_ResetTimer_Tooltip` | Timer zurücksetzen | Reset timer | Réinitialiser le minuteur | Reimposta timer |
 | **BillingPositionsComposite** |
-| `BillingPositionsComposite_Search_Label` | Suche: | Search: | Recherche: |
-| `BillingPositionsComposite_Search_Placeholder` | Suchbegriff... | Search term... | Terme de recherche... |
+| `BillingPositionsComposite_Search_Label` | Suche: | Search: | Recherche: | Ricerca: |
+| `BillingPositionsComposite_Search_Placeholder` | Suchbegriff... | Search term... | Terme de recherche... | Termine di ricerca... |
 | **DiagnosesComposite** |
-| `DiagnosesComposite_CodeSystem_Label` | Code System: | Code System: | Système de code: |
-| `DiagnosesComposite_CodeSystem_All` | Alle | All | Tous |
-| `DiagnosesComposite_CodeSystem_ICD10` | ICD-10 | ICD-10 | ICD-10 |
-| `DiagnosesComposite_CodeSystem_TICode` | TI-Code | TI-Code | TI-Code |
-| `DiagnosesComposite_Search_Label` | Suche: | Search: | Recherche: |
-| `DiagnosesComposite_Search_Placeholder` | Diagnosecode oder Text eingeben... | Enter diagnosis code or text... | Entrer code de diagnostic ou texte... |
+| `DiagnosesComposite_CodeSystem_Label` | Code System: | Code System: | Système de code: | Sistema di codifica: |
+| `DiagnosesComposite_CodeSystem_All` | Alle | All | Tous | Tutti |
+| `DiagnosesComposite_CodeSystem_ICD10` | ICD-10 | ICD-10 | ICD-10 | ICD-10 |
+| `DiagnosesComposite_CodeSystem_TICode` | TI-Code | TI-Code | TI-Code | TI-Code |
+| `DiagnosesComposite_Search_Label` | Suche: | Search: | Recherche: | Ricerca: |
+| `DiagnosesComposite_Search_Placeholder` | Diagnosecode oder Text eingeben... | Enter diagnosis code or text... | Entrer code de diagnostic ou texte... | Inserire codice diagnostico o testo... |
 | **CasesComposite** |
-| `CasesComposite_NoCase_Selected` | Kein Fall ausgewählt | No case selected | Aucun cas sélectionné |
-| `CasesComposite_Closed_Suffix` | (geschlossen) | (closed) | (fermé) |
+| `CasesComposite_NoCase_Selected` | Kein Fall ausgewählt | No case selected | Aucun cas sélectionné | Nessun caso selezionato |
+| `CasesComposite_Closed_Suffix` | (geschlossen) | (closed) | (fermé) | (chiuso) |
 
 ## Usage in Code
 
@@ -73,4 +73,7 @@ eclipse -nl en
 
 # French
 eclipse -nl fr
+
+# Italian
+eclipse -nl it
 ```
