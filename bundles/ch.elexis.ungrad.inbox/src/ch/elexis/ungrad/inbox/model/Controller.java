@@ -112,7 +112,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 					// });
 
 				} catch (Exception ex) {
-					SWTHelper.showError("Fehler bei KI Aufruf", ex.getMessage());
+					SWTHelper.showError(ch.elexis.ungrad.inbox.ui.Messages.Controller_Error_AICall, ex.getMessage());
 				}
 
 			});

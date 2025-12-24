@@ -158,7 +158,7 @@ public class View extends ViewPart {
 
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
-			SWTHelper.showError("Konnte nicht starten", ex.getMessage());
+			SWTHelper.showError(Messages.View_Error_CouldNotStart, ex.getMessage());
 		}
 	}
 
@@ -166,9 +166,9 @@ public class View extends ViewPart {
 		/**
 		 * Fetch Mail attachments into inbox (If mail receive is configured)
 		 */
-		loadMailAction = new Action("Mails holen") {
+		loadMailAction = new Action(Messages.View_Action_FetchMail_Title) {
 			{
-				setToolTipText("IMAP Mails holen");
+				setToolTipText(Messages.View_Action_FetchMail_Tooltip);
 				setImageDescriptor(Images.IMG_MAIL.getImageDescriptor());
 			}
 			private IMAPMail.INotifier notifier = new IMAPMail.INotifier() {
@@ -181,7 +181,7 @@ public class View extends ViewPart {
 						FileTool.writeTextFile(new File(dir, name + ".meta"), sender + "," + subject);
 						reload();
 					} catch (Exception ex) {
-						SWTHelper.alert("Fehler beim Schreiben " + name, ex.getMessage());
+						SWTHelper.alert(Messages.View_Error_Writing, MessageFormat.format(Messages.View_Error_Writing, name));
 					}
 
 				}
@@ -199,7 +199,7 @@ public class View extends ViewPart {
 					}
 
 				} catch (Exception e) {
-					SWTHelper.alert("Fehler bei Nachrichtenabruf", e.getLocalizedMessage());
+					SWTHelper.alert(Messages.View_Error_FetchingMail, e.getLocalizedMessage());
 					ExHandler.handle(e);
 				}
 			}
@@ -208,9 +208,9 @@ public class View extends ViewPart {
 		/**
 		 * Associate selected file with patient and optional change filename
 		 */
-		addAction = new Action("Zuweisen") {
+		addAction = new Action(Messages.View_Action_Assign_Title) {
 			{
-				setToolTipText("Dokument zuweisen");
+				setToolTipText(Messages.View_Action_Assign_Tooltip);
 				setImageDescriptor(Images.IMG_IMPORT.getImageDescriptor());
 			}
 
@@ -228,13 +228,13 @@ public class View extends ViewPart {
 								controller.moveFileToDocbase(dd.concerns_id, sel, idlg.getValue(), idlg.bUseKI);
 								reload();
 							} else {
-								SWTHelper.alert("Kein Patient zugewiesen",
-										"Bitte weisen Sie dieses Dokument einem Patienten zu");
+								SWTHelper.alert(Messages.ImportDocumentDialog_ErrorNoPatient,
+										Messages.ImportDocumentDialog_ErrorNoPatient);
 							}
 						}
 					}
 				} catch (Exception ex) {
-					SWTHelper.showError("Fehler beim Verschieben", ex.getMessage());
+					SWTHelper.showError(Messages.View_Error_Moving, ex.getMessage());
 				}
 			}
 		};
@@ -242,16 +242,16 @@ public class View extends ViewPart {
 		/**
 		 * Delete currently selected file
 		 */
-		deleteAction = new Action("Löschen") {
+		deleteAction = new Action(Messages.View_Action_Delete_Title) {
 			{
-				setToolTipText("Dokument löschen");
+				setToolTipText(Messages.View_Action_Delete_Tooltip);
 				setImageDescriptor(Images.IMG_DELETE.getImageDescriptor());
 			}
 
 			@Override
 			public void run() {
 				File sel = getSelection();
-				if (SWTHelper.askYesNo("Eingangsfach", MessageFormat.format("{0} wirklich löschen?", sel.getName()))) {
+				if (SWTHelper.askYesNo(Messages.Plugin_PreferencesName, MessageFormat.format("{0} wirklich löschen?", sel.getName()))) {
 					File meta = new File(sel.getAbsolutePath() + ".meta");
 					if (meta.exists()) {
 						meta.delete();
@@ -265,9 +265,9 @@ public class View extends ViewPart {
 		/**
 		 * Display currently selected file
 		 */
-		execAction = new Action("Öffnen") {
+		execAction = new Action(Messages.View_Action_Open_Title) {
 			{
-				setToolTipText("Dokument öffnen");
+				setToolTipText(Messages.View_Action_Open_Tooltip);
 				setImageDescriptor(Images.IMG_EYE_WO_SHADOW.getImageDescriptor());
 			}
 
@@ -281,9 +281,9 @@ public class View extends ViewPart {
 		 * Refresh contents of the inbox view
 		 * 
 		 */
-		reloadAction = new Action("Neu einlesen") {
+		reloadAction = new Action(Messages.View_Action_Reload_Title) {
 			{
-				setToolTipText("Eingangsfach neu einlesen");
+				setToolTipText(Messages.View_Action_Reload_Tooltip);
 				setImageDescriptor(Images.IMG_REFRESH.getImageDescriptor());
 			}
 

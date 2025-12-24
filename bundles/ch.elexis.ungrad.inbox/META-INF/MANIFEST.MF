@@ -1,8 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Inbox
+Bundle-Name: %Bundle_Name
 Bundle-SymbolicName: ch.elexis.ungrad.inbox;singleton:=true
 Bundle-Version: 2.0.0.qualifier
+Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.29.0",
  ch.elexis.core;bundle-version="3.12.0",
  ch.elexis.core.data;bundle-version="3.12.0",
@@ -12,6 +13,6 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.29.0",
  ch.elexis.core.ui;bundle-version="3.12.0",
  ch.elexis.core.ui.icons;bundle-version="3.12.0",
  ch.elexis.ungrad.docmgr-lucinda;bundle-version="3.3.0"
-Bundle-Vendor: weirich@elexis.ch
+Bundle-Vendor: %Bundle_Vendor
 Automatic-Module-Name: ch.elexis.ungrad.inbox
 Bundle-RequiredExecutionEnvironment: JavaSE-21

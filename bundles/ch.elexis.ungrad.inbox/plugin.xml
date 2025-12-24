@@ -8,7 +8,7 @@
                class="ch.elexis.ungrad.inbox.ui.View"
                icon="icons/inbox.jpg"
                id="ch.rgw.elexis.ungrad.inbox.ui.View"
-               name="Ungrad-Inbox"
+               name="%Plugin_ViewName"
                restorable="true">
       </view>
    </extension>
@@ -18,7 +18,7 @@
             category="ch.elexis.ungrad.common.prefs"
             class="ch.elexis.ungrad.inbox.ui.Preferences"
             id="ch.rgw.elexis.ungrad.inbox.prefs"
-            name="Eingangsfach">
+            name="%Plugin_PreferencesName">
       </page>
    </extension>
 

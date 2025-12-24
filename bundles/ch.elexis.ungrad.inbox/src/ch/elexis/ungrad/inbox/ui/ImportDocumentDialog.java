@@ -64,13 +64,14 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 		ret.setLayout(new GridLayout(2, false));
 		// lPat = new Label(ret, SWT.NONE);
 		Button bSelect = new Button(ret, SWT.PUSH);
-		bSelect.setText("Patient/in zuweisen...");
+		bSelect.setText(Messages.ImportDocumentDialog_AssignPatient);
 		bSelect.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				KontaktSelektor ksl = new KontaktSelektor(getShell(), Person.class, "Bitte Patient/in wählen",
-						"Patient/in für Zuordnung", null);
+				KontaktSelektor ksl = new KontaktSelektor(getShell(), Person.class, 
+						Messages.ImportDocumentDialog_SelectPatientTitle,
+						Messages.ImportDocumentDialog_SelectPatientMessage, null);
 				if (ksl.open() == Dialog.OK) {
 					Person pat = (Person) ksl.getSelection();
 					setErrorMessage(null);
@@ -81,7 +82,7 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 
 		});
 		if (dd.concerns() == false) {
-			setErrorMessage("Bitte weisen Sie eine Patientin oder einen Patienten zu");
+			setErrorMessage(Messages.ImportDocumentDialog_ErrorNoPatient);
 		} else {
 			setMessage(Patient.load(dd.concerns_id).getLabel());
 		}
@@ -109,7 +110,7 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 			cbUseKI = new Button(cUseKI, SWT.CHECK);
 			cbUseKI.setSelection(bUseKI);
 			Label lUseKI = new Label(cUseKI, SWT.NONE);
-			lUseKI.setText("KI Zusammenfassung erstellen");
+			lUseKI.setText(Messages.ImportDocumentDialog_UseAI);
 		}
 		return ret;
 	}
@@ -117,8 +118,8 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		super.getShell().setText("Dokument importieren");
-		setTitle("Dieses Dokument gehört zu:");
+		super.getShell().setText(Messages.ImportDocumentDialog_ShellTitle);
+		setTitle(Messages.ImportDocumentDialog_Title);
 	}
 
 	public ImportDocumentDialog(View view, DocumentDescriptor dd) {

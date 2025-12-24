@@ -12,6 +12,7 @@
 
 package ch.elexis.ungrad.inbox.ui;
 
+import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +46,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	public Preferences() {
 		super(GRID);
 		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
-		setDescription("Ungrad Inbox");
+		setDescription(Messages.Preferences_Description);
 	}
 
 	@Override
@@ -54,30 +55,34 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 
 	}
 
-	private String[][] methods = { { "Nein", "none" }, { "IMAP", "imap" }, { "Mbox", "mbox" } };
+	private String[][] methods = { 
+		{ Messages.Preferences_FetchMethod_None, "none" }, 
+		{ Messages.Preferences_FetchMethod_IMAP, "imap" }, 
+		{ Messages.Preferences_FetchMethod_MBox, "mbox" } 
+	};
 
 	@Override
 	protected void createFieldEditors() {
-		addField(new DirectoryFieldEditor(PreferenceConstants.BASEDIR, "Verzeichnis", getFieldEditorParent()));
-		addField(new RadioGroupFieldEditor(PreferenceConstants.MAILMODE, "Emails einlesen", 3, methods,
+		addField(new DirectoryFieldEditor(PreferenceConstants.BASEDIR, Messages.Preferences_Directory, getFieldEditorParent()));
+		addField(new RadioGroupFieldEditor(PreferenceConstants.MAILMODE, Messages.Preferences_FetchEmails, 3, methods,
 				getFieldEditorParent()));
-		addField(new FileFieldEditor(PreferenceConstants.MBOX, "MBox-Datei", getFieldEditorParent()));
-		addField(new MultilineFieldEditor(PreferenceConstants.WHITELIST, "Absender", 4, SWT.V_SCROLL, false,
+		addField(new FileFieldEditor(PreferenceConstants.MBOX, Messages.Preferences_MBoxFile, getFieldEditorParent()));
+		addField(new MultilineFieldEditor(PreferenceConstants.WHITELIST, Messages.Preferences_Whitelist, 4, SWT.V_SCROLL, false,
 				getFieldEditorParent()));
-		addField(new FileFieldEditor(PreferenceConstants.MAPPINGS, "Dateinamen-Analyse", getFieldEditorParent()));
-		addField(new BooleanFieldEditor(PreferenceConstants.ANALYZE_CONTENTS, "Auch Datei-Inhalt betrachten (Erfordert Lucinda ab v. 3.2.0)", getFieldEditorParent()));
+		addField(new FileFieldEditor(PreferenceConstants.MAPPINGS, Messages.Preferences_FilenameAnalysis, getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.ANALYZE_CONTENTS, Messages.Preferences_AnalyzeContents, getFieldEditorParent()));
 		Composite p = getFieldEditorParent();
 		Group cCheck = new Group(p, SWT.BORDER);
 		cCheck.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
-		cCheck.setText("Regexp-Tester");
+		cCheck.setText(Messages.Preferences_RegexpTester);
 		cCheck.setLayout(new GridLayout(2, false));
 		Label lEnter = new Label(cCheck, SWT.NONE);
-		lEnter.setText("Regexp");
+		lEnter.setText(Messages.Preferences_Regexp);
 		tEnter = new Text(cCheck, SWT.BORDER);
 		tEnter.setLayoutData(SWTHelper.getFillGridData());
 		tEnter.addModifyListener(matchChecker);
 		Label lText = new Label(cCheck, SWT.NONE);
-		lText.setText("Zeichenfolge");
+		lText.setText(Messages.Preferences_String);
 		tText = new Text(cCheck, SWT.BORDER);
 		tText.setLayoutData(SWTHelper.getFillGridData());
 		lResult = new Label(cCheck, SWT.NONE);
@@ -96,16 +101,16 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 			if (matcher.matches()) {
 				int num = matcher.groupCount();
 				if (num == 0) {
-					lResult.setText("Gefunden: " + matcher.group());
+					lResult.setText(MessageFormat.format(Messages.Preferences_Found, matcher.group()));
 				} else {
-					String res = "Treffer: ";
+					String res = "";
 					for (int i = 1; i <= num; i++) {
 						res = res + "(" + matcher.group(i) + ") ";
 					}
-					lResult.setText(res);
+					lResult.setText(MessageFormat.format(Messages.Preferences_Matches, res));
 				}
 			} else {
-				lResult.setText("Keine Übereinstimmung");
+				lResult.setText(Messages.Preferences_NoMatch);
 			}
 		}
 	};
