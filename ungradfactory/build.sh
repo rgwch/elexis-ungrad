@@ -1,4 +1,5 @@
 #! /bin/bash
+# This file will be copied into the ungradfactory Docker image and run there
 
 # stop on errors
 set -o errexit
