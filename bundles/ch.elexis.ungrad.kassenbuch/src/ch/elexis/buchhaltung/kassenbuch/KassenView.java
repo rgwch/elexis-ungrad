@@ -61,7 +61,15 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 	TableViewer tv;
 	TableColumn[] tc;
 	TimeTool ttVon, ttBis;
-	String[] tableHeaders = new String[] { "Beleg", "Datum", "Soll", "Haben", "Saldo", "Kategorie", "Text" };
+	String[] tableHeaders = new String[] { 
+		Messages.KassenView_ColumnBeleg, 
+		Messages.KassenView_ColumnDatum, 
+		Messages.KassenView_ColumnSoll, 
+		Messages.KassenView_ColumnHaben, 
+		Messages.KassenView_ColumnSaldo, 
+		Messages.KassenView_ColumnKategorie, 
+		Messages.KassenView_ColumnText 
+	};
 	int[] tableCols = new int[] { 50, 80, 60, 60, 60, 100, 400 };
 	private IAction addAction, subtractAction, stornoAction, saldoAction, dateAction, printAction, editCatAction;
 
@@ -127,10 +135,10 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 
 	private void setFormText() {
 		if (ttVon == null) {
-			form.setText("Anzeige: Alle Buchungen");
+			form.setText(Messages.KassenView_DisplayAllBookings);
 		} else {
-			form.setText(
-					"Anzeige: Von " + ttVon.toString(TimeTool.DATE_GER) + " bis: " + ttBis.toString(TimeTool.DATE_GER));
+			form.setText(java.text.MessageFormat.format(Messages.KassenView_DisplayFromTo,
+					ttVon.toString(TimeTool.DATE_GER), ttBis.toString(TimeTool.DATE_GER)));
 		}
 	}
 
@@ -215,10 +223,10 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 	}
 
 	private void makeActions() {
-		addAction = new Action("Einnahme") {
+		addAction = new Action(Messages.KassenView_Action_Income_Title) {
 			{
 				setImageDescriptor(Images.IMG_ADDITEM.getImageDescriptor());
-				setToolTipText("Einnahme verbuchen");
+				setToolTipText(Messages.KassenView_Action_Income_Tooltip);
 			}
 
 			@Override
@@ -227,10 +235,10 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				tv.refresh();
 			}
 		};
-		subtractAction = new Action("Ausgabe") {
+		subtractAction = new Action(Messages.KassenView_Action_Expense_Title) {
 			{
 				setImageDescriptor(Images.IMG_REMOVEITEM.getImageDescriptor());
-				setToolTipText("Ausgabe verbuchen");
+				setToolTipText(Messages.KassenView_Action_Expense_Tooltip);
 			}
 
 			@Override
@@ -239,10 +247,10 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				tv.refresh();
 			}
 		};
-		stornoAction = new Action("Storno") {
+		stornoAction = new Action(Messages.KassenView_Action_Storno_Title) {
 			{
 				setImageDescriptor(Images.IMG_DELETE.getImageDescriptor());
-				setToolTipText("Buchung stornieren");
+				setToolTipText(Messages.KassenView_Action_Storno_Tooltip);
 			}
 
 			@Override
@@ -257,16 +265,16 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 
 			}
 		};
-		saldoAction = new Action("Saldo") {
+		saldoAction = new Action(Messages.KassenView_Action_Balance_Title) {
 			{
 				setImageDescriptor(getPluginImageDescriptor("icons/sigma.ico"));
-				setToolTipText("Zwischenbilanz erstellen");
+				setToolTipText(Messages.KassenView_Action_Balance_Tooltip);
 			}
 
 			@Override
 			public void run() {
-				InputDialog inp = new InputDialog(getSite().getShell(), "Kassenbestand abgleichen",
-						"Geben Sie bitte den abgezählten Betrag in der Kasse ein", "0.00", null);
+				InputDialog inp = new InputDialog(getSite().getShell(), Messages.KassenView_Balance_DialogTitle,
+						Messages.KassenView_Balance_DialogMessage, Messages.KassenView_Balance_DefaultValue, null);
 				if (inp.open() == Dialog.OK) {
 					try {
 						Money money = new Money(inp.getValue());
@@ -274,23 +282,23 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 							KassenbuchEintrag last = KassenbuchEintrag.recalc();
 							Money soll = last.getSaldo();
 							Money diff = money.subtractMoney(soll);
-							new KassenbuchEintrag(KassenbuchEintrag.nextNr(last) + " Kontrolle",
+							new KassenbuchEintrag(KassenbuchEintrag.nextNr(last) + " " + Messages.KassenView_Balance_Check,
 									new TimeTool().toString(TimeTool.DATE_GER), diff,
-									diff.isNegative() ? "Fehlbetrag" : "Überschuss");
+									diff.isNegative() ? Messages.KassenView_Balance_Shortage : Messages.KassenView_Balance_Surplus);
 							tv.refresh();
 						}
 					} catch (Exception ex) {
 						ExHandler.handle(ex);
-						SWTHelper.alert("Fehler", "Die Eingabe im Betragsfeld war ungültig");
+						SWTHelper.alert(Messages.KassenView_Error_Title, Messages.KassenView_Error_InvalidAmount);
 					}
 				}
 			}
 		};
 
-		dateAction = new Action("Zeitraum") {
+		dateAction = new Action(Messages.KassenView_Action_Period_Title) {
 			{
 				setImageDescriptor(getPluginImageDescriptor("icons/calendar.png"));
-				setToolTipText("Anzeigezeitraum einstellen");
+				setToolTipText(Messages.KassenView_Action_Period_Tooltip);
 			}
 
 			@Override
@@ -308,10 +316,10 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				tv.refresh();
 			}
 		};
-		printAction = new Action("Drucken") {
+		printAction = new Action(Messages.KassenView_Action_Print_Title) {
 			{
 				setImageDescriptor(Images.IMG_PRINTER.getImageDescriptor());
-				setTitleToolTip("Angezeigte Buchungen ausdrucken");
+				setTitleToolTip(Messages.KassenView_Action_Print_Tooltip);
 			}
 
 			public void run() {
@@ -319,10 +327,10 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 				kbd.open();
 			}
 		};
-		editCatAction = new Action("Kategorien...") {
+		editCatAction = new Action(Messages.KassenView_Action_EditCategories_Title) {
 			{
 				setImageDescriptor(Images.IMG_EDIT.getImageDescriptor());
-				setTitleToolTip("Kategorien editieren");
+				setTitleToolTip(Messages.KassenView_Action_EditCategories_Tooltip);
 			}
 
 			@Override

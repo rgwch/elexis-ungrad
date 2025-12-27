@@ -65,13 +65,20 @@ public class KassenbuchDruckDialog extends Dialog implements ICallback {
 		}
 		KassenbuchEintrag[] lines = set.toArray(new KassenbuchEintrag[0]);
 		String[][] table = new String[lines.length + 1][];
-		table[0] = new String[] { "Nr", "Datum", "Soll", "Haben", "Betrag", "Text" };
+		table[0] = new String[] { 
+			Messages.KassenbuchDruckDialog_ColumnNr, 
+			Messages.KassenbuchDruckDialog_ColumnDate, 
+			Messages.KassenbuchDruckDialog_ColumnDebit, 
+			Messages.KassenbuchDruckDialog_ColumnCredit, 
+			Messages.KassenbuchDruckDialog_ColumnAmount, 
+			Messages.KassenbuchDruckDialog_ColumnText 
+		};
 		for (int i = 1; i <= lines.length; i++) {
 			table[i] = new String[6];
 			KassenbuchEintrag kb = lines[i - 1];
 			String kategorie = kb.getKategorie();
 			if (StringTool.isNothing(kategorie)) {
-				kategorie = "Sonstiges";
+				kategorie = Messages.KassenbuchDruckDialog_Miscellaneous;
 			}
 			Money mKat = mCategories.get(kategorie);
 			if (mKat == null) {
@@ -105,7 +112,7 @@ public class KassenbuchDruckDialog extends Dialog implements ICallback {
 	@Override
 	public void create() {
 		super.create();
-		getShell().setText("Kassenbuch");
+		getShell().setText(Messages.KassenbuchDruckDialog_ShellTitle);
 		getShell().setSize(800, 700);
 
 	}

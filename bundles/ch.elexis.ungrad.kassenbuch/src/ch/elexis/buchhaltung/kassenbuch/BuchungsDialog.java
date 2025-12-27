@@ -56,17 +56,17 @@ public class BuchungsDialog extends TitleAreaDialog {
 		Composite top = new Composite(ret, SWT.BORDER);
 		top.setLayout(new FillLayout());
 		top.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		liBeleg = new LabeledInputField(top, "Beleg");
-		liDate = new LabeledInputField(top, "Datum", LabeledInputField.Typ.OBSOLETE_DATE);
-		liBetrag = new LabeledInputField(top, "Betrag", LabeledInputField.Typ.MONEY);
+		liBeleg = new LabeledInputField(top, Messages.BuchungsDialog_Label_Beleg);
+		liDate = new LabeledInputField(top, Messages.BuchungsDialog_Label_Date, LabeledInputField.Typ.OBSOLETE_DATE);
+		liBetrag = new LabeledInputField(top, Messages.BuchungsDialog_Label_Amount, LabeledInputField.Typ.MONEY);
 		Composite cCats = new Composite(ret, SWT.NONE);
 		cCats.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		cCats.setLayout(new GridLayout(2, false));
-		new Label(cCats, SWT.NONE).setText("Kategorie");
+		new Label(cCats, SWT.NONE).setText(Messages.BuchungsDialog_Label_Category);
 		cbCats = new Combo(cCats, SWT.SINGLE);
 		cbCats.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		cbCats.setItems(KassenbuchEintrag.getCategories());
-		new Label(ret, SWT.NONE).setText("Buchungstext");
+		new Label(ret, SWT.NONE).setText(Messages.BuchungsDialog_Label_Text);
 		text = new Text(ret, SWT.BORDER);
 		text.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		if (act == null) {
@@ -87,15 +87,15 @@ public class BuchungsDialog extends TitleAreaDialog {
 		super.create();
 		if (act == null) {
 			if (bType) {
-				setTitle("Einnahme verbuchen");
+				setTitle(Messages.BuchungsDialog_Income_Title);
 			} else {
-				setTitle("Ausgabe verbuchen");
+				setTitle(Messages.BuchungsDialog_Expense_Title);
 			}
 		} else {
-			setTitle("Buchung ändern");
+			setTitle(Messages.BuchungsDialog_Edit_Title);
 		}
-		setMessage("Bitte geben Sie den Betrag und einen Buchungstext ein");
-		getShell().setText("Buchung für Kassenbuch");
+		setMessage(Messages.BuchungsDialog_Message);
+		getShell().setText(Messages.BuchungsDialog_ShellTitle);
 		liBetrag.getControl().setFocus();
 	}
 

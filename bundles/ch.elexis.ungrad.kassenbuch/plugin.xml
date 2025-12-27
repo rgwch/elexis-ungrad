@@ -8,10 +8,10 @@
             class="ch.elexis.buchhaltung.kassenbuch.KassenView"
             icon="icons/sparschwein.ico"
             id="ch.elexis.ungrad.kassenbuch"
-            name="Kassenbuch"/>
+            name="%Plugin_ViewName"/>
       <category
             id="ch.elexis.ungrad.buchhaltung.kategorie"
-            name="Buchhaltung"/>
+            name="%Plugin_CategoryName"/>
    </extension>
    <extension
          point="ch.elexis.core.data.ACLContribution">

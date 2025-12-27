@@ -42,8 +42,8 @@ public class DatumEingabeDialog extends TitleAreaDialog {
 		Composite ret = new Composite(parent, SWT.NONE);
 		ret.setLayoutData(SWTHelper.getFillGridData(1, true, 1, true));
 		ret.setLayout(new GridLayout(2, true));
-		new Label(ret, SWT.NONE).setText("Von:");
-		new Label(ret, SWT.NONE).setText("Bis:");
+		new Label(ret, SWT.NONE).setText(Messages.DatumEingabeDialog_Label_From);
+		new Label(ret, SWT.NONE).setText(Messages.DatumEingabeDialog_Label_To);
 		dpVon = new DatePicker(ret, SWT.NONE);
 		dpBis = new DatePicker(ret, SWT.NONE);
 		if (ttVon != null) {
@@ -58,9 +58,9 @@ public class DatumEingabeDialog extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		setMessage("Bitte geben Sie den gewünschten Zeitraum ein oder drücken Sie 'Abbrechen'.");
-		setTitle("Anzeigezeitraum für Kassenbuch");
-		getShell().setText("Elexis Kassenbuch");
+		setMessage(Messages.DatumEingabeDialog_Message);
+		setTitle(Messages.DatumEingabeDialog_Title);
+		getShell().setText(Messages.DatumEingabeDialog_ShellTitle);
 	}
 
 	@Override

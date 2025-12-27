@@ -39,9 +39,9 @@ public class EditCatsDialog extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		setTitle("Kassenbuch-Kategorien");
-		setMessage("Geben Sie eine Kategorie pro Zeile ein");
-		getShell().setText("Elexis-Kassenbuch");
+		setTitle(Messages.EditCatsDialog_Title);
+		setMessage(Messages.EditCatsDialog_Message);
+		getShell().setText(Messages.EditCatsDialog_ShellTitle);
 	}
 
 	@Override
