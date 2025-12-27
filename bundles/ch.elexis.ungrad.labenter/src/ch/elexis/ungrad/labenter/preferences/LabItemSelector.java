@@ -42,8 +42,8 @@ public class LabItemSelector extends TitleAreaDialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
-		setMessage("Bitte Labor Item auswählen");
-		setTitle("Laboritems");
+		setMessage(ch.elexis.ungrad.labenter.Messages.LabItemSelector_Message);
+		setTitle(ch.elexis.ungrad.labenter.Messages.LabItemSelector_Title);
 		composite.setLayout(SWTHelper.createGridLayout(true, 1));
 		ViewerConfigurer vc = new ViewerConfigurer(new DefaultContentProvider(cv, LabItem.class),
 				new DefaultLabelProvider(), new DefaultControlFieldProvider(cv, new String[] { LabItem.SHORTNAME }),

@@ -5,7 +5,7 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            name="Laboreingabe"
+            name="%Plugin_ViewName"
             icon="icons/report_edit.png"
             category="ch.elexis.messungenKategorie"
             class="ch.elexis.ungrad.labenter.views.ManualLabEntry"
@@ -18,7 +18,7 @@
       		catogory="ch.elexis.LaborPref"
             class="ch.elexis.ungrad.labenter.preferences.PreferencePage"
             id="ch.elexis.ungrad.labenter.preferences.PreferencePage"
-            name="Laboreingabe">
+            name="%Plugin_PreferencesName">
       </page>
    </extension>
    <extension

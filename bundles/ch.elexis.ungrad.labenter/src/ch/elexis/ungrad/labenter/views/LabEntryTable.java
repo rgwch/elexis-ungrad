@@ -92,7 +92,7 @@ public class LabEntryTable {
 	}
 	
 	private void createColumns(final Composite parent, final TableViewer viewer){
-		TableViewerColumn tvc = createColumn("Parameter", 300, 0);
+		TableViewerColumn tvc = createColumn(ch.elexis.ungrad.labenter.Messages.LabEntryTable_Column_Parameter, 300, 0);
 		tvc.setLabelProvider(new ColumnLabelProvider() {
 			
 			@Override
@@ -101,7 +101,7 @@ public class LabEntryTable {
 			}
 			
 		});
-		tvc = createColumn("Wert", 50, 1);
+		tvc = createColumn(ch.elexis.ungrad.labenter.Messages.LabEntryTable_Column_Value, 50, 1);
 		tvc.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public void update(ViewerCell cell){

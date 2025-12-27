@@ -44,7 +44,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	public PreferencePage() {
 		super(GRID);
 		setPreferenceStore(new SettingsPreferenceStore(CoreHub.globalCfg));
-		setDescription("Laboritems für manuelle Eingabe");
+		setDescription(ch.elexis.ungrad.labenter.Messages.PreferencePage_Description);
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	 */
 	public void createFieldEditors() {
 
-		addField(new ItemsEditor(PreferenceConstants.P_ITEMS, "labItems", getFieldEditorParent()));
+		addField(new ItemsEditor(PreferenceConstants.P_ITEMS, ch.elexis.ungrad.labenter.Messages.PreferencePage_LabItems, getFieldEditorParent()));
 		/*
 		 * addField(new DirectoryFieldEditor(PreferenceConstants.P_PATH,
 		 * "&Directory preference:", getFieldEditorParent())); addField( new

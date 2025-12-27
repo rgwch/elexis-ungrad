@@ -113,8 +113,9 @@ public class ManualLabEntry extends ViewPart implements IRefreshable {
 	private void setLabel() {
 		pat = (IPatient) ctx.getActivePatient().orElseGet(() -> null);
 		// pat = ElexisEventDispatcher.getSelectedPatient();
-		String lab = pat == null ? "Kein Patient gewählt" : pat.getLabel();
-		form.setText("Labor von " + lab + ", vom " + actDate.toString(TimeTool.DATE_GER));
+		String lab = pat == null ? ch.elexis.ungrad.labenter.Messages.ManualLabEntry_NoPatientSelected : pat.getLabel();
+		form.setText(java.text.MessageFormat.format(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_LabOf, lab) + ", " + 
+				java.text.MessageFormat.format(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_From, actDate.toString(TimeTool.DATE_GER)));
 	}
 
 	private void hookContextMenu() {
@@ -168,8 +169,8 @@ public class ManualLabEntry extends ViewPart implements IRefreshable {
 	private void makeActions() {
 		changeDateAction = new Action() {
 			{
-				setText("Anderes Datum");
-				setToolTipText("Datum für diese Laborwerte eingeben");
+				setText(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_Action_ChangeDate_Title);
+				setToolTipText(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_Action_ChangeDate_Tooltip);
 				setImageDescriptor(Images.IMG_CALENDAR.getImageDescriptor());
 			}
 
@@ -184,18 +185,19 @@ public class ManualLabEntry extends ViewPart implements IRefreshable {
 
 		sendValuesAction = new Action() {
 			{
-				setText("Absenden");
-				setToolTipText("Diese Werte speichern");
+				setText(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_Action_Send_Title);
+				setToolTipText(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_Action_Send_Tooltip);
 				setImageDescriptor(Images.IMG_EDIT_DONE.getImageDescriptor());
 			}
 
 			public void run() {
 				if (pat == null) {
-					showMessage("Es ist kein Patient ausgewählt");
+					showMessage(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_NoPatientSelected);
 
 				} else {
-					if (SWTHelper.askYesNo("Daten eintragen", "Wirklich die Daten für\n\n" + pat.getLabel() + ", Datum "
-							+ actDate.toString(TimeTool.DATE_GER) + "\n\neintragen?")) {
+					if (SWTHelper.askYesNo(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_Dialog_EnterData_Title, 
+							java.text.MessageFormat.format(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_Dialog_EnterData_Message,
+									pat.getLabel(), actDate.toString(TimeTool.DATE_GER)))) {
 						BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 							public void run() {
 								for (Element el : let.elements) {
@@ -203,7 +205,7 @@ public class ManualLabEntry extends ViewPart implements IRefreshable {
 										new LabResult(Patient.load(pat.getId()), actDate, el.item, el.value, "");
 									}
 								}
-								showMessage("ok");
+								showMessage(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_Dialog_Success);
 								clearFields();
 							}
 						});
@@ -213,8 +215,8 @@ public class ManualLabEntry extends ViewPart implements IRefreshable {
 		};
 		clearAction = new Action() {
 			{
-				setText("Alles löschen");
-				setToolTipText("Formulareingaben leeren");
+				setText(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_Action_Clear_Title);
+				setToolTipText(ch.elexis.ungrad.labenter.Messages.ManualLabEntry_Action_Clear_Tooltip);
 				setImageDescriptor(Images.IMG_CLEAR.getImageDescriptor());
 			}
 
@@ -234,7 +236,7 @@ public class ManualLabEntry extends ViewPart implements IRefreshable {
 	}
 
 	private void showMessage(String message) {
-		MessageDialog.openInformation(viewer.getControl().getShell(), "Laboreingabe", message);
+		MessageDialog.openInformation(viewer.getControl().getShell(), ch.elexis.ungrad.labenter.Messages.ManualLabEntry_Title, message);
 	}
 
 	/**
