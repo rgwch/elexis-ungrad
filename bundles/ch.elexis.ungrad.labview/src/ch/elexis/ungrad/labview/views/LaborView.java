@@ -86,12 +86,12 @@ public class LaborView extends ViewPart implements IRefreshable {
 		cTabFolder = new CTabFolder(parent, SWT.BOTTOM);
 		cTabFolder.setLayoutData(SWTHelper.getFillGridData());
 		CTabItem ctSmart = new CTabItem(cTabFolder, SWT.NONE);
-		ctSmart.setText("Kompakt");
+		ctSmart.setText(ch.elexis.ungrad.labview.Messages.LaborView_Tab_Compact);
 		ctSmart.setControl(controller.createSmartControl(cTabFolder));
 		CTabItem ctSummary = new CTabItem(cTabFolder, SWT.NONE);
-		ctSummary.setText("Synopsis");
+		ctSummary.setText(ch.elexis.ungrad.labview.Messages.LaborView_Tab_Synopsis);
 		CTabItem ctFull = new CTabItem(cTabFolder, SWT.NONE);
-		ctFull.setText("Voll");
+		ctFull.setText(ch.elexis.ungrad.labview.Messages.LaborView_Tab_Full);
 		Control ctlSummary = controller.createSummaryControl(cTabFolder);
 		// ctlSummary.setLayoutData(SWTHelper.getFillGridData());
 		ctSummary.setControl(ctlSummary);
@@ -149,7 +149,7 @@ public class LaborView extends ViewPart implements IRefreshable {
 		exportHtmlAction = new Action() {
 			{
 				setImageDescriptor(Images.IMG_WEB.getImageDescriptor());
-				setToolTipText("Laborblatt exportieren");
+				setToolTipText(ch.elexis.ungrad.labview.Messages.LaborView_Action_Export_Tooltip);
 			}
 
 			@Override
@@ -161,7 +161,7 @@ public class LaborView extends ViewPart implements IRefreshable {
 		viewInBrowserAction = new Action() {
 			{
 				setImageDescriptor(Images.IMG_EYE_WO_SHADOW.getImageDescriptor());
-				setToolTipText("In Browser ansehen");
+				setToolTipText(ch.elexis.ungrad.labview.Messages.LaborView_Action_ViewBrowser_Tooltip);
 			}
 
 			@Override
@@ -169,25 +169,25 @@ public class LaborView extends ViewPart implements IRefreshable {
 				controller.getExporter().runInBrowser();
 			}
 		};
-		importAction = new Action("Labordaten import") {
+		importAction = new Action(ch.elexis.ungrad.labview.Messages.LaborView_Action_Import_Title) {
 			{
 				setImageDescriptor(Images.IMG_IMPORT.getImageDescriptor());
-				setToolTipText("Resultate importieren");
+				setToolTipText(ch.elexis.ungrad.labview.Messages.LaborView_Action_Import_Tooltip);
 			}
 
 			@Override
 			public void run() {
 				Importer imp = new Importer(getViewSite().getShell(), ExtensionPointConstantsUi.LABORDATENIMPORT); // $NON-NLS-1$
 				imp.create();
-				imp.setMessage("Bitte Datenquelle auswählen");
-				imp.getShell().setText("Labordaten import");
-				imp.setTitle("Labor Auswahl");
+				imp.setMessage(ch.elexis.ungrad.labview.Messages.LaborView_Action_Import_Message);
+				imp.getShell().setText(ch.elexis.ungrad.labview.Messages.LaborView_Action_Import_ShellTitle);
+				imp.setTitle(ch.elexis.ungrad.labview.Messages.LaborView_Action_Import_DialogTitle);
 				imp.open();
 			}
 		};
-		removeEmptyItemsAction = new Action("Aufräumen") {
+		removeEmptyItemsAction = new Action(ch.elexis.ungrad.labview.Messages.LaborView_Action_Cleanup_Title) {
 			{
-				setToolTipText("Ungebrauchte Items und Gruppen löschen");
+				setToolTipText(ch.elexis.ungrad.labview.Messages.LaborView_Action_Cleanup_Tooltip);
 				Bundle bundle = FrameworkUtil.getBundle(this.getClass());
 				URL url = FileLocator.find(bundle, new Path("icons/edit-clear24.png"), null);
 				setImageDescriptor(ImageDescriptor.createFromURL(url));
@@ -195,8 +195,8 @@ public class LaborView extends ViewPart implements IRefreshable {
 
 			@Override
 			public void run() {
-				if (SWTHelper.askYesNo("Laboritems aufräumen",
-						"Alle Laboritems entfernen, für die keine Resultate existieren. (Das kann sehr lange dauern)")) {
+				if (SWTHelper.askYesNo(ch.elexis.ungrad.labview.Messages.LaborView_Action_Cleanup_DialogTitle,
+						ch.elexis.ungrad.labview.Messages.LaborView_Action_Cleanup_DialogMessage)) {
 					controller.purgeLabItems();
 				}
 

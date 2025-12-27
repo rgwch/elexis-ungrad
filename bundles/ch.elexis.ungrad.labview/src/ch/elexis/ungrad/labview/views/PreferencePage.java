@@ -29,15 +29,15 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	public PreferencePage(){
 		super(GRID);
 		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
-		setDescription("Ungrad Labview");
+		setDescription(ch.elexis.ungrad.labview.Messages.PreferencePage_Description);
 		
 	}
 	
 	@Override
 	protected void createFieldEditors(){
-		addField(new FileFieldEditor(Preferences.TEMPLATE, "Vorlage für HTML Export",
+		addField(new FileFieldEditor(Preferences.TEMPLATE, ch.elexis.ungrad.labview.Messages.PreferencePage_Template,
 			getFieldEditorParent()));
-		addField(new MultilineFieldEditor(Preferences.EXCLUDE, "Bei Ausgabe unterdrücken", 5, 0,
+		addField(new MultilineFieldEditor(Preferences.EXCLUDE, ch.elexis.ungrad.labview.Messages.PreferencePage_Exclude, 5, 0,
 			true, getFieldEditorParent()));
 	}
 	
