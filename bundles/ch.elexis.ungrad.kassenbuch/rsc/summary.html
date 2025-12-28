@@ -1,0 +1,36 @@
+<html>
+	<head>
+		<title>Kassenbuch</title>
+	</head>
+	<body>
+		<h1>Kassenbuch  von [from] bis [until]</h1>
+		<table border="1">
+			<tr>
+				<th>Datum</th>
+				<th>Belegnummer</th>
+				<th>Beschreibung</th>
+				<th>Einnahmen</th>
+				<th>Ausgaben</th>
+				<th>Saldo</th>
+			</tr>
+			[rows]
+			<tr>
+				<td colspan="3"><strong>Gesamt</strong></td>
+				<td><strong>[total_income]</strong></td>
+				<td><strong>[total_expense]</strong></td>
+				<td><strong>[final_balance]</strong></td>
+			</tr>
+		</table>
+		<h2>Zusammenfassung nach Kategorien</h2>
+		<table border="1">
+			<tr>
+				<th>Kategorie</th>
+				<th>Einnahmen</th>
+				<th>Ausgaben</th>
+			</tr>
+			[category_rows]
+		</table>
+				
+	</body>
+</html>
+						

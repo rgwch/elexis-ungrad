@@ -12,6 +12,9 @@
  *******************************************************************************/
 package ch.elexis.buchhaltung.kassenbuch;
 
+import java.awt.print.PrinterException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.SortedSet;
 
 import org.eclipse.jface.action.Action;
@@ -61,15 +64,9 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 	TableViewer tv;
 	TableColumn[] tc;
 	TimeTool ttVon, ttBis;
-	String[] tableHeaders = new String[] { 
-		Messages.KassenView_ColumnBeleg, 
-		Messages.KassenView_ColumnDatum, 
-		Messages.KassenView_ColumnSoll, 
-		Messages.KassenView_ColumnHaben, 
-		Messages.KassenView_ColumnSaldo, 
-		Messages.KassenView_ColumnKategorie, 
-		Messages.KassenView_ColumnText 
-	};
+	String[] tableHeaders = new String[] { Messages.KassenView_ColumnBeleg, Messages.KassenView_ColumnDatum,
+			Messages.KassenView_ColumnSoll, Messages.KassenView_ColumnHaben, Messages.KassenView_ColumnSaldo,
+			Messages.KassenView_ColumnKategorie, Messages.KassenView_ColumnText };
 	int[] tableCols = new int[] { 50, 80, 60, 60, 60, 100, 400 };
 	private IAction addAction, subtractAction, stornoAction, saldoAction, dateAction, printAction, editCatAction;
 
@@ -282,9 +279,11 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 							KassenbuchEintrag last = KassenbuchEintrag.recalc();
 							Money soll = last.getSaldo();
 							Money diff = money.subtractMoney(soll);
-							new KassenbuchEintrag(KassenbuchEintrag.nextNr(last) + " " + Messages.KassenView_Balance_Check,
+							new KassenbuchEintrag(
+									KassenbuchEintrag.nextNr(last) + " " + Messages.KassenView_Balance_Check,
 									new TimeTool().toString(TimeTool.DATE_GER), diff,
-									diff.isNegative() ? Messages.KassenView_Balance_Shortage : Messages.KassenView_Balance_Surplus);
+									diff.isNegative() ? Messages.KassenView_Balance_Shortage
+											: Messages.KassenView_Balance_Surplus);
 							tv.refresh();
 						}
 					} catch (Exception ex) {
@@ -323,9 +322,32 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 			}
 
 			public void run() {
-				KassenbuchDruckDialog kbd = new KassenbuchDruckDialog(getSite().getShell(), ttVon, ttBis);
-				kbd.open();
-			}
+				try {
+					org.eclipse.swt.widgets.FileDialog fd = new org.eclipse.swt.widgets.FileDialog(
+							getSite().getShell(), SWT.SAVE);
+					fd.setFilterExtensions(new String[] { "*.pdf" });
+					fd.setFilterNames(new String[] { "PDF Dokumente (*.pdf)" });
+					fd.setFileName("kassenbuch_summary.pdf");
+					String selectedPath = fd.open();
+					if (selectedPath != null) {
+						java.io.File outputFile = new java.io.File(selectedPath);
+						PdfPrinter.createSummary(ttVon, ttBis, outputFile.getParentFile(), outputFile.getName());
+						
+						// Launch PDF viewer
+						if (outputFile.exists()) {
+							if (java.awt.Desktop.isDesktopSupported()) {
+								java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+								if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
+									desktop.open(outputFile);
+								}
+							}
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					ExHandler.handle(e);
+				}
+			}	
 		};
 		editCatAction = new Action(Messages.KassenView_Action_EditCategories_Title) {
 			{
