@@ -25,5 +25,14 @@
             Class="ch.elexis.buchhaltung.kassenbuch.KassenbuchEintragFactory"
             name="Kassenbuch"/>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="ch.elexis.ungrad.common.prefs"
+            class="ch.elexis.buchhaltung.kassenbuch.KassenbuchPreferencePage"
+            id="ch.elexis.buchhaltung.kassenbuch.preferences"
+            name="%Plugin_PreferencesName">
+      </page>
+   </extension>
 
 </plugin>

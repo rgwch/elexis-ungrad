@@ -20,6 +20,7 @@ public class Messages extends NLS {
 	// Plugin metadata
 	public static String Plugin_ViewName;
 	public static String Plugin_CategoryName;
+	public static String Plugin_PreferencesName;
 	
 	// KassenView
 	public static String KassenView_DisplayAllBookings;
@@ -90,6 +91,10 @@ public class Messages extends NLS {
 	public static String KassenbuchDruckDialog_ColumnAmount;
 	public static String KassenbuchDruckDialog_ColumnText;
 	public static String KassenbuchDruckDialog_Miscellaneous;
+	
+	// PreferencePage
+	public static String PreferencePage_Description;
+	public static String PreferencePage_HTMLTemplate;
 	
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

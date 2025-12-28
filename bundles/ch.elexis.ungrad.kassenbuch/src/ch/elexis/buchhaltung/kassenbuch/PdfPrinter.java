@@ -113,6 +113,26 @@ public class PdfPrinter {
 	}
 	
 	private static String readTemplate() throws IOException {
+		// Try to read user-configured template first
+		String userTemplate = ch.elexis.core.data.activator.CoreHub.localCfg.get(PreferenceConstants.HTML_TEMPLATE, null);
+		
+		if (userTemplate != null && !userTemplate.trim().isEmpty()) {
+			java.io.File templateFile = new java.io.File(userTemplate);
+			if (templateFile.exists() && templateFile.canRead()) {
+				// Read from user-configured file
+				StringBuilder sb = new StringBuilder();
+				try (BufferedReader reader = new BufferedReader(
+						new java.io.FileReader(templateFile, StandardCharsets.UTF_8))) {
+					String line;
+					while ((line = reader.readLine()) != null) {
+						sb.append(line).append("\n");
+					}
+				}
+				return sb.toString();
+			}
+		}
+		
+		// Fall back to default template
 		InputStream is = PdfPrinter.class.getResourceAsStream("/rsc/summary.html");
 		if (is == null) {
 			throw new FileNotFoundException("Template file rsc/summary.html not found");
