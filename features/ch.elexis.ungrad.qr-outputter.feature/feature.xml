@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="ch.elexis.ungrad.qr_outputter.feature"
+      id="ch.elexis.ungrad.qr-outputter.feature"
       label="QR_Outputter"
       version="1.0.0.qualifier">
 
