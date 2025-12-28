@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="ch.elexis.core.data.RechnungsManager">
+      <Rechnung
+            localizedName="Ungrad-Rechnungsdrucker"
+            name="qrprinter_ungrad"
+            outputter="ch.elexis.ungrad.QR_Outputter.QrRnOutputter">
+      </Rechnung>
+   </extension>
+
+</plugin>

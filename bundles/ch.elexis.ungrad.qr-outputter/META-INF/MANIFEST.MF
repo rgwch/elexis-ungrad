@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Qr-Outputter with Printer support
+Bundle-SymbolicName: ch.elexis.ungrad.qr-outputter;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: elexis.ch
+Require-Bundle: org.eclipse.swt,
+ org.eclipse.jface,
+ org.eclipse.ui;bundle-version="3.207.100",
+ org.jdom.2;bundle-version="2.0.6",
+ ch.elexis.base.ch.arzttarife;bundle-version="3.13.0",
+ ch.elexis.core;bundle-version="3.13.0",
+ ch.elexis.core.l10n;bundle-version="3.13.0",
+ ch.elexis.core.services;bundle-version="3.13.0",
+ ch.elexis.core.ui;bundle-version="3.13.0"
+Automatic-Module-Name: ch.elexis.ungrad.qr.outputter
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Import-Package: ch.elexis.core.data.interfaces,
+ ch.elexis.core.data.util,
+ ch.elexis.data,
+ ch.elexis.pdfBills
