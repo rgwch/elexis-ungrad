@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2024, G. Weirich and Elexis
+ * Copyright (c) 2007-2025, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,6 @@
  *******************************************************************************/
 package ch.elexis.buchhaltung.kassenbuch;
 
-import java.awt.print.PrinterException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.SortedSet;
 
 import org.eclipse.jface.action.Action;
@@ -50,7 +47,6 @@ import ch.elexis.core.data.events.Heartbeat.HeartListener;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.IActivationListener;
-import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
@@ -323,16 +319,17 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 
 			public void run() {
 				try {
-					org.eclipse.swt.widgets.FileDialog fd = new org.eclipse.swt.widgets.FileDialog(
-							getSite().getShell(), SWT.SAVE);
+					org.eclipse.swt.widgets.FileDialog fd = new org.eclipse.swt.widgets.FileDialog(getSite().getShell(),
+							SWT.SAVE);
 					fd.setFilterExtensions(new String[] { "*.pdf" });
 					fd.setFilterNames(new String[] { "PDF Dokumente (*.pdf)" });
 					fd.setFileName("kassenbuch_summary.pdf");
 					String selectedPath = fd.open();
 					if (selectedPath != null) {
 						java.io.File outputFile = new java.io.File(selectedPath);
+						System.out.println("Creating PDF file " + outputFile.getAbsolutePath());
 						PdfPrinter.createSummary(ttVon, ttBis, outputFile.getParentFile(), outputFile.getName());
-						
+						System.out.println("PDF file created.");
 						// Launch PDF viewer
 						if (outputFile.exists()) {
 							if (java.awt.Desktop.isDesktopSupported()) {
@@ -341,13 +338,16 @@ public class KassenView extends ViewPart implements IActivationListener, HeartLi
 									desktop.open(outputFile);
 								}
 							}
+						}else {
+							SWTHelper.alert(Messages.KassenView_Error_Title, Messages.KassenView_Error_PrintFailed+": File not found after creation.");
 						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 					ExHandler.handle(e);
+					SWTHelper.alert(Messages.KassenView_Error_Title, Messages.KassenView_Error_PrintFailed+": "+e.getMessage());
 				}
-			}	
+			}
 		};
 		editCatAction = new Action(Messages.KassenView_Action_EditCategories_Title) {
 			{

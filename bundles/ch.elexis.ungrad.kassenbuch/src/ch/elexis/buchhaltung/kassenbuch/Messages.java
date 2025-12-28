@@ -55,6 +55,7 @@ public class Messages extends NLS {
 	public static String KassenView_Balance_Surplus;
 	public static String KassenView_Error_Title;
 	public static String KassenView_Error_InvalidAmount;
+	public static String KassenView_Error_PrintFailed;
 	
 	// BuchungsDialog
 	public static String BuchungsDialog_Income_Title;
