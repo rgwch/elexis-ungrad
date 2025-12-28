@@ -18,4 +18,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-21
 Import-Package: ch.elexis.core.data.interfaces,
  ch.elexis.core.data.util,
  ch.elexis.data,
- ch.elexis.pdfBills
+ ch.elexis.pdfBills,
+ ch.elexis.ungrad.pdf

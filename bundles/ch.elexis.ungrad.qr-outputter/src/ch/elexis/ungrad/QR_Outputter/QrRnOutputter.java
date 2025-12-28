@@ -72,6 +72,7 @@ import ch.elexis.pdfBills.ElexisPDFGenerator;
 import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.PdfUtil;
 import ch.elexis.pdfBills.TarmedXmlUtil;
+import ch.elexis.ungrad.pdf.Manager;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Result;
 
@@ -116,6 +117,7 @@ public class QrRnOutputter implements IRnOutputter {
 	private Text tXml;
 	private Text tPdf;
 
+	private Manager pdfManager = new Manager();
 	private Button bWithEsr;
 	private Button bWithRf;
 
@@ -129,7 +131,7 @@ public class QrRnOutputter implements IRnOutputter {
 
 	@Override
 	public String getDescription() {
-		return "Rechnung ausdrucken";
+		return "Ungrad Drucker";
 	}
 
 	@Override
@@ -224,7 +226,8 @@ public class QrRnOutputter implements IRnOutputter {
 							if (!noUi) {
 								for (File pdfFile : printed) {
 									if (pdfFile.exists()) {
-										Program.launch(pdfFile.getAbsolutePath());
+										pdfManager.printFromPDF(pdfFile, null);
+										// Program.launch(pdfFile.getAbsolutePath());
 									}
 								}
 							}
