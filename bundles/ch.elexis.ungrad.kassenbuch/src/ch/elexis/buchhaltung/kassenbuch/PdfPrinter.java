@@ -81,10 +81,15 @@ public class PdfPrinter {
 		// Build category rows HTML
 		StringBuilder categoryRowsHtml = new StringBuilder();
 		for (Map.Entry<String, CategorySum> catEntry : categoryMap.entrySet()) {
+			CategorySum catSum = catEntry.getValue();
+			Money categorySaldo = new Money(catSum.income);
+			categorySaldo.subtractMoney(catSum.expense);
+			
 			categoryRowsHtml.append("\t\t\t<tr>\n");
 			categoryRowsHtml.append("\t\t\t\t<td>").append(htmlEscape(catEntry.getKey())).append("</td>\n");
-			categoryRowsHtml.append("\t\t\t\t<td>").append(catEntry.getValue().income.getAmountAsString()).append("</td>\n");
-			categoryRowsHtml.append("\t\t\t\t<td>").append(catEntry.getValue().expense.getAmountAsString()).append("</td>\n");
+			categoryRowsHtml.append("\t\t\t\t<td>").append(catSum.income.getAmountAsString()).append("</td>\n");
+			categoryRowsHtml.append("\t\t\t\t<td>").append(catSum.expense.getAmountAsString()).append("</td>\n");
+			categoryRowsHtml.append("\t\t\t\t<td>").append(categorySaldo.getAmountAsString()).append("</td>\n");
 			categoryRowsHtml.append("\t\t\t</tr>\n");
 		}
 		
