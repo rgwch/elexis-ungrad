@@ -72,8 +72,9 @@ public class ExtIdPreferences extends PreferencePage implements IWorkbenchPrefer
 		contact.addHyperlinkListener(new HyperlinkAdapter() {
 			@Override
 			public void linkActivated(HyperlinkEvent e) {
-				KontaktSelektor ksl = new KontaktSelektor(getShell(), Kontakt.class, "Kontakt auswählen",
-						"Bitte wählen Sie den Kontakt, dessen Extinfo bearbeitet werden soll", new String[] {});
+				KontaktSelektor ksl = new KontaktSelektor(getShell(), Kontakt.class, 
+						ch.elexis.ungrad.common.Messages.ExtIdPreferences_SelectContact,
+						ch.elexis.ungrad.common.Messages.ExtIdPreferences_SelectContactMessage, new String[] {});
 				int ret = ksl.open();
 				if (ret == Window.OK) {
 					Kontakt k = (Kontakt) ksl.getSelection();

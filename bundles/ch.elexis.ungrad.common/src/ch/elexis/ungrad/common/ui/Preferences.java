@@ -28,12 +28,16 @@ import ch.elexis.core.ui.preferences.inputs.PasswordFieldEditor;
 import ch.elexis.ungrad.PreferenceConstants;
 
 public class Preferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-	static String[][] conn = { { "Unverschlüsselt", "plain" }, { "TLS", "tls" }, { "SSL", "ssl" } };
+	static String[][] conn = { 
+		{ ch.elexis.ungrad.common.Messages.Preferences_ConnectionPlain, "plain" }, 
+		{ ch.elexis.ungrad.common.Messages.Preferences_ConnectionTLS, "tls" }, 
+		{ ch.elexis.ungrad.common.Messages.Preferences_ConnectionSSL, "ssl" } 
+	};
 
 	public Preferences() {
 		super(GRID);
 		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
-		setDescription("Ungrad Gemeinsames");
+		setDescription(ch.elexis.ungrad.common.Messages.Preferences_Description);
 
 	}
 
@@ -44,24 +48,36 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 
 	@Override
 	protected void createFieldEditors() {
-		addField(
-				new DirectoryFieldEditor(PreferenceConstants.DOCBASE, "Dokumentenverzeichnis", getFieldEditorParent()));
-		addField(new RadioGroupFieldEditor(PreferenceConstants.SMTP_SECURITY, "SMTP-Verbindung", 3, conn,
+		addField(new DirectoryFieldEditor(PreferenceConstants.DOCBASE, 
+				ch.elexis.ungrad.common.Messages.Preferences_DocDirectory, getFieldEditorParent()));
+		addField(new RadioGroupFieldEditor(PreferenceConstants.SMTP_SECURITY, 
+				ch.elexis.ungrad.common.Messages.Preferences_SMTPConnection, 3, conn,
 				getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.MAIL_SENDER, "Mail-Absender", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.SMTP_HOST, "SMTP Server", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.SMTP_PORT, "SMTP Port", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.SMTP_USER, "SMTP User", getFieldEditorParent()));
-		addField(new PasswordFieldEditor(PreferenceConstants.SMTP_PWD, "SMTP Passwort", getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.MAIL_SENDER, 
+				ch.elexis.ungrad.common.Messages.Preferences_MailSender, getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.SMTP_HOST, 
+				ch.elexis.ungrad.common.Messages.Preferences_SMTPServer, getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.SMTP_PORT, 
+				ch.elexis.ungrad.common.Messages.Preferences_SMTPPort, getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.SMTP_USER, 
+				ch.elexis.ungrad.common.Messages.Preferences_SMTPUser, getFieldEditorParent()));
+		addField(new PasswordFieldEditor(PreferenceConstants.SMTP_PWD, 
+				ch.elexis.ungrad.common.Messages.Preferences_SMTPPassword, getFieldEditorParent()));
 
 		// addField(new RadioGroupFieldEditor(PreferenceConstants.IMAP_SECURITY,
 		// "IMAP-Verbindung", 3 , conn , getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.IMAP_HOST, "IMAP Server", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.IMAP_PORT, "IMAP Port",getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.IMAP_USER, "IMAP User", getFieldEditorParent()));
-		addField(new PasswordFieldEditor(PreferenceConstants.IMAP_PWD, "IMAP Passwort", getFieldEditorParent()));
-		addField(new BooleanFieldEditor(PreferenceConstants.USE_AI, "KI Analyse benutzen", getFieldEditorParent()));
-		addField(new StringFieldEditor(PreferenceConstants.AI_URL, "URL für KI", getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.IMAP_HOST, 
+				ch.elexis.ungrad.common.Messages.Preferences_IMAPServer, getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.IMAP_PORT, 
+				ch.elexis.ungrad.common.Messages.Preferences_IMAPPort,getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.IMAP_USER, 
+				ch.elexis.ungrad.common.Messages.Preferences_IMAPUser, getFieldEditorParent()));
+		addField(new PasswordFieldEditor(PreferenceConstants.IMAP_PWD, 
+				ch.elexis.ungrad.common.Messages.Preferences_IMAPPassword, getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.USE_AI, 
+				ch.elexis.ungrad.common.Messages.Preferences_UseAI, getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.AI_URL, 
+				ch.elexis.ungrad.common.Messages.Preferences_AIUrl, getFieldEditorParent()));
 		
 	}
 

@@ -6,13 +6,13 @@
          <page
             class="ch.elexis.ungrad.common.ui.Preferences"
             id="ch.elexis.ungrad.common.prefs"
-            name="Elexis Ungrad">
+            name="%Plugin_PreferencesName">
       </page>
          <page
                category="ch.elexis.ungrad.common.prefs"
                class="ch.elexis.ungrad.common.ui.ExtIdPreferences"
                id="ch.elexis.ungrad.extid.prefs"
-               name="ExtInfo">
+               name="%Plugin_PreferencesName_ExtInfo">
          </page>
    </extension>
     <extension
@@ -21,7 +21,7 @@
              allowMultiple="false"
              class="ch.elexis.ungrad.common.ui.KonsZumVerrechnen"
              id="ch.elexis.ungrad.common.KonsZumVerrechnen"
-             name="Offene Kons"
+             name="%Plugin_ViewName"
              restorable="true">
        </view>
     </extension>
