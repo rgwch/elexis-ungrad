@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -246,10 +247,10 @@ public class QrRnOutputter implements IRnOutputter {
 							}
 							String[] mailing = shouldMail(rn);
 							if (mailing != null) {
+								ArrayList<String> toMail = new ArrayList<>();
 								printed.stream().forEach(f -> {
-									if (!f.exists()) {
-										throw new IllegalStateException(
-												"File to mail does not exist: " + f.getAbsolutePath());
+									if (f.exists()) {
+										toMail.add(f.getAbsolutePath());
 									}
 								});
 								Map<String, PersistentObject> replacer = new HashMap<>();
@@ -263,8 +264,7 @@ public class QrRnOutputter implements IRnOutputter {
 										.resolve(cfg.get(PreferenceConstants.BY_MAIL_SUBJECT, "Rechnung"));
 								String body = resolver.resolve(mailing[1]);
 								mailer.defaultMail(mailing[0], subject, body,
-										new String[] { printed.get(0).getAbsolutePath(),
-												printed.get(1).getAbsolutePath(), printed.get(2).getAbsolutePath() });
+										toMail.toArray(new String[toMail.size()]));
 								rn.addTrace(Rechnung.OUTPUT, "by Mail an " + mailing[0]);
 								try {
 									TimeUnit.MILLISECONDS.sleep(100);
@@ -289,7 +289,7 @@ public class QrRnOutputter implements IRnOutputter {
 						} catch (Exception e1) {
 							ExHandler.handle(e1);
 							SWTHelper.showError("Fehler beim Rechnungsdruck",
-									"Konnte Datei " + fname + " nicht schreiben");
+									"Konnte Datei " + fname + " nicht schreiben: "+e1.getMessage());
 							invoice.reject(REJECTCODE.INTERNAL_ERROR, "write error: " + fname); //$NON-NLS-1$
 							CoreModelServiceHolder.get().save(invoice);
 							continue;

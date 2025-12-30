@@ -51,7 +51,6 @@ import ch.elexis.data.Query;
 import ch.rgw.tools.StringTool;
 
 public class BillPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
-	private Combo cbMandanten;
 	private Text txCaseVar;
 	private Button bMailIfCaseVar;
 	private Text txSubject, txBody;
@@ -65,39 +64,12 @@ public class BillPreferencePage extends PreferencePage implements IWorkbenchPref
 	public void init(IWorkbench workbench) {
 	}
 
-	private void setMandant(Mandant m) {
-		currentMandator = m;
-	}
 
 	@Override
 	protected Control createContents(Composite parent) {
 		Color blau = UiDesk.getColor(UiDesk.COL_BLUE);
 		Composite ret = new Composite(parent, SWT.NONE);
 		ret.setLayout(new GridLayout(3, false));
-		cbMandanten = new Combo(ret, SWT.READ_ONLY);
-		cbMandanten.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
-		HashMap<String, Mandant> hMandanten = new HashMap<>();
-		cbMandanten.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				int i = cbMandanten.getSelectionIndex();
-				if (i == -1) {
-					return;
-				}
-				setMandant((Mandant) hMandanten.get(cbMandanten.getItem(i)));
-
-			}
-
-		});
-		setMandant(ElexisEventDispatcher.getSelectedMandator());
-		Query<Mandant> qbe = new Query<Mandant>(Mandant.class);
-		List<Mandant> list = qbe.execute();
-
-		for (Mandant m : list) {
-			cbMandanten.add(m.getLabel());
-			hMandanten.put(m.getLabel(), m);
-		}
-		cbMandanten.setText(currentMandator.getLabel());
 		// Send Mail if Case Variable is set to Mailaddress
 		bMailIfCaseVar = new Button(ret, SWT.CHECK);
 		bMailIfCaseVar.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
