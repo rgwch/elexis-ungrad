@@ -11,7 +11,9 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.commands.Command;
@@ -60,6 +62,7 @@ import ch.elexis.core.ui.views.rechnung.RnOutputDialog;
 import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Kontakt;
+import ch.elexis.data.PersistentObject;
 import ch.elexis.data.Person;
 import ch.elexis.data.Rechnung;
 import ch.elexis.pdfBills.ElexisPDFGenerator;
@@ -67,6 +70,7 @@ import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.PdfUtil;
 import ch.elexis.pdfBills.TarmedXmlUtil;
 import ch.elexis.ungrad.Mailer;
+import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Result;
@@ -135,16 +139,24 @@ public class QrRnOutputter implements IRnOutputter {
 		mailer.showSuccess(false);
 	}
 
-	/*
-	 * private String[] shouldMail(TarmedBillDetails bill) { Kontakt k =
-	 * bill.adressat; String mailaddr = ""; String mailbody =
-	 * cfg.get(PreferenceConstants.BY_MAIL_BODY, ""); if
-	 * (!StringTool.isNothing(mailPref)) { mailaddr =
-	 * bill.fall.getInfoString(mailPref); if (!StringTool.isMailAddress(mailaddr)) {
-	 * return null; } String altBody = bill.fall.getInfoString("Mailtext"); if
-	 * (!StringTool.isNothing(altBody)) { mailbody = altBody; } return new String[]
-	 * { mailaddr, mailbody }; } return null; }
-	 */
+	private String[] shouldMail(Rechnung bill) {
+		Fall fall = bill.getFall();
+		String mailaddr = "";
+		String mailbody = cfg.get(PreferenceConstants.BY_MAIL_BODY, "");
+		if (!StringTool.isNothing(mailPref)) {
+			mailaddr = fall.getInfoString(mailPref);
+			if (!StringTool.isMailAddress(mailaddr)) {
+				return null;
+			}
+			String altBody = fall.getInfoString("Mailtext");
+			if (!StringTool.isNothing(altBody)) {
+				mailbody = altBody;
+			}
+			return new String[] { mailaddr, mailbody };
+		}
+		return null;
+	}
+
 	@Override
 	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, Properties props) {
 
@@ -232,13 +244,41 @@ public class QrRnOutputter implements IRnOutputter {
 									PdfUtil.addCopyWatermark(pdfFile);
 								}
 							}
-							for (File pdfFile : printed) {
-								if (pdfFile.exists()) {
-									pdfManager.printFromPDF(pdfFile, qrs.selectedPrinter);
-									// Program.launch(pdfFile.getAbsolutePath());
+							String[] mailing = shouldMail(rn);
+							if (mailing != null) {
+								printed.stream().forEach(f -> {
+									if (!f.exists()) {
+										throw new IllegalStateException(
+												"File to mail does not exist: " + f.getAbsolutePath());
+									}
+								});
+								Map<String, PersistentObject> replacer = new HashMap<>();
+								replacer.put("Adressat", rn.getFall().getInvoiceRecipient());
+								replacer.put("Mandant", rn.getFall().getRechnungssteller());
+								replacer.put("Patient", rn.getFall().getPatient());
+								replacer.put("Rechnung", rn);
+								Resolver resolver = new Resolver(replacer, true);
+
+								String subject = resolver
+										.resolve(cfg.get(PreferenceConstants.BY_MAIL_SUBJECT, "Rechnung"));
+								String body = resolver.resolve(mailing[1]);
+								mailer.defaultMail(mailing[0], subject, body,
+										new String[] { printed.get(0).getAbsolutePath(),
+												printed.get(1).getAbsolutePath(), printed.get(2).getAbsolutePath() });
+								rn.addTrace(Rechnung.OUTPUT, "by Mail an " + mailing[0]);
+								try {
+									TimeUnit.MILLISECONDS.sleep(100);
+								} catch (InterruptedException e) {
+
+								}
+							} else {
+								for (File pdfFile : printed) {
+									if (pdfFile.exists()) {
+										pdfManager.printFromPDF(pdfFile, qrs.selectedPrinter);
+										// Program.launch(pdfFile.getAbsolutePath());
+									}
 								}
 							}
-
 						} catch (IllegalStateException e) {
 							ExHandler.handle(e);
 							SWTHelper.showError("Fehler beim Rechnungsdruck",
