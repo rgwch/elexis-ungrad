@@ -118,8 +118,8 @@ public class QrRnOutputter implements IRnOutputter {
 	private Text tPdf;
 
 	private Manager pdfManager = new Manager();
-	private Button bWithEsr;
-	private Button bWithRf;
+	// private Button bWithEsr;
+	// private Button bWithRf;
 
 	private boolean modifyInvoiceState;
 	private boolean noUi;
@@ -421,6 +421,9 @@ public class QrRnOutputter implements IRnOutputter {
 
 	@Override
 	public Object createSettingsControl(Object parent) {
+		Composite ret = new QR_SettingsControl((Composite) parent);
+		// return qrs;
+		/*
 		final Composite compParent = (Composite) parent;
 		Composite ret = new Composite(compParent, SWT.NONE);
 		ret.setLayoutData(SWTHelper.getFillGridData());
@@ -485,8 +488,10 @@ public class QrRnOutputter implements IRnOutputter {
 				}
 
 			});
-			boolean useGlobalOutputDirs = OutputterUtil.useGlobalOutputDirs();
-			setWidgetsVisible(!useGlobalOutputDirs, bXML, bPDF, tXml, tPdf);
+			// boolean useGlobalOutputDirs = OutputterUtil.useGlobalOutputDirs();
+			//setWidgetsVisible(!useGlobalOutputDirs, bXML, bPDF, tXml, tPdf);
+			setWidgetsVisible(true, bXML, bPDF, tXml, tPdf);
+			*/
 		return ret;
 	}
 
@@ -507,11 +512,12 @@ public class QrRnOutputter implements IRnOutputter {
 					rnOutputDialog.customButtonPressed(IDialogConstants.OK_ID);
 				}
 			});
-			updateButtonStates(rnOutputDialog);
+			//updateButtonStates(rnOutputDialog);
 			rnOutputDialog.redrawLayout();
 		}
 	}
 
+	/*
 	private void updateButtonStates(RnOutputDialog rnOutputDialog) {
 		boolean isEnabled = bWithEsr.getSelection() || bWithRf.getSelection();
 		rnOutputDialog.setOkButtonEnabled(bWithEsr.getSelection() || bWithRf.getSelection());
@@ -528,7 +534,11 @@ public class QrRnOutputter implements IRnOutputter {
 		}
 		LocalConfigService.flush();
 	}
-
+*/
+	@Override
+	public void saveComposite() {
+		// nothing to do
+	}
 	@Override
 	public void openOutput(IInvoice invoice, LocalDateTime timestamp, InvoiceState invoiceState) {
 		try {
@@ -557,10 +567,11 @@ public class QrRnOutputter implements IRnOutputter {
 			LoggerFactory.getLogger(getClass()).error("Error opening output", e);
 		}
 	}
-
+/*
 	private void setWidgetsVisible(boolean visible, Control... widgets) {
 		for (Control widget : widgets) {
 			widget.setVisible(visible);
 		}
 	}
+	*/
 }

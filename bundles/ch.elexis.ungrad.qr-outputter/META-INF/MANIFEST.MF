@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.swt,
  ch.elexis.core;bundle-version="3.13.0",
  ch.elexis.core.l10n;bundle-version="3.13.0",
  ch.elexis.core.services;bundle-version="3.13.0",
- ch.elexis.core.ui;bundle-version="3.13.0"
+ ch.elexis.core.ui;bundle-version="3.13.0",
+ ch.elexis.core.data;bundle-version="[3.13.0,4.0.0)"
 Automatic-Module-Name: ch.elexis.ungrad.qr.outputter
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Import-Package: ch.elexis.core.data.interfaces,
