@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
-import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.commands.Command;
@@ -51,6 +50,7 @@ import ch.elexis.core.model.IPatient;
 import ch.elexis.core.model.InvoiceConstants;
 import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.model.InvoiceState.REJECTCODE;
+import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.LocalConfigService;
 import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.services.holder.CoreModelServiceHolder;
@@ -66,9 +66,11 @@ import ch.elexis.pdfBills.ElexisPDFGenerator;
 import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.PdfUtil;
 import ch.elexis.pdfBills.TarmedXmlUtil;
+import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Result;
+import ch.rgw.tools.StringTool;
 
 public class QrRnOutputter implements IRnOutputter {
 	public static final String PDFDIR = "pdfdir"; //$NON-NLS-1$
@@ -110,22 +112,39 @@ public class QrRnOutputter implements IRnOutputter {
 
 	private QR_SettingsControl qrs;
 	private Manager pdfManager = new Manager();
-	// private Button bWithEsr;
-	// private Button bWithRf;
+	String mailPref;
+	Mailer mailer;
 
 	private boolean modifyInvoiceState;
-	private boolean noUi;
 	private boolean noPrint;
 
 	private boolean pdfOnly;
 	private RnOutputDialog rnOutputDialog;
 	private Button buttonOpen;
+	private IConfigService cfg = ConfigServiceHolder.get();
 
 	@Override
 	public String getDescription() {
 		return "Ungrad Drucker";
 	}
 
+	public QrRnOutputter() {
+		cfg = ConfigServiceHolder.get();
+		mailPref = cfg.get(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
+		mailer = new Mailer();
+		mailer.showSuccess(false);
+	}
+
+	/*
+	 * private String[] shouldMail(TarmedBillDetails bill) { Kontakt k =
+	 * bill.adressat; String mailaddr = ""; String mailbody =
+	 * cfg.get(PreferenceConstants.BY_MAIL_BODY, ""); if
+	 * (!StringTool.isNothing(mailPref)) { mailaddr =
+	 * bill.fall.getInfoString(mailPref); if (!StringTool.isMailAddress(mailaddr)) {
+	 * return null; } String altBody = bill.fall.getInfoString("Mailtext"); if
+	 * (!StringTool.isNothing(altBody)) { mailbody = altBody; } return new String[]
+	 * { mailaddr, mailbody }; } return null; }
+	 */
 	@Override
 	public Result<Rechnung> doOutput(final TYPE type, final Collection<Rechnung> rnn, Properties props) {
 
@@ -134,7 +153,6 @@ public class QrRnOutputter implements IRnOutputter {
 		} else {
 			modifyInvoiceState = true;
 			noPrint = false;
-			noUi = false;
 		}
 
 		if (StringUtils.isEmpty(OutputterUtil.getXmlOutputDir(CFG_ROOT))) {
@@ -151,7 +169,6 @@ public class QrRnOutputter implements IRnOutputter {
 		IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 		final Result<Rechnung> res = new Result<Rechnung>();
 		final File rsc = new File(PlatformHelper.getBasePath(PLUGIN_ID), "rsc"); //$NON-NLS-1$
-		final StringJoiner mailErrors = new StringJoiner("\n- ", "- ", StringUtils.EMPTY); //$NON-NLS-1$ //$NON-NLS-2$
 		try {
 			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {
 				@Override
@@ -215,31 +232,13 @@ public class QrRnOutputter implements IRnOutputter {
 									PdfUtil.addCopyWatermark(pdfFile);
 								}
 							}
-							if (!noUi) {
-								for (File pdfFile : printed) {
-									if (pdfFile.exists()) {
-										pdfManager.printFromPDF(pdfFile, qrs.selectedPrinter);
-										// Program.launch(pdfFile.getAbsolutePath());
-									}
+							for (File pdfFile : printed) {
+								if (pdfFile.exists()) {
+									pdfManager.printFromPDF(pdfFile, qrs.selectedPrinter);
+									// Program.launch(pdfFile.getAbsolutePath());
 								}
 							}
 
-							if (LocalConfigService.get(CFG_ROOT + CFG_MAIL_CPY, false) && shouldSendCopyMail(rn)) {
-								Kontakt guarantor = getGuarantor(rn);
-								if (guarantor != null && StringUtils.isNotBlank(guarantor.getMailAddress())) {
-
-									if (!printed.isEmpty()) {
-										String resultString = sendAsMail(guarantor, rn, printed);
-										if (StringUtils.isNoneBlank(resultString)) {
-											mailErrors.add(resultString);
-										}
-									}
-								} else if (guarantor != null) {
-									mailErrors.add("Keine mail Addresse für " + guarantor.getLabel(false));
-								} else {
-									mailErrors.add("Keine Garant für Rechnung " + rn.getNr());
-								}
-							}
 						} catch (IllegalStateException e) {
 							ExHandler.handle(e);
 							SWTHelper.showError("Fehler beim Rechnungsdruck",
@@ -259,14 +258,13 @@ public class QrRnOutputter implements IRnOutputter {
 					}
 					pdfOnly = false;
 					monitor.done();
-					if (!noUi) {
-						if (errors > 0) {
-							SWTHelper.alert("Fehler bei der Übermittlung", Integer.toString(errors)
-									+ " Rechnungen waren fehlerhaft. Sie können diese unter Rechnungen mit dem Status fehlerhaft aufsuchen und korrigieren");
-						} else {
-							SWTHelper.showInfo("Übermittlung beendet", "Es sind keine Fehler aufgetreten");
-						}
+					if (errors > 0) {
+						SWTHelper.alert("Fehler bei der Übermittlung", Integer.toString(errors)
+								+ " Rechnungen waren fehlerhaft. Sie können diese unter Rechnungen mit dem Status fehlerhaft aufsuchen und korrigieren");
+					} else {
+						SWTHelper.showInfo("Übermittlung beendet", "Es sind keine Fehler aufgetreten");
 					}
+
 				}
 			}, null);
 		} catch (Exception ex) {
@@ -275,33 +273,6 @@ public class QrRnOutputter implements IRnOutputter {
 			Display.getDefault().syncExec(() -> {
 				ErrorDialog.openError(null, "Fehler bei der Ausgabe", "Konnte Rechnungsdruck nicht starten",
 						ResultAdapter.getResultAsStatus(res));
-			});
-			return res;
-		}
-		if (mailErrors.length() > 2) {
-			Display.getDefault().syncExec(() -> {
-				MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(),
-						"Fehler beim Mail-Versand", null,
-						"Beim Mail-Versand sind folgende Fehler aufgetreten:\n" + mailErrors.toString(),
-						MessageDialog.ERROR, 0, new String[] { IDialogConstants.OK_LABEL, "als Text öffnen" }) {
-
-					@Override
-					protected void buttonPressed(int buttonId) {
-						if (buttonId == 1) {
-							try {
-								Path tmpFile = Files.createTempFile("error_", "rechnung.txt"); //$NON-NLS-1$ //$NON-NLS-2$
-								try (FileWriter fo = new FileWriter(tmpFile.toFile())) {
-									fo.write(mailErrors.toString());
-								}
-								Program.launch(tmpFile.toString());
-							} catch (IOException e) {
-								LoggerFactory.getLogger(getClass()).error("Error writing tmp file", e); //$NON-NLS-1$
-							}
-						}
-						super.buttonPressed(buttonId);
-					}
-				};
-				dialog.open();
 			});
 		}
 		return res;
@@ -325,10 +296,6 @@ public class QrRnOutputter implements IRnOutputter {
 		if (props.get(IRnOutputter.PROP_OUTPUT_WITH_MAIL) instanceof String) {
 			String value = (String) props.get(IRnOutputter.PROP_OUTPUT_WITH_MAIL);
 			LocalConfigService.set(CFG_ROOT + CFG_MAIL_CPY, Boolean.parseBoolean(value));
-		}
-		if (props.get(IRnOutputter.PROP_OUTPUT_NOUI) instanceof String) {
-			String value = (String) props.get(IRnOutputter.PROP_OUTPUT_NOUI);
-			noUi = Boolean.parseBoolean(value);
 		}
 		if (props.get(IRnOutputter.PROP_OUTPUT_NOPRINT) instanceof String) {
 			String value = (String) props.get(IRnOutputter.PROP_OUTPUT_NOPRINT);
@@ -438,7 +405,6 @@ public class QrRnOutputter implements IRnOutputter {
 		}
 	}
 
-	
 	@Override
 	public void saveComposite() {
 		qrs.doSave();

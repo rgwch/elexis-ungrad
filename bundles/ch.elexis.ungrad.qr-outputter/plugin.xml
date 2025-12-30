@@ -9,5 +9,14 @@
             outputter="ch.elexis.ungrad.QR_Outputter.QrRnOutputter">
       </Rechnung>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="ch.elexis.ungrad.common.prefs"
+            class="ch.elexis.ungrad.QR_Outputter.BillPreferencePage"
+            id="ch.elexis.ungrad.qr-outputter.prefs"
+            name="Rechnungen">
+      </page>
+   </extension>
 
 </plugin>
