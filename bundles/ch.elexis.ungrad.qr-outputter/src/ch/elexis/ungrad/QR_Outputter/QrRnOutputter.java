@@ -218,7 +218,7 @@ public class QrRnOutputter implements IRnOutputter {
 							if (!noUi) {
 								for (File pdfFile : printed) {
 									if (pdfFile.exists()) {
-										pdfManager.printFromPDF(pdfFile, null);
+										pdfManager.printFromPDF(pdfFile, qrs.selectedPrinter);
 										// Program.launch(pdfFile.getAbsolutePath());
 									}
 								}

@@ -42,6 +42,7 @@ public class QR_SettingsControl extends Composite {
 	String outputDirXML;
 	Combo cbPrinters;
 	PrintService[] printers;
+	String selectedPrinter;
 	Button cbQRPage, cbTarmedForm, cbDoPrint, cbDirectPrint, cbDoDelete, cbDebug, cbMissingData;
 	Text tOutdirPDF;
 	Text tOutdirXML;
@@ -138,6 +139,7 @@ public class QR_SettingsControl extends Composite {
 		String currentPrinter = cfg.getLocal(PreferenceConstants.DEFAULT_PRINTER, "");
 		if (!StringTool.isNothing(currentPrinter)) {
 			cbPrinters.setText(currentPrinter);
+			selectedPrinter = currentPrinter;
 		}
 		cbDoDelete = new Button(this, SWT.CHECK);
 		cbDoDelete.setText("PDF nach dem Drucken löschen");
@@ -153,7 +155,7 @@ public class QR_SettingsControl extends Composite {
 	}
 
 	public void doSave() {
-
+		selectedPrinter = cbPrinters.getText();
 		cfg.setLocal(PreferenceConstants.RNN_DIR_PDF, tOutdirPDF.getText());
 		cfg.setLocal(PreferenceConstants.RNN_DIR_XML, tOutdirXML.getText());
 		cfg.setLocal(PreferenceConstants.PRINT_QR, cbQRPage.getSelection());
