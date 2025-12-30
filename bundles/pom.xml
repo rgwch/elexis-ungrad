@@ -26,7 +26,8 @@
         <module>ch.elexis.ungrad.laborimport_risch</module>
         <module>ch.elexis.ungrad.laborimport_sftp</module>
         <module>ch.elexis.ungrad.kassenbuch</module>
-	<module>ch.elexis.ungrad.tardoc</module>
+	    <module>ch.elexis.ungrad.tardoc</module>
+        <module>ch.elexis.ungrad.qr-outputter</module>
         <!-- module>ch.elexis.ungrad.privatrechnung_qr</module>
         <module>com.jsigle.noatext_jsl</module -->
     </modules>
