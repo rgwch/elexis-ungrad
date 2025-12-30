@@ -30,11 +30,14 @@
    <feature url="features/ch.elexis.ungrad.labenter.feature_0.0.0.jar" id="ch.elexis.ungrad.labenter.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.findings"/>
    </feature>
-   <feature id="ch.elexis.ungrad.kassenbuch.feature">
+   <feature url="features/ch.elexis.ungrad.kassenbuch.feature_0.0.0.jar" id="ch.elexis.ungrad.kassenbuch.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.financial"/>
    </feature>
    <feature url="features/ch.elexis.ungrad.tardoc.feature_0.0.0.jar" id="ch.elexis.ungrad.tardoc.feature" version="0.0.0">
       <category name="ch.elexis.ungrad.emr"/>
+   </feature>
+   <feature url="features/ch.elexis.ungrad.qr-outputter.feature_0.0.0.jar" id="ch.elexis.ungrad.qr-outputter.feature" version="0.0.0">
+      <category name="ch.elexis.ungrad.financial"/>
    </feature>
    <category-def name="ch.elexis.ungrad.docmgr" label="Document Manager"/>
    <category-def name="ch.elexis.ungrad.findings" label="Befunde"/>
