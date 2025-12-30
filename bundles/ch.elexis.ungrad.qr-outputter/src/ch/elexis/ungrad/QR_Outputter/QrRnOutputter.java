@@ -22,18 +22,13 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -56,7 +51,6 @@ import ch.elexis.core.model.IPatient;
 import ch.elexis.core.model.InvoiceConstants;
 import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.model.InvoiceState.REJECTCODE;
-import ch.elexis.core.preferences.PreferencesUtil;
 import ch.elexis.core.services.LocalConfigService;
 import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.services.holder.CoreModelServiceHolder;
@@ -114,9 +108,7 @@ public class QrRnOutputter implements IRnOutputter {
 	public static final String CFG_MSGTEXT_TG_M2 = CFG_ROOT + "pdf.txt.M2tg"; //$NON-NLS-1$
 	public static final String CFG_MSGTEXT_TG_M3 = CFG_ROOT + "pdf.txt.M3tg"; //$NON-NLS-1$
 
-	private Text tXml;
-	private Text tPdf;
-
+	private QR_SettingsControl qrs;
 	private Manager pdfManager = new Manager();
 	// private Button bWithEsr;
 	// private Button bWithRf;
@@ -421,78 +413,8 @@ public class QrRnOutputter implements IRnOutputter {
 
 	@Override
 	public Object createSettingsControl(Object parent) {
-		Composite ret = new QR_SettingsControl((Composite) parent);
-		// return qrs;
-		/*
-		final Composite compParent = (Composite) parent;
-		Composite ret = new Composite(compParent, SWT.NONE);
-		ret.setLayoutData(SWTHelper.getFillGridData());
-		ret.setLayout(new GridLayout(2, false));
-		bWithEsr = new Button(ret, SWT.CHECK);
-		bWithEsr.setText("Mit Einzahlungsschein");
-		bWithEsr.setSelection(LocalConfigService.get(CFG_ROOT + OutputterUtil.CFG_PRINT_BESR, true));
-		bWithEsr.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				LocalConfigService.set(CFG_ROOT + OutputterUtil.CFG_PRINT_BESR, bWithEsr.getSelection());
-				updateButtonStates(rnOutputDialog);
-			}
-		});
-		bWithEsr.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-
-		bWithRf = new Button(ret, SWT.CHECK);
-		bWithRf.setText("Mit Rechnungsformular");
-		bWithRf.setSelection(LocalConfigService.get(CFG_ROOT + OutputterUtil.CFG_PRINT_RF, true));
-		bWithRf.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				LocalConfigService.set(CFG_ROOT + OutputterUtil.CFG_PRINT_RF, bWithRf.getSelection());
-				updateButtonStates(rnOutputDialog);
-			}
-		});
-		bWithRf.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-
-		LocalConfigService.set(CFG_ROOT + CFG_MAIL_CPY, false);
-
-			Button bXML = new Button(ret, SWT.PUSH);
-			bXML.setText("XML Verzeichnis");
-			tXml = new Text(ret, SWT.BORDER | SWT.READ_ONLY);
-			tXml.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-			tXml.setText(PreferencesUtil.getOsSpecificPreference(OutputterUtil.CFG_PRINT_GLOBALXMLDIR,
-					ConfigServiceHolder.get()));
-			Button bPDF = new Button(ret, SWT.PUSH);
-			bPDF.setText("PDF Verzeichnis");
-			tPdf = new Text(ret, SWT.BORDER | SWT.READ_ONLY);
-			tPdf.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-			tPdf.setText(PreferencesUtil.getOsSpecificPreference(OutputterUtil.CFG_PRINT_GLOBALPDFDIR,
-					ConfigServiceHolder.get()));
-			bXML.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					DirectoryDialog dd = new DirectoryDialog(compParent.getShell());
-					String dir = dd.open();
-					if (dir != null) {
-						tXml.setText(dir);
-					}
-				}
-
-			});
-			bPDF.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					DirectoryDialog dd = new DirectoryDialog(compParent.getShell());
-					String dir = dd.open();
-					if (dir != null) {
-						tPdf.setText(dir);
-					}
-				}
-
-			});
-			// boolean useGlobalOutputDirs = OutputterUtil.useGlobalOutputDirs();
-			//setWidgetsVisible(!useGlobalOutputDirs, bXML, bPDF, tXml, tPdf);
-			setWidgetsVisible(true, bXML, bPDF, tXml, tPdf);
-			*/
-		return ret;
+		qrs = new QR_SettingsControl((Composite) parent);
+		return qrs;
 	}
 
 	@Override
@@ -512,33 +434,23 @@ public class QrRnOutputter implements IRnOutputter {
 					rnOutputDialog.customButtonPressed(IDialogConstants.OK_ID);
 				}
 			});
-			//updateButtonStates(rnOutputDialog);
 			rnOutputDialog.redrawLayout();
 		}
 	}
 
-	/*
-	private void updateButtonStates(RnOutputDialog rnOutputDialog) {
-		boolean isEnabled = bWithEsr.getSelection() || bWithRf.getSelection();
-		rnOutputDialog.setOkButtonEnabled(bWithEsr.getSelection() || bWithRf.getSelection());
-		rnOutputDialog.setButtonEnabled(Messages.Core_Open, isEnabled);
-	}
-
+	
 	@Override
 	public void saveComposite() {
-		LocalConfigService.set(CFG_ROOT + OutputterUtil.CFG_PRINT_BESR, bWithEsr.getSelection());
-		LocalConfigService.set(CFG_ROOT + OutputterUtil.CFG_PRINT_RF, bWithRf.getSelection());
+		qrs.doSave();
+		LocalConfigService.set(CFG_ROOT + OutputterUtil.CFG_PRINT_BESR, qrs.cbQRPage.getSelection());
+		LocalConfigService.set(CFG_ROOT + OutputterUtil.CFG_PRINT_RF, qrs.cbTarmedForm.getSelection());
 		if (!OutputterUtil.useGlobalOutputDirs()) {
-			LocalConfigService.set(CFG_ROOT + XMLDIR, tXml.getText());
-			LocalConfigService.set(CFG_ROOT + PDFDIR, tPdf.getText());
+			LocalConfigService.set(CFG_ROOT + XMLDIR, qrs.tOutdirXML.getText());
+			LocalConfigService.set(CFG_ROOT + PDFDIR, qrs.tOutdirPDF.getText());
 		}
 		LocalConfigService.flush();
 	}
-*/
-	@Override
-	public void saveComposite() {
-		// nothing to do
-	}
+
 	@Override
 	public void openOutput(IInvoice invoice, LocalDateTime timestamp, InvoiceState invoiceState) {
 		try {
@@ -567,11 +479,5 @@ public class QrRnOutputter implements IRnOutputter {
 			LoggerFactory.getLogger(getClass()).error("Error opening output", e);
 		}
 	}
-/*
-	private void setWidgetsVisible(boolean visible, Control... widgets) {
-		for (Control widget : widgets) {
-			widget.setVisible(visible);
-		}
-	}
-	*/
+
 }
