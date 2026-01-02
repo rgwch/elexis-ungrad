@@ -77,3 +77,5 @@ create table if not exists tardoc_kumulation(
 alter table ch_elexis_arzttarife_ch_physio add column law varchar(3);
 alter table output_log add column creatorid varchar(40);
 alter table reminders add column groupid varchar(40);
+ALTER TABLE `artikelstamm_ch` 
+CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
