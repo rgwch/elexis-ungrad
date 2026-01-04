@@ -92,3 +92,5 @@ create table if not exists bestellung_entry{
    provider varchar(40),
    state integer default 0,
 }
+
+ALTER TABLE `artikelstamm_ch` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
