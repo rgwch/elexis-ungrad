@@ -76,4 +76,19 @@ create table if not exists tardoc_kumulation(
 
 alter table ch_elexis_arzttarife_ch_physio add column law varchar(3);
 alter table output_log add column creatorid varchar(40);
+alter table output_log add column outputterstatus longtext;
 alter table reminders add column groupid varchar(40);
+
+create table if not exists bestellung_entry{
+   lastupdate bigint,
+   id varchar(40),
+   deleted char(1) default "0",
+   bestellung varchar(80),
+   stock varchar(40),
+   article_type varchar(255),
+   article_id varchar(40),
+   count integer default 0,
+   delivered_count integer default 0,
+   provider varchar(40),
+   state integer default 0,
+}
