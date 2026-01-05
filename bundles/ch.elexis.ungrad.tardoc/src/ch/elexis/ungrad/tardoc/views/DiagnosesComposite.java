@@ -144,16 +144,20 @@ public class DiagnosesComposite extends Composite {
 		setLayout(new GridLayout(1, false));
 		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+		// Create diags composite with 50% height
 		diags = new DiagnosenDisplay(page, this, SWT.NONE);
-		GridData ddLayoutData = new GridData(SWT.FILL, SWT.TOP, true, false);
-		ddLayoutData.heightHint = 150; // Minimum height of 150 pixels
+		GridData ddLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		ddLayoutData.minimumHeight = 100;
 		diags.setLayoutData(ddLayoutData);
+		
 		// Create search field with code system selector
 		createSearchControls(this);
 
-		// Create table viewer
+		// Create table viewer with 50% height
 		diagnosesViewer = new TableViewer(this, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
-		diagnosesViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		GridData viewerGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		viewerGridData.minimumHeight = 100;
+		diagnosesViewer.getTable().setLayoutData(viewerGridData);
 		diagnosesViewer.getTable().setHeaderVisible(false);
 		diagnosesViewer.getTable().setLinesVisible(true);
 

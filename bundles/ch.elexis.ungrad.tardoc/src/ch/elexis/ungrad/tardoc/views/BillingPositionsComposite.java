@@ -127,16 +127,22 @@ public class BillingPositionsComposite extends Composite {
 	 */
 	private void createContent() {
 		setLayout(new GridLayout(1, false));
-		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		// Create billed composite with 50% height
 		billed = new VerrechnungsDisplay(tkv.getSite().getPage(), this, SWT.NONE);
-		billed.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		GridData billedGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		billedGridData.minimumHeight = 100;
+		billed.setLayoutData(billedGridData);
 
 		// Create search field
 		createSearchField(this);
 
-		// Create table viewer
+		// Create table viewer with 50% height
 		billingPositionsViewer = new TableViewer(this, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
-		billingPositionsViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		GridData viewerGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		viewerGridData.minimumHeight = 100;
+		billingPositionsViewer.getTable().setLayoutData(viewerGridData);
 		billingPositionsViewer.getTable().setHeaderVisible(false);
 		billingPositionsViewer.getTable().setLinesVisible(true);
 
