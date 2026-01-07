@@ -60,14 +60,19 @@ import ch.rgw.tools.ExHandler;
  *
  */
 public class DirectoryViewPane extends Composite {
+	private static final String PREF_DIRECTORY_DATE_COLUMN_WIDTH = "directoryview.datecolumn.width";
+	private static final int DEFAULT_DATE_COLUMN_WIDTH = 80;
+	private static final int DEFAULT_NAME_COLUMN_WIDTH = 300;
+	
 	private static int COLUMN_DATE = 0;
 	private static int COLUMN_NAME = 1;
 	private String[] columnTitles = { Messages.DirectoryViewPane_col_date, Messages.DirectoryViewPane_col_filename };
-	private int[] columnWidths = { 80, 300 };
+	private int[] columnWidths = { DEFAULT_DATE_COLUMN_WIDTH, DEFAULT_NAME_COLUMN_WIDTH };
 	private Table table;
 	private TableViewer tv;
 	private DirectoryContentProvider dcp = new DirectoryContentProvider();
 	private StorageController sc = new StorageController();
+	private TableColumn dateColumn;
 
 	public DirectoryViewPane(Composite parent, Controller controlle) {
 		super(parent, SWT.NONE);
@@ -219,11 +224,27 @@ public class DirectoryViewPane extends Composite {
 	}
 
 	private void createColumns() {
+		// Restore saved date column width
+		int savedDateWidth = CoreHub.localCfg.get(PREF_DIRECTORY_DATE_COLUMN_WIDTH, DEFAULT_DATE_COLUMN_WIDTH);
+		
 		for (int i = 0; i < columnTitles.length; i++) {
 			TableViewerColumn tvc = new TableViewerColumn(tv, SWT.NULL);
 			TableColumn tc = tvc.getColumn();
 			tc.setText(columnTitles[i]);
-			tc.setWidth(columnWidths[i]);
+			
+			if (i == COLUMN_DATE) {
+				dateColumn = tc;
+				tc.setWidth(savedDateWidth);
+				// Add listener to save width changes
+				tc.addListener(SWT.Resize, event -> {
+					int newWidth = dateColumn.getWidth();
+					CoreHub.localCfg.set(PREF_DIRECTORY_DATE_COLUMN_WIDTH, newWidth);
+					CoreHub.localCfg.flush();
+				});
+			} else {
+				tc.setWidth(columnWidths[i]);
+			}
+			
 			addHeaderListener(tc, i);
 		}
 	}
