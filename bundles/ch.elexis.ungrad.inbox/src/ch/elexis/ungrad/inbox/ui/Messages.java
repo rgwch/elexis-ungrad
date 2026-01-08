@@ -16,6 +16,10 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "ch.elexis.ungrad.inbox.ui.messages";
+
+	public static String ImportDocumentDialog_Directory;
+
+	public static String ImportDocumentDialog_SelectFileTitle;
 	
 	public static String View_Action_FetchMail_Title;
 	public static String View_Action_FetchMail_Tooltip;

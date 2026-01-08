@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023-2024, G. Weirich and Elexis
+ * Copyright (c) 2023-2026, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,12 +31,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
-import ch.elexis.data.Patient;
 import ch.elexis.ungrad.IMAPMail;
 import ch.elexis.ungrad.MBox;
 import ch.elexis.ungrad.inbox.model.Controller;
@@ -181,7 +179,8 @@ public class View extends ViewPart {
 						FileTool.writeTextFile(new File(dir, name + ".meta"), sender + "," + subject);
 						reload();
 					} catch (Exception ex) {
-						SWTHelper.alert(Messages.View_Error_Writing, MessageFormat.format(Messages.View_Error_Writing, name));
+						SWTHelper.alert(Messages.View_Error_Writing,
+								MessageFormat.format(Messages.View_Error_Writing, name));
 					}
 
 				}
@@ -222,7 +221,7 @@ public class View extends ViewPart {
 						DocumentDescriptor dd = fmatch.analyze(sel);
 						ImportDocumentDialog idlg = new ImportDocumentDialog(View.this, dd);
 						if (idlg.open() == Dialog.OK) {
-							System.out.print(idlg.getValue());
+							// System.out.print(idlg.getValue());
 							if (dd.concerns()) {
 								// boolean bUseKI = CoreHub.localCfg.get(PreferenceConstants.USE_AI, false);
 								controller.moveFileToDocbase(dd.concerns_id, sel, idlg.getValue(), idlg.bUseKI);
@@ -251,7 +250,8 @@ public class View extends ViewPart {
 			@Override
 			public void run() {
 				File sel = getSelection();
-				if (SWTHelper.askYesNo(Messages.Plugin_PreferencesName, MessageFormat.format("{0} wirklich löschen?", sel.getName()))) {
+				if (SWTHelper.askYesNo(Messages.Plugin_PreferencesName,
+						MessageFormat.format("{0} wirklich löschen?", sel.getName()))) {
 					File meta = new File(sel.getAbsolutePath() + ".meta");
 					if (meta.exists()) {
 						meta.delete();
