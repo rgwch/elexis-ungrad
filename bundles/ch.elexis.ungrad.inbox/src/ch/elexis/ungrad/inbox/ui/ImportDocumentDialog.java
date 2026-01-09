@@ -91,6 +91,7 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 				if (fn != null) {
 					if (FileTool.copyFile(dd.file, new File(fn), FileTool.FAIL_IF_EXISTS)) {
 						dd.file.delete();
+						view.reload();
 						cancelPressed();
 					}
 				}

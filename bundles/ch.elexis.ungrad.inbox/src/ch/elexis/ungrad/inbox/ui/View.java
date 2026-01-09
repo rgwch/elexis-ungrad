@@ -126,7 +126,10 @@ public class View extends ViewPart {
 		return (File) sel.getFirstElement();
 	}
 
-	private void reload() {
+	/**
+	 * Reload the contents of the inbox folder
+	 */
+	public void reload() {
 		UiDesk.asyncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -221,9 +224,7 @@ public class View extends ViewPart {
 						DocumentDescriptor dd = fmatch.analyze(sel);
 						ImportDocumentDialog idlg = new ImportDocumentDialog(View.this, dd);
 						if (idlg.open() == Dialog.OK) {
-							// System.out.print(idlg.getValue());
 							if (dd.concerns()) {
-								// boolean bUseKI = CoreHub.localCfg.get(PreferenceConstants.USE_AI, false);
 								controller.moveFileToDocbase(dd.concerns_id, sel, idlg.getValue(), idlg.bUseKI);
 								reload();
 							} else {
