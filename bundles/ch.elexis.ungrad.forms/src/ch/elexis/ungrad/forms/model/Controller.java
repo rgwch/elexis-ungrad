@@ -420,8 +420,10 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	public void signPDF(File pdfFile) throws Exception {
 		Signer signer = new Signer();
 		String imgFile = CoreHub.localCfg.get(PreferenceConstants.SIGNATURE, null);
+		int x=CoreHub.localCfg.get(PreferenceConstants.SIGNATURE_X, 10);
+		int y=CoreHub.localCfg.get(PreferenceConstants.SIGNATURE_Y, 30);
 		if (imgFile != null) {
-			signer.sign(pdfFile.getAbsolutePath(), imgFile, 10, 10);
+			signer.sign(pdfFile.getAbsolutePath(), imgFile, x, y);
 		}
 	}
 }

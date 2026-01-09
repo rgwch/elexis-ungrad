@@ -45,6 +45,8 @@ public class Messages extends NLS {
 	public static String Preferences_PDFViewer;
 	public static String Preferences_MailBody;
 	public static String Preferences_Signature;
+	public static String Preferences_SignatureX;
+	public static String Preferences_SignatureY;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

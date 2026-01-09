@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2024, G. Weirich and Elexis
+ * Copyright (c) 2022-2026, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ package ch.elexis.ungrad.forms.ui;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -33,6 +34,8 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		super(GRID);
 		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
 		setDescription(Messages.Preferences_Description);
+		CoreHub.localCfg.set(PreferenceConstants.SIGNATURE_X, CoreHub.localCfg.get(PreferenceConstants.SIGNATURE_X, "10"));
+		CoreHub.localCfg.set(PreferenceConstants.SIGNATURE_Y, CoreHub.localCfg.get(PreferenceConstants.SIGNATURE_Y, "10"));
 	}
 
 	@Override
@@ -48,6 +51,16 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		addField(new FileFieldEditor(PreferenceConstants.PDF_VIEWER, Messages.Preferences_PDFViewer, getFieldEditorParent()));
 		addField(new MultilineFieldEditor(PreferenceConstants.MAIL_BODY, Messages.Preferences_MailBody, getFieldEditorParent()));
 		addField(new FileFieldEditor(PreferenceConstants.SIGNATURE, Messages.Preferences_Signature, getFieldEditorParent()));
+		
+		StringFieldEditor signatureX = new StringFieldEditor(PreferenceConstants.SIGNATURE_X, Messages.Preferences_SignatureX, 5, getFieldEditorParent());
+		signatureX.setTextLimit(5);
+		signatureX.setEmptyStringAllowed(false);
+		addField(signatureX);
+		
+		StringFieldEditor signatureY = new StringFieldEditor(PreferenceConstants.SIGNATURE_Y, Messages.Preferences_SignatureY, 5, getFieldEditorParent());
+		signatureY.setTextLimit(5);
+		signatureY.setEmptyStringAllowed(false);
+		addField(signatureY);
 
 	}
 

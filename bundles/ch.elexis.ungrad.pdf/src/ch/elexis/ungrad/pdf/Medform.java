@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2024, G. Weirich and Elexis
+ * Copyright (c) 2022-2026, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -89,7 +89,7 @@ public class Medform {
 	}
 
 	/**
-	 * Check if the currentliy loaded pdf is a medForm. Read the oid form-field.
+	 * Check if the currently loaded pdf is a medForm. Read the oid form-field.
 	 * 
 	 * @return true if an OID form field was found, and if its value starts with
 	 *         "medforms".
@@ -143,6 +143,12 @@ public class Medform {
 			m.put(get("mandatorAddress"), mand.getPostalAddress());
 			m.put(get("mandatorNameLine"), mand.getDescription1() + " " + mand.getDescription2());
 			String ean = (String) mand.getExtInfo("EAN");
+			if(ean==null) {
+				ean=(String)mand.getExtInfo("GLN");
+			}
+			if(ean==null) {
+				ean="";
+			}
 			m.put(get("mandatorEAN"), ean);
 			String ksk = (String) mand.getExtInfo("KSK");
 			if (ksk == null) {

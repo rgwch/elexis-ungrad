@@ -19,5 +19,7 @@ public class PreferenceConstants {
 	public static final String MAIL_BODY = BASE + "defaultMailBody";
 	public static final String PDF_VIEWER = BASE + "pdfViewer";
 	public static final String SIGNATURE = BASE + "signatureFile";
+	public static final String SIGNATURE_X = BASE + "signatureX";
+	public static final String SIGNATURE_Y = BASE + "signatureY";
 
 }
