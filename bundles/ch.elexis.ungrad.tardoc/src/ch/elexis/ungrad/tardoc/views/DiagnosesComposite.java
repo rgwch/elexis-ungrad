@@ -48,6 +48,7 @@ import ch.elexis.core.common.ElexisEventTopics;
 import ch.elexis.core.data.service.StoreToStringServiceHolder;
 import ch.elexis.core.model.IDiagnosis;
 import ch.elexis.core.model.IEncounter;
+import ch.elexis.core.services.holder.CoreModelServiceHolder;
 import ch.elexis.core.ui.views.DiagnosenDisplay;
 import ch.elexis.ungrad.tardoc.Messages;
 import ch.elexis.ungrad.tardoc.services.DiagnosesManager;
@@ -62,7 +63,6 @@ public class DiagnosesComposite extends Composite {
 	private Text searchField;
 	private Combo codeSystemCombo;
 	private DiagnosesManager diagnosesManager;
-	// rivate Label statusLabel;
 	private IWorkbenchPage page;
 	private IEncounter currentEncounter;
 	private DiagnosenDisplay diags;
@@ -311,6 +311,7 @@ public class DiagnosesComposite extends Composite {
 				if (diags != null) {
 					diags.setEncounter(currentEncounter);
 				}
+				CoreModelServiceHolder.get().save(currentEncounter);
 			}
 		});
 	}
