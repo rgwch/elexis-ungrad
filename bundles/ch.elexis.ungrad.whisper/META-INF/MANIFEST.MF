@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Whisper
+Bundle-SymbolicName: ch.elexis.ungrad.whisper;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: elexis.ch
+Require-Bundle: org.eclipse.swt,
+ org.eclipse.jface,
+ ch.elexis.core.ui;bundle-version="3.13.0"
+Automatic-Module-Name: ch.elexis.ungrad.whisper
+Bundle-RequiredExecutionEnvironment: JavaSE-21

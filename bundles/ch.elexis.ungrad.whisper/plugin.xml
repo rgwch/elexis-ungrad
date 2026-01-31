@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="ch.elexis.ungrad.whisper.toggleDictation"
+            name="Diktat starten/stoppen">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="ch.elexis.ungrad.whisper.ToggleDictationHandler"
+            commandId="ch.elexis.ungrad.whisper.toggleDictation">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+          <key
+         commandId="ch.elexis.speech.commands.toggleDictation"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+D"/>
+   </extension>
+
+</plugin>
