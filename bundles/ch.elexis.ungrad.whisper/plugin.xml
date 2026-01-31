@@ -18,7 +18,7 @@
    <extension
          point="org.eclipse.ui.bindings">
           <key
-         commandId="ch.elexis.speech.commands.toggleDictation"
+         commandId="ch.elexis.ungrad.whisper.toggleDictation"
          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
          sequence="M1+M2+D"/>
    </extension>
@@ -29,7 +29,7 @@
          locationURI="toolbar:ch.elexis.core.ui.views.KonsView">
       <command
             commandId="ch.elexis.ungrad.whisper.toggleDictation"
-            id="ch.elexis.speech.toolbar.toggleDictation"
+            id="ch.elexis.ungrad.whisper.toolbar.toggleDictation"
             label="Diktat"
             tooltip="Diktat starten / stoppen"
             icon="icons/microphone.png">
