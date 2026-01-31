@@ -22,5 +22,19 @@
          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
          sequence="M1+M2+D"/>
    </extension>
+<extension
+      point="org.eclipse.ui.menus">
+   <menuContribution
+         allPopups="false"
+         locationURI="toolbar:ch.elexis.core.ui.views.KonsView">
+      <command
+            commandId="ch.elexis.ungrad.whisper.toggleDictation"
+            id="ch.elexis.speech.toolbar.toggleDictation"
+            label="Diktat"
+            tooltip="Diktat starten / stoppen"
+            icon="icons/microphone.png">
+      </command>
+   </menuContribution>
+</extension>
 
 </plugin>
