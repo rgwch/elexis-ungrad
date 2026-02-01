@@ -8,4 +8,6 @@ Require-Bundle: org.eclipse.swt,
  org.eclipse.jface,
  ch.elexis.core.ui;bundle-version="3.13.0"
 Automatic-Module-Name: ch.elexis.ungrad.whisper
+Bundle-ClassPath: .,
+ lib/whisper-jni-1.7.1.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-21
