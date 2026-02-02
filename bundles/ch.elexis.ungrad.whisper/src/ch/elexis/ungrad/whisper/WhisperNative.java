@@ -5,6 +5,7 @@ public class WhisperNative {
     static {
         // libwhisperjni.so muss in java.library.path liegen
         System.loadLibrary("whisperjni");
+    	// WhisperJNI.loadLibrary();
     }
 
     public static native boolean init(String modelPath);

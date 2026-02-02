@@ -3,6 +3,8 @@ package ch.elexis.ungrad.whisper;
 
 import org.eclipse.swt.widgets.Display;
 
+import io.github.givimad.whisperjni.WhisperJNI;
+
 public class WhisperService {
 
  private final WhisperRecorder recorder = new WhisperRecorder();
