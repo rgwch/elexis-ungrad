@@ -54,13 +54,13 @@ public class QR_SettingsControl extends Composite {
 		this.setLayout(new GridLayout(2, false));
 
 		cbMissingData = new Button(this, SWT.CHECK);
-		cbMissingData.setText("Bei fehlenden administrativen Daten trotzdem ausgeben");
+		cbMissingData.setText(Messages.QR_SettingsControl_OutputDespiteMissingData);
 		cbMissingData.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbMissingData.setSelection(cfg.getLocal(PreferenceConstants.MISSING_DATA, true));
 
 		// PDF output directory
 		Label l = new Label(this, SWT.NONE);
-		l.setText("Zielverzeichnis für PDFs");
+		l.setText(Messages.QR_SettingsControl_PDFDirectory);
 		l.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		tOutdirPDF = new Text(this, SWT.READ_ONLY | SWT.BORDER);
 		tOutdirPDF.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
@@ -74,10 +74,10 @@ public class QR_SettingsControl extends Composite {
 				tOutdirPDF.setText(outputDirPDF);
 			}
 		});
-		b.setText("Ändern");
+		b.setText(Messages.QR_SettingsControl_Change);
 
 		Label lx = new Label(this, SWT.NONE);
-		lx.setText("Zielverzeichnis für XMLs");
+		lx.setText(Messages.QR_SettingsControl_XMLDirectory);
 		lx.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		tOutdirXML = new Text(this, SWT.READ_ONLY | SWT.BORDER);
 		tOutdirXML.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
@@ -106,28 +106,28 @@ public class QR_SettingsControl extends Composite {
 			outputDirXML = cfg.getLocal(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
 		}
 		tOutdirPDF.setText(outputDirPDF);
-		bx.setText("Ändern");
+		bx.setText(Messages.QR_SettingsControl_Change);
 		tOutdirXML.setText(outputDirXML);
 		Label sep = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL);
 		sep.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbQRPage = new Button(this, SWT.CHECK);
-		cbQRPage.setText("Seite mit QR ausgeben");
+		cbQRPage.setText(Messages.QR_SettingsControl_PrintQRPage);
 		cbQRPage.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbQRPage.setSelection(cfg.getLocal(PreferenceConstants.PRINT_QR, true));
 		cbTarmedForm = new Button(this, SWT.CHECK);
-		cbTarmedForm.setText("Rechnungsformular ausgeben");
+		cbTarmedForm.setText(Messages.QR_SettingsControl_PrintInvoiceForm);
 		cbTarmedForm.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbTarmedForm.setSelection(cfg.getLocal(PreferenceConstants.PRINT_TARMED, true));
 		cbDoPrint = new Button(this, SWT.CHECK);
-		cbDoPrint.setText("Rechnung ausdrucken");
+		cbDoPrint.setText(Messages.QR_SettingsControl_PrintOrMail);
 		cbDoPrint.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		cbDoPrint.setSelection(cfg.getLocal(PreferenceConstants.DO_PRINT, false));
 		cbFaceDown = new Button(this, SWT.CHECK);
 		cbFaceDown.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		cbFaceDown.setText("Druckseite unten");
+		cbFaceDown.setText(Messages.QR_SettingsControl_FaceDown);
 		cbFaceDown.setSelection(cfg.getLocal(PreferenceConstants.FACE_DOWN, false));
 		cbDirectPrint = new Button(this, SWT.CHECK);
-		cbDirectPrint.setText("Direkt ausdrucken auf:");
+		cbDirectPrint.setText(Messages.QR_SettingsControl_DirectPrintOn);
 		cbDirectPrint.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		cbDirectPrint.setSelection(cfg.getLocal(PreferenceConstants.DIRECT_PRINT, false));
 		cbPrinters = new Combo(this, SWT.READ_ONLY);
@@ -142,14 +142,14 @@ public class QR_SettingsControl extends Composite {
 			selectedPrinter = currentPrinter;
 		}
 		cbDoDelete = new Button(this, SWT.CHECK);
-		cbDoDelete.setText("PDF nach dem Drucken löschen");
+		cbDoDelete.setText(Messages.QR_SettingsControl_DeleteAfterPrint);
 		cbDoDelete.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbDoDelete.setSelection(cfg.getLocal(PreferenceConstants.DELETE_AFTER_PRINT, true));
 		Label sep2 = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL);
 		sep2.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 
 		cbDebug = new Button(this, SWT.CHECK);
-		cbDebug.setText("Debug: HTML Zwischendateien nicht löschen");
+		cbDebug.setText(Messages.QR_SettingsControl_DebugKeepHTML);
 		cbDebug.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		cbDebug.setSelection(cfg.getLocal(PreferenceConstants.DEBUGFILES, true));
 	}

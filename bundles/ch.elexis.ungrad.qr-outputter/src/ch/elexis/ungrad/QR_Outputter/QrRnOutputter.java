@@ -45,7 +45,6 @@ import ch.elexis.TarmedRechnung.XMLExporterUtil;
 import ch.elexis.base.ch.arzttarife.xml.exporter.Tarmed45Exporter.EsrType;
 import ch.elexis.core.data.interfaces.IRnOutputter;
 import ch.elexis.core.data.util.ResultAdapter;
-import ch.elexis.core.l10n.Messages;
 import ch.elexis.core.model.IContact;
 import ch.elexis.core.model.ICoverage;
 import ch.elexis.core.model.IInvoice;
@@ -130,7 +129,7 @@ public class QrRnOutputter implements IRnOutputter {
 
 	@Override
 	public String getDescription() {
-		return "Ungrad Drucker";
+		return Messages.QrRnOutputter_Description;
 	}
 
 	public QrRnOutputter() {
@@ -169,13 +168,13 @@ public class QrRnOutputter implements IRnOutputter {
 		}
 
 		if (StringUtils.isEmpty(OutputterUtil.getXmlOutputDir(CFG_ROOT))) {
-			String msg = "Es ist kein XML Ausgabe-Verzeichnis konfiguriert.\nBitte konfigurieren Sie dieses in den Einstellungen.";
-			SWTHelper.showError("Fehler beim Rechnungsdruck", msg);
+			String msg = Messages.QrRnOutputter_NoXMLDir;
+			SWTHelper.showError(Messages.QrRnOutputter_ErrorTitle, msg);
 			return new Result<Rechnung>(Result.SEVERITY.ERROR, 2, msg, null, true);
 		}
 		if (!OutputterUtil.isPdfOutputDirValid(CFG_ROOT)) {
-			String msg = "Es ist kein PDF Ausgabe-Verzeichnis konfiguriert.\nBitte konfigurieren Sie dieses in den Einstellungen.";
-			SWTHelper.showError("Fehler beim Rechnungsdruck", msg);
+			String msg = Messages.QrRnOutputter_NoPDFDir;
+			SWTHelper.showError(Messages.QrRnOutputter_ErrorTitle, msg);
 			return new Result<Rechnung>(Result.SEVERITY.ERROR, 2, msg, null, true);
 		}
 
@@ -186,7 +185,7 @@ public class QrRnOutputter implements IRnOutputter {
 			progressService.runInUI(PlatformUI.getWorkbench().getProgressService(), new IRunnableWithProgress() {
 				@Override
 				public void run(final IProgressMonitor monitor) {
-					monitor.beginTask("Exportiere Rechnungen...", rnn.size() * 10);
+					monitor.beginTask(Messages.QrRnOutputter_ExportingInvoices, rnn.size() * 10);
 					int errors = 0;
 					for (Rechnung rn : rnn) {
 						IInvoice invoice = CoreModelServiceHolder.get().load(rn.getId(), IInvoice.class).orElseThrow(
@@ -265,31 +264,34 @@ public class QrRnOutputter implements IRnOutputter {
 								String body = resolver.resolve(mailing[1]);
 								mailer.defaultMail(mailing[0], subject, body,
 										toMail.toArray(new String[toMail.size()]));
-								rn.addTrace(Rechnung.OUTPUT, "by Mail an " + mailing[0]);
+								rn.addTrace(Rechnung.OUTPUT, Messages.QrRnOutputter_ByMailTo.replace("{0}", mailing[0]));
 								try {
 									TimeUnit.MILLISECONDS.sleep(100);
 								} catch (InterruptedException e) {
 
 								}
 							} else {
-								for (File pdfFile : printed) {
-									if (pdfFile.exists()) {
-										pdfManager.printFromPDF(pdfFile, qrs.selectedPrinter);
-										// Program.launch(pdfFile.getAbsolutePath());
+								boolean doPrint = cfg.getLocal(PreferenceConstants.DO_PRINT, true);
+								if (doPrint) {
+									for (File pdfFile : printed) {
+										if (pdfFile.exists()) {
+											pdfManager.printFromPDF(pdfFile, qrs.selectedPrinter);
+											// Program.launch(pdfFile.getAbsolutePath());
+										}
 									}
 								}
 							}
 						} catch (IllegalStateException e) {
 							ExHandler.handle(e);
-							SWTHelper.showError("Fehler beim Rechnungsdruck",
-									"Bei der Ausgabe ist folgender Fehler aufgetreten.\n\n" + e.getMessage());
+							SWTHelper.showError(Messages.QrRnOutputter_ErrorTitle,
+									Messages.QrRnOutputter_WriteError.replace("{0}", e.getMessage()));
 							invoice.reject(REJECTCODE.INTERNAL_ERROR, "write error: " + fname); //$NON-NLS-1$
 							CoreModelServiceHolder.get().save(invoice);
 							continue;
 						} catch (Exception e1) {
 							ExHandler.handle(e1);
-							SWTHelper.showError("Fehler beim Rechnungsdruck",
-									"Konnte Datei " + fname + " nicht schreiben: "+e1.getMessage());
+							SWTHelper.showError(Messages.QrRnOutputter_ErrorTitle,
+									Messages.QrRnOutputter_CouldNotWrite.replace("{0}", fname).replace("{1}", e1.getMessage()));
 							invoice.reject(REJECTCODE.INTERNAL_ERROR, "write error: " + fname); //$NON-NLS-1$
 							CoreModelServiceHolder.get().save(invoice);
 							continue;
@@ -299,10 +301,10 @@ public class QrRnOutputter implements IRnOutputter {
 					pdfOnly = false;
 					monitor.done();
 					if (errors > 0) {
-						SWTHelper.alert("Fehler bei der Übermittlung", Integer.toString(errors)
-								+ " Rechnungen waren fehlerhaft. Sie können diese unter Rechnungen mit dem Status fehlerhaft aufsuchen und korrigieren");
+						SWTHelper.alert(Messages.QrRnOutputter_TransmissionError,
+								Messages.QrRnOutputter_DefectiveInvoices.replace("{0}", Integer.toString(errors)));
 					} else {
-						SWTHelper.showInfo("Übermittlung beendet", "Es sind keine Fehler aufgetreten");
+						SWTHelper.showInfo(Messages.QrRnOutputter_TransmissionComplete, Messages.QrRnOutputter_NoErrors);
 					}
 
 				}
@@ -311,7 +313,7 @@ public class QrRnOutputter implements IRnOutputter {
 			ExHandler.handle(ex);
 			res.add(Result.SEVERITY.ERROR, 2, ex.getMessage(), null, true);
 			Display.getDefault().syncExec(() -> {
-				ErrorDialog.openError(null, "Fehler bei der Ausgabe", "Konnte Rechnungsdruck nicht starten",
+				ErrorDialog.openError(null, Messages.QrRnOutputter_OutputError, Messages.QrRnOutputter_CouldNotStart,
 						ResultAdapter.getResultAsStatus(res));
 			});
 		}
@@ -367,47 +369,7 @@ public class QrRnOutputter implements IRnOutputter {
 		return false;
 	}
 
-	private String sendAsMail(Kontakt receiver, Rechnung rechnung, List<File> printed) {
-		ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
-		try {
-			String attachmentsString = getAttachmentsString(printed);
-			Command sendMailCommand = commandService.getCommand("ch.elexis.core.mail.ui.sendMailNoUi"); //$NON-NLS-1$
-
-			HashMap<String, String> params = new HashMap<String, String>();
-			String accountid = ConfigServiceHolder.getGlobal(QrRnOutputter.CFG_ROOT
-					+ QrRnOutputter.CFG_MAIL_MANDANT_ACCOUNT + "/" + rechnung.getMandant().getId(), null); //$NON-NLS-1$
-			if (accountid != null) {
-				params.put("ch.elexis.core.mail.ui.sendMailNoUi.accountid", accountid); //$NON-NLS-1$
-			}
-			params.put("ch.elexis.core.mail.ui.sendMailNoUi.mandant", rechnung.getMandant().getId()); //$NON-NLS-1$
-			params.put("ch.elexis.core.mail.ui.sendMailNoUi.to", receiver.getMailAddress()); //$NON-NLS-1$
-			params.put("ch.elexis.core.mail.ui.sendMailNoUi.attachments", attachmentsString); //$NON-NLS-1$
-			params.put("ch.elexis.core.mail.ui.sendMailNoUi.subject", "Rechnungskopie vom " + rechnung.getDatumRn()); //$NON-NLS-1$
-			params.put("ch.elexis.core.mail.ui.sendMailNoUi.text", //$NON-NLS-1$
-					"Anbei finden Sie eine Kopie der Rechnung vom " + rechnung.getDatumRn()
-							+ " für Ihre Unterlagen.\n\nBeste Grüsse\n" + rechnung.getMandant().get(Person.TITLE)
-							+ StringUtils.SPACE + rechnung.getMandant().getVorname() + StringUtils.SPACE
-							+ rechnung.getMandant().getName());
-
-			ParameterizedCommand parametrizedCommmand = ParameterizedCommand.generateCommand(sendMailCommand, params);
-			return (String) PlatformUI.getWorkbench().getService(IHandlerService.class)
-					.executeCommand(parametrizedCommmand, null);
-		} catch (Exception me) {
-			throw new RuntimeException("ch.elexis.core.mail.ui.sendMailNoUi not found", me); //$NON-NLS-1$
-		}
-	}
-
-	private String getAttachmentsString(List<File> attachments) {
-		StringBuilder sb = new StringBuilder();
-		for (File file : attachments) {
-			if (sb.length() > 0) {
-				sb.append(":::"); //$NON-NLS-1$
-			}
-			sb.append(file.getAbsolutePath());
-		}
-		return sb.toString();
-	}
-
+	
 	@Override
 	public boolean canStorno(Rechnung rn) {
 		return false;

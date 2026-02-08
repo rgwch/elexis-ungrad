@@ -4,7 +4,7 @@
    <extension
          point="ch.elexis.core.data.RechnungsManager">
       <Rechnung
-            localizedName="Ungrad-Rechnungsdrucker"
+            localizedName="%invoiceOutputterName"
             name="qrprinter_ungrad"
             outputter="ch.elexis.ungrad.QR_Outputter.QrRnOutputter">
       </Rechnung>
@@ -15,7 +15,7 @@
             category="ch.elexis.ungrad.common.prefs"
             class="ch.elexis.ungrad.QR_Outputter.BillPreferencePage"
             id="ch.elexis.ungrad.qr-outputter.prefs"
-            name="Rechnungen">
+            name="%preferencesPageName">
       </page>
    </extension>
 

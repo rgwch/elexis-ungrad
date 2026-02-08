@@ -43,7 +43,7 @@ public class BillPreferencePage extends PreferencePage implements IWorkbenchPref
 	IConfigService cfg = ConfigServiceHolder.get();
 
 	public BillPreferencePage() {
-		setDescription("Rechnungen");
+		setDescription(Messages.BillPreferencePage_Title);
 	}
 
 	public void init(IWorkbench workbench) {
@@ -62,14 +62,14 @@ public class BillPreferencePage extends PreferencePage implements IWorkbenchPref
 		// Sender line on bills
 		Label lbSenderLine = new Label(ret, SWT.NONE);
 		lbSenderLine.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		lbSenderLine.setText("Absenderzeile auf Rechnungen");
+		lbSenderLine.setText(Messages.BillPreferencePage_SenderLine);
 		txSenderLine = new Text(ret, SWT.SINGLE);
 		txSenderLine.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		txSenderLine.setText(cfg.get("pdf-output/esr.header.line3/"+this.currentMandator.getId(), ""));
 		// Send Mail if Case Variable is set to Mailaddress
 		bMailIfCaseVar = new Button(ret, SWT.CHECK);
 		bMailIfCaseVar.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
-		bMailIfCaseVar.setText("Rechnungen bei Fällen mit folgender Eigenschaft per Mail senden");
+		bMailIfCaseVar.setText(Messages.BillPreferencePage_SendMailIfCaseVar);
 		txCaseVar = new Text(ret, SWT.SINGLE);
 		txCaseVar.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
 		String caseVar = cfg.get(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
@@ -77,13 +77,13 @@ public class BillPreferencePage extends PreferencePage implements IWorkbenchPref
 		bMailIfCaseVar.setSelection(!StringTool.isNothing(caseVar));
 		Label lbSubject = new Label(ret, SWT.NONE);
 		lbSubject.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		lbSubject.setText("Nachrichtentitel");
+		lbSubject.setText(Messages.BillPreferencePage_MessageTitle);
 		txSubject = new Text(ret, SWT.NONE);
 		txSubject.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 		txSubject.setText(cfg.get(PreferenceConstants.BY_MAIL_SUBJECT, ""));
 		Label lbBody = new Label(ret, SWT.NONE);
 		lbBody.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		lbBody.setText("Standard-Nachrichtentext");
+		lbBody.setText(Messages.BillPreferencePage_MessageBody);
 		txBody = new Text(ret, SWT.MULTI);
 		txBody.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
 		txBody.setText(cfg.get(PreferenceConstants.BY_MAIL_BODY, ""));

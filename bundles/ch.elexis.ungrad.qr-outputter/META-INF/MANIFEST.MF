@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Qr-Outputter with Printer support
 Bundle-SymbolicName: ch.elexis.ungrad.qr-outputter;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.2.qualifier
 Bundle-Vendor: elexis.ch
 Require-Bundle: org.eclipse.swt,
  org.eclipse.jface,
