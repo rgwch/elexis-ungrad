@@ -1,6 +1,7 @@
 # Plugin for PDF Handling
 
 * Convert HTML to PDF
+* Fill out MedForm forms
 * Print PDF
 
 ## Credits

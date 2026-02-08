@@ -204,8 +204,9 @@ public class View extends ViewPart implements IActivationListener {
 		File outFile = new File(outDir, basename);
 		Medform medform = new Medform(templateFile.getAbsolutePath());
 		Kontakt kRecipient = null;
+		String outfilePath = "";
 		if (medform.isMedform()) {
-			medform.create(outFile.getAbsolutePath(), currentPatient);
+			outfilePath=medform.create(outFile.getAbsolutePath(), currentPatient);
 			String recipient = medform.getFieldValue("receiverMail");
 			Query<Kontakt> qbe = new Query<Kontakt>(Kontakt.class, Kontakt.FLD_E_MAIL, recipient);
 			List<Kontakt> found = qbe.execute();
@@ -218,11 +219,11 @@ public class View extends ViewPart implements IActivationListener {
 			if (mappingFile.exists()) {
 				String raw = FileTool.readTextFile(mappingFile);
 				MappedForm mapped = new MappedForm(templateFile.getAbsolutePath());
-				mapped.create(outFile.getAbsolutePath(), raw);
+				outfilePath=mapped.create(outFile.getAbsolutePath(), raw);
 			}
 		}
 		controller.createLinksWithElexis(outFile.getAbsolutePath(), kRecipient);
-		return outFile.getAbsolutePath();
+		return outfilePath;
 	}
 
 	private void makeActions() {

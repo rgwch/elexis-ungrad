@@ -57,9 +57,10 @@ public class Manager {
 	 * @throws Exception
 	 */
 	public String fillForm(String formpath, String outputPath, Map<String, String> fields) throws Exception {
+		PDDocument pdfDoc = null;
 		try {
 			InputStream resource = new FileInputStream(formpath);
-			PDDocument pdfDoc = PDDocument.load(resource);
+			pdfDoc = PDDocument.load(resource);
 			PDDocumentCatalog docCatalog = pdfDoc.getDocumentCatalog();
 			pdfDoc.getDocumentInformation().setCreator("Elexis Ungrad");
 			pdfDoc.getDocumentInformation().setCustomMetadataValue("concern", "Forms");
@@ -77,12 +78,16 @@ public class Manager {
 				}
 			}
 			pdfDoc.save(outputPath);
-			pdfDoc.close();
-			pdfDoc = null;
+			resource.close();
+			acroForm = null;
 			return outputPath;
 		} catch (Exception ex) {
 			ExHandler.handle(ex);
 			return "";
+		} finally {
+			if (pdfDoc != null) {
+				pdfDoc.close();
+			}
 		}
 	}
 
@@ -127,7 +132,7 @@ public class Manager {
 		builder.toStream(fout);
 		builder.run();
 		fout.close();
-		builder=null;
+		builder = null;
 	}
 
 	/**
