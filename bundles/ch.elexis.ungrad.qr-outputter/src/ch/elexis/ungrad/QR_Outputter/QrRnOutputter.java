@@ -1,13 +1,8 @@
 package ch.elexis.ungrad.QR_Outputter;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,23 +12,17 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.progress.IProgressService;
 import org.jdom2.Document;
 import org.jdom2.output.Format;
@@ -63,7 +52,6 @@ import ch.elexis.core.ui.views.rechnung.RnOutputDialog;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.PersistentObject;
-import ch.elexis.data.Person;
 import ch.elexis.data.Rechnung;
 import ch.elexis.pdfBills.ElexisPDFGenerator;
 import ch.elexis.pdfBills.OutputterUtil;
@@ -217,10 +205,12 @@ public class QrRnOutputter implements IRnOutputter {
 							// consider fallback to non QR bill, always fall back for tarmed xml version
 							// lower 4.5
 							EsrType outputEsrType = ex.getEsrTypeOrFallback(invoice);
+							InvoiceState newInvoiceState = getNewInvoiceState(invoice);
+
 							if ("5.0".equals(epdf.getBillVersion())) {
-								epdf.printQrBill(rsc);
+								epdf.printQrBill(type,newInvoiceState,rsc);
 							} else if ("4.5".equals(epdf.getBillVersion()) && outputEsrType != EsrType.esr9) { //$NON-NLS-1$
-								epdf.printQrBill(rsc);
+								epdf.printQrBill(type,newInvoiceState,rsc);
 							} else {
 								LoggerFactory.getLogger(getClass()).warn("Fallback to ESR9 for xml version [" //$NON-NLS-1$
 										+ epdf.getBillVersion() + "] and esrType [" + outputEsrType + "]"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -318,6 +308,18 @@ public class QrRnOutputter implements IRnOutputter {
 			});
 		}
 		return res;
+	}
+
+	private InvoiceState getNewInvoiceState(IInvoice invoice) {
+		InvoiceState currentState = invoice.getState();
+		int currentStateInt = currentState.numericValue();
+		if ((currentStateInt == InvoiceState.OPEN.numericValue())
+				|| (currentStateInt == InvoiceState.DEMAND_NOTE_1.numericValue())
+				|| (currentStateInt == InvoiceState.DEMAND_NOTE_2.numericValue())
+				|| (currentStateInt == InvoiceState.DEMAND_NOTE_3.numericValue())) {
+			return InvoiceState.fromState(currentStateInt + 1);
+		}
+		return currentState;
 	}
 
 	private void initSelectedFromProperties(Properties props) {
@@ -419,33 +421,5 @@ public class QrRnOutputter implements IRnOutputter {
 		LocalConfigService.flush();
 	}
 
-	@Override
-	public void openOutput(IInvoice invoice, LocalDateTime timestamp, InvoiceState invoiceState) {
-		try {
-			File esrFile = VirtualFilesystemServiceHolder.get().of(OutputterUtil.getPdfOutputDir(QrRnOutputter.CFG_ROOT)
-					+ File.separator + invoice.getNumber() + "_esr.pdf").toFile().orElse(null);
-			File rfFile = VirtualFilesystemServiceHolder.get().of(OutputterUtil.getPdfOutputDir(QrRnOutputter.CFG_ROOT)
-					+ File.separator + invoice.getNumber() + "_rf.pdf").toFile().orElse(null);
-			File qrFile = VirtualFilesystemServiceHolder.get().of(OutputterUtil.getPdfOutputDir(QrRnOutputter.CFG_ROOT)
-					+ File.separator + invoice.getNumber() + "_qr.pdf").toFile().orElse(null);
-			if (esrFile.exists()) {
-				Program.launch(esrFile.getAbsolutePath());
-			} else {
-				LoggerFactory.getLogger(getClass()).info("File [" + esrFile.getAbsolutePath() + "] does not exist"); //$NON-NLS-1$
-			}
-			if (rfFile.exists()) {
-				Program.launch(rfFile.getAbsolutePath());
-			} else {
-				LoggerFactory.getLogger(getClass()).info("File [" + rfFile.getAbsolutePath() + "] does not exist"); //$NON-NLS-1$
-			}
-			if (qrFile.exists()) {
-				Program.launch(qrFile.getAbsolutePath());
-			} else {
-				LoggerFactory.getLogger(getClass()).info("File [" + qrFile.getAbsolutePath() + "] does not exist"); //$NON-NLS-1$
-			}
-		} catch (IOException e) {
-			LoggerFactory.getLogger(getClass()).error("Error opening output", e);
-		}
-	}
 
 }

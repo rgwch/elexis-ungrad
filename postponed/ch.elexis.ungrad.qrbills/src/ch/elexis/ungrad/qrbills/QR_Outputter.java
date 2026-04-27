@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018-2024 by G. Weirich
+ * Copyright (c) 2018-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -18,15 +18,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -36,23 +32,18 @@ import org.eclipse.ui.progress.IProgressService;
 import ch.elexis.arzttarife_schweiz.Messages;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.interfaces.IRnOutputter;
-import ch.elexis.core.data.interfaces.ISticker;
-import ch.elexis.core.model.IPatient;
-import ch.elexis.core.model.InvoiceState;
+import ch.elexis.core.rcp.utils.PlatformHelper;
 import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.LocalConfigService;
 import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
-import ch.elexis.core.utils.PlatformHelper;
 import ch.elexis.data.Fall;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.PersistentObject;
 import ch.elexis.data.Rechnung;
-import ch.elexis.data.Sticker;
 import ch.elexis.data.Zahlung;
 import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.QrRnOutputter;
-import ch.elexis.ungrad.MailQueue;
 import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.pdf.Manager;

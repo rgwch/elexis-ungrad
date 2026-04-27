@@ -1,6 +1,7 @@
 package ch.elexis.ungrad;
 
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 
@@ -23,10 +24,10 @@ public class AIUtil {
 				model, prompt);
 		try {
 			Http http=new Http();
-			URL url = new URL(CoreHub.localCfg.get(PreferenceConstants.AI_URL, ""));
-			String result = http.doPost(url, requestBody, 200);
+			URI uri = new URI(CoreHub.localCfg.get(PreferenceConstants.AI_URL, ""));
+			String result = http.doPost(uri.toURL(), requestBody, 200);
 			if (!StringTool.isNothing(result)) {
-				Gson gson = new Gson();
+				Gson gson = new Gson();	
 
 			    Type type = new TypeToken<Map<String, String>>() {}.getType();
 			    Map<String, String> json = gson.fromJson(result, type);
