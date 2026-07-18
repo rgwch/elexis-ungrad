@@ -15,7 +15,7 @@
             category="ch.elexis.ungrad.common.prefs"
             class="ch.elexis.ungrad.QR_Outputter.BillPreferencePage"
             id="ch.elexis.ungrad.qr-outputter.prefs"
-            name="%preferencesPageName">
+            name="QR-Output">
       </page>
    </extension>
 
