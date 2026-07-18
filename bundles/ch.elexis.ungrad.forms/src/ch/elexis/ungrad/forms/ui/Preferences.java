@@ -66,13 +66,6 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 
 	protected void performApply() {
 		CoreHub.localCfg.flush();
-		super.performApply();
 	}
-	
-	public boolean performOk() {
-		CoreHub.localCfg.flush();
-		return super.performOk();
-	}
-	
 
 }
