@@ -65,7 +65,20 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	}
 
 	protected void performApply() {
+		super.performApply();
 		CoreHub.localCfg.flush();
 	}
+	
+	public boolean performOk() {
+		String test=CoreHub.localCfg.get(PreferenceConstants.PDF_VIEWER, "");
+		performApply();
+		boolean ret = super.performOk();
+		String test2=CoreHub.localCfg.get(PreferenceConstants.PDF_VIEWER, "");
+		if(test.equals(test2)){
+			System.out.println("Preferences: PDF_VIEWER not changed");
+		}
+		return ret;
+	}
+	
 
 }
