@@ -22,8 +22,6 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.preferences.inputs.PasswordFieldEditor;
 import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.PreferenceConstants;

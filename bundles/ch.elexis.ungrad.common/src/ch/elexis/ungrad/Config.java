@@ -1,3 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2026 by G. Weirich
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *
+ * Contributors:
+ * G. Weirich - initial implementation
+ *********************************************************************************/
+
 package ch.elexis.ungrad;
 
 import java.io.BufferedReader;
@@ -20,6 +34,10 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  * It implements IPreferenceStore and IPersistentPreferenceStore interfaces.
  * Since CoreHub.localCfg is deprecated and seems dysfunctional in 3.13, 
  * this class is used to manage configuration settings in a more reliable way.
+ * 
+ * Since the config is a simple text-file (~/elexis/ungrad.ini), 
+ * it can be edited by hand if necessary and simply copied to other installations. 
+ * The config file is created if it does not exist.
  */
 public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 
@@ -72,6 +90,7 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 
 	/**
 	 * Loads properties from the INI file.
+	 * Supports multi-line values using backslash continuation.
 	 */
 	private void load() throws IOException {
 		properties.clear();
@@ -81,18 +100,55 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(iniFile))) {
 			String line;
+			String currentKey = null;
+			StringBuilder currentValue = new StringBuilder();
+			
 			while ((line = reader.readLine()) != null) {
-				line = line.trim();
-				// Skip empty lines and comments
-				if (line.isEmpty() || line.startsWith("#") || line.startsWith(";")) {
+				String trimmed = line.trim();
+				
+				// Skip empty lines and comments (only if not in continuation)
+				if (currentKey == null && (trimmed.isEmpty() || trimmed.startsWith("#") || trimmed.startsWith(";"))) {
 					continue;
 				}
-				int equalsIndex = line.indexOf('=');
-				if (equalsIndex > 0) {
-					String key = line.substring(0, equalsIndex).trim();
-					String value = line.substring(equalsIndex + 1).trim();
-					properties.put(key, value);
+				
+				// Handle continuation from previous line
+				if (currentKey != null) {
+					// Previous line ended with backslash, append this line
+					currentValue.append("\n").append(line);
+					
+					// Check if this line also continues
+					if (!line.endsWith("\\")) {
+						// End of multi-line value, remove trailing backslashes
+						String finalValue = currentValue.toString().replace("\\\n", "\n");
+						properties.put(currentKey, finalValue);
+						currentKey = null;
+						currentValue.setLength(0);
+					} else {
+						// Remove the trailing backslash for next iteration
+						currentValue.setLength(currentValue.length() - 1);
+					}
+					continue;
 				}
+				
+				// Parse new key=value line
+				int equalsIndex = trimmed.indexOf('=');
+				if (equalsIndex > 0) {
+					String key = trimmed.substring(0, equalsIndex).trim();
+					String value = trimmed.substring(equalsIndex + 1).trim();
+					
+					// Check if value continues on next line
+					if (value.endsWith("\\")) {
+						currentKey = key;
+						currentValue.append(value, 0, value.length() - 1);
+					} else {
+						properties.put(key, value);
+					}
+				}
+			}
+			
+			// Handle case where file ends with continuation
+			if (currentKey != null) {
+				properties.put(currentKey, currentValue.toString().replace("\\\n", "\n"));
 			}
 		}
 		dirty = false;
@@ -102,8 +158,25 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 	public void save() throws IOException {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(iniFile))) {
 			for (Map.Entry<String, String> entry : properties.entrySet()) {
-				writer.write(entry.getKey() + "=" + entry.getValue());
-				writer.newLine();
+				String key = entry.getKey();
+				String value = entry.getValue();
+				
+				// Handle multi-line values
+				if (value.contains("\n")) {
+					String[] lines = value.split("\n", -1);
+					writer.write(key + "=");
+					for (int i = 0; i < lines.length; i++) {
+						writer.write(lines[i]);
+						if (i < lines.length - 1) {
+							writer.write("\\");
+							writer.newLine();
+						}
+					}
+					writer.newLine();
+				} else {
+					writer.write(key + "=" + value);
+					writer.newLine();
+				}
 			}
 		}
 		dirty = false;
