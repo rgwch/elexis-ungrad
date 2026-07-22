@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -13,11 +13,10 @@
  *********************************************************************************/
 package ch.elexis.ungrad.labview;
 
-import ch.elexis.core.data.activator.CoreHub;
-import ch.rgw.io.Settings;
+import ch.elexis.ungrad.Config;
 
 public class Preferences {
-	public static final Settings cfg = CoreHub.localCfg;
+	public static final Config cfg = Config.getDefaultInstance();
 	public static final String BASE = "ch.elexis.ungrad.labview.";
 	public static final String MODE = BASE + "mode";
 	// public static final String COLWIDTHS = BASE + "colwidths";

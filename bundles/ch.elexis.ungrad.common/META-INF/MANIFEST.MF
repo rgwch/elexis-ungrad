@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle_Name
 Bundle-SymbolicName: ch.elexis.ungrad.common;singleton:=true
-Bundle-Version: 3.1.0.qualifier
+Bundle-Version: 3.2.1.qualifier
 Bundle-Vendor: %Bundle_Vendor
 Bundle-Localization: plugin
 Automatic-Module-Name: ch.elexis.ungrad-common
@@ -20,4 +20,5 @@ Require-Bundle: ch.elexis.core;bundle-version="3.12.0",
  ch.elexis.core.mail;bundle-version="3.12.0",
  com.google.gson;bundle-version="2.12.1"
 Export-Package: ch.elexis.ungrad,
+ ch.elexis.ungrad.common,
  ch.elexis.ungrad.common.ui

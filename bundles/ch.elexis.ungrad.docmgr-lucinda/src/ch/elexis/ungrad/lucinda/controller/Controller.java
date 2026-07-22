@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2024 by G. Weirich
+ * Copyright (c) 2016-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -51,10 +51,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.events.ElexisEventDispatcher;
 import ch.elexis.core.data.service.ContextServiceHolder;
-import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.text.model.Samdas;
@@ -63,11 +61,12 @@ import ch.elexis.data.Fall;
 import ch.elexis.data.Konsultation;
 import ch.elexis.data.Patient;
 import ch.elexis.ungrad.AIUtil;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.Client3;
+import ch.elexis.ungrad.lucinda.Client3.INotifier;
 import ch.elexis.ungrad.lucinda.Lucinda;
 import ch.elexis.ungrad.lucinda.Preferences;
-import ch.elexis.ungrad.lucinda.Client3.INotifier;
 import ch.elexis.ungrad.lucinda.view.DirectoryViewPane;
 import ch.elexis.ungrad.lucinda.view.GlobalViewPane;
 import ch.elexis.ungrad.lucinda.view.Master;
@@ -97,6 +96,7 @@ public class Controller implements IProgressController {
 	private Logger log = LoggerFactory.getLogger(Controller.class);
 	Composite envelope;
 	StackLayout stack = new StackLayout();
+	Config cfg = Config.getDefaultInstance();
 
 	@Reference
 	private IContextService contextService = ContextServiceHolder.get();
@@ -113,13 +113,13 @@ public class Controller implements IProgressController {
 	}
 
 	public Composite createView(Composite parent) {
-		if (Preferences.cfg.get(Preferences.SHOW_CONS, true)) {
+		if (Preferences.cfg.getBoolean(Preferences.SHOW_CONS, true)) {
 			allowed_doctypes.add(Preferences.KONSULTATION_NAME);
 		}
-		if (Preferences.cfg.get(Preferences.SHOW_OMNIVORE, true)) {
+		if (Preferences.cfg.getBoolean(Preferences.SHOW_OMNIVORE, true)) {
 			allowed_doctypes.add(Preferences.OMNIVORE_NAME);
 		}
-		if (Preferences.cfg.get(Preferences.SHOW_INBOX, true)) {
+		if (Preferences.cfg.getBoolean(Preferences.SHOW_INBOX, true)) {
 			allowed_doctypes.add(Preferences.INBOX_NAME);
 		}
 
@@ -147,7 +147,7 @@ public class Controller implements IProgressController {
 			}
 		});
 		dirView = new DirectoryViewPane(envelope, this);
-		if (CoreHub.localCfg.get(Preferences.COMMON_DIRECTORY, false) == true) {
+		if (cfg.getBoolean(Preferences.COMMON_DIRECTORY, false) == true) {
 			stack.topControl = dirView;
 		} else {
 			stack.topControl = lucindaView;
@@ -292,7 +292,7 @@ public class Controller implements IProgressController {
 		String doctype = (String) doc.get(Preferences.FLD_LUCINDA_DOCTYPE);
 
 		if (Preferences.INBOX_NAME.equalsIgnoreCase(doctype)) {
-			String docbase = Preferences.cfg.get(Preferences.DOCUMENT_STORE, "");
+			String docbase = Preferences.cfg.getString(Preferences.DOCUMENT_STORE, "");
 			loadFile(docbase, doc);
 
 		} else if (doctype.equalsIgnoreCase(Preferences.KONSULTATION_NAME)) {

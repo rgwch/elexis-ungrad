@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2024, G. Weirich and Elexis
+ * Copyright (c) 2022-2026, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Text;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.DefaultLabelProvider;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.forms.model.PreferenceConstants;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.StringTool;
@@ -53,7 +54,7 @@ public class SelectTemplateDialog extends TitleAreaDialog {
 
 	public SelectTemplateDialog(Shell parentShell) {
 		super(parentShell);
-		templateDir = CoreHub.localCfg.get(PreferenceConstants.TEMPLATES, ""); //$NON-NLS-1$
+		templateDir = Config.getDefaultInstance().getString(PreferenceConstants.TEMPLATES, ""); //$NON-NLS-1$
 	}
 
 	@Override

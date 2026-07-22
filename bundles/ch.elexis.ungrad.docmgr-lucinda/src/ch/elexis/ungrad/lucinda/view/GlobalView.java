@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2024 by G. Weirich
+ * Copyright (c) 2016-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -54,6 +54,7 @@ import ch.elexis.core.ui.actions.IActivationListener;
 import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.e4.util.CoreUiUtil;
 import ch.elexis.core.ui.icons.Images;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.lucinda.Activator;
 import ch.elexis.ungrad.lucinda.IDocumentHandler;
 import ch.elexis.ungrad.lucinda.Preferences;
@@ -72,9 +73,8 @@ public class GlobalView extends ViewPart implements IActivationListener {
 	private Action[] aquireActions;
 	private List<IDocumentHandler> addons;
 	private List<IAction> addonActions = new ArrayList<IAction>();
-
-	@Inject
-	private IConfigService cfg;
+	private Config cfg=Config.getDefaultInstance();
+	
 	@Inject
 	private IContextService ctx = ContextServiceHolder.get();
 
@@ -130,7 +130,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 		IActionBars bars = getViewSite().getActionBars();
 		IMenuManager menu = bars.getMenuManager();
 		IToolBarManager toolbar = bars.getToolBarManager();
-		if (CoreHub.localCfg.get(Preferences.COMMON_DIRECTORY, false)) {
+		if (cfg.getBoolean(Preferences.COMMON_DIRECTORY, false)) {
 			toolbar.add(showDirectoryAction);
 			toolbar.add(new Separator());
 		}
@@ -261,7 +261,7 @@ public class GlobalView extends ViewPart implements IActivationListener {
 
 		};
 		showInboxAction.setChecked(is(SHOW_INBOX));
-		String[] aquire = CoreHub.localCfg.get(Preferences.AQUIRE_ACTION_SCRIPTS, "").split("\\n");
+		String[] aquire = cfg.getString(Preferences.AQUIRE_ACTION_SCRIPTS).split("\\n");
 		aquireActions = new Action[aquire.length];
 		for (int i = 0; i < aquire.length; i++) {
 			String[] line = aquire[i].split(":");

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2024 by G. Weirich
+ * Copyright (c) 2016-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.lucinda.Preferences;
 import ch.rgw.tools.StringTool;
 
@@ -66,7 +67,8 @@ public class Detail extends Composite {
 			 */
 			@Override
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-				exclusions = CoreHub.localCfg.get(Preferences.EXCLUDEMETA, "").split(","); //$NON-NLS-1$ //$NON-NLS-2$
+				Config cfg = Config.getDefaultInstance();
+				exclusions = cfg.getString(Preferences.EXCLUDEMETA, "").split(","); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			@Override

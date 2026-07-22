@@ -118,7 +118,6 @@ public class ImportDocumentDialog extends TitleAreaDialog {
 
 		});
 		text.setText(dd.filename);
-		// boolean bUseKI=CoreHub.localCfg.get(PreferenceConstants.USE_AI, false);
 		if (bUseKI) {
 			Composite cUseKI = new Composite(ret, SWT.NONE);
 			cUseKI.setLayoutData(SWTHelper.getFillGridData(1, false, 1, true));

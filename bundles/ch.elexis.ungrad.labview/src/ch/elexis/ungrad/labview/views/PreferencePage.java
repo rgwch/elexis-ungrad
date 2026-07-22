@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -19,16 +19,15 @@ import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.preferences.inputs.MultilineFieldEditor;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.labview.Preferences;
 
 public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	
 	public PreferencePage(){
 		super(GRID);
-		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
+		setPreferenceStore(Config.getDefaultInstance());
 		setDescription(ch.elexis.ungrad.labview.Messages.PreferencePage_Description);
 		
 	}

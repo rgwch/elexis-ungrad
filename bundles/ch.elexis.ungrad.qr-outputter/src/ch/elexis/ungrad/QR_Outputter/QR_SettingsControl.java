@@ -14,9 +14,6 @@ package ch.elexis.ungrad.QR_Outputter;
 
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
-import javax.print.attribute.Attribute;
-import javax.print.attribute.PrintServiceAttribute;
-import javax.print.attribute.PrintServiceAttributeSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -30,11 +27,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.services.IConfigService;
-import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.QrRnOutputter;
+import ch.elexis.ungrad.Config;
 import ch.rgw.tools.StringTool;
 
 public class QR_SettingsControl extends Composite {
@@ -46,17 +42,17 @@ public class QR_SettingsControl extends Composite {
 	Button cbQRPage, cbTarmedForm, cbDoPrint, cbDirectPrint, cbDoDelete, cbDebug, cbMissingData;
 	Text tOutdirPDF;
 	Text tOutdirXML;
-	IConfigService cfg = ConfigServiceHolder.get();
 	private Button cbFaceDown;
-
+	Config cfg=PreferenceConstants.cfg;
+	
 	public QR_SettingsControl(Composite parent) {
 		super(parent, SWT.NONE);
 		this.setLayout(new GridLayout(2, false));
-
+		
 		cbMissingData = new Button(this, SWT.CHECK);
 		cbMissingData.setText(Messages.QR_SettingsControl_OutputDespiteMissingData);
 		cbMissingData.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		cbMissingData.setSelection(cfg.getLocal(PreferenceConstants.MISSING_DATA, true));
+		cbMissingData.setSelection(PreferenceConstants.cfg.getBoolean(PreferenceConstants.MISSING_DATA, true));
 
 		// PDF output directory
 		Label l = new Label(this, SWT.NONE);
@@ -69,8 +65,8 @@ public class QR_SettingsControl extends Composite {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				outputDirPDF = new DirectoryDialog(parent.getShell(), SWT.OPEN).open();
-				cfg.setLocal(PreferenceConstants.RNN_DIR_PDF, outputDirPDF);
-				cfg.setLocal(OutputterUtil.CFG_PRINT_GLOBALOUTPUTDIRS, false);
+				PreferenceConstants.cfg.setValue(PreferenceConstants.RNN_DIR_PDF, outputDirPDF);
+				PreferenceConstants.cfg.setValue(OutputterUtil.CFG_PRINT_GLOBALOUTPUTDIRS, false);
 				tOutdirPDF.setText(outputDirPDF);
 			}
 		});
@@ -86,8 +82,8 @@ public class QR_SettingsControl extends Composite {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				outputDirXML = new DirectoryDialog(parent.getShell(), SWT.OPEN).open();
-				cfg.setLocal(PreferenceConstants.RNN_DIR_XML, outputDirXML);
-				cfg.setLocal(OutputterUtil.CFG_PRINT_GLOBALOUTPUTDIRS, false);
+				PreferenceConstants.cfg.setValue(PreferenceConstants.RNN_DIR_XML, outputDirXML);
+				PreferenceConstants.cfg.setValue(OutputterUtil.CFG_PRINT_GLOBALOUTPUTDIRS, false);
 				tOutdirXML.setText(outputDirXML);
 			}
 		});
@@ -102,8 +98,8 @@ public class QR_SettingsControl extends Composite {
 				outputDirXML=outputDirXML.substring("file:/".length()-1);
 			}
 		} else {
-			outputDirPDF = cfg.getLocal(PreferenceConstants.RNN_DIR_PDF, CoreHub.getTempDir().getAbsolutePath());
-			outputDirXML = cfg.getLocal(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
+			outputDirPDF = cfg.getString(PreferenceConstants.RNN_DIR_PDF, CoreHub.getTempDir().getAbsolutePath());
+			outputDirXML = cfg.getString(PreferenceConstants.RNN_DIR_XML, CoreHub.getTempDir().getAbsolutePath());
 		}
 		tOutdirPDF.setText(outputDirPDF);
 		bx.setText(Messages.QR_SettingsControl_Change);
@@ -113,30 +109,30 @@ public class QR_SettingsControl extends Composite {
 		cbQRPage = new Button(this, SWT.CHECK);
 		cbQRPage.setText(Messages.QR_SettingsControl_PrintQRPage);
 		cbQRPage.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		cbQRPage.setSelection(cfg.getLocal(PreferenceConstants.PRINT_QR, true));
+		cbQRPage.setSelection(cfg.getBoolean(PreferenceConstants.PRINT_QR, true));
 		cbTarmedForm = new Button(this, SWT.CHECK);
 		cbTarmedForm.setText(Messages.QR_SettingsControl_PrintInvoiceForm);
 		cbTarmedForm.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		cbTarmedForm.setSelection(cfg.getLocal(PreferenceConstants.PRINT_TARMED, true));
+		cbTarmedForm.setSelection(cfg.getBoolean(PreferenceConstants.PRINT_TARMED, true));
 		cbDoPrint = new Button(this, SWT.CHECK);
 		cbDoPrint.setText(Messages.QR_SettingsControl_PrintOrMail);
 		cbDoPrint.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		cbDoPrint.setSelection(cfg.getLocal(PreferenceConstants.DO_PRINT, false));
+		cbDoPrint.setSelection(cfg.getBoolean(PreferenceConstants.DO_PRINT, false));
 		cbFaceDown = new Button(this, SWT.CHECK);
 		cbFaceDown.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		cbFaceDown.setText(Messages.QR_SettingsControl_FaceDown);
-		cbFaceDown.setSelection(cfg.getLocal(PreferenceConstants.FACE_DOWN, false));
+		cbFaceDown.setSelection(cfg.getBoolean(PreferenceConstants.FACE_DOWN, false));
 		cbDirectPrint = new Button(this, SWT.CHECK);
 		cbDirectPrint.setText(Messages.QR_SettingsControl_DirectPrintOn);
 		cbDirectPrint.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
-		cbDirectPrint.setSelection(cfg.getLocal(PreferenceConstants.DIRECT_PRINT, false));
+		cbDirectPrint.setSelection(cfg.getBoolean(PreferenceConstants.DIRECT_PRINT, false));
 		cbPrinters = new Combo(this, SWT.READ_ONLY);
 		cbPrinters.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		printers = PrintServiceLookup.lookupPrintServices(null, null);
 		for (PrintService ps : printers) {
 			cbPrinters.add(ps.getName());
 		}
-		String currentPrinter = cfg.getLocal(PreferenceConstants.DEFAULT_PRINTER, "");
+		String currentPrinter = cfg.getString(PreferenceConstants.DEFAULT_PRINTER, "");
 		if (!StringTool.isNothing(currentPrinter)) {
 			cbPrinters.setText(currentPrinter);
 			selectedPrinter = currentPrinter;
@@ -144,29 +140,29 @@ public class QR_SettingsControl extends Composite {
 		cbDoDelete = new Button(this, SWT.CHECK);
 		cbDoDelete.setText(Messages.QR_SettingsControl_DeleteAfterPrint);
 		cbDoDelete.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		cbDoDelete.setSelection(cfg.getLocal(PreferenceConstants.DELETE_AFTER_PRINT, true));
+		cbDoDelete.setSelection(cfg.getBoolean(PreferenceConstants.DELETE_AFTER_PRINT, true));
 		Label sep2 = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL);
 		sep2.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
 
 		cbDebug = new Button(this, SWT.CHECK);
 		cbDebug.setText(Messages.QR_SettingsControl_DebugKeepHTML);
 		cbDebug.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		cbDebug.setSelection(cfg.getLocal(PreferenceConstants.DEBUGFILES, true));
+		cbDebug.setSelection(cfg.getBoolean(PreferenceConstants.DEBUGFILES, true));
 	}
 
 	public void doSave() {
 		selectedPrinter = cbPrinters.getText();
-		cfg.setLocal(PreferenceConstants.RNN_DIR_PDF, tOutdirPDF.getText());
-		cfg.setLocal(PreferenceConstants.RNN_DIR_XML, tOutdirXML.getText());
-		cfg.setLocal(PreferenceConstants.PRINT_QR, cbQRPage.getSelection());
-		cfg.setLocal(PreferenceConstants.PRINT_TARMED, cbTarmedForm.getSelection());
-		cfg.setLocal(PreferenceConstants.DO_PRINT, cbDoPrint.getSelection());
-		cfg.setLocal(PreferenceConstants.DIRECT_PRINT, cbDirectPrint.getSelection());
-		cfg.setLocal(PreferenceConstants.DELETE_AFTER_PRINT, cbDoDelete.getSelection());
-		cfg.setLocal(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
-		cfg.setLocal(PreferenceConstants.DEBUGFILES, cbDebug.getSelection());
-		cfg.setLocal(PreferenceConstants.FACE_DOWN, cbFaceDown.getSelection());
-		cfg.setLocal(PreferenceConstants.MISSING_DATA, cbMissingData.getSelection());
+		cfg.setValue(PreferenceConstants.RNN_DIR_PDF, tOutdirPDF.getText());
+		cfg.setValue(PreferenceConstants.RNN_DIR_XML, tOutdirXML.getText());
+		cfg.setValue(PreferenceConstants.PRINT_QR, cbQRPage.getSelection());
+		cfg.setValue(PreferenceConstants.PRINT_TARMED, cbTarmedForm.getSelection());
+		cfg.setValue(PreferenceConstants.DO_PRINT, cbDoPrint.getSelection());
+		cfg.setValue(PreferenceConstants.DIRECT_PRINT, cbDirectPrint.getSelection());
+		cfg.setValue(PreferenceConstants.DELETE_AFTER_PRINT, cbDoDelete.getSelection());
+		cfg.setValue(PreferenceConstants.DEFAULT_PRINTER, cbPrinters.getText());
+		cfg.setValue(PreferenceConstants.DEBUGFILES, cbDebug.getSelection());
+		cfg.setValue(PreferenceConstants.FACE_DOWN, cbFaceDown.getSelection());
+		cfg.setValue(PreferenceConstants.MISSING_DATA, cbMissingData.getSelection());
 
 		if (cbPrinters.getSelectionIndex() > -1) {
 			PrintService printService = printers[cbPrinters.getSelectionIndex()];

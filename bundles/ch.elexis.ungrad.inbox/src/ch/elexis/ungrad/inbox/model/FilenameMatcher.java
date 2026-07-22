@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023-2024, G. Weirich and Elexis
+ * Copyright (c) 2023-2026, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.data.Person;
 import ch.elexis.data.Query;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.lucinda.Client3;
 import ch.elexis.ungrad.lucinda.Client3.INotifier;
 import ch.rgw.io.FileTool;
@@ -29,7 +29,7 @@ import ch.rgw.tools.TimeTool;
 
 public class FilenameMatcher {
 	Pattern datePattern, datePattern2;
-
+	Config cfg = Config.getDefaultInstance();
 	public FilenameMatcher() {
 		// Patterns like 1.2.1960, 01.02.1960, 1960-02-01, 1960-2-1
 		datePattern = Pattern.compile("\\d{1,4}[\\.-]\\d?\\d[\\.-]\\d{1,4}");
@@ -119,7 +119,7 @@ public class FilenameMatcher {
 	 * @throws Exception
 	 */
 	private void analyzeMappings(DocumentDescriptor dd) throws Exception {
-		String mapfilename = CoreHub.localCfg.get(PreferenceConstants.MAPPINGS, null);
+		String mapfilename = cfg.getString(PreferenceConstants.MAPPINGS, null);
 		if (mapfilename != null) {
 			File mapfile = new File(mapfilename);
 			if (mapfile.exists() && mapfile.canRead()) {
@@ -156,7 +156,7 @@ public class FilenameMatcher {
 	}
 
 	public void analyzeContents(DocumentDescriptor dd) throws Exception {
-		if (CoreHub.localCfg.get(PreferenceConstants.ANALYZE_CONTENTS, false)) {
+		if (cfg.getBoolean(PreferenceConstants.ANALYZE_CONTENTS, false)) {
 			Client3 client = new Client3();
 			client.analyzeFile(FileTool.readFile(dd.file), new INotifier() {
 

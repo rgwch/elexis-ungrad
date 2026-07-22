@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2020 by G. Weirich
+ * Copyright (c) 2016-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -17,12 +17,11 @@ package ch.elexis.ungrad.lucinda;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.elexis.core.data.activator.CoreHub;
-import ch.rgw.io.Settings;
+import ch.elexis.ungrad.Config;
 import ch.rgw.tools.net.NetTool;
 
 public class Preferences {
-	public static final Settings cfg = CoreHub.localCfg;
+	public static final Config cfg = Config.getDefaultInstance();
 	public static final String MSG = "ch.rgw.lucinda"; //$NON-NLS-1$
 
 	private static final String BASE = "ch.rgw.docmgr-lucinda."; //$NON-NLS-1$
@@ -75,11 +74,11 @@ public class Preferences {
 	}
 
 	public static String get(final String key, final String def) {
-		return cfg.get(key, def);
+		return cfg.getString(key, def);
 	}
 
 	public static void set(final String key, final String value) {
-		cfg.set(key, value);
+		cfg.setValue(key, value);
 	}
 
 	public static void set(final String key, final boolean value) {

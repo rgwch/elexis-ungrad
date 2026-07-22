@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2024 by G. Weirich
+ * Copyright (c) 2016-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -49,11 +49,12 @@ import ch.rgw.io.FileTool;
  *
  */
 public class Mailer {
-	String user = CoreHub.localCfg.get(PreferenceConstants.SMTP_USER, "");
-	String sender = CoreHub.localCfg.get(PreferenceConstants.MAIL_SENDER, user);
-	String smtpHost = CoreHub.localCfg.get(PreferenceConstants.SMTP_HOST, "localhost");
-	String smtpPassword = CoreHub.localCfg.get(PreferenceConstants.SMTP_PWD, "doesntMatter");
-	String smtpPort = CoreHub.localCfg.get(PreferenceConstants.SMTP_PORT, "53");
+	Config cfg = Config.getDefaultInstance();
+	String user = cfg.getString(PreferenceConstants.SMTP_USER);
+	String sender = cfg.getString(PreferenceConstants.MAIL_SENDER);
+	String smtpHost = cfg.getString(PreferenceConstants.SMTP_HOST);
+	String smtpPassword = cfg.getString(PreferenceConstants.SMTP_PWD);
+	String smtpPort = cfg.getString(PreferenceConstants.SMTP_PORT); // 53
 	// String sender;
 	// String smtpHost;
 	// String smtpPassword;
@@ -244,7 +245,10 @@ public class Mailer {
 	 * @throws Exception
 	 */
 	public void defaultMail(String recipient, String subject, String body, String[] attachments) throws Exception {
-		String sec = CoreHub.localCfg.get(PreferenceConstants.SMTP_SECURITY, "plain");
+		String sec = cfg.getString(PreferenceConstants.SMTP_SECURITY);
+		if(sec==null || sec.isEmpty()) {
+			sec="plain";
+		}
 		if (sec.equals("plain")) {
 			simpleMail(recipient, subject, body, attachments);
 		} else if (sec.equals("tls")) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2024, G. Weirich and Elexis
+ * Copyright (c) 2022-2026, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,7 @@ import ch.elexis.core.data.interfaces.IPersistentObject;
 import ch.elexis.data.Brief;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.PersistentObject;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.Resolver;
 import ch.rgw.tools.StringTool;
 
@@ -51,7 +52,8 @@ public class Template {
 	String filename;
 	private Kontakt adressat = null;
 	Map<String, String> inputs = new LinkedHashMap<String, String>();
-
+	Config cfg=Config.getDefaultInstance();
+	
 	/**
 	 * Analyze a HTML template and prefill some elements with the given recipient 
 	 * @param rawhtml unprocessed HTML, possibly with variable fields.
@@ -60,6 +62,7 @@ public class Template {
 	 */
 	public Template(String rawhtml, Kontakt adressat) throws Exception {
 		Map<String, PersistentObject> replacer = new HashMap<>();
+		cfg.setDefault(PreferenceConstants.MAIL_BODY, "Siehe Anhang");
 		if (adressat != null) {
 			this.adressat = adressat;
 			replacer.put("Adressat", adressat);
@@ -228,12 +231,12 @@ public class Template {
 	}
 
 	/**
-	 * Get the body for mails created witg this subject. 
+	 * Get the body for mails created with this subject. 
 	 * @return
 	 */
 	public String getMailBody() {
 		if (StringTool.isNothing(mailBody)) {
-			return CoreHub.localCfg.get(PreferenceConstants.MAIL_BODY, "Siehe Anhang");
+			return cfg.getString(PreferenceConstants.MAIL_BODY);
 		} else {
 			return mailBody;
 		}

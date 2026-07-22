@@ -52,6 +52,7 @@ public class IMAPMail {
 	long uidvalidity;
 	long lastseen;
 	INotifier notifier;
+	private Config cfg = Config.getDefaultInstance();
 
 	public static interface INotifier {
 		public void documentFound(String name, byte[] doc, String sender, String subject);
@@ -60,12 +61,16 @@ public class IMAPMail {
 	public IMAPMail(String[] whitelist, INotifier notify) {
 		this.whitelist = whitelist;
 		this.notifier = notify;
+		cfg.setDefault(PreferenceConstants.IMAP_UIDVALIDITY, "0");
+		cfg.setDefault(PreferenceConstants.IMAP_LAST_SEEN, "1");
+
 	}
 
 	class FetchJob extends Job {
 
 		public FetchJob() {
 			super("Import Imap Mails");
+
 		}
 
 		@Override
@@ -77,8 +82,8 @@ public class IMAPMail {
 				if (uid != uidvalidity) {
 					lastseen = 1;
 					uidvalidity = uid;
-					CoreHub.localCfg.set(PreferenceConstants.IMAP_UIDVALIDITY, Long.toString(uidvalidity, 10));
-					CoreHub.localCfg.flush();
+					cfg.setValue(PreferenceConstants.IMAP_UIDVALIDITY, Long.toString(uidvalidity, 10));
+					cfg.save();
 				}
 				// Message m1=uf.getMessageByUID(1);
 				Message[] messages = uf.getMessagesByUID(lastseen + 1, -1);// folder.getMessages();
@@ -100,8 +105,8 @@ public class IMAPMail {
 						}
 					}
 					lastseen = uf.getUID(msg);
-					CoreHub.localCfg.set(PreferenceConstants.IMAP_LAST_SEEN, Long.toString(lastseen, 10));
-					CoreHub.localCfg.flush();
+					cfg.putValue(PreferenceConstants.IMAP_LAST_SEEN, Long.toString(lastseen, 10));
+					cfg.save();
 					monitor.worked(1);
 					if (monitor.isCanceled()) {
 						folder.close(false);
@@ -122,12 +127,14 @@ public class IMAPMail {
 
 	public void fetch() throws Exception {
 		Map<String, byte[]> ret = new HashMap<String, byte[]>();
-		String host = CoreHub.localCfg.get(PreferenceConstants.IMAP_HOST, "");
-		String user = CoreHub.localCfg.get(PreferenceConstants.IMAP_USER, "");
-		String pwd = CoreHub.localCfg.get(PreferenceConstants.IMAP_PWD, "");
-		// String port = CoreHub.localCfg.get(PreferenceConstants.IMAP_PORT, "993");
-		uidvalidity = Long.parseLong(CoreHub.localCfg.get(PreferenceConstants.IMAP_UIDVALIDITY, "0"));
-		lastseen = Long.parseLong(CoreHub.localCfg.get(PreferenceConstants.IMAP_LAST_SEEN, "1"));
+		String host = cfg.getString(PreferenceConstants.IMAP_HOST);
+		String user = cfg.getString(PreferenceConstants.IMAP_USER);
+		String pwd = cfg.getString(PreferenceConstants.IMAP_PWD);
+		// String port = Activator.getSettings().get(PreferenceConstants.IMAP_PORT,
+		// "993");
+		uidvalidity = Long.parseLong(cfg.getString(PreferenceConstants.IMAP_UIDVALIDITY));
+
+		lastseen = Long.parseLong(cfg.getString(PreferenceConstants.IMAP_LAST_SEEN));
 		Properties props = System.getProperties();
 		props.setProperty("mail.store.protocol", "imaps");
 		session = Session.getDefaultInstance(props, null);

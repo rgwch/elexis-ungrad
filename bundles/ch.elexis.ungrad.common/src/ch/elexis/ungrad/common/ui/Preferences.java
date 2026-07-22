@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2025 by G. Weirich
+ * Copyright (c) 2022-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -25,6 +25,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.preferences.inputs.PasswordFieldEditor;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.PreferenceConstants;
 
 public class Preferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
@@ -36,7 +37,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 
 	public Preferences() {
 		super(GRID);
-		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
+		setPreferenceStore(Config.getDefaultInstance());
 		setDescription(ch.elexis.ungrad.common.Messages.Preferences_Description);
 
 	}
@@ -81,8 +82,5 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 		
 	}
 
-	protected void performApply() {
-		CoreHub.localCfg.flush();
-	}
 
 }

@@ -29,15 +29,12 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.lock.types.LockResponse;
 import ch.elexis.core.model.IEncounter;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.model.IUser;
-import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.IContextService;
-import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.services.holder.LocalLockServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.viewers.TableLabelProvider;
@@ -47,6 +44,7 @@ import ch.elexis.data.Konsultation;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Query;
 import ch.elexis.data.User;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.pdf.Manager;
@@ -66,8 +64,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 
 	IContextService contextService = ContextServiceHolder.get();
 	StorageController sc = new StorageController();
-	IConfigService cfg = ConfigServiceHolder.get();
-
+	Config cfg=Config.getDefaultInstance();
 	/* CoontentProvider */
 	@Override
 	public Object[] getElements(Object inputElement) {
@@ -251,7 +248,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 					}
 				}
 				String filepath = outfile.getAbsolutePath();
-				String viewer = cfg.getLocal(PreferenceConstants.PDF_VIEWER, Messages.Controller_21);
+				String viewer = cfg.getString(PreferenceConstants.PDF_VIEWER);
 				if (!StringTool.isNothing(viewer)) {
 					asyncRunViewer(viewer, outfile, brief);
 				} else {
@@ -307,7 +304,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	 */
 	public String convertPug(String pug, String dir) throws Exception {
 		dir += File.separator + "x";
-		String pugbin = cfg.getLocal(PreferenceConstants.PUG, "pug");
+		String pugbin = cfg.getString(PreferenceConstants.PUG);
 
 		Process process = new ProcessBuilder(pugbin, "-p", dir).start();
 		InputStreamReader err = new InputStreamReader(process.getErrorStream());
@@ -400,7 +397,7 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	}
 
 	public void launchPDFViewerFor(String pdf) throws Exception {
-		String viewer = cfg.getLocal(PreferenceConstants.PDF_VIEWER, Messages.Controller_21);
+		String viewer = cfg.getString(PreferenceConstants.PDF_VIEWER);
 		if (!StringTool.isNothing(viewer)) {
 			asyncRunViewer(viewer, new File(pdf), null);
 		}
@@ -419,9 +416,9 @@ public class Controller extends TableLabelProvider implements IStructuredContent
 	 */
 	public void signPDF(File pdfFile) throws Exception {
 		Signer signer = new Signer();
-		String imgFile = CoreHub.localCfg.get(PreferenceConstants.SIGNATURE, null);
-		int x=CoreHub.localCfg.get(PreferenceConstants.SIGNATURE_X, 10);
-		int y=CoreHub.localCfg.get(PreferenceConstants.SIGNATURE_Y, 30);
+		String imgFile = cfg.getString(PreferenceConstants.SIGNATURE);
+		int x=cfg.getInt(PreferenceConstants.SIGNATURE_X);
+		int y=cfg.getInt(PreferenceConstants.SIGNATURE_Y);
 		if (imgFile != null) {
 			signer.sign(pdfFile.getAbsolutePath(), imgFile, x, y);
 		}

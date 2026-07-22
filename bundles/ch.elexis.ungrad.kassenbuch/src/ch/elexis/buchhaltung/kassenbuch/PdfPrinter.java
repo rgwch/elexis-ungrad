@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.pdf.Manager;
 import ch.rgw.tools.Money;
 import ch.rgw.tools.StringTool;
@@ -114,9 +115,9 @@ public class PdfPrinter {
 	
 	private static String readTemplate() throws IOException {
 		// Try to read user-configured template first
-		String userTemplate = ch.elexis.core.data.activator.CoreHub.localCfg.get(PreferenceConstants.HTML_TEMPLATE, null);
+		String userTemplate = Config.getDefaultInstance().getString(PreferenceConstants.HTML_TEMPLATE);
 		
-		if (userTemplate != null && !userTemplate.trim().isEmpty()) {
+		if (!userTemplate.isBlank()) {
 			java.io.File templateFile = new java.io.File(userTemplate);
 			if (templateFile.exists() && templateFile.canRead()) {
 				// Read from user-configured file

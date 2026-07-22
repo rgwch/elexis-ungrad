@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2024, G. Weirich and Elexis
+ * Copyright (c) 2010-2026, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,26 +12,24 @@
 package ch.elexis.ungrad.text.templator.ui;
 
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.Config;
+
 
 public class OOOProcessorPrefs extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	IPreferenceStore store;
+	// IPreferenceStore store;
 	public static final String PREFERENCE_BRANCH = Preferences.PREFERENCE_BRANCH + "oooprocessor/";
 
 	public OOOProcessorPrefs() {
 		super(GRID);
-		store = new SettingsPreferenceStore(CoreHub.localCfg);
-		setPreferenceStore(store);
+		setPreferenceStore(Config.getDefaultInstance());
 	}
 
 	@Override
@@ -51,9 +49,5 @@ public class OOOProcessorPrefs extends FieldEditorPreferencePage implements IWor
 
 	}
 
-	@Override
-	protected void performApply() {
-		CoreHub.localCfg.flush();
-	}
-
+	
 }

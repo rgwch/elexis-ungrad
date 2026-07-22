@@ -26,12 +26,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import ch.elexis.core.services.IConfigService;
-import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.services.holder.ContextServiceHolder;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Mandant;
+import ch.elexis.ungrad.Config;
 import ch.rgw.tools.StringTool;
 
 public class BillPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
@@ -40,10 +39,11 @@ public class BillPreferencePage extends PreferencePage implements IWorkbenchPref
 	private Button bMailIfCaseVar;
 	private Text txSubject, txBody;
 	private Mandant currentMandator;
-	IConfigService cfg = ConfigServiceHolder.get();
+	Config cfg = Config.getDefaultInstance();
 
 	public BillPreferencePage() {
 		setDescription(Messages.BillPreferencePage_Title);
+		setPreferenceStore(Config.getDefaultInstance());
 	}
 
 	public void init(IWorkbench workbench) {
@@ -65,14 +65,14 @@ public class BillPreferencePage extends PreferencePage implements IWorkbenchPref
 		lbSenderLine.setText(Messages.BillPreferencePage_SenderLine);
 		txSenderLine = new Text(ret, SWT.SINGLE);
 		txSenderLine.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		txSenderLine.setText(cfg.get("pdf-output/esr.header.line3/"+this.currentMandator.getId(), ""));
+		txSenderLine.setText(cfg.getString("pdf-output/esr.header.line3/"+this.currentMandator.getId(), ""));
 		// Send Mail if Case Variable is set to Mailaddress
 		bMailIfCaseVar = new Button(ret, SWT.CHECK);
 		bMailIfCaseVar.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
 		bMailIfCaseVar.setText(Messages.BillPreferencePage_SendMailIfCaseVar);
 		txCaseVar = new Text(ret, SWT.SINGLE);
 		txCaseVar.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
-		String caseVar = cfg.get(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
+		String caseVar = cfg.getString(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
 		txCaseVar.setText(caseVar);
 		bMailIfCaseVar.setSelection(!StringTool.isNothing(caseVar));
 		Label lbSubject = new Label(ret, SWT.NONE);
@@ -80,26 +80,26 @@ public class BillPreferencePage extends PreferencePage implements IWorkbenchPref
 		lbSubject.setText(Messages.BillPreferencePage_MessageTitle);
 		txSubject = new Text(ret, SWT.NONE);
 		txSubject.setLayoutData(SWTHelper.getFillGridData(2, true, 1, false));
-		txSubject.setText(cfg.get(PreferenceConstants.BY_MAIL_SUBJECT, ""));
+		txSubject.setText(cfg.getString(PreferenceConstants.BY_MAIL_SUBJECT, ""));
 		Label lbBody = new Label(ret, SWT.NONE);
 		lbBody.setLayoutData(SWTHelper.getFillGridData(1, true, 1, false));
 		lbBody.setText(Messages.BillPreferencePage_MessageBody);
 		txBody = new Text(ret, SWT.MULTI);
 		txBody.setLayoutData(SWTHelper.getFillGridData(2, true, 1, true));
-		txBody.setText(cfg.get(PreferenceConstants.BY_MAIL_BODY, ""));
+		txBody.setText(cfg.getString(PreferenceConstants.BY_MAIL_BODY, ""));
 		return ret;
 	}
 
 	private boolean applyFields() {
-		cfg.set("pdf-output/esr.header.line3/"+currentMandator.getId(), txSenderLine.getText());
+		cfg.setValue("pdf-output/esr.header.line3/"+currentMandator.getId(), txSenderLine.getText());
 		if (bMailIfCaseVar.getSelection()) {
-			cfg.set(PreferenceConstants.BY_MAIL_IF_CASEVAR, txCaseVar.getText());
+			cfg.setValue(PreferenceConstants.BY_MAIL_IF_CASEVAR, txCaseVar.getText());
 
 		} else {
-			cfg.set(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
+			cfg.setValue(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
 		}
-		cfg.set(PreferenceConstants.BY_MAIL_SUBJECT, txSubject.getText());
-		cfg.set(PreferenceConstants.BY_MAIL_BODY, txBody.getText());
+		cfg.setValue(PreferenceConstants.BY_MAIL_SUBJECT, txSubject.getText());
+		cfg.setValue(PreferenceConstants.BY_MAIL_BODY, txBody.getText());
 		return true;
 	}
 

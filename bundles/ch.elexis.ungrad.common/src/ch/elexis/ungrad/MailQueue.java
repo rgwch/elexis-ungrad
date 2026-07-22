@@ -35,6 +35,8 @@ import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
 
 public class MailQueue {
+	Config cfg = Config.getDefaultInstance();
+	
 	static private class Mail {
 		String subject;
 		String body;
@@ -51,14 +53,18 @@ public class MailQueue {
 
 	class SendJob extends Job {
 		Result<String> ret = new Result<String>();
-		String user = CoreHub.localCfg.get(PreferenceConstants.SMTP_USER, "");
-		String sender = CoreHub.localCfg.get(PreferenceConstants.MAIL_SENDER, user);
-		String smtpHost = CoreHub.localCfg.get(PreferenceConstants.SMTP_HOST, "localhost");
-		String smtpPassword = CoreHub.localCfg.get(PreferenceConstants.SMTP_PWD, "doesntMatter");
-		String smtpPort = CoreHub.localCfg.get(PreferenceConstants.SMTP_PORT, "53");
+		String user = cfg.getString(PreferenceConstants.SMTP_USER);
+		String sender = cfg.getString(PreferenceConstants.MAIL_SENDER);
+		String smtpHost = cfg.getString(PreferenceConstants.SMTP_HOST);
+		String smtpPassword = cfg.getString(PreferenceConstants.SMTP_PWD);
+		String smtpPort = cfg.getString(PreferenceConstants.SMTP_PORT);
 
 		SendJob() {
 			super("send invoices");
+			if (sender == null || sender.isEmpty()) {
+				sender = user;
+			}
+		
 			setUser(true);
 		}
 

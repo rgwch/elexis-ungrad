@@ -13,9 +13,11 @@ package ch.elexis.ungrad.QR_Outputter;
  * G. Weirich - initial implementation
  *********************************************************************************/
 
+import ch.elexis.ungrad.Config;
+
 public class PreferenceConstants {
 	static final String BASE = "ch.elexis.ungrad/qrbills";
-
+	static final Config cfg = Config.getDefaultInstance();
 	// Settings entries
 	public static final String RNN_DIR_XML = BASE + "/xmldir";
 	public static final String RNN_DIR_PDF = BASE + "/pdfdir";

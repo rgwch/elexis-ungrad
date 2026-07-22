@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2024 by G. Weirich
+ * Copyright (c) 2016-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -21,16 +21,15 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.preferences.inputs.MultilineFieldEditor;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.lucinda.Preferences;
 
 public class LucindaPrefs extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	public LucindaPrefs() {
 		super(GRID);
-		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
+		setPreferenceStore(Config.getDefaultInstance());
 		setDescription("Lucinda Client"); //$NON-NLS-1$
 	}
 

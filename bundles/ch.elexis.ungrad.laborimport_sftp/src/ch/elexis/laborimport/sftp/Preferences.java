@@ -1,5 +1,5 @@
 /**
- * (c) 2008-2016 by G. Weirich
+ * (c) 2008-2026 by G. Weirich
  * All rights reserved
  * 
  */
@@ -14,6 +14,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
+import ch.elexis.ungrad.Config;
 
 public class Preferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	public static final String SFTP_LABNAME ="LABORNAME";
@@ -26,7 +27,7 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 	
 	public Preferences(){
 		super(GRID);
-		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
+		setPreferenceStore(Config.getDefaultInstance());
 		getPreferenceStore().setDefault(SFTP_URL, "62.202.19.130");
 		getPreferenceStore().setDefault(SFTP_PORT, "22");
 		getPreferenceStore().setDefault(SFTP_DELETE, true);

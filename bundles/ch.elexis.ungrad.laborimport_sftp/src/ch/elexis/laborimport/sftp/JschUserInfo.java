@@ -13,6 +13,7 @@ import com.jcraft.jsch.UserInfo;
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.Config;
 
 /**
  * Override UserInfo to supply our info from Configuration
@@ -21,18 +22,19 @@ import ch.elexis.core.ui.util.SWTHelper;
  */
 public class JschUserInfo implements UserInfo {
 	
+	Config cfg = Config.getDefaultInstance();
 	/**
 	 * Get the passphrase
 	 */
 	public String getPassphrase(){
-		return CoreHub.localCfg.get(Preferences.SFTP_PWD, null);
+		return cfg.getString(Preferences.SFTP_PWD);
 	}
 	
 	/**
 	 * Get the Password - Same as passphrase here
 	 */
 	public String getPassword(){
-		return CoreHub.localCfg.get(Preferences.SFTP_PWD, null);
+		return cfg.getString(Preferences.SFTP_PWD);
 	}
 	
 	/**
@@ -42,7 +44,7 @@ public class JschUserInfo implements UserInfo {
 		InputDialog input =
 			new InputDialog(UiDesk.getTopShell(), "Passworteingabe", message, "", null);
 		if (input.open() == Dialog.OK) {
-			CoreHub.localCfg.set(Preferences.SFTP_PWD, input.getValue());
+			cfg.setValue(Preferences.SFTP_PWD, input.getValue());
 			return true;
 		}
 		return false;
@@ -62,7 +64,7 @@ public class JschUserInfo implements UserInfo {
 	 * @param message: prompt of the message box
 	 */
 	public boolean promptYesNo(String message){
-		return SWTHelper.askYesNo("Laborimport "+CoreHub.localCfg.get(Preferences.SFTP_LABNAME, "unknown"), message);
+		return SWTHelper.askYesNo("Laborimport "+cfg.getString(Preferences.SFTP_LABNAME, "unknown"), message);
 	}
 	
 	/**
@@ -70,7 +72,7 @@ public class JschUserInfo implements UserInfo {
 	 * @param message prompt for the message box
 	 */
 	public void showMessage(String message){
-		SWTHelper.showInfo("Laborimport "+CoreHub.localCfg.get(Preferences.SFTP_LABNAME, "unknown"), message);
+		SWTHelper.showInfo("Laborimport "+cfg.getString(Preferences.SFTP_LABNAME, "unknown"), message);
 		
 	}
 	

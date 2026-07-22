@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2024, G. Weirich and Elexis
+ * Copyright (c) 2022-2026, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import ch.elexis.core.data.activator.CoreHub;
+// import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IContextService;
@@ -37,12 +37,14 @@ import ch.elexis.ungrad.forms.model.Template;
 import ch.elexis.ungrad.pdf.Medform;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
+import ch.elexis.ungrad.Config;
 
 public class DocumentList extends Composite {
 	private TableViewer tv;
 	private Controller controller;
 	private IContextService contextService = ContextServiceHolder.get();
-
+	private Config cfg = Config.getDefaultInstance();
+	
 	public DocumentList(Composite parent, Controller controller) {
 		super(parent, SWT.NONE);
 		this.controller = controller;
@@ -112,7 +114,7 @@ public class DocumentList extends Composite {
 					File outfile = new File(dir, selected + ".pdf");
 					File templateFile = new File(dir, selected + ".html");
 					String subject = selected;
-					String body = CoreHub.localCfg.get(PreferenceConstants.MAIL_BODY,
+					String body = cfg.getString(PreferenceConstants.MAIL_BODY,
 							Messages.DocumentList_MessageBodyDefault);
 					String recipient = ""; //$NON-NLS-1$
 					if (templateFile.exists()) {

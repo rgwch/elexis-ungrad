@@ -19,9 +19,8 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.ui.preferences.SettingsPreferenceStore;
 import ch.elexis.core.ui.preferences.inputs.MultilineFieldEditor;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.forms.model.PreferenceConstants;
 
 /**
@@ -32,10 +31,8 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 
 	public Preferences() {
 		super(GRID);
-		setPreferenceStore(new SettingsPreferenceStore(CoreHub.localCfg));
 		setDescription(Messages.Preferences_Description);
-		CoreHub.localCfg.set(PreferenceConstants.SIGNATURE_X, CoreHub.localCfg.get(PreferenceConstants.SIGNATURE_X, "10"));
-		CoreHub.localCfg.set(PreferenceConstants.SIGNATURE_Y, CoreHub.localCfg.get(PreferenceConstants.SIGNATURE_Y, "10"));
+		setPreferenceStore(Config.getDefaultInstance());
 	}
 
 	@Override
@@ -64,17 +61,5 @@ public class Preferences extends FieldEditorPreferencePage implements IWorkbench
 
 	}
 
-	
-	public boolean performOk() {
-		String test=CoreHub.localCfg.get(PreferenceConstants.PDF_VIEWER, "");
-		CoreHub.localCfg.flush();
-		boolean ret = super.performOk();
-		String test2=CoreHub.localCfg.get(PreferenceConstants.PDF_VIEWER, "");
-		if(test.equals(test2)){
-			System.out.println("Preferences: PDF_VIEWER not changed");
-		}
-		return ret;
-	}
-	
 
 }

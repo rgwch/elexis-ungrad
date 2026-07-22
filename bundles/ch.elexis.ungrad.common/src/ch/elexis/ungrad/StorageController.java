@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018-2024, G. Weirich and Elexis
+ * Copyright (c) 2018-2026, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,7 +65,7 @@ public class StorageController {
 		String name = p.getName();
 		String fname = p.getVorname();
 		String birthdate = p.getGeburtsdatum();
-		File superdir = new File(CoreHub.localCfg.get(ch.elexis.ungrad.PreferenceConstants.DOCBASE, ""),
+		File superdir = new File(Config.getDefaultInstance().getString(ch.elexis.ungrad.PreferenceConstants.DOCBASE),
 				name.substring(0, 1).toLowerCase());
 		File dir = new File(superdir, name + "_" + fname + "_" + birthdate);
 		if (!dir.exists() && bCreateIfNotExists) {

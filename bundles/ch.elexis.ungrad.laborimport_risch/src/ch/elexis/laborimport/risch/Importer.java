@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007-2024, G. Weirich and Elexis
+ * Copyright (c) 2007-2026, G. Weirich and Elexis
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -39,13 +38,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import ch.elexis.core.data.activator.CoreHub;
-import ch.elexis.core.model.ILabResult;
 import ch.elexis.core.data.util.ResultAdapter;
 import ch.elexis.core.importer.div.importers.HL7Parser;
-import ch.elexis.core.model.ILabItem;
+import ch.elexis.core.model.ILabResult;
 import ch.elexis.core.ui.importer.div.importers.DefaultHL7Parser;
 import ch.elexis.core.ui.util.ImporterPage;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.Config;
 import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
 
@@ -63,9 +62,11 @@ public class Importer extends ImporterPage {
 
 	private Object openmedicalObject = null;
 	private Method openmedicalDownloadMethod = null;
+	
+	private Config cfg = Config.getDefaultInstance();
 
 	public Importer() {
-		System.out.println("here");
+		// System.out.println("here");
 	}
 
 	private static URLClassLoader getURLClassLoader(final URL jarURL) {
@@ -75,8 +76,8 @@ public class Importer extends ImporterPage {
 	@Override
 	public Composite createPage(final Composite parent) {
 		// try to dynamically load the openmedical JAR file
-		String jarPath = CoreHub.localCfg.get(PreferencePage.JAR_PATH, null);
-		if (jarPath != null) {
+		String jarPath = cfg.getString(PreferencePage.JAR_PATH);
+		if (!jarPath.isEmpty()) {
 			File jar = new File(jarPath);
 			if (jar.canRead()) {
 				try {
@@ -120,8 +121,8 @@ public class Importer extends ImporterPage {
 		}
 		Result<String> result = new Result<String>("OK");
 
-		String downloadDirPath = CoreHub.localCfg.get(PreferencePage.DL_DIR, CoreHub.getTempDir().toString());
-		String iniPath = CoreHub.localCfg.get(PreferencePage.INI_PATH, null);
+		String downloadDirPath = cfg.getString(PreferencePage.DL_DIR, CoreHub.getTempDir().toString());
+		String iniPath = cfg.getString(PreferencePage.INI_PATH);
 
 		int res = -1;
 		if (iniPath != null) {
@@ -267,7 +268,7 @@ public class Importer extends ImporterPage {
 			bDirect.setText("Direkter Import");
 			bDirect.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
 
-			int type = CoreHub.localCfg.get("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
+			int type = cfg.getInt("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
 			if (openmedicalObject == null) {
 				type = FILE;
 			}
@@ -278,10 +279,10 @@ public class Importer extends ImporterPage {
 				bFile.setSelection(true);
 				bDirect.setSelection(false);
 
-				String filename = CoreHub.localCfg.get("ImporterPage/" + home.getTitle() + "/filename", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				String filename = cfg.getString("ImporterPage/" + home.getTitle() + "/filename"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				tFilename.setText(filename);
 
-				home.results[0] = new Integer(FILE).toString();
+				home.results[0] = Integer.toString(FILE);
 				home.results[1] = filename;
 			} else {
 				bFile.setSelection(false);
@@ -289,7 +290,7 @@ public class Importer extends ImporterPage {
 
 				tFilename.setText("");
 
-				home.results[0] = new Integer(DIRECT).toString();
+				home.results[0] = Integer.toString(DIRECT);
 				home.results[1] = "";
 			}
 
@@ -324,8 +325,8 @@ public class Importer extends ImporterPage {
 						home.results[0] = new Integer(FILE).toString();
 						home.results[1] = filename;
 
-						CoreHub.localCfg.set("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
-						CoreHub.localCfg.set("ImporterPage/" + home.getTitle() + "/filename", //$NON-NLS-1$//$NON-NLS-2$
+						cfg.setValue("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
+						cfg.setValue("ImporterPage/" + home.getTitle() + "/filename", //$NON-NLS-1$//$NON-NLS-2$
 								filename);
 					} else {
 						bFile.setSelection(false);
@@ -333,11 +334,11 @@ public class Importer extends ImporterPage {
 
 						tFilename.setText("");
 
-						home.results[0] = new Integer(DIRECT).toString();
+						home.results[0] = Integer.toString(DIRECT);
 						home.results[1] = "";
 
-						CoreHub.localCfg.set("ImporterPage/" + home.getTitle() + "/type", DIRECT); //$NON-NLS-1$ //$NON-NLS-2$
-						CoreHub.localCfg.set("ImporterPage/" + home.getTitle() + "/filename", ""); //$NON-NLS-1$ //$NON-NLS-2$
+						cfg.setValue("ImporterPage/" + home.getTitle() + "/type", DIRECT); //$NON-NLS-1$ //$NON-NLS-2$
+						cfg.setValue("ImporterPage/" + home.getTitle() + "/filename", ""); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
 			};
@@ -362,11 +363,11 @@ public class Importer extends ImporterPage {
 					}
 
 					tFilename.setText(filename);
-					home.results[0] = new Integer(FILE).toString();
+					home.results[0] = Integer.toString(FILE);
 					home.results[1] = filename;
 
-					CoreHub.localCfg.set("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
-					CoreHub.localCfg.set("ImporterPage/" + home.getTitle() + "/filename", filename); //$NON-NLS-1$ //$NON-NLS-2$
+					cfg.setValue("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
+					cfg.setValue("ImporterPage/" + home.getTitle() + "/filename", filename); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 			});

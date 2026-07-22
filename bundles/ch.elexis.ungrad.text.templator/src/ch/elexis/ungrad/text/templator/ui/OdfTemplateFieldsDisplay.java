@@ -28,6 +28,7 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.text.ITextPlugin.ICallback;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.text.templator.model.ODFDoc;
 import ch.rgw.tools.ExHandler;
 
@@ -80,7 +81,7 @@ public class OdfTemplateFieldsDisplay extends Composite {
 		}
 		cFields.layout();
 		this.doc = doc;
-		if(CoreHub.localCfg.get(Preferences.PREF_DIRECT, false)) {
+		if(Config.getDefaultInstance().getBoolean(Preferences.PREF_DIRECT, false)) {
 			printAction.run();
 		}
 	}
@@ -112,7 +113,7 @@ public class OdfTemplateFieldsDisplay extends Composite {
 			}
 
 			public void run() {
-				CoreHub.localCfg.set(Preferences.PREF_DIRECT, isChecked());
+				cfg.setValue(Preferences.PREF_DIRECT, isChecked());
 			}
 		};
 		*/

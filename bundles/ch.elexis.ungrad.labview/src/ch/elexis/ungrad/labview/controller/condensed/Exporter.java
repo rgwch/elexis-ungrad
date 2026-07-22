@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 by G. Weirich
+ * Copyright (c) 2016-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -98,7 +98,7 @@ public class Exporter {
 		html.append("</table>");
 		String fallback = PlatformHelper.getBasePath("ch.elexis.ungrad.labview") + File.separator + "doc"
 				+ File.separator + "laborblatt_beispiel.html";
-		File tmpl = new File(Preferences.cfg.get(Preferences.TEMPLATE, fallback));
+		File tmpl = new File(Preferences.cfg.getString(Preferences.TEMPLATE, fallback));
 		if (!tmpl.exists() || !tmpl.canRead()) {
 			SWTHelper.showError("Vorlage fehlt",
 					"Die Vorlagendatei für den HTML Export wurde nicht gefunden. Bitte unter 'Einstellungen' nachprüfen");
@@ -113,7 +113,7 @@ public class Exporter {
 	}
 
 	private String makeFullGrid(TimeTool[] dates) {
-		String[] exclusions = Preferences.cfg.get(Preferences.EXCLUDE, "00,?").split(",");
+		String[] exclusions = Preferences.cfg.getString(Preferences.EXCLUDE, "00,?").split(",");
 
 		StringBuilder ret = new StringBuilder("<table class=\"fullgrid\">");
 		ret.append("<tr><th class=\"rowheader\">Parameter</th><th class=\"ref\">Referenz</th>");

@@ -30,11 +30,11 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.core.ui.util.ViewMenus;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.IMAPMail;
 import ch.elexis.ungrad.MBox;
 import ch.elexis.ungrad.inbox.model.Controller;
@@ -57,9 +57,10 @@ public class View extends ViewPart {
 	FilenameMatcher fmatch = new FilenameMatcher();
 	private IAction addAction, deleteAction, execAction, reloadAction, loadMailAction;
 	private String[] whitelist;
+	private Config cfg = Config.getDefaultInstance();
 
 	public View() {
-		String senders = CoreHub.localCfg.get(PreferenceConstants.WHITELIST, "");
+		String senders = cfg.getString(PreferenceConstants.WHITELIST);
 		if (StringTool.isNothing(senders)) {
 			whitelist = new String[0];
 		} else {
@@ -107,10 +108,10 @@ public class View extends ViewPart {
 		addAction.setEnabled(false);
 		deleteAction.setEnabled(false);
 		execAction.setEnabled(false);
-		if (CoreHub.localCfg.get(PreferenceConstants.MAILMODE, "none").equals("none")) {
+		if (cfg.getString(PreferenceConstants.MAILMODE, "none").equals("none")) {
 			loadMailAction.setEnabled(false);
 		}
-		tv.setInput(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
+		tv.setInput(cfg.getString(PreferenceConstants.BASEDIR));
 	}
 
 	@Override
@@ -173,7 +174,7 @@ public class View extends ViewPart {
 				setImageDescriptor(Images.IMG_MAIL.getImageDescriptor());
 			}
 			private IMAPMail.INotifier notifier = new IMAPMail.INotifier() {
-				File dir = new File(CoreHub.localCfg.get(PreferenceConstants.BASEDIR, ""));
+				File dir = new File(cfg.getString(PreferenceConstants.BASEDIR));
 
 				@Override
 				public void documentFound(String name, byte[] doc, String sender, String subject) {
@@ -192,9 +193,9 @@ public class View extends ViewPart {
 			@Override
 			public void run() {
 				try {
-					String mailMode = CoreHub.localCfg.get(PreferenceConstants.MAILMODE, "none");
+					String mailMode = cfg.getString(PreferenceConstants.MAILMODE, "none");
 					if (mailMode.equals("mbox")) {
-						String mbox = CoreHub.localCfg.get(PreferenceConstants.MBOX, "");
+						String mbox = cfg.getString(PreferenceConstants.MBOX, "");
 						new MBox(mbox, whitelist).readMessages(notifier);
 					} else if (mailMode.equals("imap")) {
 						new IMAPMail(whitelist, notifier).fetch();

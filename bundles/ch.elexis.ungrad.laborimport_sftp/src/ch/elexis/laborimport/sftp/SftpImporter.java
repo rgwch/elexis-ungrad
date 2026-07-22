@@ -1,5 +1,5 @@
 /**
- * (c) 2008-2024 by G. Weirich
+ * (c) 2008-2026 by G. Weirich
  * All rights reserved
  * 
  */
@@ -42,12 +42,14 @@ import ch.elexis.core.ui.importer.div.importers.DefaultHL7Parser;
 import ch.elexis.core.ui.util.ImporterPage;
 import ch.elexis.core.ui.util.Log;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.Config;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.Result;
 import ch.rgw.tools.Result.SEVERITY;
 
 public class SftpImporter extends ImporterPage {
-	public static final String MY_LAB = CoreHub.localCfg.get(Preferences.SFTP_LABNAME, "<unbekannt>");
+	static Config cfg = Config.getDefaultInstance();
+	public static final String MY_LAB = cfg.getString(Preferences.SFTP_LABNAME, "<unbekannt>");
 	public static final String PLUGIN_ID = "ch.elexis.laborimport.sftp";
 
 	private static final int FILE = 1;
@@ -76,10 +78,10 @@ public class SftpImporter extends ImporterPage {
 	private Result<?> importDirect() {
 		Result<?> result = new Result<String>("OK");
 
-		String downloadDirPath = CoreHub.localCfg.get(Preferences.DL_DIR, CoreHub.getTempDir().toString());
-		String pwd = CoreHub.localCfg.get(Preferences.SFTP_PWD, null);
-		String host = CoreHub.localCfg.get(Preferences.SFTP_URL, null);
-		String user = CoreHub.localCfg.get(Preferences.SFTP_USER, null);
+		String downloadDirPath = cfg.getString(Preferences.DL_DIR, CoreHub.getTempDir().toString());
+		String pwd = cfg.getString(Preferences.SFTP_PWD);
+		String host = cfg.getString(Preferences.SFTP_URL);
+		String user = cfg.getString(Preferences.SFTP_USER);
 		File downloadDir = new File(downloadDirPath);
 		File archiveDir = new File(downloadDir, "archive");
 		if (!archiveDir.exists()) {
@@ -95,7 +97,7 @@ public class SftpImporter extends ImporterPage {
 					public void run() {
 						try {
 							JSch jsch = new JSch();
-							int port = CoreHub.localCfg.get(Preferences.SFTP_PORT, 22);
+							int port = cfg.getInt(Preferences.SFTP_PORT, 22);
 							Session session = jsch.getSession(user, host, port);
 
 							// username and password will be given via UserInfo
@@ -142,7 +144,7 @@ public class SftpImporter extends ImporterPage {
 
 									result.add(r);
 									if (r.isOK()) {
-										if (CoreHub.localCfg.get(Preferences.SFTP_DELETE, true)) {
+										if (cfg.getBoolean(Preferences.SFTP_DELETE, true)) {
 											c.rm(entry.getFilename());
 										}
 										count++;
@@ -248,10 +250,10 @@ public class SftpImporter extends ImporterPage {
 			bDirect.setText("Direkter Import");
 			bDirect.setLayoutData(SWTHelper.getFillGridData(3, true, 1, false));
 
-			int type = CoreHub.localCfg.get("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
+			int type = cfg.getInt("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
 
 			home.results = new String[2];
-			String filename = CoreHub.localCfg.get("ImporterPage/" + home.getTitle() + "/filename", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String filename = cfg.getString("ImporterPage/" + home.getTitle() + "/filename", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			tFilename.setText(filename);
 			home.results[1] = filename;
 
@@ -271,7 +273,7 @@ public class SftpImporter extends ImporterPage {
 				home.results[0] = new Integer(DIRECT).toString();
 			}
 
-			if (CoreHub.localCfg.get(Preferences.SFTP_PWD, null) == null) {
+			if (cfg.getString(Preferences.SFTP_PWD, null) == null) {
 				bDirect.setEnabled(false);
 			}
 
@@ -287,13 +289,13 @@ public class SftpImporter extends ImporterPage {
 
 					if (button == bFile) {
 						type = FILE;
-						CoreHub.localCfg.set("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
+						cfg.setValue("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
 						bBrowse.setEnabled(true);
 						tFilename.setEnabled(true);
 						bFile.setSelection(true);
 					} else if (button == bDirect) {
 						type = DIRECT;
-						CoreHub.localCfg.set("ImporterPage/" + home.getTitle() + "/type", DIRECT); //$NON-NLS-1$ //$NON-NLS-2$
+						cfg.setValue("ImporterPage/" + home.getTitle() + "/type", DIRECT); //$NON-NLS-1$ //$NON-NLS-2$
 						bBrowse.setEnabled(false);
 						bDirect.setSelection(true);
 						tFilename.setEnabled(false);
@@ -319,10 +321,10 @@ public class SftpImporter extends ImporterPage {
 					}
 
 					tFilename.setText(filename);
-					home.results[0] = new Integer(FILE).toString();
+					home.results[0] = Integer.toString(FILE);
 					home.results[1] = filename;
-					CoreHub.localCfg.set("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
-					CoreHub.localCfg.set("ImporterPage/" + home.getTitle() + "/filename", filename); //$NON-NLS-1$ //$NON-NLS-2$
+					cfg.setValue("ImporterPage/" + home.getTitle() + "/type", FILE); //$NON-NLS-1$ //$NON-NLS-2$
+					cfg.setValue("ImporterPage/" + home.getTitle() + "/filename", filename); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 			});

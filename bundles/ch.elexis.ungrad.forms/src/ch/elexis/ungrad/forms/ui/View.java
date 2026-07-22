@@ -16,8 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import jakarta.inject.Inject;
-
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -35,7 +33,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
-import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.model.IPatient;
 import ch.elexis.core.services.IContextService;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
@@ -46,6 +43,7 @@ import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.data.Kontakt;
 import ch.elexis.data.Query;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.forms.Activator;
 import ch.elexis.ungrad.forms.model.Controller;
 import ch.elexis.ungrad.forms.model.PreferenceConstants;
@@ -55,6 +53,7 @@ import ch.elexis.ungrad.pdf.Medform;
 import ch.rgw.io.FileTool;
 import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.TimeTool;
+import jakarta.inject.Inject;
 
 /**
  * Main View of the Elexis-Forms Plugin
@@ -73,6 +72,7 @@ public class View extends ViewPart implements IActivationListener {
 	private boolean bHasSignature;
 	private IPatient currentPatient;
 
+	private Config cfg = Config.getDefaultInstance();
 	@Inject
 	private IContextService ctx; // = ContextServiceHolder.get();
 
@@ -98,8 +98,8 @@ public class View extends ViewPart implements IActivationListener {
 	public View() {
 		controller = Activator.getController();
 		stack = new StackLayout();
-		String signature = CoreHub.localCfg.get(PreferenceConstants.SIGNATURE, null);
-		if (signature != null && new File(signature).exists()) {
+		String signature = cfg.getString(PreferenceConstants.SIGNATURE);
+		if (!signature.isBlank() && new File(signature).exists()) {
 			bHasSignature = true;
 		}
 	}

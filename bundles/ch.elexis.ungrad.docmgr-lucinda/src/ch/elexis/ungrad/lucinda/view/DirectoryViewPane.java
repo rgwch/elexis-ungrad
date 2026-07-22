@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2025 by G. Weirich
+ * Copyright (c) 2022-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -16,6 +16,7 @@ package ch.elexis.ungrad.lucinda.view;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Optional;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -44,6 +45,7 @@ import ch.elexis.core.model.IPatient;
 import ch.elexis.core.ui.util.SWTHelper;
 import ch.elexis.ungrad.PreferenceConstants;
 import ch.elexis.ungrad.StorageController;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.common.ui.MailUI;
 import ch.elexis.ungrad.lucinda.Client3.INotifier;
 import ch.elexis.ungrad.lucinda.Preferences;
@@ -73,6 +75,7 @@ public class DirectoryViewPane extends Composite {
 	private DirectoryContentProvider dcp = new DirectoryContentProvider();
 	private StorageController sc = new StorageController();
 	private TableColumn dateColumn;
+	private Config cfg = Config.getDefaultInstance();
 
 	public DirectoryViewPane(Composite parent, Controller controlle) {
 		super(parent, SWT.NONE);
@@ -102,7 +105,7 @@ public class DirectoryViewPane extends Composite {
 		Menu menu = new Menu(table);
 		MenuItem mEdit = new MenuItem(menu, SWT.NONE);
 		MenuItem mSend = new MenuItem(menu, SWT.NONE);
-		if (CoreHub.localCfg.get(PreferenceConstants.USE_AI, false) == true) {
+		if (cfg.getBoolean(PreferenceConstants.USE_AI, false) == true) {
 			new MenuItem(menu, SWT.SEPARATOR);
 
 			MenuItem mSummary = new MenuItem(menu, SWT.NONE);
@@ -199,8 +202,8 @@ public class DirectoryViewPane extends Composite {
 				IStructuredSelection sel = tv.getStructuredSelection();
 				if (!sel.isEmpty()) {
 					File selected = (File) sel.getFirstElement();
-					String subject = CoreHub.localCfg.get(Preferences.DEFAULT_MAILSUBJECT, "Dokumente");
-					String body = CoreHub.localCfg.get(Preferences.DEFAULT_MAILBODY, "Bitte beachten Sie den Anhang");
+					String subject = cfg.getString(Preferences.DEFAULT_MAILSUBJECT, "Dokumente");
+					String body = cfg.getString(Preferences.DEFAULT_MAILBODY, "Bitte beachten Sie den Anhang");
 					MailUI mailer = new MailUI(getShell());
 					mailer.sendMail(subject, body, "", selected.getAbsolutePath());
 				}
@@ -225,7 +228,7 @@ public class DirectoryViewPane extends Composite {
 
 	private void createColumns() {
 		// Restore saved date column width
-		int savedDateWidth = CoreHub.localCfg.get(PREF_DIRECTORY_DATE_COLUMN_WIDTH, DEFAULT_DATE_COLUMN_WIDTH);
+		int savedDateWidth = cfg.getInt(PREF_DIRECTORY_DATE_COLUMN_WIDTH, DEFAULT_DATE_COLUMN_WIDTH);
 		
 		for (int i = 0; i < columnTitles.length; i++) {
 			TableViewerColumn tvc = new TableViewerColumn(tv, SWT.NULL);
@@ -238,8 +241,12 @@ public class DirectoryViewPane extends Composite {
 				// Add listener to save width changes
 				tc.addListener(SWT.Resize, event -> {
 					int newWidth = dateColumn.getWidth();
-					CoreHub.localCfg.set(PREF_DIRECTORY_DATE_COLUMN_WIDTH, newWidth);
-					CoreHub.localCfg.flush();
+					cfg.setValue(PREF_DIRECTORY_DATE_COLUMN_WIDTH, newWidth);
+					try {
+						cfg.save();
+					} catch (IOException e) {
+						ExHandler.handle(e);
+					}
 				});
 			} else {
 				tc.setWidth(columnWidths[i]);

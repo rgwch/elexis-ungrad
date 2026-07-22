@@ -29,8 +29,8 @@ import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.data.service.ContextServiceHolder;
 import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.IContextService;
-import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.StorageController;
 import ch.elexis.ungrad.text.templator.ui.OOOProcessorPrefs;
 import ch.rgw.io.FileTool;
@@ -45,7 +45,7 @@ public class ODFDoc {
 	private String title = "Ausgang";
 	private boolean bExternal = false;
 	private IContextService ctx = ContextServiceHolder.get();
-	private IConfigService cfg = ConfigServiceHolder.get();
+	private Config cfg = Config.getDefaultInstance();
 	private StorageController storageController = new StorageController();
 
 	public void clear() {
@@ -223,8 +223,8 @@ public class ODFDoc {
 
 	public boolean editFile(String file) {
 		try {
-			String cmd = cfg.getLocal(OOOProcessorPrefs.PREFERENCE_BRANCH + "cmd", "soffice");
-			String param = cfg.getLocal(OOOProcessorPrefs.PREFERENCE_BRANCH + "param", "%");
+			String cmd = cfg.getString(OOOProcessorPrefs.PREFERENCE_BRANCH + "cmd", "soffice");
+			String param = cfg.getString(OOOProcessorPrefs.PREFERENCE_BRANCH + "param", "%");
 			int i = param.indexOf('%');
 			if (i != -1) {
 				param = param.substring(0, i) + file + param.substring(i + 1);

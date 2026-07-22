@@ -42,9 +42,7 @@ import ch.elexis.core.model.InvoiceConstants;
 import ch.elexis.core.model.InvoiceState;
 import ch.elexis.core.model.InvoiceState.REJECTCODE;
 import ch.elexis.core.rcp.utils.PlatformHelper;
-import ch.elexis.core.services.IConfigService;
 import ch.elexis.core.services.LocalConfigService;
-import ch.elexis.core.services.holder.ConfigServiceHolder;
 import ch.elexis.core.services.holder.CoreModelServiceHolder;
 import ch.elexis.core.services.holder.VirtualFilesystemServiceHolder;
 import ch.elexis.core.ui.util.SWTHelper;
@@ -57,6 +55,7 @@ import ch.elexis.pdfBills.ElexisPDFGenerator;
 import ch.elexis.pdfBills.OutputterUtil;
 import ch.elexis.pdfBills.PdfUtil;
 import ch.elexis.pdfBills.TarmedXmlUtil;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.Resolver;
 import ch.elexis.ungrad.pdf.Manager;
@@ -113,7 +112,7 @@ public class QrRnOutputter implements IRnOutputter {
 	private boolean pdfOnly;
 	private RnOutputDialog rnOutputDialog;
 	private Button buttonOpen;
-	private IConfigService cfg = ConfigServiceHolder.get();
+	private Config cfg=Config.getDefaultInstance();
 
 	@Override
 	public String getDescription() {
@@ -121,8 +120,7 @@ public class QrRnOutputter implements IRnOutputter {
 	}
 
 	public QrRnOutputter() {
-		cfg = ConfigServiceHolder.get();
-		mailPref = cfg.get(PreferenceConstants.BY_MAIL_IF_CASEVAR, "");
+		mailPref = cfg.getString(PreferenceConstants.BY_MAIL_IF_CASEVAR);
 		mailer = new Mailer();
 		mailer.showSuccess(false);
 	}
@@ -130,7 +128,7 @@ public class QrRnOutputter implements IRnOutputter {
 	private String[] shouldMail(Rechnung bill) {
 		Fall fall = bill.getFall();
 		String mailaddr = "";
-		String mailbody = cfg.get(PreferenceConstants.BY_MAIL_BODY, "");
+		String mailbody = cfg.getString(PreferenceConstants.BY_MAIL_BODY);
 		if (!StringTool.isNothing(mailPref)) {
 			mailaddr = fall.getInfoString(mailPref);
 			if (!StringTool.isMailAddress(mailaddr)) {
@@ -250,7 +248,7 @@ public class QrRnOutputter implements IRnOutputter {
 								Resolver resolver = new Resolver(replacer, true);
 
 								String subject = resolver
-										.resolve(cfg.get(PreferenceConstants.BY_MAIL_SUBJECT, "Rechnung"));
+										.resolve(cfg.getString(PreferenceConstants.BY_MAIL_SUBJECT, "Rechnung"));
 								String body = resolver.resolve(mailing[1]);
 								mailer.defaultMail(mailing[0], subject, body,
 										toMail.toArray(new String[toMail.size()]));
@@ -261,7 +259,7 @@ public class QrRnOutputter implements IRnOutputter {
 
 								}
 							} else {
-								boolean doPrint = cfg.getLocal(PreferenceConstants.DO_PRINT, true);
+								boolean doPrint = cfg.getBoolean(PreferenceConstants.DO_PRINT, true);
 								if (doPrint) {
 									for (File pdfFile : printed) {
 										if (pdfFile.exists()) {

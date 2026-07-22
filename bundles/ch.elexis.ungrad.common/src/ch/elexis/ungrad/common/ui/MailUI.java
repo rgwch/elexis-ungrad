@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022-2024 by G. Weirich
+ * Copyright (c) 2022-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import ch.elexis.core.data.activator.CoreHub;
 import ch.elexis.core.ui.util.SWTHelper;
+import ch.elexis.ungrad.Config;
 import ch.elexis.ungrad.Mailer;
 import ch.elexis.ungrad.PreferenceConstants;
 import ch.elexis.ungrad.Resolver;
@@ -26,7 +27,8 @@ import ch.rgw.tools.ExHandler;
 
 public class MailUI {
 	Shell shell;
-
+	private Config cfg = Config.getDefaultInstance();
+	
 	public MailUI(Shell shell) {
 		this.shell = shell;
 	}
@@ -41,11 +43,11 @@ public class MailUI {
 	 * @param pdfFilePath first attachment
 	 */
 	public void sendMail(String subject, String body, String recipient, String pdfFilePath) {
-		String user = CoreHub.localCfg.get(PreferenceConstants.SMTP_USER, "");
-		String sender = CoreHub.localCfg.get(PreferenceConstants.MAIL_SENDER, user);
-		String smtpserver = CoreHub.localCfg.get(PreferenceConstants.SMTP_HOST, "localhost");
-		String smtppwd = CoreHub.localCfg.get(PreferenceConstants.SMTP_PWD, "doesntMatter");
-		String smtpport = CoreHub.localCfg.get(PreferenceConstants.SMTP_PORT, "53");
+		String user = cfg.getString(PreferenceConstants.SMTP_USER);
+		String sender = cfg.getString(PreferenceConstants.MAIL_SENDER);
+		String smtpserver = cfg.getString(PreferenceConstants.SMTP_HOST);
+		String smtppwd = cfg.getString(PreferenceConstants.SMTP_PWD);
+		String smtpport = cfg.getString(PreferenceConstants.SMTP_PORT);
 		String[] attachments = new String[] { pdfFilePath };
 		Resolver resolver = new Resolver();
 		Mailer mailer = new Mailer(sender, smtpserver, smtppwd, smtpport,true);
@@ -68,8 +70,8 @@ public class MailUI {
 			recipient = mailDialog.mailTo;
 			attachments = mailDialog.attachments;
 			try {
-				String sec = CoreHub.localCfg.get(PreferenceConstants.SMTP_SECURITY, "plain");
-				if (sec.equals("plain")) {
+				String sec = cfg.getString(PreferenceConstants.SMTP_SECURITY);
+				if (sec.equals("plain") || sec.isEmpty()) {
 					mailer.simpleMail(recipient, subject, body, attachments);
 				} else if (sec.equals("tls")) {
 					mailer.tlsMail(user, recipient, subject, body, attachments);

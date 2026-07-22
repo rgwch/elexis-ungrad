@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2024 by G. Weirich
+ * Copyright (c) 2016-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -32,6 +32,7 @@ import ch.elexis.ungrad.lucinda.Preferences;
 import ch.elexis.ungrad.lucinda.controller.IProgressController;
 import ch.elexis.ungrad.lucinda.model.Customer;
 import ch.elexis.ungrad.lucinda.model.Sender;
+import ch.rgw.tools.ExHandler;
 import ch.rgw.tools.JdbcLink;
 import ch.rgw.tools.TimeTool;
 
@@ -180,7 +181,11 @@ public class OmnivoreIndexer implements Customer {
 	@Override
 	public void finished(List<Map<String, Object>> messages) {
 		Activator.getDefault().addMessages(messages);
-		Preferences.cfg.flush();
+		try {
+			Preferences.cfg.save();
+		} catch (IOException e) {
+			ExHandler.handle(e);
+		}
 	}
 
 	/**

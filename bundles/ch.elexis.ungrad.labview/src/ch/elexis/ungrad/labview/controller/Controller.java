@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2024 by G. Weirich
+ * Copyright (c) 2016-2026 by G. Weirich
  *
  *
  * All rights reserved. This program and the accompanying materials
@@ -73,17 +73,17 @@ public class Controller {
 	}
 
 	public void saveState() {
-		Preferences.cfg.set(Preferences.CONDVIEW, ctlCond.getState());
-		Preferences.cfg.set(Preferences.FULLVIEW, ctlFull.getState());
-		Preferences.cfg.set(Preferences.SMARTVIEW, ctlSmart.getState());
+		Preferences.cfg.setValue(Preferences.CONDVIEW, ctlCond.getState());
+		Preferences.cfg.setValue(Preferences.FULLVIEW, ctlFull.getState());
+		Preferences.cfg.setValue(Preferences.SMARTVIEW, ctlSmart.getState());
 
 	}
 
 	public void loadState() {
-		String colWidths = Preferences.cfg.get(Preferences.CONDVIEW, "150,150,100,130,130,130");
+		String colWidths = Preferences.cfg.getString(Preferences.CONDVIEW, "150,150,100,130,130,130");
 		ctlCond.setState(colWidths);
-		ctlFull.setState(Preferences.cfg.get(Preferences.FULLVIEW, ""));
-		ctlSmart.setState(Preferences.cfg.get(Preferences.SMARTVIEW,""));
+		ctlFull.setState(Preferences.cfg.getString(Preferences.FULLVIEW));
+		ctlSmart.setState(Preferences.cfg.getString(Preferences.SMARTVIEW));
 
 	}
 
