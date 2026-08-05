@@ -71,14 +71,15 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 	 * exist, it will be created.
 	 * 
 	 * @param filePath path to the INI file, or null to use ~/elexis/ungrad.ini if
-	 *                 the environment variable "UngradSettings" is set, that path
+	 *                 the property "UngradSettings" is set, that path
 	 *                 will be used instead of the default.
 	 * @throws IOException if the file cannot be created or read
 	 */
 	private Config(String filePath) throws IOException {
 		if (filePath == null) {
-			String defaultPath = System.getenv("UngradSettings");
+			String defaultPath = System.getProperty("UngradSettings");
 			if (defaultPath != null && !defaultPath.isEmpty()) {
+				System.out.println("Using UngradSettings environment variable for config file: " + defaultPath);
 				filePath = defaultPath;
 			} else {
 				String userHome = System.getProperty("user.home");
