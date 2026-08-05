@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle_Name
 Bundle-SymbolicName: ch.elexis.ungrad.common;singleton:=true
-Bundle-Version: 3.2.1.qualifier
+Bundle-Version: 3.2.2.qualifier
 Bundle-Vendor: %Bundle_Vendor
 Bundle-Localization: plugin
 Automatic-Module-Name: ch.elexis.ungrad-common

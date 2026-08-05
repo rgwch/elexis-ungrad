@@ -30,14 +30,15 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
- * A simple configuration class that reads and writes key-value pairs to an INI file.
- * It implements IPreferenceStore and IPersistentPreferenceStore interfaces.
- * Since CoreHub.localCfg is deprecated and seems dysfunctional in 3.13, 
- * this class is used to manage configuration settings in a more reliable way.
+ * A simple configuration class that reads and writes key-value pairs to an INI
+ * file. It implements IPreferenceStore and IPersistentPreferenceStore
+ * interfaces. Since CoreHub.localCfg is deprecated and seems dysfunctional in
+ * 3.13, this class is used to manage configuration settings in a more reliable
+ * way.
  * 
- * Since the config is a simple text-file (~/elexis/ungrad.ini), 
- * it can be edited by hand if necessary and simply copied to other installations. 
- * The config file is created if it does not exist.
+ * Since the config is a simple text-file (~/elexis/ungrad.ini), it can be
+ * edited by hand if necessary and simply copied to other installations. The
+ * config file is created if it does not exist.
  */
 public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 
@@ -69,13 +70,20 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 	 * Creates a new Config instance backed by an INI file. If the file does not
 	 * exist, it will be created.
 	 * 
-	 * @param filePath path to the INI file, or null to use ~/elexis/ungrad.ini
+	 * @param filePath path to the INI file, or null to use ~/elexis/ungrad.ini if
+	 *                 the environment variable "UngradSettings" is set, that path
+	 *                 will be used instead of the default.
 	 * @throws IOException if the file cannot be created or read
 	 */
 	private Config(String filePath) throws IOException {
 		if (filePath == null) {
-			String userHome = System.getProperty("user.home");
-			filePath = userHome + File.separator + "elexis" + File.separator + "ungrad.ini";
+			String defaultPath = System.getenv("UngradSettings");
+			if (defaultPath != null && !defaultPath.isEmpty()) {
+				filePath = defaultPath;
+			} else {
+				String userHome = System.getProperty("user.home");
+				filePath = userHome + File.separator + "elexis" + File.separator + "ungrad.ini";
+			}
 		}
 		this.iniFile = new File(filePath);
 		if (!iniFile.exists()) {
@@ -89,8 +97,8 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 	}
 
 	/**
-	 * Loads properties from the INI file.
-	 * Supports multi-line values using backslash continuation.
+	 * Loads properties from the INI file. Supports multi-line values using
+	 * backslash continuation.
 	 */
 	private void load() throws IOException {
 		properties.clear();
@@ -102,20 +110,20 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 			String line;
 			String currentKey = null;
 			StringBuilder currentValue = new StringBuilder();
-			
+
 			while ((line = reader.readLine()) != null) {
 				String trimmed = line.trim();
-				
+
 				// Skip empty lines and comments (only if not in continuation)
 				if (currentKey == null && (trimmed.isEmpty() || trimmed.startsWith("#") || trimmed.startsWith(";"))) {
 					continue;
 				}
-				
+
 				// Handle continuation from previous line
 				if (currentKey != null) {
 					// Previous line ended with backslash, append this line
 					currentValue.append("\n").append(line);
-					
+
 					// Check if this line also continues
 					if (!line.endsWith("\\")) {
 						// End of multi-line value, remove trailing backslashes
@@ -129,13 +137,13 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 					}
 					continue;
 				}
-				
+
 				// Parse new key=value line
 				int equalsIndex = trimmed.indexOf('=');
 				if (equalsIndex > 0) {
 					String key = trimmed.substring(0, equalsIndex).trim();
 					String value = trimmed.substring(equalsIndex + 1).trim();
-					
+
 					// Check if value continues on next line
 					if (value.endsWith("\\")) {
 						currentKey = key;
@@ -145,7 +153,7 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 					}
 				}
 			}
-			
+
 			// Handle case where file ends with continuation
 			if (currentKey != null) {
 				properties.put(currentKey, currentValue.toString().replace("\\\n", "\n"));
@@ -160,7 +168,7 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 			for (Map.Entry<String, String> entry : properties.entrySet()) {
 				String key = entry.getKey();
 				String value = entry.getValue();
-				
+
 				// Handle multi-line values
 				if (value.contains("\n")) {
 					String[] lines = value.split("\n", -1);
@@ -216,7 +224,7 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 		}
 		return defaultValue;
 	}
-	
+
 	@Override
 	public boolean getDefaultBoolean(String name) {
 		String value = defaults.get(name);
@@ -319,7 +327,7 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 		}
 		return getDefaultInt(name);
 	}
-	
+
 	public int getInt(String name, int defaultValue) {
 		String value = properties.get(name);
 		if (value != null) {
@@ -355,7 +363,7 @@ public class Config implements IPreferenceStore, IPersistentPreferenceStore {
 		String value = properties.get(name);
 		return value != null ? value : defaultValue;
 	}
-	
+
 	@Override
 	public boolean isDefault(String name) {
 		if (!contains(name)) {
