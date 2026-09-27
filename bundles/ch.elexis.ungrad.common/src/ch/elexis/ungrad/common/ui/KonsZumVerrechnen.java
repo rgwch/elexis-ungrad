@@ -87,9 +87,7 @@ import ch.elexis.core.ui.UiDesk;
 import ch.elexis.core.ui.actions.GlobalEventDispatcher;
 import ch.elexis.core.ui.actions.RestrictedAction;
 import ch.elexis.core.ui.commands.ErstelleRnnCommand;
-import ch.elexis.core.ui.commands.KonsZumVerrechnenLinkCommand;
 import ch.elexis.core.ui.constants.UiResourceConstants;
-import ch.elexis.core.ui.dialogs.KonsZumVerrechnenWizardDialog;
 import ch.elexis.core.ui.e4.util.CoreUiUtil;
 import ch.elexis.core.ui.icons.Images;
 import ch.elexis.core.ui.text.ITextPlugin.ICallback;
@@ -593,9 +591,9 @@ public class KonsZumVerrechnen extends ViewPart {
 			}
 
 			@Override
-			public void run() {
+			public void run() { /*
 				KonsZumVerrechnenWizardDialog kzvd = new KonsZumVerrechnenWizardDialog(getViewSite().getShell());
-				if (kzvd.open() == Dialog.OK) {
+				if (kzvd.open() == Dialog.OK) { 
 					IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 					try {
 						progressService.runInUI(progressService,
@@ -608,7 +606,9 @@ public class KonsZumVerrechnen extends ViewPart {
 					}
 					tvSel.refresh();
 					cv.notify(CommonViewer.Message.update);
+					
 				}
+				*/
 			}
 		};
 		printAction = new Action(Messages.KonsZumVerrechnenView_printSelection) { // $NON-NLS-1$
@@ -939,7 +939,7 @@ public class KonsZumVerrechnen extends ViewPart {
 						IHandlerService handlerService = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 								.getService(IHandlerService.class);
 
-						handlerService.executeCommand(KonsZumVerrechnenLinkCommand.CMD_ID, null);
+						// handlerService.executeCommand(KonsZumVerrechnenLinkCommand.CMD_ID, null);
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
