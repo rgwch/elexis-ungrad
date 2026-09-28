@@ -24,5 +24,12 @@
              name="%Plugin_ViewName"
              restorable="true">
        </view>
+       <view
+             category="ch.elexis.konsultationKategorie"
+             class="ch.elexis.ungrad.common.ui.KonsZumVerrechnen"
+             id="ch.elexis.ungrad.KonsZumVerrechnen"
+             name="Kons zum Verrechnen"
+             restorable="true">
+       </view>
     </extension>
 </plugin>

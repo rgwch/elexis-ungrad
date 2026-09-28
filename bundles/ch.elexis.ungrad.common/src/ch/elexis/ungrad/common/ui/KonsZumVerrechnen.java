@@ -320,7 +320,7 @@ public class KonsZumVerrechnen extends ViewPart {
 		menu.createToolbar(refreshAction, wizardAction, printAction, clearAction, null, billAction);
 		menu.createMenu(wizardAction, selectByDateAction);
 		menu.createViewerContextMenu(cv.getViewerWidget(), detailAction);
-		addPartActivationListener();
+		//addPartActivationListener();
 	}
 
 	class RLazyTreeListener implements LazyTreeListener {
@@ -924,49 +924,7 @@ public class KonsZumVerrechnen extends ViewPart {
 		return tvSel;
 	}
 
-	private void addPartActivationListener() {
-		getViewSite().getPage().addPartListener(new IPartListener() {
-			@Override
-			public void partActivated(IWorkbenchPart part) {
-				ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
-				Command command = commandService.getCommand("ch.elexis.core.command.linkViews"); //$NON-NLS-1$
-				boolean state = (boolean) command.getState(RegistryToggleState.STATE_ID).getValue();
-
-				if (state == true) {
-					try {
-						command.getState(RegistryToggleState.STATE_ID).setValue(Boolean.FALSE);
-						// execute the command
-						IHandlerService handlerService = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-								.getService(IHandlerService.class);
-
-						// handlerService.executeCommand(KonsZumVerrechnenLinkCommand.CMD_ID, null);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-
-				getViewSite().getPage().removePartListener(this);
-			}
-
-			@Override
-			public void partBroughtToTop(IWorkbenchPart part) {
-			}
-
-			@Override
-			public void partClosed(IWorkbenchPart part) {
-			}
-
-			@Override
-			public void partDeactivated(IWorkbenchPart part) {
-			}
-
-			@Override
-			public void partOpened(IWorkbenchPart part) {
-			}
-		});
-	}
-
-	protected boolean isResizable() {
+		protected boolean isResizable() {
 		return true;
 	}
 
